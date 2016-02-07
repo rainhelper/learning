@@ -1,0 +1,273 @@
+#uaCheck()
+#parse("/velocity/mobileweb/onair/template/timeline.vm")
+<form name="searchForm" action="/onair/timeline" method="get">
+	<input type="hidden" name="channelIds"/>
+	<input type="hidden" name="radioChannelType" value="$!{command.radioChannelType}"/>
+	<input type="hidden" name="tvChannelType" value="$!{command.tvChannelType}"/>
+	<input type="hidden" name="searchChannelType" value="$!{command.searchChannelType}"/>
+</form>
+
+<div id="daumContent" class="cont_now" role="main">
+		<div id="mArticle">
+
+#if(!$StringUtils.equals("$!{isDaumMusicApp}", "true"))
+#parse("/velocity/mobileweb/onair/common/menu.vm")
+#end
+
+	<h3 class="screen_out">방금 그 곡 본문</h3>
+    <div class="now_channel"> <!-- channel_open 클래스 추가시 채널 리스트 활성화 -->
+    	<div class="opt_time">
+    		<div class="date_cont">
+    			#set($hour1 = $!{command.currentTime.substring(8,9)})
+    			#set($hour2 = $!{command.currentTime.substring(9,10)})
+    			#set($min1 = $!{command.currentTime.substring(10,11)})
+    			#set($min2 = $!{command.currentTime.substring(11,12)})
+    			#set($sec1 = $!{command.currentTime.substring(12,13)})
+    			#set($sec2 = $!{command.currentTime.substring(13,14)})
+    			<span class="screen_out">현재 시간 ${hour1}${hour2}시 ${min1}${min2}분 ${sec1}${sec2}초</span>
+    			<span class="txt_num txt_num$hour1"></span><span class="txt_num txt_num$hour2"></span><span class="txt_num txt_dot"></span><span class="txt_num txt_num$min1"></span><span class="txt_num txt_num$min2"></span><span class="txt_num txt_dot"></span><span class="txt_num txt_num$sec1"></span><span class="txt_num txt_num$sec2"></span>
+    		</div>
+    		<button type="button" class="btn_option" id="refresh"><span class="ico_now ico_stop">일시정지</span></button> <!--일시정지 활성화시 주석처리 제거 -->
+    		<!-- <button type="button" class="btn_option"><span class="ico_now ico_reset">새로고침</span></button> 새로고침 활성화시 주석처리 제거 -->
+    	</div>
+    	<a href="javascript:;" class="link_channel link_choice"><span class="txt_channel"></span><span class="ico_now ico_fold">열기/닫기</span></a>
+    	<div class="channel_choice">
+    		<strong class="screen_out">채널 선택</strong>
+    		<div class="choice_desc">
+    			<p class="txt_desc">원하는 채널을 선택해 주세요</p>
+    		</div>
+    
+    		#set($channelCount = 0)
+    		#set($preChannelType = "")
+            #foreach($channel in $channelList)
+    			#set($checked = "")
+    			#foreach($selectedChannel in $command.channelIds)
+    				#if($selectedChannel == ${channel.channelId})
+    					#set($checked = "class='on'")
+    					#break
+    				#end
+        		#end
+    			#if($channelCount == 0)
+    		<strong class="tit_chioce">TV</strong>
+    		<ul class="list_choice">
+    			<li #if("$!{command.tvChannelType}" =="1" || ("$!{command.tvChannelType}" =="" && "$!{command.radioChannelType}" =="" && "${command.channelIdsToString()}" == ""))class="on"#end><a href="javascript:;" class="link_chioce" id="tvChannelType">TV전체</a></li> <!-- 선택시 on 클래스 추가 -->
+    			#end
+    			
+    			#if($channelCount != 0 && $preChannelType != ${channel.channelType})
+    		</ul>
+    		<strong class="tit_chioce">Radio</strong>
+    		<ul class="list_choice">
+    			<li #if("$!{command.radioChannelType}" =="4" || ("$!{command.tvChannelType}" =="" && "$!{command.radioChannelType}" =="" && "${command.channelIdsToString()}" == ""))class="on"#end><a href="javascript:;" class="link_chioce" id="radioChannelType">Radio전체</a></li> <!-- 선택시 on 클래스 추가 -->
+    			#end
+    			<li $checked>
+    				<input type="hidden" value="${channel.channelId}">
+    				<a href="javascript:;" class="link_chioce" id="channelType_${channel.channelType}" >${channel.channelName}</a>
+    			</li>							
+    			#set($channelCount = $channelCount +1)
+    			#set($preChannelType = ${channel.channelType})
+            #end
+    		</ul>
+    		<a href="javascript:;" class="btn_choice" id="confirm">확인</a>
+    		<a href="javascript:;" class="btn_choice" id="cancel">취소</a>
+    	</div>
+    </div>
+    <strong class="screen_out">선택된 채널 곡 리스트</strong>
+    <ul class="list_timeline">
+    #set($count = 0)
+    #set($songStartTime = "")
+    #foreach($channelSong in $songList)
+    	#set($count = $count+1)
+    	#if($count == 1)
+    		#set($songStartTime = ${channelSong.startTime})
+    
+    	<li class="fst">
+			#if("$!{channelSong.song.album.albumId}" != "0")
+    		<a href="/album/main?album_id=${channelSong.song.album.albumId}" class="link_album">
+    		#else
+    		<a href="#none" class="link_album">
+    		#end			
+        		#if("$!{channelSong.song.albumId}" != "0" && "$!{channelSong.song.album.mainImage.filePath}" !="")
+        		<img src='$ImageUtil.getMobileImageUrl("$!{channelSong.song.album.mainImage.filePath}", "200x200", "ALBUM", "C")' width="115" height="115" class="thumb_img" alt="${channelSong.title}">
+        		#else
+        		<img src="http://m1.daumcdn.net/img-media/mobile/m640/music/img_none1.jpg" width="115" height="115" class="thumb_img" alt="${channelSong.title}">
+				#end
+			</a>
+    		<div class="timeline_info">
+    			<div class="info_detail">
+    				<span class="txt_time" data-time="${channelSong.startTime}"><span class="ico_now ico_time">방송시간 </span>${channelSong.compareStartTimeToCurrentTime($!{command.searchDate}, true)}</span>
+    				<strong class="tit_song"><span class="screen_out">곡명 </span>#if(${channelSong.songId} != 0) #strCut(${channelSong.title}, 17, "..") #else #strCut(${channelSong.song.title}, 17, "..")#end -<span class="screen_out">아티스트명 </span>
+    					#if("$!{channelSong.song.songId}" != "0")
+    						#set($artistCount = 0)
+    						#set($etcArtistCount = 0)
+    						#foreach($songArtist in $!{channelSong.song.keyArtistList})
+    							#set($artistCount = $artistCount +1)
+								#set($strCutLen = 7)
+    							#if($!{channelSong.song.keyArtistList.size()} == 1)
+    								#set($strCutLen = 17)
+    							#end								
+    							#strCut(${songArtist.name}, $strCutLen, "..")#if($artistCount < $!{channelSong.song.keyArtistList.size()} && $artistCount < 1),#end
+    							#if($artistCount == 1) #set($etcArtistCount = $!{channelSong.song.keyArtistList.size()} - 1) #break #end
+    						#end
+    						#if($etcArtistCount > 0)
+    						외 ${etcArtistCount}명 
+    						#end
+    					#else #strCut($!{channelSong.artistName}, 17, "..")
+    					#end
+    				</strong>
+    				<span class="txt_info"><span class="screen_out">프로그램 </span>${channelSong.channel.channelName} - ${channelSong.schedule.programName}</span>
+    			</div>
+                #if("$!{channelSong.song.songId}" != "0" && "$!{channelSong.song.AODLinkId}" != "" && "$!{channelSong.song.AODLinkId}" != "0")
+                <a href="javascript:;" class="link_play" onclick="music.mobile.mMusicPlay.playSample('$!{channelSong.song.songId}_$foreach.index','','close');"><span class="desc_info">미리듣기</span></a>
+                #else
+                <a href="javascript:;" class="link_play off"><span class="desc_info">미리듣기</span></a>
+    			#end
+    			#if("$!{channelSong.schedule.programId}" !="" && "$!{channelSong.channel.channelType}" == "1")
+    			<a href="/onair/tv/detail?programId=$!{channelSong.schedule.programId}" class="link_select">
+    			#elseif("$!{channelSong.schedule.programId}" !="" && "$!{channelSong.channel.channelType}" == "4")
+    			<a href="/onair/radio/detail?channelId=${channelSong.channel.channelId}&programId=${channelSong.schedule.programId}" class="link_select">
+    			#else
+    			<a href="javascript:;" class="link_select off">
+    			#end
+    			<span class="desc_info">프로그램 선곡표</span></a>
+    		</div>
+    		#if("$!{channelSong.song.songId}" != "0" && "$!{channelSong.song.AODLinkId}" != "" && "$!{channelSong.song.AODLinkId}" != "0")
+    		<div id="sId_$!{channelSong.song.songId}_$foreach.index" class="audio"></div>
+    		#end
+
+    	</li>
+    	#else
+    	<li>
+    		<!-- 2014-04-02 수정 시작 --> 
+    		#if("$!{channelSong.song.album.albumId}" != "0")
+    		<a href="/album/main?album_id=${channelSong.song.album.albumId}" class="link_album">
+    		#else
+    		<a href="#none" class="link_album">
+    		#end
+    			#if("$!{channelSong.song.album.albumId}" != "0" && "$!{channelSong.song.album.mainImage.filePath}" != "")
+        		<img src='$ImageUtil.getMobileImageUrl("$!{channelSong.song.album.mainImage.filePath}", "100x100", "ALBUM", "C")' width="50" height="50" class="thumb_img" alt="${channelSong.title}">
+        		#else
+        		<img src="http://m1.daumcdn.net/img-media/mobile/m640/music/img_none2.jpg"  width="50" height="50" class="thumb_img" alt="${channelSong.title}">
+        		#end
+    		</a>
+    		<a href="javascript:;" class="link_info" onclick="music.mobile.Timeline.moreViewLayer(this);">
+    			<span class="timeline_info">
+    				<span class="txt_time"><span class="ico_now ico_time">방송시간 </span><span class="txt_num" data-time="${channelSong.startTime}">${channelSong.compareStartTimeToCurrentTime($!{command.searchDate}, true)}</span></span>
+    				<strong class="tit_song"><span class="screen_out">곡명 </span>#if(${channelSong.songId} != 0)#strCut(${channelSong.song.title}, 30) #else #strCut(${channelSong.title}, 30)#end - <span class="screen_out">아티스트명 </span>
+    					#if("$!{channelSong.song.songId}" != "0")
+    						#set($artistCount = 0)
+    						#set($etcArtistCount = 0)
+    						#foreach($songArtist in $!{channelSong.song.keyArtistList})
+    							#set($artistCount = $artistCount +1)
+								#set($strCutLen = 10)
+    							#if($!{channelSong.song.keyArtistList.size()} == 1)
+    								#set($strCutLen = 30)
+    							#end								
+    							#strCut(${songArtist.name}, $strCutLen, "..")#if($artistCount < $!{channelSong.song.keyArtistList.size()} && $artistCount < 2),#end
+    							#if($artistCount == 2) #set($etcArtistCount = $!{channelSong.song.keyArtistList.size()} - 2) #break #end
+    						#end
+    						#if($etcArtistCount > 0)
+    						외 ${etcArtistCount}명 
+    						#end
+    					#else #strCut($!{channelSong.artistName}, 30, "..")
+    					#end
+    				</strong> <!-- off 클래스 추가시 딤드 처리 -->
+    				<span class="txt_info"><span class="screen_out">프로그램 </span>${channelSong.channel.channelName} - ${channelSong.schedule.programName}</span>
+    			</span>
+    			<span class="btn_side"><span class="ico_now ico_fold">추가 제공 서비스 열기/닫기</span></span>
+    		</a>
+    		<a href="javascript:;" class="btn_side #if("$!{channelSong.song.songId}" == 0 || "$!{channelSong.song.AODLinkId}" == "" || "$!{channelSong.song.AODLinkId}" =="0")btn_off#end" #if("$!{channelSong.song.songId}" != 0 && "$!{channelSong.song.AODLinkId}" != "" && "$!{channelSong.song.AODLinkId}" !="0") onclick="music.mobile.mMusicPlay.playSample('${channelSong.song.AODLinkId}_$foreach.index','','close');" #end><span class="ico_now ico_listen">듣기</span></a>
+    		<div class="timeline_fold">
+    			#btnPlayListOnAir($!{channelSong.schedule.programId}, "program", $!{channelSong.channel.channelType}, $!{channelSong.channel.channelId})
+    			#btnPlayListOnAir($!{channelSong.song.songId}, "lyrics", $!{channelSong.sogn.lyricsYn}, $!{channelSong.song.album.albumId})
+    			#btnPlayListOnAir($!{channelSong.song.songId}, "buy", $!{channelSong.song.MP3LinkId}, $!{channelSong.song.album.albumId})
+    			#btnPlayListOnAir($!{channelSong.song.songId}, "app", $!{channelSong.song.AODLinkId}, $!{channelSong.song.album.albumId})
+    		</div>
+    		#if("$!{channelSong.song.songId}" != 0 && "$!{channelSong.song.AODLinkId}" != "" && "$!{channelSong.song.AODLinkId}" !="0")
+    		<div id="sId_${channelSong.song.songId}_$foreach.index" class="audio"></div>
+    		#end
+    	</li>
+    	#end
+    	
+    	#if($count == ${songList.size()})
+    		#set($songEndTime = ${channelSong.startTime})	
+    	#end
+    	
+    #end
+    </ul>
+    <a href="javascript:;" class="btn_more" onclick="javascript:music.mobile.Timeline.getBottomSongList();">펼쳐보기<span class="ico_now ico_more"></span></a> <!-- 2014-04-02 클래스 수정 -->
+#SearchForm("only_bottom")
+</div>
+<div id="mAside">
+</div>
+</div>
+#parse("/velocity/mobileweb/realtimeissue.vm")
+
+
+<script type="text/javascript">
+	var tvChannelType="$!{command.tvChannelType}";
+	var radioChannelType="$!{command.radioChannelType}";
+	var selectedChannelIds = [];
+	
+	#foreach($selChannel in $!{command.channelIds})
+	selectedChannelIds.push("${selChannel}");
+	#end
+	selectedChannelIds.join("",",");
+	var nextPageNo = $!{command.pageNo}+1;
+	var totalPage = $!totalPage;
+	var option = {
+		 nextPageNo : nextPageNo,
+		 tvChannelType : tvChannelType,
+		 radioChannelType : radioChannelType,
+		 selectedChannelIds : selectedChannelIds,
+		 searchDate : "$!{command.searchDate}",
+		 totalCnt : ${totalCnt},
+		 totalPage :$!totalPage,
+		 searchChannelType: "$!{command.searchChannelType}",
+		 songStartTime : "${songStartTime}",
+		 songEndTime : "${songEndTime}"
+	};
+	
+	jQuery("#refresh").click(music.mobile.Timeline.changeButtenClass);
+	
+    daum.Event.addEvent( window, "load", function(){
+    	new music.mobile.Timeline.init(option);  
+    	music.mobile.Timeline.getSongList('', '', 1, '');
+		music.mobile.Timeline.setCurrentTime();
+		music.mobile.Timeline.run();
+	});
+	
+	jQuery("#confirm").click(music.mobile.Timeline.confirm);
+	jQuery("#cancel").click(music.mobile.Timeline.cancel);
+	
+	jQuery("ul.list_choice li a.link_chioce").click(music.mobile.Timeline.selectChannelId);
+	
+	jQuery(".now_channel a.link_choice").click(music.mobile.Timeline.channelSel);
+	
+	jQuery("document").ready(function(){
+		var selectedChannelSize= jQuery("ul.list_choice li.on").length;
+		if(selectedChannelSize > 0){
+
+			var html = '';
+			var isTv = false;
+			var isRadio = false;
+			
+			jQuery("ul.list_choice li.on a.link_chioce").each(function(index, item){
+			
+				if(index == 0)	html = jQuery(item).html();
+    			
+    			if(item.id == "tvChannelType") isTv = true;
+    			if(item.id == "radioChannelType") isRadio = true;
+			});
+			
+			if(isTv && isRadio){
+   				html = "TV 전체, Radio 전체";
+			}else{
+    			if(selectedChannelSize > 1){
+    				html = html +" 외 "+(selectedChannelSize-1)+"개 채널";
+    			}
+			}
+			jQuery("a.link_choice span.txt_channel").html(html);
+		}
+	});
+	
+</script>

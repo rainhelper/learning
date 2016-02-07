@@ -1,0 +1,14 @@
+{
+	"result" : {
+		"type" : "${result.resultType}",
+		"message" : "${result.message}",
+			
+		"info" : {
+			"playListId" : "${result.info.playListId}",
+			"playListName" : "${result.info.playListName}",
+			"totalPlayCnt" : "${result.info.totalPlayCnt}",
+            "totalPlayTime" : "${result.info.totalPlayTime}",
+            "modifyDate" : "$CheckDate.makeReleaseDate("$!{result.info.modDttm}")"
+			}
+	}
+}

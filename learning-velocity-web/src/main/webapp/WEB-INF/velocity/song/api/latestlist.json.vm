@@ -1,0 +1,38 @@
+{
+"serviceid" : "music",
+"sectionid" : "song_latest",
+"title" : "곡 최신순 목록",
+"list" :[
+#foreach($song in $songList)
+	{
+	    "serviceid":"music",
+	    "sectionid":"song",
+	    "songid" : "$!{song.songId}",
+	    "title" : "$!{EscapeUtil.escapeJsonString($!{song.title})}",
+	    "synonym" : [
+	    #foreach($synonym in $song.synonymList)
+	    	"$!{synonym}"#if($velocityHasNext),#end
+	    #end
+	    ],
+	    "link" : "http://music.daum.net/album/main?album_id=$!{song.album.albumId}&song_id=$!{song.songId}",
+	    "image" : "$!{song.album.mainImage.filePath}",
+	    "etc" : {
+	    	"artist" : [
+	    		#set($artistList = $song.keyArtistList)
+	    		#foreach($artist in $artistList)
+					{
+						"artistdetailid" : "$!{artist.artistId}",
+						"artistname" : "${EscapeUtil.escapeJsonString($!{artist.name})}"
+					}#if($velocityHasNext),#end
+	    		#end
+	    	],
+	    	"featartist" : "${EscapeUtil.escapeJsonString($!{song.featAllArtistWithComma})}",
+	    	"aod" : "$!{song.AODLinkId}",
+	    	"adultyn" : "$!{song.adultYn}",
+	    	"albumid" : "$!{song.album.albumId}",
+	    	"albumname" : "${EscapeUtil.escapeJsonString($!{song.album.title})}"
+	    }
+	}#if($velocityHasNext),#end
+#end
+]
+}

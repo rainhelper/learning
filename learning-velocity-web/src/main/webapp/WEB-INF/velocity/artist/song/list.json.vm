@@ -1,0 +1,70 @@
+{
+	"album" : {
+		"albumId":"$!{album.albumId}",
+		"title":"$StringUtils.replace($!{album.title}, '"', '&quot;')",
+		"typeCd":"$!{album.typeCd}",
+		"typeName":"$!{album.typeName}",
+		"volume":"$!{album.volume}",
+		"releaseDt":"$!{album.releaseDt}",
+		"playYn":"$!{album.playYn}",
+		"tagType":"$!{album.tagType}",
+		"oneLineNotice":"$!{album.oneLineNotice}",
+		"imageUrl":"$!{album.mainImage.filePath}",
+		"playSongList":"$!{album.getPlaySongList()}",
+		"event" : {
+			"eventId" : "$!{album.event.eventId}",
+			"title" : "$StringUtils.replace($!{album.event.eventTitle}, '"', '&quot;')",
+			"url" : "$!{album.event.linkUrl}"
+		}
+	},
+	"songs" : [
+	#foreach($song in $songList)
+		#if($foreach.index > 0),#end
+		{
+			"songId":"$!{song.songId}",
+			"title":"#strCut($StringUtils.replace($!{song.title}, '"', '&quot;'), 50)",
+			"keyArtistList": [
+				#foreach($artist in $song.keyArtistList)
+					#if($foreach.index > 0),#end
+					{
+						"artistId":"$!{artist.artistId}",
+						"name":"$StringUtils.replace($!{artist.name}, '"', '&quot;')"
+					} 
+				#end
+			],
+			"featArtistList": [
+				#foreach($artist in $song.featArtistList)
+					#if($foreach.index > 0),#end
+					{
+						"artistId":"$!{artist.artistId}",
+						"name":"$StringUtils.replace($!{artist.name}, '"', '&quot;')"
+					} 
+				#end
+			],
+			"creditArtistList": [
+				#foreach($artist in $song.creditArtistList)
+					#if($foreach.index > 0),#end
+					{
+						"artistId":"$!{artist.artistId}",
+						"name":"$StringUtils.replace($!{artist.name}, '"', '&quot;')",
+						"credit":"$!{artist.creditTitle}"
+					} 
+				#end
+			],
+			"favorite":"$!{song.favorite}",
+			"AODLinkId":"$!{song.AODLinkId}",
+			"lyricsYn":"$!{song.lyricsYn}",
+			"adultYn":"$!{song.adultYn}",
+			"albumId":"$!{song.album.albumId}",
+			"vclipLinkId":"$!{song.vclipLinkId}",
+			"tvpotVId":"$!{song.tvpotVId}",
+			"MP3LinkId":"$!{song.MP3LinkId}",
+			"BGMLinkId":"$!{song.BGMLinkId}",
+			"bellSalesStatus":"$!{song.bellSalesStatus}",
+			"ringSalesStatus":"$!{song.ringSalesStatus}",
+			"typeCd":"$!{song.typeCd}",
+			"packageSaleYn":"$!{album.packageSaleYn}"
+		}
+	#end
+	]		
+}

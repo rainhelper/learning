@@ -1,0 +1,28 @@
+<div class="frameWrap">
+    <div id="wWords" class="conBody">
+        <ul class="inf">
+        <li class="i1"><label>곡&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;명 : </label> <span class="subject">#if( $StringUtils.equals( "$!{song.title}", "")) - #else $!{song.title} #end</span></li>
+        <li class="i2"><label>아티스트 : </label> 
+			<span class="atrist">#printArtistName($!{song.keyArtistList} "" 20 false)#if( $!{song.album.albumName} && !$StringUtils.equals("$!{song.album.albumName}", "$!{song.title}") ) - $!{song.album.albumName}&nbsp;#end</span></li>
+#if( !$StringUtils.equals( "$!{song.lyrics.user.daumName}", "" ) )		
+        <li class="i3"><strong class="nick">$!{song.lyrics.user.daumName}</strong> <span class="fromTxt">님께서 등록해주신 가사입니다.</span></li>
+#end		
+        </ul>      
+        
+        <div class="words">
+#if($StringUtils.equals( "$!{song.lyricsYn}","Y" ) )
+$StringCutUtil.carriageReturnReplace("$!{song.lyrics.lyrics}")
+#else
+            <div class="help">
+                <a href="http://music.daum.net/album/main?album_id=$!{song.album.albumId}&song_id=$!{song.songId}" target="_blank" class="wordsUp" class="이 곡의 가사를 직접 등록">이 곡의 가사를 직접 등록</a>해 보세요.<br>
+                <p class="msg">
+                    등록해주신 가사는 운영자 검수 후, 서비스에 반영됩니다.<br />
+                    검수 과정에 따라 처리 시간이 걸릴 수 있는 점 양해 부탁 드립니다.<br />
+                    채택 시에는 입력된 가사와 함께 회원님의 닉네임이 등록됩니다.
+                </p>
+            </div>
+#end
+        </div>
+    </div>
+    <!-- <div class="conBtm">#if($lyric.lyrics)<input type="button" class="typeBtn btWordEdit" value="가사수정하기" title="가사수정하기" onclick="regLyric('$!{lyric.songId}','#escScript( $!{lyric.title} )','U')">#else<input type="button" class="typeBtn btWordNew" value="가사등록하기" title="가사등록하기" onclick="regLyric('$!{lyric.songId}','#escScript( $!{lyric.title} )','U')">#end</div> -->
+</div>

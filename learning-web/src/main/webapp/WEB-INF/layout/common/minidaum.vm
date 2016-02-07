@@ -1,0 +1,143 @@
+	##<div id="DaumUI__minidaum"></div> ## position:absolute.
+    ##<script type="text/javascript" src="http://go.daum.net/bin/minidaum.cgi" charset="euc-kr"></script>
+    <script type="text/javascript">
+    var minidaum_options = {
+        bgType: "white"
+    };
+    </script>
+	<script src="http://go.daum.net/jsa_minidaum_pc.daum" charset="utf-8" type="text/javascript"></script><!--http일 경우 -->
+
+#if($StringUtils.isBlank($!{command.query}))
+<!-- 검색창텍스트 광고 -->
+<script type="text/javascript" src="http://display.ad.daum.net/imp?slotid=04996"></script>
+#* 검색창텍스트 광고 소재 강제세팅
+<script type="text/javascript">
+top.AmsLink2 = function() {
+top.location.href = 'http://music.daum.net/vclip/';  
+};
+top.document.getElementById("qTop").style.backgroundRepeat="no-repeat";
+top.document.getElementById("qTop").style.backgroundPosition="left";
+top.document.getElementById("qTop").style.backgroundImage="url('http://adimg.daumcdn.net/www4/3Dlx/dJrN/search_text.gif')";
+</script>
+*#
+#end
+
+<!--[if lte IE 6]>
+<script type="text/javascript">
+(function() {
+	var daumBtnSearchAll = document.getElementById('daumBtnSearchAll');
+	var daumSuggest = document.getElementById('daumSuggest');
+	var daumBtnSearch = document.getElementById('daumBtnSearch');
+
+	daumBtnSearchAll.onmouseover
+	= daumBtnSearch.onmouseover
+	= daumSuggest.onmouseover
+	= function() {this.style.backgroundPositionY='bottom'};
+
+	daumBtnSearchAll.onmouseout
+	= daumBtnSearch.onmouseout
+	= daumSuggest.onmouseout
+	= function() {this.style.backgroundPositionY='top'};
+
+})();
+</script>
+<![endif]-->
+	#*
+<script type="text/javascript">
+//<![CDATA[
+    document.domain = "daum.net";
+    daum.suggest.Service.init();
+
+    var sug1 = daum.suggest.Service.add(
+    	"qTop",
+    	"daumSearch",
+    	"http://suggest.common.daum.net",
+    	"/music").
+    setUseThumbnail().
+    setLimit( [2,2,4] ).    // artist, album, song limit count
+    setEncodeKeyword( "utf_in_out" ).
+    setBeforeSubmitFunc( checkSubmit ).
+    setForm( document.daumSearch );
+	proxyHtmlLoadYn = "Y"; 
+	
+	function checkSubmit(form) {
+		var check = 0;
+		var suggestbox = daum.$C(form,'suggestBox')[0];
+		if(suggestbox != undefined && suggestbox.style.cssText.indexOf('block')>-1){
+			var selected =  daum.$C(suggestbox,'on')[0];
+			if(selected != undefined){
+				var selectedli = selected.getElementsByTagName('a')[0];
+				if(selectedli != undefined){
+					window.location.href = selectedli.href;
+					return false;
+				}
+				else{
+					check = 1;
+				}
+			}
+			else{
+				check = 1;
+			}
+		}
+		else{
+			check = 1;
+		}
+		if(check == 1){
+			var _dir = 'integrated';
+			form.action = "/search/" + _dir + "/list";
+			form.submit();
+		}
+		return false;
+	}
+	function goTotalSearch() {
+		window.open("http://search.daum.net/search?q="+encodeURIComponent(document.getElementById('qTop').value));
+	}
+	
+(function setServiceSearchOption(){
+	var els = {
+		"box_searchbar" : "box_searchbar", // 검색창 id
+		"queryText":"qTop" // 검색어 입력 텍스트박스 id
+	}
+
+	
+	function setSearchCategory( sug ){
+		var requestUrl = null;
+		requestUrl = "/music";
+
+		sug.setRequestUrl( requestUrl );
+		sug.reRequest();
+	}
+	
+	function setSearchOpt(){
+		
+ 		daum.$(els.queryText).focus();
+		
+		setSearchCategory(sug1);
+	}
+})();
+
+
+(function() {
+	var qTop = daum.$('qTop');
+	var searchBtn = daum.$('daumBtnSearch');
+	qTop.onfocus = function() {
+		qTop.parentNode.className += ' search_on';
+		if(!!top.document.getElementById("qTop").style.backgroundImage) {
+			top.document.getElementById("qTop").style.backgroundImage = "none";
+		}
+	};
+	qTop.onblur = function() {
+		qTop.parentNode.className = 'box_searchbar';
+	};
+	searchBtn.onclick = function() {
+		if(top.document.getElementById("qTop").style.backgroundImage != "none" && !!top.AmsLink2) {
+			top.AmsLink2();
+			return false;
+		}
+	}
+})();
+
+
+//]]>
+</script>
+*#

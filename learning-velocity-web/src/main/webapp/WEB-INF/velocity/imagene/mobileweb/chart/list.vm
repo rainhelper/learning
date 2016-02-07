@@ -1,0 +1,194 @@
+#uaCheck()
+<div id="daumContent" class="cont_chart">
+	<h2 class="screen_out">인기차트 상세정보</h2>
+	<div class="section_realtime">
+		<div class="cont_navi">
+#if("$!{genreCode}"!="")
+#set($type =$genreCode)
+#else
+#set($type = $request.getParameter("genre_cd"))
+#end
+#set($type = $request.getParameter("genre_cd"))
+#if("$type" == "TORA")#set($title="실시간 TOP100")#end
+#if("$type" == "HOT")#set($title="핫이슈 공감")#end
+#if("$type" == "MBAR")#set($title="뮤직 bar 추천")#end
+#if("$type" == "KORA")#set($title="가요")#end
+#if("$type" == "PORA")#set($title="팝")#end
+#if("$type" == "OSRA")#set($title="OST")#end
+#if("$type" == "IDRA")#set($title="아이돌")#end
+#if("$type" == "INRA")#set($title="인디")#end
+#if("$type" == "TRRA")#set($title="트로트")#end
+#if("$type" == "JPRA")#set($title="J-POP")#end
+#if("$type" == "JARA")#set($title="JAZZ")#end
+#if("$type" == "CLRA")#set($title="클래식")#end
+#if("$type" == "RERA")#set($title="종교음악")#end
+#if("$type" == "ETRA")#set($title="기타")#end
+			<h3 class="tit">$!title</h3>
+			
+##btnPrev() 여기서만 이렇게
+#if(!$StringUtils.equals("$!{isDaumMusicApp}", "true"))	
+    <a href="/chart/main" class="bround btn_prev" title="이전">
+    	<span class="ico_music ico_arrow"></span>이전
+	</a>
+#end
+
+##$ua_result.isAndroid ||
+#if($ua_result.os.ios || ($ua_result.os.android && $StringUtils.equals("$!{command.for_android_app}", "Y")))
+#set($isMobile = "true")
+#end
+<a href="/chart/viewer?genreCd=$!{type}" class="bround btn_view" title="슬라이드 뷰">슬라이드뷰</a>
+		</div>
+		
+		
+		<div #if($StringUtils.equals("$!{isMobile}", "true"))class="wrap_realtime100"#end>
+#if("$type" == "HOT")
+		<ol class="list_info list_music" id="chart_list"><li style="text-align:center;padding:20px 0;"><img width="17" height="17"  alt="" class="loading"></li></ol>
+#else
+		<ol class="list_info list_realtime" id="chart_list"><li style="text-align:center;padding:20px 0;"><img width="17" height="17"  alt="" class="loading"></li></ol>
+#end
+
+#if($ua_result.os.ios )
+    #if($MathTool.toNumber($ua_result.browser.major) > 3)
+		<a href="javascript:;" onclick="chartRanking.listenByApp();return false;" class="link_applisten"><span class="ico_music ico_applisten"></span>앱에서 전체듣기</a>
+    #else
+        <a href="javascript:;" onclick="alert('사용하시는 IOS 버전에서는 지원하지 않는 기능입니다. IOS를 최신버전으로 업그레이드 해 주세요');" class="link_applisten"><span class="ico_music ico_applisten"></span>앱에서 전체듣기</a>
+	#end
+#elseif(($ua_result.os.android && $StringUtils.equals("$!{command.for_android_app}", "Y")))
+	<a href="javascript:;" onclick="chartRanking.listenByApp();return false;" class="link_applisten"><span class="ico_music ico_applisten"></span>앱에서 전체듣기</a>
+#end
+		</div>
+	</div>
+<script>
+var chartRanking = {
+#if($isWVGA)
+	imgSize:"62",
+#else
+	imgSize:"41",
+#end
+	genre_cd:"$!{type}",
+	date_key:"$!{dateKey}",
+	songIds:[],
+	init:function(result){
+		chartRanking.adultYn = result.user.adultYn;
+		var olTxt = "";
+		var songIds = [];
+		for (var i =0; i < result.list.length;i++ ){
+			if(result.list[i].songadult == "Y" && chartRanking.adultYn !="Y"){
+				var song_type = "adult";
+			}else{
+				var song_type = "";
+			}
+			if(chartRanking.genre_cd == "HOT"){
+				#if($StringUtils.equals("$!{isMobile}", "true"))
+				olTxt +=(i%2 == 0)?((i == 0)?"<li class=\"open bg_cont\">":"<li class=\"bg_cont\">"):"<li>";
+				#else
+				olTxt +=(i%2 == 0)?((i == 0)?"<li class=\"open\">":"<li>"):"<li class=\"bg_cont\" >";
+				#end
+				olTxt += chartRanking.Listing(result.list[i],song_type,(i+1));
+				olTxt += chartRanking.listBtn(result.list[i],song_type);
+				olTxt +="</li>"
+			}else{
+					#if($StringUtils.equals("$!{isMobile}", "true"))
+					olTxt +=(i%2 == 0)?((i == 0)?"<li class=\"open bg_cont\">":"<li class=\"bg_cont\">"):"<li>";
+					#else
+    				olTxt +=(i%2 == 0)?((i == 0)?"<li class=\"open\">":"<li>"):"<li class=\"bg_cont\" >";
+					#end
+    				olTxt += chartRanking.Listing(result.list[i],song_type,result.list[i].rank);
+    				olTxt += chartRanking.listBtn(result.list[i],song_type);
+    				olTxt +="</li>"
+			}
+			chartRanking.songIds.push(result.list[i].songId);
+		}
+		$('chart_list').innerHTML = olTxt;
+		music.mobile.enableMusicClicks('list_music');
+		music.mobile.enableMusicClicks('list_realtime');
+	},
+	call:function(){
+		/*chartRanking.init(RankList)*/
+		new daum.Ajax({onsuccess:function(r){
+			result = daum.jsonToObject(r.responseText);
+			chartRanking.init(result)
+		},onfailure: function(){alert("통신에 실패했습니다")},ontimeout: function(){alert("통신에 실패했습니다")},method:"get",encoding: "utf-8",paramString: "genre_cd="+chartRanking.genre_cd+"&date_key="+chartRanking.date_key}).request('/chart/list.json');		
+		
+	},
+	Listing:function(data,song_type,list_num){
+		if(chartRanking.genre_cd == "HOT"){
+			var listTxt = "<div class=\"wrap_cont\">";
+			listTxt +="<a href=\"javascript:;\" class=\"wrap_folding\">";
+			listTxt +="<span class=\"num_rank\">"+list_num+"</span>";
+		}else{
+			var listTxt = "<div class=\"wrap_cont wrap_noimg\">";
+			listTxt +="<a href=\"javascript:;\" class=\"wrap_folding\">";
+			listTxt +="<span class=\"txt_rank\" style=\"text-align:center;\">"+list_num+"</span>";
+		}
+		listTxt +="<span class=\"info\">";
+		listTxt +="<span class=\"wrap_song\">";
+		listTxt +="<strong class=\"tit\">"+data.title+"</strong>";
+		
+		listTxt += music.mobile.getAdultIconTag(data.songadult) || "";
+		
+		if(data.featArtistList.length > 0){
+			listTxt += " (feat. ";
+			for (var i=0 ;i < data.featArtistList.length;i++ ){
+				listTxt += (i != 0)?", "+data.featArtistList[i].name:data.featArtistList[i].name;
+			}
+			listTxt += ")";
+		}
+		listTxt +="</span>";
+		listTxt +="<span class=\"txt_info\">";
+		if(data.songArtist.length > 0){
+			for (var i=0 ;i < data.songArtist.length;i++ ){
+				listTxt += (i != 0)?", "+data.songArtist[i].name:data.songArtist[i].name;
+			}
+		}
+		listTxt +="</span></span>";
+		listTxt +="<span class=\"bround btn_fold\"><span class=\"ico_music ico_fold\">펼치기/접기</span></span>";
+		listTxt +="</a>";
+		listTxt +=(data.AODLinkId != "")?"<a class=\"bround btn_listen\" title=\"곡 듣기\" href=\"javascript:;\" onclick=\"music.mobile.mMusicPlay.playSample('"+data.songId+"','"+song_type+"','close');\">":"<a class=\"bround btn_listen off\" title=\"곡 듣기\">";
+		listTxt +="<span class=\"ico_music ico_listen\">듣기</span></a>";
+		listTxt +="</div>";
+		return listTxt;
+	},
+	listBtn:function(data,song_type){
+		var btnTxt = "";
+		btnTxt +="<div class=\"wrap_action\">";
+		if(data.lyricsYn=="Y"){
+			btnTxt +=(song_type == "adult")?"<a href=\"javascript:;\" onclick=\"music.mobile.adultcheck()\" class=\"bround btn_lyrics\">":"<a href=\"/song/vcliplyrics?song_id="+data.songId+"&album_id="+data.albumId+"\" class=\"bround btn_lyrics\">";
+		}else{
+			btnTxt +="<a class=\"bround btn_lyrics  off\">";
+		}
+		btnTxt +="<span class=\"ico_music ico_lyrics\"></span>가사</a>";
+		btnTxt +="<a href=\"/album/main?album_id="+data.albumId+"\" class=\"bround btn_album\">";
+		btnTxt +="<span class=\"ico_music ico_album\"></span>앨범</a>";
+		
+//		if(data.MP3LinkId != "" && data.MP3LinkId != 0){
+//			btnTxt +="<a href=\"javascript:;\" onclick=\"music.mobile_billing.mMusicMp3buy.goMp3Add('"+data.songId+"', '"+data.albumId+"');return false;\" class=\"bround btn_buy\">MP3 구매</a>";
+//		}else{
+			btnTxt +="<a class=\"bround btn_buy off\">MP3 구매</a>";
+//		}
+		
+		#if($ua_result.os.ios)
+        	btnTxt +=( data.AODLinkId!="")?"<a href=\"javascript:;\" onclick=\"music.mobile.mMusicPlay.playOnApp('SO', '"+data.songId+"', '"+data.albumId+"');return false;\" class=\"bround btn_app\">뮤직앱":"<a class=\"bround btn_app off\">뮤직앱";
+        #elseif(($ua_result.os.android && $StringUtils.equals("$!{command.for_android_app}", "Y")))
+			btnTxt +=( data.AODLinkId!="")?"<a href=\"javascript:;\" onclick=\"music.mobile.mMusicPlay.playOnApp('SO', '"+data.songId+"', '"+data.albumId+"');return false;\" class=\"bround btn_app\">뮤직앱":"<a class=\"bround btn_app off\">뮤직앱";
+		#else
+			btnTxt += "<a class=\"bround btn_app off\">뮤직앱";
+		#end
+		btnTxt +="</a>";
+		btnTxt +="<div id=\"sId_"+data.songId+"\" class=\"audio\"></div>";
+		btnTxt +="</div>";
+		return btnTxt;
+	},
+	listenByApp:function(){	
+		if(chartRanking.songIds.length>0) {
+			music.mobile.mMusicPlay.playOnApp('SO', chartRanking.songIds.join('/'), '');
+			//location.href = "/appHub?obj_type=SO&obj_id="+chartRanking.songIds[0]+"&obj_id_list="+chartRanking.songIds.join('/');
+		}
+	}
+}
+
+daum.Event.addEvent( window, "load", function(){chartRanking.call();});
+</script>
+#SearchForm("only_bottom")
+</div>
+#parse("/velocity/mobileweb/realtimeissue.vm")

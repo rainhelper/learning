@@ -1,0 +1,74 @@
+<div id="frmSearchListWrap" class="listWrap">
+    <table class="tblHead">
+    <thead>
+    <tr>
+        <th class="chkbox"><input type="checkbox" name="checkBoxItem" onClick="controlBtn.allCheck(this);"></th>
+        <th class="subject">곡명</th>
+        <th class="artist">아티스트</th>
+        <th class="album">앨범</th>
+        <th class="buy">구매
+    </tr>
+    </thead>
+    </table>
+    <div class="conList">
+        <table id="tblTrk" class="tblBody">
+        <tbody>
+#set($songList = $dto.songResult.documentList)
+#set($totalCount = $dto.songResult.totalResultsCount)
+#if($totalCount > 0)
+#***##foreach($song in $songList)
+#if($StringUtils.equals("$!{song.listen_yn}","Y")) #set ( $_listenAble = true ) #else #set ( $_listenAble = false ) #end
+#if($StringUtils.equals("$!{song.mp3_yn}","Y")) #set ( $_mp3Able = true ) #else #set ( $_mp3Able = false ) #end
+#if($StringUtils.equals("$!{song.bgm_yn}","Y")) #set ( $_bgmAble = true ) #else #set ( $_bgmAble = false ) #end
+#if($StringUtils.equals("$!{song.mv_yn}","Y")) #set( $_mvAble = true ) #else #set ( $_mvAble = false ) #end
+        <tr onmouseover="mOverRow(this);" onmouseout="mOutRow(this);" >
+            <td class="chkbox"><input type="checkbox" id="listen_$!{song.song_id}" value="$!{song.song_id}" name="checkBoxItem"></td>
+				
+#if( $_listenAble == true )             
+            <td class="subject linked #if( $_mvAble ==  true ) mvicon #end"><div class="marqueeCon ellipsis"><a href="#" onclick="top.AddPlayerPlay(['$!{song.song_id}'], false)" title="#escTitle("#stripHTML(${song.song_name})")">${song.song_name}&nbsp;#printSongIcon($song,true)</a></div>
+			#if( $_mvAble ==  true )<input type="button" class="typeBtn btSetProduct btProductTv" value="뮤직비디오보기" title="#escTitle($!{song.song_name})뮤직비디오 보기" onclick="viewVideo('$!{song.song_id}', '$!{song.mv_id}');UI.stopEvent();">#end</td>
+#else           
+            <td class="subject linked #if( $_mvAble ==  true ) mvicon #end" onclick="Music.message('play');"><div class="marqueeCon ellipsis" title="#escTitle("#stripHTML(${song.song_name})")">${song.song_name}</div></td>
+#end
+#set( $songKeyArtist = "#printKeyArtist( ${song.getKeyArtistList()} )" )
+            <td class="artist linked"><div class="marqueeCon ellipsis"><a href="#"  onclick="top.searchArtistList('#escScriptStrip($songKeyArtist)','$!{song.artist_id}');return false;" title="#escTitle("#stripHTML($songKeyArtist)")">$songKeyArtist</a></div></td>
+#set ( $albumName = "#escTitle( $!{song.album_name} )" )
+#set ( $albumName = "#escScript( $!{albumName} )" )
+            <td class="album linked"><div class="marqueeCon ellipsis"><a href="#" onclick="top.searchAlbumList('$!{albumName})','$!{song.album_id}');return false;" title="#escTitle("#stripHTML(${song.album_name})")">${song.album_name}</a></div></td>
+            <td class="buy"><input type="button" #if( $StringUtils.equals( $!{song.mp3_yn}, "Y" )) class="typeBtn btMySet btMp3" id="mp3_$!{song.song_id}" onclick="openCartPop([$!{song.song_id}], 'mp3');" #else  class="typeBtn btMySet btMp3_dis" disabled #end value="엠피삼" title="MP3"><input type="button" #if( $StringUtils.equals( $!{song.bgm_yn}, "Y" )) class="typeBtn btMySet btBgm" id="bgm_$!{song.song_id}" onclick="openCartPop([$!{song.song_id}], 'bgm');" #else class="typeBtn btMySet btBgm_dis" disabled #end  value="배경" title="배경"></td>
+        </tr>
+	#end
+#else
+        <tr>
+			<td class="nodata">검색 결과가 존재하지 않습니다.</td>
+		</tr>
+#end	
+        </tbody>
+        </table>
+#if($totalCount > 0 )
+##set ($url = "http://music.daum.net/search/player.do?query=$!{command.query}&searchRange=$!{command.searchRange}")
+##printPaging("${url}&pageNo=", $dto.ph.pageNo, $dto.ph)
+    	<div class="conMore">
+                더 많은 곡을 검색하시려면? <a class="more" href="/search/search.do?type=total&query=#escUrl($command.query)" target="_blank" title="음악검색 더보기">음악검색 더보기</a>
+    	</div>
+#end		
+    </div>
+    <script type="text/javascript">
+	var controlBtn = new Music.ControlListButton();
+	var ds = new DragSelector(daum.$("tblTrk"));
+	new Music.marquee("marqueeCon");
+	</script>
+	
+
+    <div class="conBtn">
+        <input type="button" class="typeBtn btRight btAllListen" value="전체듣기" title="전체듣기" onclick="Music.Btn.AllListen(controlBtn);">
+        <input type="button" class="typeBtn btRight btListen" value="선택듣기" title="선택듣기" onclick="Music.Btn.Listen(controlBtn);">
+        <input type="button" class="typeBtn btRight btBuy" value="구매" title="구매"  onmouseover="showBuyLayer();" onmouseout="hideBuyLayer();">
+        <div id="conBtnBuy" onmouseover="showBuyLayer();" onmouseout="hideBuyLayer();">
+            <input type="button" class="typeBtn btGroupBuy btMp3Down" value="MP3다운" title="MP3다운" onclick="Music.Btn.Mp3Down(controlBtn);">
+            <input type="button" class="typeBtn btGroupBuy btBgmBuy" value="배경음악 구매" title="배경음악 구매" onclick="Music.Btn.BgmBuy(controlBtn);">
+        </div>
+        <input type="button" class="typeBtn btRight btMyAdd" value="MY앨범담기" title="MY앨범담기" onclick="Music.Btn.MyAdd(controlBtn);">
+    </div>
+
+</div>

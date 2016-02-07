@@ -1,0 +1,105 @@
+<script type="text/javascript">
+	var message = "\uC720\uD6A8\uD558\uC9C0 \uC54A\uC740 \uC694\uCCAD\uC785\uB2C8\uB2E4.";  	// 유효하지 않은 요청입니다.
+	var returnUrl = location.protocol + "//" + location.host + "/talk/detail/$!{menuId}/$!{boardId}";
+
+    var responseCode = "${pollResultTemplete.pollResponseCode}";
+    if("NODATE" == responseCode){
+        message = "\uD22C\uD45C \uC2DC\uC791\uC77C\uC774 \uC544\uB2D9\uB2C8\uB2E4.";    // 투표 시작일이 아닙니다.
+    }else if("NO_VOTE" == responseCode){
+        message = "\uD22C\uD45C\uC5D0 \uCC38\uC5EC\uD558\uC9C0 \uC54A\uC73C\uC168\uC2B5\uB2C8\uB2E4.";      // 투표에 참여하지 않으셨습니다.
+    }else if("LOGIN_REQUIRED" == responseCode){
+        var URL = "https://accounts.kakao.com/login";
+        if(confirm("\uBA3C\uC800 \uB85C\uADF8\uC778 \uD558\uC154\uC57C \uD569\uB2C8\uB2E4.\n\uB85C\uADF8\uC778 \uD398\uC774\uC9C0\uB85C \uC774\uB3D9 \uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?")){        //먼저 로그인 하셔야 합니다. 로그인 페이지로 이동 하시겠습니까?
+            var loginUrl = URL+"?continue="+ escape( window.location );
+            returnUrl = loginUrl;
+        }
+    }
+</script>
+
+<main id="daumContent" class="cont_list" style="display: none">
+    <article id="mArticle">
+        <div class="vote_result">
+			#if( !$winnerInfo.isEmpty() )
+            <h2 class="screen_out">투표 결과</h2>
+            <span class="ico_comm ico_smart"></span>
+            <div class="vote_visual">
+                <img src="$!{ImageUtil.getMobileImageUrl("$!{winnerInfo.imageUrl}", "500x500", "PHOTO", "C")}" class="thumb_rank" alt="$!{EscapeUtil.encodeHtmlTag($!{winnerInfo.title})}" style="width:200px;height:200px">
+            </div>
+			#end
+	    </div>
+        <div class="post_result">
+			#if( !$winnerInfo.isEmpty() )
+            <div class="info_result">
+                <strong class="tit_result">
+					<span class="rank_result">
+						<span class="ico_comm ico_ranktop"></span>
+						<span class="rank_top">
+							1<span class="screen_out">위</span>
+						</span>
+					</span>
+                    <span class="txt_name">$!{winnerInfo.title}</span>
+                </strong>
+                <!-- 2015-03-27 수정 끝 -->
+                <span class="txt_result"><span class="txt_get">$!{StringUtil.formatTypeByString($!{winnerInfo.score})}표 획득</span><span class="txt_bar">|</span>$!{StringUtil.formatTypeByString($!{winnerInfo.totalCount})}명 참여</span>
+            </div>
+			#end
+
+            <strong class="screen_out">투표 순위</strong>
+	        <ol class="info_graph">
+		        #foreach( $pollItemContent in $pollResultTemplete.pollItemList )
+                <li class="graph_comm graph#if($foreach.index < 2 )_on#end"> <!-- 1,2위에 graph_on 클래스 추가 -->
+                    <div class="thumb_poll"><img src="$!{ImageUtil.getMobileImageUrl("$!{pollItemContent.pollImageUrl}", "500x500", "PHOTO", "C")}" class="thumb_vote" alt= "$!{EscapeUtil.encodeHtmlTag($!{pollItemContent.pollItem})} " style="width:40px;height:40px"></div>
+                    <div class="info_poll">
+			            <span class="score_info">
+				            <em class="emph_rank">${velocityCount}<span class="screen_out">위</span></em>
+						    <span class="txt_rate">$!{pollItemContent.pollItem}</span>
+						    <span class="txt_vote">$!{pollItemContent.pollPerc}% <span class="txt_bar"> | </span> $!{StringUtil.formatTypeByNumber($!{pollItemContent.pollCount})}표 획득</span>
+					    </span>
+				        <span class="box_graph">
+						    <span perc="$!{pollItemContent.pollPerc}%" class="bar_g"></span>
+						</span>
+                    </div>
+                </li>
+	            #end
+        </div>
+    </article>
+    <script type="text/javascript">
+        $(function(){
+            if("SUCCESS" != responseCode){
+                if("LOGIN_REQUIRED" != responseCode){
+                    alert(message);
+                }
+                window.location.href = returnUrl;
+            }else{
+                jQuery("#daumContent").show();
+            }
+        });
+
+        var gvTimeStamp = $timestamp;
+        var __TiaraObject = __TiaraObject || {};
+        if ('undefined' === typeof __TiaraObject.startTime) {
+            __TiaraObject.startTime = new Date();
+        }
+
+        _tiq.push(['__setSection', 'talkmusic#pollresult']);
+        _tiq.push(['__setPageName', 'pollresult']);
+        _tiq.push(['__setParam', 'puid', gvTimeStamp]);
+        _tiq.push(['__setParam', 'svcdomain', 'talkmusic.kakao.com']);
+        _tiq.push(['__setConfig',
+            {enablePageshow: true, enableButton: false, enableHash: true}
+        ]);
+
+        _tiq.push(['__clickOn']);
+        _tiq.push(['__trackPageview']);
+
+        jQuery(window).load(function() {
+            jQuery(".bar_g").each(function() {
+                var percText = jQuery(this).attr("perc");
+                jQuery(this).animate({
+                    width: percText,
+                }, 500 );
+            });
+        });
+
+    </script>
+</main>

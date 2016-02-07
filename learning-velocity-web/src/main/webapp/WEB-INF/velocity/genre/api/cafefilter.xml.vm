@@ -1,0 +1,20 @@
+<SongList>
+#foreach($song in $songList)
+	<Song id="${song.songId}">
+		<SongTitle><![CDATA[$!{song.title}]]></SongTitle>
+		<SongTitleKoreanLanguage><![CDATA[$!{song.titleKorLang}]]></SongTitleKoreanLanguage>
+		<SongTitleKoreanPronounce><![CDATA[$!{song.titleKorPron}]]></SongTitleKoreanPronounce>
+		<AlbumName><![CDATA[$!{song.album.title}]]></AlbumName>
+		<AlbumNameKoreanPronounce><![CDATA[$!{song.album.titleKorPron}]]></AlbumNameKoreanPronounce>
+		#if($song.keyArtistList && $song.keyArtistList.size() > 0)
+			#set($artist = $song.keyArtistList.get(0))
+			<ArtistName><![CDATA[$!{artist.name}]]></ArtistName>
+			<ArtistNameKoreanLanguage><![CDATA[$!{artist.nameKorLang}]]></ArtistNameKoreanLanguage>
+		#else
+			<ArtistName></ArtistName>
+			<ArtistNameKoreanLanguage></ArtistNameKoreanLanguage>
+		#end
+		<Keyword><![CDATA[$!{song.synonymKeyword}]]></Keyword>
+	</Song>
+#end
+</SongList>

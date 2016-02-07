@@ -1,0 +1,37 @@
+#set($album = $song.album)
+#set($vclip = $song.vclip)
+#set($lyrics = $song.lyrics)
+{
+	"song" : {
+		"songId" : "$!{song.songId}",
+		"title" : "$!{EscapeUtil.escapeJsonString($!{song.title})}",
+		"adultYn" : "$!{song.adultYn}", 
+	},
+	"album" : {
+		"albumId" : "$!{album.albumId}",
+		"title" : "$!{EscapeUtil.escapeJsonString($!{album.title})}",
+		"volume" : "$!{album.volume}"
+	},
+	"vclip" : {
+		"vclipId" : "$!{vclip.vclipId}",
+		"tvpotVId" : "$!{vclip.tvpotVId}",
+		"tvpotPreVId" : "$!{vclip.tvpotPreVId}",
+		"title" : "$!{vclip.title}",
+		"filePath" : "$!{vclip.mainImage.filePath}",
+	},
+	"lyrics" : {
+		"lyricsId" : "$!{lyrics.lyricsId}",
+		"lyrics" : "$!{lyrics.lyrics.replaceAll("\r","").replaceAll("\n", "<br />")}",
+	},
+	"keyArtistList" : [
+		#foreach($artist in $artistList)
+			#if($foreach.index > 0),#end
+			{
+   				"name" : "$!{EscapeUtil.escapeJsonString($!{artist.name})}",
+   				"artistId" : "$!{artist.artistId}",
+   				"creditTitle" : "$!{artist.creditTitle}",
+   				"creditCd" : "$!{artist.creditCd}"
+   			}
+		#end
+	]
+}

@@ -1,0 +1,17 @@
+#setter( "devel" "true" )
+#setter( "debugmode" "$!request.getParameter('debugmode')" )
+#setter( "URI" "$!{requestURI}" )
+#setter( "PATH_URI" "$!{requestPathInfo}" )
+#setter( "CSS", "/css/" ) 	## music.daum.net
+##setter( "CSS", "http://html.ftdev.daum.net/music_2011/service/_css/music_" )
+##setter( "CSS", "http://wsft2.ftdev.daum.net/music_2011/service/_css/music_" ) ## 영일님 local
+
+#setter( "GAIA_DOMAIN", "http://local.bbs.music.daum.net" )
+#setter( "SERVICE_DOMAIN", "http://music.daum.net" )
+#setter( "BI_DOMAIN", "http://test.bill.daum.net" )
+#setter( "BI_V2_DOMAIN", "http://test.cash.daum.net" )
+
+
+#setter( "M_MUSIC_DOMAIN", "http://stage.m.music.daum.net" )
+#setter( "M_PLAYER_DOMAIN", "http://stage.m.player.music.daum.net" )
+#setter( "M_BBS_DOMAIN", "http://stage.m.bbs.music.daum.net" )

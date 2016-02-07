@@ -1,0 +1,151 @@
+#set($bgmList = $dto.bgmResult.documentList)
+#set($bgmCount = $dto.bgmResult.totalResultsCount)
+
+#set ($url = "?query=$!{command.encodedQuery}")	
+#if( $StringUtils.isNotEmpty("$!{command.searchRange}") ) #set ($url = $url + "&searchRange=$!{command.searchRange}") #end
+#if( $StringUtils.isNotEmpty("$!{command.artistId}") ) #set ($url = $url + "&artistId=$!{command.artistId}") #end
+#if( $StringUtils.isNotEmpty("$!{command.genreId}") ) #set ($url = $url + "&genreId=$!{command.genreId}") #end
+#if( $StringUtils.isNotEmpty("$!{command.releaseYear}") ) #set ($url = $url + "&releaseYear=$!{command.releaseYear}") #end
+
+         <h2>본문영역</h2> 
+<!-- BGM -->		
+		#if(($!{bgmCount}) && $!{bgmCount} > 0)		
+		<div class="collTitle">
+			<h3 class="fl">배경음악 <span class="num">총 $!{bgmCount}건</span></h3>
+			<span class="fl">&nbsp;
+				#if($StringUtils.equals($!{command.sortType}, "0"))
+    				<span class="nrl base">정확도</span>
+    			#else
+    				<a href="$url&sortType=0" class="stlink" onclick="return gExtraLink(this, 'SRGY', '1');">정확도</a>
+    			#end
+    			#if($StringUtils.equals($!{command.sortType}, "1"))
+    				<span class="nrl vline"> | </span><span class="nrl base">최신</span>
+    			#else
+    				<span class="nrl vline"> | </span><a href="$url&sortType=1" class="stlink" onclick="return gExtraLink(this, 'SRGY', '2');">최신</a>
+    			#end
+    			#if($StringUtils.equals($!{command.sortType}, "2"))
+    				<span class="nrl vline"> | </span><span class="nrl base">인기도</span>
+    			#else
+    				<span class="nrl vline"> | </span><a href="$url&sortType=2" class="stlink" onclick="return gExtraLink(this, 'SRGY', '3');">인기도</a>
+    			#end
+			</span>
+		</div>
+			
+		<div class="collWid collTot">
+			<div class="tab">
+				
+				<div class="tabBody conHdMv" id="tabBody_tpItem1">
+					<div class="btn clearfix">
+						<input type="button" onclick="controlBtn.goAction('all_listen');return gExtraLink(this, 'SRGY', '7');" class="typeBtn btSetAct btActAllListen" value="전체듣기" title="전체듣기" >
+                        <input type="button" onclick="controlBtn.goAction('chk_listen');return gExtraLink(this, 'SRGY', '8');" class="typeBtn btSetAct btActSelListen" value="선택듣기" title="선택듣기" >
+                        <input type="button" onclick="controlBtn.goAction('chk_mp3', this);return gExtraLink(this, 'SRGY', '9');" class="typeBtn btSetAct btActMp3" >
+                        <input type="button" onclick="controlBtn.goAction('chk_bgm', this);return gExtraLink(this, 'SRGY', '10');" class="typeBtn btSetAct btActBgm" >
+                        <input type="button" onclick="controlBtn.goAction('chk_my');return gExtraLink(this, 'SRGY', '11');" class="typeBtn btSetAct btActMy" value="MY앨범담기" title="MY앨범담기" >
+						## #printListButton("song", "controlBtn")
+					</div>
+					<table id="wAbmTbl" class="baseTbl baseTblTypeSch">
+					<thead>
+						<tr>
+							<th class="tColChk"><input type="checkbox" name="checkBoxItem" onClick="controlBtn.allCheck(this);"></th>
+							<th class="c3">곡명</th>
+							<th class="c4">아티스트</th>
+							<th class="c5">앨범</th>
+							<th class="tColListen">듣기</th>
+                    		<th class="tColTxt">가사</th>
+                    		<th class="tColView">뮤비</th>
+							<th class="tColPhone">폰</th>
+                    		<th class="tColMp3">MP3</th>
+                    		<th class="tColBgm">배경음악</th>
+						</tr>
+					</thead>
+					<tbody>
+					#set ($count = 0)
+					#foreach($bgm in $bgmList)			
+						#set ($count = $count + 1)
+						#if($stringUtil.isNotEmpty($!bgm.song_type_name))
+							#set ($track = "track")
+						#else
+							#set ($track = "")
+						#end 
+						
+						#if($StringUtils.equals("$!{bgm.listen_yn}","Y"))#set ( $_listenAble = true ) #else #set ( $_listenAble = false ) #end
+	        			#if($StringUtils.equals("$!{bgm.mp3_yn}","Y")) #set ( $_mp3Able = true ) #else #set ( $_mp3Able = false ) #end
+	        			#if($StringUtils.equals("$!{bgm.bgm_yn}","Y")) #set ( $_bgmAble = true ) #else #set ( $_bgmAble = false ) #end
+						<tr class="$track #if($count == 1) first #end">
+							<td class="tColChk"><input type="checkbox" name="checkBoxItem" value="${bgm.song_id}"></td>
+							<td class="c3">
+								#set ($featT = "")
+								#if ($bgm.getFeatArtist().size() > 0)
+									#foreach($feat in $bgm.getFeatArtist()) 
+										#if ($foreach.index > 0) #set ($featT = $featT + ", ") #end
+										#set ($featT = $featT + $feat)
+									#end
+									#set ($featT = "(feat. "+ $featT + ")")
+								#else
+									#set ($featT = "")
+								#end 
+							
+								#if ($_listenAble)
+									<a href="javascript:;" onclick="titleSong('$!{bgm.song_id}', $_listenAble);return gLink(null, 'SRGY', '1', '$!{count}');" title="#getStrongText($!{bgm.song_name}) 곡 듣기" class="gray_d2">
+									$!{bgm.song_name} $!{featT}</a>
+								#else								
+									<span class="gray" title="#getStrongText($!{bgm.song_name})">$!{bgm.song_name} ${featT}</span>
+								#end
+							</td>
+							<td class="c4">
+								#if($StringUtils.isNotEmpty("$!{bgm.artist_id}") && !$StringUtils.equals("$!{bgm.artist_id}","0"))<a href="/artist/artist.do?artistId=$!{bgm.artist_id}" class="gray_d2" onclick="return gLink(null, 'SRGY', '2', '$!{count}');">$!{bgm.artist_name.replace("|",", ")}</a>#else $!{bgm.artist_name.replace("|",", ")}#end 
+							</td>
+							<td class="c5"><a href="/album/album.do?albumId=$!{bgm.album_id}" class="gray_d2" onclick="return gLink(null, 'SRGY', '3', '$!{count}');">$!{bgm.album_vol} $!{bgm.album_name}</a></td>		
+							<td class="tColListen"><input type="button" class="typeBtn btSetMini btMiniListen#if(!$!{bgm.song_id}||!$_listenAble)_dis#end" #if(!$!{bgm.song_id}||!$_listenAble)disabled#end id="listen_$!{bgm.song_id}" value="곡 듣기" title="곡 듣기" onclick="listenSong('$!{bgm.song_id}');return gLink(null, 'SRGY', '4', '$!{count}');"></td>
+                			<td class="tColTxt"><input type="button" class="typeBtn btSetMini btMiniTxt#if(!$!{bgm.song_id}||$StringUtils.equals("$!{bgm.lyrics_yn}","N"))_dis#end" #if($StringUtils.equals("$!{bgm.lyrics_yn}","N")) value="가사 등록" title="가사 등록"#else value="가사 보기" title="가사 보기"#end onclick="lyricMini('$!{bgm.song_id}');return gLink(null, 'SRGY', '5', '$!{count}');"></td>
+                			<td class="tColView"><input type="button" class="typeBtn btSetMini btMiniView#if(!$!{bgm.mv_id})_dis#end" #if(!$!{bgm.mv_id})disabled#end id="video_$!{bgm.mv_id}" value="뮤비 보기" title="뮤비 보기" onclick="viewVideo('$!{bgm.song_id}', '$!{bgm.mv_id}');return gLink(null, 'SRGY', '6', '$!{count}');"></td>
+							<td class="tColPhone"><input id="phone_$!{bgm.song_id}" class="typeBtn btSetMini btMiniPhone#if(!$!{bgm.song_id}||!$bgm.getMobileItemYn())_dis#end" type="button" #if(!$!{bgm.song_id}||!$bgm.getMobileItemYn())disabled#end onclick="phoneMini('$!{bgm.song_id}', this, '$!{bgm.ring_sales_yn}', '$!{bgm.bell_sales_yn}');"/></td>
+                    		<td class="tColMp3"><input type="button" class="typeBtn btSetMini btMiniMp3#if(!$!{bgm.song_id}||!$_mp3Able)_dis#end" #if(!$!{bgm.song_id}||!$_mp3Able)disabled#end id="mp3_$!{bgm.song_id}" onclick="mp3Mini('$!{bgm.song_id}', this);return gLink(null, 'SRGY', '7', '$!{count}');"></td>
+                    		<td class="tColBgm"><input type="button" class="typeBtn btSetMini btMiniBgm#if(!$!{bgm.song_id}||!$_bgmAble)_dis#end" #if(!$!{bgm.song_id}||!$_bgmAble)disabled#end id="bgm_$!{bgm.song_id}" onclick="bgmMini('$!{bgm.song_id}', this);return gLink(null, 'SRGY', '8', '$!{count}');"></td>							
+							#*
+							<td class="tColListen">#printListItemButton( $!{bgm.song_id}, "listen", $_listenAble )</td>
+                			<td class="tColTxt">#printListItemButton( ${bgm.song_id}, "words", $!{bgm.lyrics_yn} )</td>
+                			<td class="tColView">#printListItemButton( $!{bgm.mv_id}, "view", $!{bgm.mv_id} )</td>
+                    		<td class="tColMp3">#printListItemButton( $!{bgm.song_id}, "mp3", $_mp3Able )</td>
+                    		<td class="tColBgm">#printListItemButton( $!{bgm.song_id}, "bgm", $_bgmAble )</td> *#
+						</tr>
+					##	#if($stringUtil.isNotEmpty($!bgm.song_type_name))	
+					##	<tr class="join">
+					##		<td colspan="2"></td>
+					##		<td class="t1" colspan="7">
+					##			<a href="#">원곡</a><span class="vline"> | </span><a href="#">$!{bgm.song_type_name}</a><span class="vline"> | </span>연주: <a href="#">자우림</a> 외&nbsp;&nbsp;<a href="#" class="mlink">더보기</a>
+					##		</td>
+					##	</tr>
+					##	#end
+					#end						
+					</tbody>
+					</table>
+					<script type="text/javascript">
+						var controlBtn = new Music.ControlListButton();
+						var ds = new DragSelector(daum.$("wAbmTbl"));
+					</script>
+				</div>
+			</div>
+		</div>
+
+		<div class="collBottom"></div>
+		
+<!-- 페이징 -->	
+		#if( $StringUtils.isNotEmpty("$!{command.sortType}") ) #set ($url = $url + "&sortType=$!{command.sortType}") #end
+			#printPagingClickLog("${url}&pageNo=", $dto.ph.pageNo, $dto.ph)
+		#end	
+		<!--검색결과 없음 -->
+        #if($bgmCount <= 0)
+        	<div class="rsltHelp">
+        		<p><span class="dot">ㆍ</span>검색어의 단어 수를 줄이거나, 보다 일반적인 단어로 검색해 보세요.</p>
+        		<p><span class="dot">ㆍ</span>두 단어 이상의 키워드로 검색 하신 경우, 정확하게 띄어쓰기를 한 후 검색해 보세요.</p>
+        		<p><span class="dot">ㆍ</span>키워드에 있는 특수문자를 뺀 후에 검색해 보세요.</p>
+        	</div>
+    	</div>
+		#end
+		
+<!-- 제보 -->
+##		<hr/><div id="wInfoArea"><span class="tit">지금 보시는 검색 결과에 추가, 수정이 필요한 내용을 직접 등록해 주세요.</span><input type="button" class="typeBtn btnInfo fl" value="제보하기" title="제보하기"></div>
+	
+<!-- 클릭로그 -->
+<script type="text/javascript">init("GY", "$!{command.eucKrQuery}", "-1", "@@@");</script>

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<ProgramList>
+#if($programList.size() > 0)
+#foreach($program in $programList)
+	<Program>
+		<ProgramName><![CDATA[$program.programMasterName]]></ProgramName>
+		<ProgramId><![CDATA[$program.programId]]></ProgramId>
+	</Program>
+#end
+#end
+</ProgramList>

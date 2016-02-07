@@ -1,0 +1,110 @@
+#*
+<br>REQ : $request
+<br>REQ : $request.getRequest() 
+<br>Context : $request.getContextPath() 
+<br>Length : $request.getContentLength() 
+<br>Header : $request.getHeader()
+<br>Info : $request.getInfo()
+<br>URL : $request.getRequestURL()
+<br>Query : $request.getQueryString()   
+<br>Attribute로 만든 URL: $request.getAttribute("url")
+<br>Attribute로 만든 QUery: $request.getAttribute("query")
+*#  
+<script type="text/javascript">
+## 19세관련 뮤비 체킹
+top.isNextPlay = '$command.nextPlay';
+## 로그인여부
+top.isLogin = '$command.getIsLogin()';
+</script>
+##$command.nextPlay
+##$!{song.vclip.tvpotVId}
+##$!{item.tvpotVId}
+#set( $item = $ListTool.get( $song, 0 ) )
+<div id="videoCanvas" class="wmv" width="502" height="443" class="mv_player"></div>
+#set($vid = $!{song.vclip.tvpotVId})#set($isPreVid = "N")
+#if($StringUtils.equals("$!{song.vclip.FreeYn}", "N"))
+	#if($StringUtils.isNotBlank("$!{musicUser}"))
+		#if(!$StringUtils.equals("$!{authorizedPlayVideo}", "true"))
+			#set($vid = $!{song.vclip.tvpotPreVId})#set($isPreVid = "Y")
+		#end
+	#else
+		#set($vid = $!{song.vclip.tvpotPreVId})#set($isPreVid = "Y")
+	#end
+#end
+<script type="text/javascript">
+	 daum.Music.VideoPlayer.add("videoCanvas", "$!{vid}", {thumb:""});
+</script>	
+#*
+		 //var videoClip = UI.embedSWF("http://flvs.daum.net/flvPlayer.swf?vid=$!{song.vclip.tvpotVId}&smooth=true&autoplay=true&informal=true&bannerMore=true",502,443,{bgcolor:'#fafafa',allowScriptAccess:'always'});
+<div id="mvPlayer">
+    <h3>뮤직비디오 영상</h3>
+    <div id="mvPlayerWrap"></div>
+</div>
+<script type="text/javascript">
+// 페이지 보호
+runProtectedContents();
+
+// 뮤비 실행
+var url = "$!{item.playPath}";
+var brow = UI.getBrowser();
+var mplayer1 = new Music.Mplayer( UI.$("mvPlayerWrap"), {url: url, seq:1} );
+var mplayerCtrl1 = new Music.MplayerControl( {
+    playerHandle: mplayer1,
+	track: {
+       width: 270,
+       height: 7
+    },
+    volume: {
+       width: 49,
+       height: 7 
+    }
+});
+mplayer1.changePlayState = function( NewState ){
+    switch(NewState) {
+    case 1://stopped
+        break;
+    case 2://paused
+        break;
+    case 3://playing
+        if( top.isNextPlay == "true" ){//19세미만 뮤비
+           this.stop();
+           if( top.isLogin == "false" ){// 비로그인상태
+               if( confirm("19세이상 뮤비입니다. 로그인 하시겠습니까?") ){
+                   var rtnUrl = encodeURIComponent( "http://music.daum.net/player/loginConfirmRedirect.html?action=mv19" );
+                   var popWin = UI.Popup("http://www.daum.net/Mail-bin/login.html?daumauth=1&service=adult_service&popup=1&url="+rtnUrl,"musicLoginPopup" );
+                   if( popWin == false ){
+                        top.UI.resizePopup( top.document.getElementById("playerWrap") );
+                   }
+               } else {
+                   top.playListCtrl.nextPlay( true );// autoplay && no count
+               }
+           } else {// 로그인상태+19세 미만
+               alert("19세 미만은 감상이 불가능한 뮤직비디오입니다.");
+               top.playListCtrl.nextPlay( true );// autoplay && no count
+           }
+        }
+        break;
+    case 8 ://end
+        var id = top.playListCtrl.getNextId()
+		this.objectControl.txtTimeCurrent.innerHTML = this.objectControl.txtTimeTotal.innerHTML;
+        if( id ){
+            top.Music.playListController.playCount++;
+            top.playListCtrl.nextPlay( true );// autoplay && no count
+        }
+        break;
+    }
+
+};
+</script>*#
+#*
+#foreach($video in $Dto.videoList)
+    ID : $video.videoId</br>
+        경로 : $video.playPath</br>
+#end
+
+$!{item} => ${song} :: 뮤직비디오를 담고있는 곡정보.
+$!{Dto.videoList} => $!{relationVclipList} :: 관련 뮤직비디오
+$!{musicUser} :: 사용자 정보
+$!{authorizedPlayVideo} :: 보기 가능여부
+$!{artistList} :: 동영상의 아티스트
+*#

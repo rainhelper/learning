@@ -1,0 +1,141 @@
+#uaCheck()
+<div id="daumContent" class="cont_chart">
+	<h2 class="screen_out">인기차트 상세정보</h2>
+#SearchForm("only_top")
+	<div class="section_chart">
+		<div class="wrap_head">
+			<h3 class="tit">인기차트</h3>
+		</div>
+		<ul class="list_info list_chart">
+			<li>
+				<div class="wrap_cont">
+					<a href="/chart/viewer?genreCd=TORA" class="tit_chart">
+						<span class="ico_music ico_clock"></span>
+						<span class="f_l">실시간 TOP100</span>
+						<span class="ico_music ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="wrap_cont">
+					<a href="/chart/viewer?genreCd=HOT" class="tit_chart">
+						<span class="ico_music ico_smile"></span>
+						<span class="f_l">핫이슈 공감</span>
+						<span class="ico_music ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			<li>
+
+				<div class="wrap_cont">
+					<a href="/chart/viewer?genreCd=MBAR" class="tit_chart">
+						<span class="ico_music ico_star"></span>
+						<span class="f_l">뮤직 Bar 추천</span>
+						<span class="ico_music ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="wrap_cont">
+					<a href="/chart/viewer?genreCd=KORA&date_key=2" class="tit_chart">
+						<span class="ico_music ico_list"></span>
+						<span class="f_l">가요</span>
+						<span class="ico_music ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="wrap_cont">
+					<a href="/chart/viewer?genreCd=PORA&date_key=2" class="tit_chart">
+						<span class="ico_music ico_list"></span>
+						<span class="f_l">POP</span>
+						<span class="ico_music ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="wrap_cont">
+					<a href="/chart/viewer?genreCd=OSRA&date_key=2" class="tit_chart">
+						<span class="ico_music ico_list"></span>
+						<span class="f_l">OST</span>
+						<span class="ico_music ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="wrap_cont">
+					<a href="/chart/viewer?genreCd=IDRA&date_key=2" class="tit_chart">
+						<span class="ico_music ico_list"></span>
+						<span class="f_l">아이돌</span>
+						<span class="ico_music ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="wrap_cont">
+					<a href="/chart/viewer?genreCd=INRA&date_key=2" class="tit_chart">
+						<span class="ico_music ico_list"></span>
+						<span class="f_l">인디</span>
+						<span class="ico_music ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="wrap_cont">
+					<a href="/chart/viewer?genreCd=TRRA&date_key=2" class="tit_chart">
+						<span class="ico_music ico_list"></span>
+						<span class="f_l">트로트</span>
+						<span class="ico_music ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="wrap_cont">
+					<a href="/chart/viewer?genreCd=JPRA&date_key=2" class="tit_chart">
+						<span class="ico_music ico_list"></span>
+						<span class="f_l">J-POP</span>
+						<span class="ico_music ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="wrap_cont">
+					<a href="/chart/viewer?genreCd=JARA&date_key=2" class="tit_chart">
+						<span class="ico_music ico_list"></span>
+						<span class="f_l">재즈</span>
+						<span class="ico_music ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="wrap_cont">
+					<a href="/chart/viewer?genreCd=CLRA&date_key=2" class="tit_chart">
+						<span class="ico_music ico_list"></span>
+						<span class="f_l">클래식</span>
+						<span class="ico_music ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="wrap_cont">
+					<a href="/chart/viewer?genreCd=RERA&date_key=2" class="tit_chart">
+						<span class="ico_music ico_list"></span>
+						<span class="f_l">종교음악</span>
+						<span class="ico_music ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="wrap_cont">
+					<a href="/chart/viewer?genreCd=ETRA&date_key=2" class="tit_chart">
+						<span class="ico_music ico_list"></span>
+						<span class="f_l">기타</span>
+						<span class="ico_music ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>
+<script type="text/javascript" src="http://issue.search.daum-img.net/jumpkeyword/API/tot_api.js" charset="euc-kr"></script>
+#parse("/velocity/mobileweb/realtimeissue.vm")

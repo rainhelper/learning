@@ -1,0 +1,17 @@
+{
+    "totalCnt" : "$!{totalCount}",    
+	"hist_page_no" : "$!{command.hist_page_no}",
+	"historyList" : 
+	[
+		#foreach($item in $$historyList)
+			#if($foreach.index > 0),#end
+			{
+   				"onOff" : "$!{item.onOff}",
+   				"userName" : "$!{item.daumName}",
+   				"fundPrice" : "#toCurrency($!{item.fundPrice})",
+   				"message" : "$!{item.supportMessage.replaceAll('\\', '\\\\')}",
+   				"fundDate" : "$CheckDate.makeReleaseDate("$!{item.fundDateTime}")"
+			}
+		#end
+	]
+}

@@ -1,0 +1,142 @@
+#uaCheck()
+
+#if(!$StringUtils.equals("$!{isDaumMusicApp}", "true"))
+#*
+<div id="daumAd">
+#if($isWVGA)
+	<script type="text/javascript" src="http://m.amsv2.daum.net/ad/adview?secid=0E634&replace=viewport.480" charset="utf-8"></script> 
+#else
+	<script type="text/javascript" src="http://m.amsv2.daum.net/ad/adview?secid=0E634&replace=viewport.320" charset="utf-8"></script> 
+#end
+</div> 
+*#
+
+
+<!-- 실시간이슈 -->
+<div id="hottrendsContainer"></div>
+
+<!-- 실시간 이슈 include -->
+<script src="http://m1.daumcdn.net/svc/original/U03/cssjs/slide/slide-1.0.5.min.js"></script>
+<script src="http://m1.daumcdn.net/svc/original/U03/cssjs/hottrends/hottrends-1.4.0.min.js"></script>
+<script>
+/*
+var realtimeIssueTxt = nowSearch.init(issueAPI.music);
+var customCollection = {
+    name: '실시간차트',
+    isNew: false,
+    render: function (callback) {
+        callback(realtimeIssueTxt);
+    },
+    renderCollapsed: function (callback) {
+        callback(realtimeIssueTxt);
+    }
+};
+*/
+
+(function (){
+  'use strict';
+   hottrends.realTimeChartCollection =  hottrends.Collection.extend({
+       init: function(){
+           this.name = "실시간차트";
+	       this.collapsedCounter=0;
+	       this.data=issueAPI;
+       },
+       _getSearchURL: function(word) {
+           return "http://m.search.daum.net/search?w=tot&q=" + encodeURIComponent(word.urlkeyword);
+       }
+   });
+})();
+daumtools.event.on(window, 'load', function () {
+    window.rtupcate = 'issuemusic';
+    var htContainer = document.getElementById('hottrendsContainer');
+    var trends = new hottrends.Main(htContainer);
+    var apibookAppKey = '888587620b022c0565ccd6451431094d';
+    trends.addCollection(new hottrends.Collection(apibookAppKey));
+    trends.addCollection(new hottrends.realTimeChartCollection());
+	//trends.pin = 'issue';
+	//trends.addCollection(new hottrends.SocialPickCollection(apibookAppKey));
+    trends.render();
+	trends.setActiveCollectionByIndex(1);
+});
+
+</script>
+#* 2013-2-14 웹투앱 2차로 인해 막음
+<div id="searchRankArea" class="open rank_area">
+	<div class="partition">
+		<h3>
+			<span class="title" id="searchRankTitle">핫이슈공감</span>
+		</h3>
+		<ul class="p1" id="nowSearch_list2"></ul>
+	</div>
+	<div class="partition part_right">
+		<h3>
+			<span class="title" id="searchRankTitle2">실시간이슈</span>
+			<span class="now"></span>
+		</h3>
+		<ul class="p1" id="nowSearch_list"></ul>
+	</div>
+	<a href="javascript:;" id="rankOpen" class="onoff"><span>열고/닫기</span></a>
+</div>
+
+
+<!div class="move_link" id="searchRankAreaMoveLink">
+	<a href="http://herennow.search.daum.net/issue" class="link_quick">
+		<span class="ico_top ico_search"></span>이슈검색어 전체보기
+	</a>
+	<a href="#" onclick="window.scrollTo(0, 1); return false;" class="round btn_top">
+		<span class="inner"><span class="ico_top ico_arrow"></span>맨위로</span>
+	</a>
+</div>
+<script type="text/javascript">
+    nowSearch.init(issueAPI.realtime,issueAPI.music,'핫이슈공감');
+    var nowNews= (new roll()).autoRoll().setHandler(["rankOpen"]);
+</script>
+*#
+
+<div id="daumAd"></div>
+<script type="text/javascript">
+var daum_adam_vars = {
+	client : '12e1Z1RT13319dfa1d0',
+	position : 'MIDDLE',
+	width :#if($isWVGA) 480#else 320#end,
+	bannerDivId : 'daumAd',
+	mraidDelay : 20,
+	special: 'layered'
+};
+</script>
+<script type="text/javascript" src="http://display.ad.daum.net/imp?slotid=0Qb65"></script>
+
+
+##<script type="text/javascript" src="http://180.70.134.141/issue_api/search?s=music&format=json&callback=musicIssueApi"></script>
+#* 인기음악 data
+<script type="text/javascript" src="http://issue.search.daum-img.net/issue/music/music_rank.js"></script> 
+<div id="searchRankArea" class="open"> 
+	<div class="partition">
+	<h3> 
+		<a class="title" id="searchRankTitle" href="http://issue.search.daum.net" onclick='smartLog(this,"s=TO&a=RSTO&hi=0&r=1&p=30",event);'>실시간이슈</a> 
+		<a  href="http://issue.search.daum.net" onclick='smartLog(this,"s=TO&a=RSTO&hi=0&r=1&p=30",event);' class="now">이슈검색어 전체보기&gt;</a> 
+	</h3> 
+	<ul class="p1" id="nowSearch_list2"> 
+		<li class="n1"></li> 
+	</ul> 
+	</div>
+
+	<div class="partition part_right">
+	<h3> 
+		<a class="title2" id="searchRankTitle2" href="http://issue.search.daum.net" onclick='smartLog(this,"s=TO&a=RSTO&hi=0&r=1&p=30",event);'>실시간이슈</a> 
+		<span class="now"></span> 
+	</h3> 
+	<ul class="p1" id="nowSearch_list"> 
+		<li class="n1"></li> 
+	</ul>
+	</div>
+	<a href="javascript:;" id="rankOpen"  class="onoff"><span>열고/닫기</span></a><a  href="javascript:;" id="rankClose"><span>닫기</span></a> 
+
+</div> 
+<script type="text/javascript"> 
+nowSearch.init('nowTotal','nowMusic');
+var nowNews= (new roll()).autoRoll().setHandler(["rankOpen","rankClose"]);
+</script>
+*#
+
+#end

@@ -1,0 +1,234 @@
+<main id="daumContent">
+    <article id="mArticle">
+        <h2 class="screen_out">톡뮤직 본문</h2>
+        <div class="cont_latest">
+            <h3 class="tit_latest">최신등록순</h3>
+		    #foreach( $talkContent in $talkContents )
+
+                #if( ${foreach.index} >= 5 )
+                    <div class="loading" style="width:100%; max-width: 640px; margin-top: 8px;">
+                        <div class="loading_img_background">
+                            <div class="loading_img"></div>
+                        </div>
+                    </div>
+                    #break
+                #end
+
+			    #if( $!{talkContent.templetType} == "Q")
+                    <div class="post_vote">
+                        <h4 class="screen_out">퀴즈 컨텐츠</h4>
+                        <a href="/talk/quiz/$!{talkContent.menuId}/$!{talkContent.boardId}">
+                            <div class="vote_visual">
+                                <div class="vote_item" style="height: 150px;">
+                                <img src=#if("$!{talkContent.cropYn}" == "Y") "$!{ImageUtil.getFaceDetectImageUrl("$!{talkContent.imageUrl}", "C640x340")}" class="thumb_visual"
+									     #else "$!{ImageUtil.getMobileImageUrl("$!{talkContent.imageUrl}", "640x0", "PHOTO", "R")}" class="thumb_visual thumb_top"
+									     #end alt="$!{EscapeUtil.encodeHtmlTag($!{talkContent.title})}">
+                                </div>
+                                <span class="ico_comm ico_quiz">Quiz</span>
+                            </div>
+                            <div class="info_vote">
+                                <strong class="tit_vote">
+									<span class="txt_vote">
+										<span class="ico_comm ico_lquote">&ldquo;</span>
+										$!{talkContent.title}
+									</span>
+                                    <span class="ico_comm ico_rquote">&rdquo;</span>
+                                </strong>
+                            </div>
+                            <span class="desc_vote">$!{talkContent.subTitle}</span>
+                            <button class="link_vote">
+							    #if ("$!{talkContent.progressStatus}" == "ING") 퀴즈 참여하기
+							    #elseif ("$!{talkContent.progressStatus}" == "END") 퀴즈 결과보기
+							    #else 퀴즈 준비중
+							    #end
+                            </button>
+                        </a>
+                        <div class="post_card">
+                            <div class="post_info" style="height:12px; padding-top:0px; border:0px;">
+                                <span class="date_card">$!{CheckDate.makeReleaseDate($!{talkContent.regdttm})}</span>
+                                <span class="count_card">조회 <span class="num_count">$!{StringUtil.formatTypeByNumber($!{talkContent.pvCnt})}</span></span>
+                            </div>
+                        </div>
+                    </div>
+			    #elseif( $!{talkContent.templetType} == "P")
+                    <div class="post_vote">
+                        <h4 class="screen_out">투표 컨텐츠</h4>
+                        <a href="/talk/detail/$!{talkContent.menuId}/$!{talkContent.boardId}">
+                            <div class="vote_visual">
+                                <div class="vote_item" style="height: 150px;">
+                                <img src=#if("$!{talkContent.cropYn}" == "Y") "$!{ImageUtil.getFaceDetectImageUrl("$!{talkContent.imageUrl}", "C640x340")}" class="thumb_visual"
+									     #else "$!{ImageUtil.getMobileImageUrl("$!{talkContent.imageUrl}", "640x0", "PHOTO", "R")}" class="thumb_visual thumb_top"
+									     #end alt="$!{EscapeUtil.encodeHtmlTag($!{talkContent.title})}">
+                                </div>
+                                <span class="ico_comm ico_vs">$!{talkContent.title}</span>
+                            </div>
+                            <div class="info_vote">
+                                <strong class="tit_vote">
+									<span class="txt_vote">
+										<span class="ico_comm ico_lquote">&ldquo;</span>
+										$!{talkContent.title}
+									</span>
+                                    <span class="ico_comm ico_rquote">&rdquo;</span>
+                                </strong>
+                            </div>
+                            <span class="desc_vote">$!{talkContent.subTitle}</span>
+                            <button class="link_vote">
+							    #if ("$!{talkContent.progressStatus}" == "ING") 투표 참여하기
+							    #elseif ("$!{talkContent.progressStatus}" == "END") 투표 결과보기
+							    #else 투표 준비중
+							    #end
+                            </button>
+                        </a>
+                        <div class="post_card">
+                            <div class="post_info" style="height:12px; padding-top:0px; border:0px;">
+                                <span class="date_card">$!{CheckDate.makeReleaseDate($!{talkContent.regdttm})}</span>
+                                <span class="count_card">조회 <span class="num_count">$!{StringUtil.formatTypeByNumber($!{talkContent.pvCnt})}</span></span>
+                            </div>
+                        </div>
+                    </div>
+			    #elseif( $!{talkContent.templetType} == "V")
+                    <div class="post_card post_video">
+                        <h4 class="screen_out">동영상 컨텐츠</h4>
+                        <a href="/talk/detail/$!{talkContent.menuId}/$!{talkContent.boardId}" class="link_visual" style="height: 150px;">
+                        <img src=#if("$!{talkContent.cropYn}" == "Y") "$!{ImageUtil.getFaceDetectImageUrl("$!{talkContent.imageUrl}", "C640x340")}" class="thumb_visual"
+							     #else "$!{ImageUtil.getMobileImageUrl("$!{talkContent.imageUrl}", "640x0", "PHOTO", "R")}" class="thumb_visual thumb_top"
+							     #end alt="$!{EscapeUtil.encodeHtmlTag($!{talkContent.title})}">
+							<span class="txt_visual">
+								<strong class="tit_visual">$!{talkContent.title}</strong>
+								<span class="desc_visual">$!{talkContent.writer.nickName}</span>
+							</span>
+                            <span class="ico_comm ico_play">재생하기</span>
+                        </a>
+                        <div class="post_info">
+                            <span class="date_card">$!{CheckDate.makeReleaseDate($!{talkContent.regdttm})}</span>
+                            <span class="count_card">조회 <span class="num_count">$!{StringUtil.formatTypeByNumber($!{talkContent.pvCnt})}</span></span>
+                        </div>
+                    </div>
+			    #elseif( $!{talkContent.templetType} == "B")
+                    <div class="post_card post_general">
+                        <h4 class="screen_out">일반 컨텐츠</h4>
+                        <a href="/talk/detail/$!{talkContent.menuId}/$!{talkContent.boardId}" class="link_visual" style="height: 150px;">
+                        <img src=#if($!{talkContent.cropYn} == "Y") "$!{ImageUtil.getFaceDetectImageUrl("$!{talkContent.imageUrl}", "C640x340")}" class="thumb_visual"
+							     #else "$!{ImageUtil.getMobileImageUrl("$!{talkContent.imageUrl}", "640x0", "PHOTO", "R")}" class="thumb_visual thumb_top"
+							     #end alt="$!{EscapeUtil.encodeHtmlTag($!{talkContent.title})}">
+							<span class="txt_visual">
+								<strong class="tit_visual">$!{talkContent.title}<br/>$!{talkContent.subTitle}</strong>
+								<span class="desc_visual">$!{talkContent.writer.nickName}</span>
+							</span>
+                        </a>
+                        <div class="post_info">
+                            <span class="date_card">$!{CheckDate.makeReleaseDate($!{talkContent.regdttm})}</span>
+                            <span class="count_card">조회 <span class="num_count">$!{StringUtil.formatTypeByNumber($!{talkContent.pvCnt})}</span></span>
+                        </div>
+                    </div>
+			    #elseif( $!{talkContent.templetType} == "A")
+			    #end
+		    #end
+        </div>
+
+
+        <!-- 우선 광고 영역에 대한 표기만 해둔 상태! -->
+        <hr class="hide">
+        <div class="bnr_add bnr_detail" style="display: none">
+            <strong class="screen_out">배너영역</strong>
+            <a href="http://contents.kakao.com/music/1428491158377.html" target="_blank" class="link_bnr link_type3"> <!-- 배너 바탕 주황색, link_type1, 보라색 link_type2, 노란색 link_type3 -->
+                <img src="http://cfile190.uf.daum.net/image/2616864B552CDD4C215669" width="310" height="55" class="img_bnr" alt="카카오 뮤직 앱 설치 하러 가기">
+            </a>
+        </div>
+
+    </article>
+</main>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        if (util.userAgent().platform != 'mobile') {
+            $(window).resize(function(){
+                resizeHeight();
+            });
+
+            window.onload = function(){
+                resizeHeight();
+            };
+        }
+    });
+
+    var pageNum = 1;
+    var isLastPage = false;
+    var loading = false;
+
+    function addTalkContents(pg){
+        if (loading) {
+            return;
+        }
+
+        pageNum++;
+
+	    var menuId = $!{menuId};
+        var jsonUrl = "/talk/" + menuId + ".json";
+        var param = "&page=" + pg;
+
+        var opt = {
+            paramString : param,
+            method: "POST",
+            onsuccess : function(res){
+                var data = daum.jsonToObject(res.responseText);
+                showTalkContents(data, pg);
+            },
+            onfailure : showErrorMessageForTalk
+        };
+        new daum.Ajax().request(jsonUrl, opt);
+    }
+
+    function showTalkContents(data, pg){
+        var talkContents = data.talkContents;
+        daum.Music.Talk.addBottomList(talkContents, "MENU");
+
+        if (talkContents.length == 0) {
+            isLastPage = true;
+        }
+
+        loading = false;
+    }
+
+    function showErrorMessageForTalk(){
+        loading = false;
+        pageNum--;
+        alert("데이터를 가져오지 못했습니다.");
+    }
+
+    $(window).scroll(function(){
+        if($(window).scrollTop() >= $(document).height() - $(window).height() - 200){
+            addTalkContents(pageNum);
+            loading = true;
+        }
+    });
+
+    if($(document).height() == $(window).height()){
+        addTalkContents(pageNum);
+        loading = true;
+    }
+
+    var gvTimeStamp = $timestamp;
+    var __TiaraObject = __TiaraObject || {};
+    if ('undefined' === typeof __TiaraObject.startTime) {
+        __TiaraObject.startTime = new Date();
+    }
+
+    _tiq.push(['__setSection', 'talkmusic#menu']);
+    _tiq.push(['__setPageName', 'menu']);
+    _tiq.push(['__setParam', 'puid', gvTimeStamp]);
+    _tiq.push(['__setParam', 'svcdomain', 'talkmusic.kakao.com']);
+    _tiq.push(['__setConfig',
+        {enablePageshow: true, enableButton: false, enableHash: true}
+    ]);
+
+    _tiq.push(['__clickOn']);
+    _tiq.push(['__trackPageview']);
+
+
+    function resizeHeight(){
+        $('.link_visual').height($('.link_visual').width() / 2.2);
+        $('.vote_item').height($('.vote_item').width() / 2.2);
+    }
+
+</script>

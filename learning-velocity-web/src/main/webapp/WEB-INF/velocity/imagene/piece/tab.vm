@@ -1,0 +1,42 @@
+<div class="intro_month">
+	<p>IAM(이매진 어워드 뮤직페스트)과 함께하는 Daum 뮤직 이달의 앨범</p>
+	<p>젊은 비평가들로 구성된 전문가 집단과 함께 매달 좋은 앨범을 추천하여 소개합니다.</p>
+</div>
+<div class="wrap_tabyear">
+	<ul class="list_tabyear">
+		<li#if($StringUtils.equals("$!{tab}","albumview")) class="on"#end><a href="/imagene/detail" class="tab_link tab_monthalbum">이달의 앨범</a></li>
+		<li#if($StringUtils.equals("$!{tab}","album")) class="on"#end><a href="/imagene/main" class="tab_link tab_all">선정작 목록</a></li>
+		<li#if($StringUtils.equals("$!{tab}","standard")) class="on"#end><a href="/imagene/description" class="tab_link tab_standard">선정기준</a></li>
+		<li#if($StringUtils.equals("$!{tab}","yearAward")) class="on"#end><a href="/imagene/yearAward" class="tab_link tab_yearalbum">IA 올해의 앨범</a></li>
+		<li#if($StringUtils.equals("$!{tab}","intro")) class="on"#end><a href="/imagene/intro" class="tab_link tab_intro">IAM소개</a></li>
+	</ul>
+	<div class="btn_consumer">
+    	##set($thumb = $ImageUtil.getImageUrl("$!{album.mainImage.filePath}", "42x42", "ALBUM"))
+		#set($thumb = "http://i1.daumcdn.net/img-contents/2010ci/daumlogo.gif")
+		#if($StringUtils.equals("$!{tab}","yearAward"))
+			#set($link = "http://music.daum.net/imagene/yearAward")
+			#set($prefix = "IA 올해의 앨범 선정작을 소개합니다.")
+		#else
+    		#set($link = "http://music.daum.net/imagene/detail?dummy="+$!{Date.getSystemTime()})
+    		#set($prefix = "이달의 앨범을 소개합니다.")
+		#end
+		#set($prefix = $prefix.replaceAll('"', '&quot;'))
+		#set($prefix = "#escScript($!{prefix})")
+		#printSnsButton($id $type $!{link} $!{prefix} "etc")
+		<!--
+		<span class="btn_sns">
+			<a class="btn_comm btn_yozm" href="#" title="요즘으로 보내기"><span class="screen_out">요즘</span></a>
+			<a class="btn_comm btn_my" href="#" title="마이피플로 보내기"><span class="screen_out">마이피플</span></a>
+			<a class="btn_comm btn_twitter" href="#" title="트위터로 보내기"><span class="screen_out">트위터</span></a>
+
+			<a class="btn_comm btn_cyworld" href="#" title="싸이월드로 보내기"><span class="screen_out">싸이월드</span></a>
+			<a class="btn_comm btn_more" href="#" title="SNS 더보기"><span class="screen_out">더보기</span></a>
+		</span>
+		-->
+	</div>
+	<div class="cl_b"></div>
+</div>
+	
+
+
+

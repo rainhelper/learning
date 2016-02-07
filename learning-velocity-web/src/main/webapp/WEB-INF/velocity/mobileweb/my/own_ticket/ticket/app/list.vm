@@ -1,0 +1,47 @@
+#uaCheck()
+<div id="daumContent" class="cont_purchase">
+	#if( !$isIos == true )	
+		#printPurchaseMenuApp("3")
+	#end
+#if(!$CollectionUtils.isEmpty($dto.ticketList))
+	<div class="wrap_cont">
+		<strong class="screen_out">이용권 관리</strong>
+		<strong class="tit_hold">보유 이용권</strong>
+		#foreach($ticket in $dto.ticketList)
+			#if($!{ticket.ticketUseStatus} != "CANCEL")
+		<div class="box_type1">
+			<em class="tit_purchase#if(${ticket.order.item.title.length()} > 20) tit_type2#end" id="title_$!{ticket.order.orderId}" title="$!{ticket.order.item.title}">$!{ticket.order.item.title}</em>
+			#if($StringUtils.equals("$!{ticket.useCode}", "N") && $ticket.isStart() == false)
+				#if("$!{dto.isAodUse()}" != "Y")
+					<a href="#none" onclick='javascript:music.mobile.MyOwnTicket.click(this, "$!{ticket.order.orderId}", "/app");' class="btn_use"> 이용권 사용하기</a>
+				#end
+			#else
+				#printRemainderInfoForApp( $!{ticket} $!{dto.user} $!{dto.isAodUse()})
+			#end		
+			
+		</div>
+			#end
+		#end
+		#if(${left.mp3LeftCount} > 0)
+		<strong class="tit_residue">구매가능 MP3 잔여곡</strong>
+		<div class="box_type1">
+			<em class="tit_purchase">MP3 <span class="txt_num">${left.mp3LeftCount}곡</span> 남음</em>
+		</div>
+		#end
+	</div>
+#else
+	<div class="wrap_cont">
+		<strong class="screen_out">이용권 관리</strong>
+		<p class="desc_nodata">사용 가능한 이용권이 없습니다.</p>
+	#if( !$isIos == true )	
+		<div class="manage_btn">
+			<a href="/coupon/app" class="link_manage">쿠폰 등록</a>
+			<a href="/ticket/ticketitem/app/list" class="link_manage link_purchase">이용권 구매</a>
+		</div>
+	#end
+	</div>
+
+#end
+</div>
+
+#parse("/velocity/mobileweb/realtimeissue.vm")

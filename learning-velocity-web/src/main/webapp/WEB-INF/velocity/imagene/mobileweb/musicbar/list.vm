@@ -1,0 +1,29 @@
+#uaCheck()
+<div id="daumContent" class="cont_bar">
+	<h2 class="screen_out">뮤직 BAR 상세정보</h2>
+#SearchForm("only_top")	
+	<div class="section_bar">
+		<div class="wrap_head">
+			<h3 class="tit">#if($musicbarTitle)$musicbarTitle#{else}뮤직 Bar#end</h3>
+		</div>
+		<ul class="list_info list_bar">
+#foreach($board in $boardList)
+#musicBarList()
+#end
+		</ul>
+#mobilePaging($pagingUrl, $command.page_no, $pageHandler)
+	</div>
+</div>
+#parse("/velocity/mobileweb/realtimeissue.vm")
+#*
+#foreach($board in $boardList)
+	뮤직바아이디 : $board.boardId <br/>
+	글제목 : $board.title <br/>
+	카테고리 : $board.subTitle <br/>
+	이미지 : $board.imageUrl <br/>
+	등록일 : $board.regdttm <br/>
+	링크 : 낫옛 <br/><br/>
+#end
+<hr/>
+*#
+##page

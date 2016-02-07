@@ -1,0 +1,196 @@
+#set($lyricsList = $dto.lyricResult.documentList)
+#set($lyricsCount = $dto.lyricResult.totalResultsCount)
+#set($query = $!{command.query})
+#set($url = "/search/lyrics/list?query=$!{query}")
+#set ($artistUrl = "&artistId=$!{command.artistId}")
+#set ($rangeUrl = "&searchRange=$!{command.searchRange}")
+#set ($nationUrl = "&nationId=$!{command.nationId}")
+#set ($genreUrl = "&genreId=$!{command.genreId}")
+#set ($releaseUrl = "&releaseYear=$!{command.releaseYear}")
+#set ($listenUrl = "&listenFilter=$!{command.listenFilter}")
+#set ($bgmUrl = "&bgmFilter=$!{command.bgmFilter}")
+#set($url = $url + $artistUrl + $rangeUrl + $nationUrl + $genreUrl + $releaseUrl + $listenUrl + $bgmUrl)
+
+<ul class="tab_cont tab_search">
+	#printSearchNaviTab()
+</ul>
+
+#parse("/velocity/search/piece/highlight.vm")
+
+#if(($!{lyricsCount}) && $!{lyricsCount} > 0)
+<div class="section_lyrics">
+	
+	
+	<div class="wrap_title">
+		<h3 class="tit_search tit_lyrics">가사</h3>
+		<span class="txt_bar"> | </span>
+		<span class="txt_quantity">총 <strong class="fc_blue ls_0">$!{lyricsCount}</strong> 건</span>
+		<div class="sort_option f_r">
+			#printSearchSortOption( $url, $!{command.sortType} )
+		</div>
+	</div>
+	
+	<ul class="list_lyrics">
+			##printSearchLyricsList($lyricsList) -> 매크로 수정할것
+			#if(!$CollectionUtils.isEmpty($lyricsList))
+        		#foreach($lyric in $lyricsList)
+        		<li #if($foreach.index == 0)class="fst"#end>
+        			#if($StringUtils.isNotBlank("$!{lyric.song_name}"))
+        			<div class="txt_tit">
+        				#if($StringUtils.equals("$lyric.listen_yn", "Y")) #set ( $_listenAble = true ) #else #set ( $_listenAble = false ) #end
+                		#if($_listenAble)<a class="ico_comm ico_listen" title="#stripHTML($!{lyric.song_name})" #if($_listenAble)onclick="daum.Music.AodPlayer.add(this,$!{lyric.song_id});return false;"#end href="javascript:;">#else<span class="ico_comm ico_nolisten ">#end
+        				${HtmlTool.cutHighlightedKoreanString("$!{lyric.song_name}", 45, "..")}
+                		#if($_listenAble)</a>#else</span>#end
+        			</div>
+        			#end
+        			#if($StringUtils.isNotBlank("$!{lyric.lyrics}"))
+        			<div class="txt_lyrics">
+        				<a title="가사" href="/album/main?album_id=$!{lyric.album_id}&song_id=$!{lyric.song_id}">${HtmlTool.cutHighlightedKoreanString("$!{lyric.lyrics}", 300, "..")}</a>
+        			</div>
+        			#end
+        			<div class="txt_info">
+        				#set($chkL = "off")
+        				#if($StringUtils.isNotBlank("$!{lyric.getArtist().getName()}"))
+        					#if($StringUtils.isNotBlank("$!{lyric.getArtist().getArtistId()}") && !$StringUtils.equals("$!{lyric.getArtist().getArtistId()}","0"))
+        					<a title="#stripHTML($!{lyric.getArtist().getName()})" href="/artist/main?artist_id=$!{lyric.getArtist().getArtistId()}" onclick="daum.Music.artistDetail($!{lyric.getArtist().getArtistId()});return false;" >$!{lyric.getArtist().getName()}</a>#else<span>$!{lyric.getArtist().getName()}</span>
+        					#end
+        					#set($chkL = "on")
+        				#else
+        					<span>V.A</span>
+        					#set($chkL = "on")
+						#end
+        				#if($StringUtils.isNotBlank("$!{lyric.album_volume}") || $StringUtils.isNotBlank("$!{lyric.album_name}"))
+        					#if($StringUtils.equals($!{chkL},"on")) <span class="txt_bar"> | </span> #end
+        					<a title="#stripHTML($!{lyric.album_name})" href="/album/main?album_id=$!{lyric.album_id}" onclick="daum.Music.albumDetail($!{lyric.album_id}, $!{lyric.artist_id});return false;">#if($StringUtils.isNotBlank("$!{lyric.album_volume}"))$!{lyric.album_volume}집 #end$!{lyric.album_name}</a>
+        					#set($chkL = "on")
+        				#end
+        				#if($StringUtils.isNotBlank("$!{lyric.release_date}"))
+        					#if($StringUtils.isNotBlank("$!{lyric.release_date}") && !$StringUtils.equals("$!{lyric.release_date}", "00000000"))
+        					#if($StringUtils.equals($!{chkL},"on")) <span class="txt_bar"> | </span> #end
+        					발매 : $!{CheckDate.makeReleaseDate($!{lyric.release_date})}
+        					#end
+        				#end
+        			</div>
+        		</li>
+        		#end
+        	#end
+
+	</ul>
+	
+	#if($StringUtils.isNotBlank("$!{command.sortType}")) #set($url = $url + "&amp;sortType=$!{command.sortType}") #end
+	#set($url = $url + "&amp;page_no=")
+	#printPaging($url, $dto.ph.pageNo, $dto.ph, "", 10)
+	
+</div>
+#else
+<ul class="list_search_guide">
+	<li class="ico_comm">검색어의 단어 수를 줄이거나, 보다 일반적인 단어로 검색해 보세요.</li>
+	<li class="ico_comm">두 단어 이상의 키워드로 검색 하신 경우, 정확하게 띄어쓰기를 한 후 검색해 보세요.</li>
+	<li class="ico_comm">키워드에 있는 특수문자를 뺀 후에 검색해 보세요.</li>
+</ul>
+#end
+
+
+<div id="FTMessage">
+---------------------<br/>
+FT 체크<br/>
+---------------------<br/>
+
+---------------------<br/>
+개발 체크<br/>
+---------------------<br/>
+
+</div>
+
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+
+#set($lyricsList = $dto.lyricResult.documentList)
+#set($lyricsCount = $dto.lyricResult.totalResultsCount)
+
+#set ($url = "?query=$!{command.encodedQuery}")	
+#if( $StringUtils.isNotEmpty("$!{command.searchRange}") ) #set ($url = $url + "&searchRange=$!{command.searchRange}") #end
+#if( $StringUtils.isNotEmpty("$!{command.artistId}") ) #set ($url = $url + "&artistId=$!{command.artistId}") #end
+#if( $StringUtils.isNotEmpty("$!{command.genreId}") ) #set ($url = $url + "&genreId=$!{command.genreId}") #end
+#if( $StringUtils.isNotEmpty("$!{command.releaseYear}") ) #set ($url = $url + "&releaseYear=$!{command.releaseYear}") #end
+
+         <h2>본문영역</h2> 
+			
+<!-- 가사 -->		
+		#if(($!{lyricsCount}) && $!{lyricsCount} > 0)		
+		<div class="collTitle">
+			<h3 class="fl">가사 <span class="num">총 $!{lyricsCount}건</span></h3>
+			<span class="fl">&nbsp;
+				#if($StringUtils.equals($!{command.sortType}, "0"))
+    				<span class="nrl base">정확도</span>
+    			#else
+    				<a href="$url&sortType=0" class="stlink" onclick="return gExtraLink(this, 'SRLY', '1')">정확도</a>
+    			#end
+    			#if($StringUtils.equals($!{command.sortType}, "1"))
+    				<span class="nrl vline"> | </span><span class="nrl base">최신</span>
+    			#else
+    				<span class="nrl vline"> | </span><a href="$url&sortType=1" class="stlink" onclick="return gExtraLink(this, 'SRLY', '2')">최신</a>
+    			#end
+    			#if($StringUtils.equals($!{command.sortType}, "2"))
+    				<span class="nrl vline"> | </span><span class="nrl base">인기도</span>
+    			#else
+    				<span class="nrl vline"> | </span><a href="$url&sortType=2" class="stlink" onclick="return gExtraLink(this, 'SRLY', '3')">인기도</a>
+    			#end
+			</span>
+		</div>
+		<div class="collWid collTot uccDl">		
+		#foreach($lyric in $lyricsList)		
+			#set ( $count = $foreach.index + 1 )
+			<dl #if($foreach.index == 0) class="fst" #end>
+		        <dt>
+					<a href="/song/song.do?songId=$!{lyric.song_id}" class="btnListenTit fl" title="#getStrongText($!{lyric.song_name}) 곡 상세정보 바로가기" onclick="return gLink(null, 'SRLY', '1', '$!{count}');">$!{lyric.song_name}</a>
+					#if($StringUtils.equals("$lyric.listen_yn", "Y")) #set ( $_listenAble = true ) #else #set ( $_listenAble = false ) #end
+					<input class="fl typeBtn btSetMini btMiniListen#if(!$_listenAble)_dis#end" type="button" #if($_listenAble)onclick="listenSong('$!{lyric.song_id}', true);return gLink(null, 'SRLY', '2', '$!{count}');"#else disabled="true"#end title="#getStrongText($!{lyric.song_name}) 곡 듣기" value="#getStrongText($!{lyric.song_name}) 곡 듣기"/>
+				</dt>
+				<dd>
+					#if($StringUtils.isNotEmpty("$!{lyric.lyrics}"))<span class="cb desc">$!{lyric.lyrics}</span> #end
+					<span class="cb etc">
+						#set($chkL = "off")
+						#if($StringUtils.isNotEmpty("$!{lyric.artist_name}"))
+							#if($StringUtils.isNotEmpty("$!{lyric.artist_id}") && !$StringUtils.equals("$!{lyric.artist_id}","0"))<a href="/artist/artist.do?artistId=$!{lyric.artist_id}" class="g_tit" onclick="return gLink(null, 'SRLY', '3', '$!{count}');">$!{lyric.artist_name}</a>#else $!{lyric.artist_name}#end 
+							#set($chkL = "on")
+						#end
+						#if($StringUtils.isNotEmpty("$!{lyric.album_name}"))
+							#if($StringUtils.equals($!{chkL},"on")) <span class="vline"> | </span> #end
+							<a href="/album/album.do?albumId=$!{lyric.album_id}" class="g_tit" onclick="return gLink(null, 'SRLY', '4', '$!{count}');">$!{lyric.album_vol} $!{lyric.album_name}</a>
+							#set($chkL = "on")
+						#end
+						#if($StringUtils.isNotEmpty("$!{lyric.release_dttm}"))
+							#if($StringUtils.equals($!{chkL},"on")) <span class="vline"> | </span> #end
+							발매 : $ConverterUtil.formatByStar(${lyric.release_dttm}, "****.**.**")
+						#end
+					</span>									
+				</dd>
+			</dl>			
+		#end
+		</div>
+		<div class="collBottom"></div>
+		
+<!-- 페이징 -->	
+        #if( $StringUtils.isNotEmpty("$!{command.sortType}") ) #set ($url = $url + "&sortType=$!{command.sortType}") #end
+			#printPagingClickLog("${url}&pageNo=", $dto.ph.pageNo, $dto.ph)
+		#end	
+		
+		<!--검색결과 없음 -->
+        #if($lyricsCount <= 0)
+    		<div class="rsltHelp">
+        		<p><span class="dot">ㆍ</span>검색어의 단어 수를 줄이거나, 보다 일반적인 단어로 검색해 보세요.</p>
+        		<p><span class="dot">ㆍ</span>두 단어 이상의 키워드로 검색 하신 경우, 정확하게 띄어쓰기를 한 후 검색해 보세요.</p>
+        		<p><span class="dot">ㆍ</span>키워드에 있는 특수문자를 뺀 후에 검색해 보세요.</p>
+        	</div>
+    	</div>
+    	#end
+		
+		
+<!-- 제보 -->
+##		<hr/><div id="wInfoArea"><span class="tit">지금 보시는 검색 결과에 추가, 수정이 필요한 내용을 직접 등록해 주세요.</span><input type="button" class="typeBtn btnInfo fl" value="제보하기" title="제보하기"></div>
+	
+<!-- 클릭로그 -->
+<script type="text/javascript">init("LY", "$!{command.eucKrQuery}", "-1", "@@@");</script>
+
+#end

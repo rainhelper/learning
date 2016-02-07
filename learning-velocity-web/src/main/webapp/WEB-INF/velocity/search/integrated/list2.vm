@@ -1,0 +1,176 @@
+#set($artistList = $dto.artistResult.documentList)
+#set($songList = $dto.songResult.documentList)
+#set($albumList = $dto.albumResult.documentList)
+#set($videoList = $dto.videoResult.documentList)
+#set($lyricsList = $dto.lyricResult.documentList)
+#set($boardList = $dto.boardResult.documentList)
+
+#set($artistCount = $dto.artistResult.totalResultsCount)
+#set($boardCount = $dto.boardResult.totalResultsCount)
+#set($albumCount = $dto.albumResult.totalResultsCount)
+#set($songCount = $dto.songResult.totalResultsCount)
+#set($videoCount = $dto.videoResult.totalResultsCount)
+#set($lyricCount = $dto.lyricResult.totalResultsCount)
+
+#set($totalCount = $dto.totalCount)
+<ul class="tab_cont tab_search">
+	#printSearchNaviTab()	
+</ul>
+
+#parse("/velocity/search/piece/highlight.vm")
+
+#if($totalCount > 0)
+<div class="article_all">
+
+	##$!{dto.resultOrderList}
+	##[ $artistCount , $albumCount , $songCount , $videoCount , $lyricCount , $boardCount ]
+	#foreach($SchOrderL in $!{dto.resultOrderList} )
+		#parse("/velocity/search/integrated/collection/${SchOrderL}2.vm")
+	#end
+	##parse("/velocity/search/integrated/collection/artist.vm")
+	##parse("/velocity/search/integrated/collection/song.vm")
+	##parse("/velocity/search/integrated/collection/album.vm")
+	##parse("/velocity/search/integrated/collection/video.vm")
+	##parse("/velocity/search/integrated/collection/lyric.vm")
+	#parse("/velocity/search/integrated/collection/board.vm")
+	
+	
+</div>
+#else
+<ul class="list_search_guide">
+	<li class="ico_comm">검색어의 단어 수를 줄이거나, 보다 일반적인 단어로 검색해 보세요.</li>
+	<li class="ico_comm">두 단어 이상의 키워드로 검색 하신 경우, 정확하게 띄어쓰기를 한 후 검색해 보세요.</li>
+	<li class="ico_comm">키워드에 있는 특수문자를 뺀 후에 검색해 보세요.</li>
+</ul>
+#end
+
+
+<div id="FTMessage">
+---------------------<br/>
+FT 체크<br/>
+---------------------<br/>
+artist<br/>
+multi는 뭘까요?<br/>
+---------------------<br/>
+개발 체크<br/>
+---------------------<br/>
+- dto.resultOrderList 에서의 데이터 순서가 바뀌던데 원래 그런건지요?<br/>
+- dto.resultOrderList 에서 board도 나오게 해주세요<br/>
+- 아티스트 json 대표곡 정보<br/>
+
+song<br/>
+- 재생시간 정보<br/>
+video<br/>
+- 등록일 정보<br/>
+musicbar<br/>
+- 이미지에 대한 정보<br/>
+</div>
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+
+- 아티스트 기본 - 6개 펼치기시 6개씩 추가
+- 곡 기본 - 10개, 펼치기시 10개씩 추가
+- 앨범 기본 - 6개 펼치기시 6개씩 추가
+- 뮤직비디오 기본 5개, 펼치기시 5개씩 추가
+- 가사 기본 4개, 펼치기시 4개씩 추가
+- 뮤직Bar 기본 4개, 펼치기시 4개씩 추가
+
+${HtmlTool.cutHighlightedKoreanString("<b>은혜초등학교</b> 앞에  뜨개질, 십자 수 놓기할수...", 13, "...")}
+${HtmlTool.cutHighlightedKoreanString("<b>은혜초등학교</b> 앞에  뜨개질, 십자 수 놓기할수...", 19, "...")}
+${HtmlTool.cutHighlightedKoreanString("<b>은혜초등학교</b> 앞에  뜨개질, 십자 수 놓기할수...", 25, "...")}
+
+
+#set($artistList = $dto.artistResult.documentList)
+#set($songList = $dto.songResult.documentList)
+#set($albumList = $dto.albumResult.documentList)
+#set($videoList = $dto.videoResult.documentList)
+#set($lyricsList = $dto.lyricResult.documentList)
+#set($boardList = $dto.boardResult.documentList)
+
+#set($artistCount = $dto.artistResult.totalResultsCount)
+#set($boardCount = $dto.boardResult.totalResultsCount)
+#set($albumCount = $dto.albumResult.totalResultsCount)
+#set($songCount = $dto.songResult.totalResultsCount)
+#set($videoCount = $dto.videoResult.totalResultsCount)
+#set($lyricCount = $dto.lyricResult.totalResultsCount)
+
+#set($totalCount = $dto.totalCount)
+
+
+		<h2>본문영역</h2>
+
+<!-- 장르 -->
+##일단 제외
+#*
+		<div class="collTitle"><h3>장르 <span class="num">(1-5 / 총  99건)</span></h3></div>
+   			<div id="wCateArea" class="collWid collTot">    				    				    				
+			<dl>
+				<dd class="fst">가요 > 발라드 > <a href="#" title="Ballade" class="stit"><strong>Ballade</strong></a></dd>
+				<dd class="fst">가요 > 발라드 > <a href="#" title="Ballade" class="stit"><strong>Ballade</strong></a></dd>
+			</dl>
+			<dl>
+				<dd>가요 > 발라드 > <a href="#" title="Ballade" class="stit"><strong>Ballade</strong> pop</a></dd>
+				<dd>가요 > 발라드 > <a href="#" title="Ballade" class="stit"><strong>Ballade</strong> pop</a></dd>
+			</dl>
+			<dl>
+				<dd>가요 > 발라드 > <a href="#" title="Ballade" class="stit"><strong>Ballade</strong></a></dd>
+				<dd>가요 > 발라드 > <a href="#" title="Ballade" class="stit"><strong>Ballade</strong></a></dd>
+			</dl>
+		</div><div class="cb"></div>       	
+		<div id="line"></div><hr/>
+*#
+	
+	
+
+<!-- 노출 순위 조정 -->				
+	##${dto.resultOrderList}
+	#foreach($SchOrderL in $!{dto.resultOrderList} )
+		
+		#parse("/velocity/search/integrated/collection/${SchOrderL}.vm")
+									
+	#end																												
+
+<!-- 게시판 -->
+	#if(($!{boardCount}) && $!{boardCount} > 0)
+		<div class="collTitle"><h3>게시판 <span class="num">($!{dto.boardResult.getStartNum()}-$!{dto.boardResult.getEndNum(5)} / 총  $!{boardCount}건)</span></h3></div>
+		<div class="collWid collTot uccDl">
+		#foreach($board in $boardList)
+			#*
+			$!{board.title} - $!{board.regdttm}<br/>
+			$!{board.content}
+			*#
+			<dl #if($foreach.index == 0)class="fst"#end>
+		        <dt>
+					<a href="$!{board.getLink()}">$!{board.subject}</a>
+					&nbsp;&nbsp;$ConverterUtil.formatByStar(${board.regdatetime}, "****.**.**")
+				</dt>
+				<dd>
+					#if($StringUtils.isNotEmpty("$!{board.content}")) <span class="desc">$!{board.content}</span> #end
+					#if($StringUtils.isNotEmpty("$!{board.getBbsName()}")) <span class="etc"><a href="/playzone/" class="g_tit">뮤직게시판</a> &gt; <a href="$!{board.getBbsLink()}" class="g_tit">$!{board.getBbsName()}</a></span> #end
+				</dd>
+			</dl>
+		#end				
+		</div>
+		#if($!{boardCount} > 5)
+			<div class="moreArea"><a href="/search/board.do?query=$!{command.encodedQuery}">게시판  더보기</a></div>
+		#else
+			<div class="nmoreArea"></div>
+		#end
+	#end
+				
+	<!--검색결과 없음 -->
+    #if($totalCount <= 0)
+		<div class="rsltHelp">
+    		<p><span class="dot">ㆍ</span>검색어의 단어 수를 줄이거나, 보다 일반적인 단어로 검색해 보세요.</p>
+    		<p><span class="dot">ㆍ</span>두 단어 이상의 키워드로 검색 하신 경우, 정확하게 띄어쓰기를 한 후 검색해 보세요.</p>
+    		<p><span class="dot">ㆍ</span>키워드에 있는 특수문자를 뺀 후에 검색해 보세요.</p>
+    	</div>
+	</div>
+	#end
+		
+<!-- 제보 -->
+	##	<hr/><div id="wInfoArea"><span class="tit">지금 보시는 검색 결과에 추가, 수정이 필요한 내용을 직접 등록해 주세요.</span><input type="button" class="typeBtn btnInfo fl" value="제보하기" title="제보하기"></div>
+	
+<!-- 클릭로그 -->
+<script type="text/javascript">init("TY", "$!{command.eucKrQuery}", "-1", "@@@");</script>
+
+#end

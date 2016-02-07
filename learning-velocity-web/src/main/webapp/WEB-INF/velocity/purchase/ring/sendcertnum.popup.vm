@@ -1,0 +1,69 @@
+<div id="wPhone" class="popWrap innerPopup">	
+	<div id="wSelSong">
+		<div class="titConS"><h3 class="bg1">통화연결음 설정</h3></div>
+		<div class="cont">
+			<p>휴대폰(<strong class="fontCor01">$StringCutUtil.getFullPhoneNum("$!{command.getNumber}")</strong>)으로<br />
+			<span id="certOk" #if($StringUtils.equals("$!{dto.apiResult.result}","S")) style="display:inline;" #else style="display:none;" #end>인증번호가 발송되었습니다.<br />도착한 인증번호를 입력해주세요.</span>
+			<span id="certNo" #if($StringUtils.equals("$!{dto.apiResult.result}","S")) style="display:none;" #else style="display:inline;" #end>인증번호가 발송되지 않았습니다.<br />:: <span id="certError">$!{dto.apiResult.resultDesc}</span></span></p>
+			<!-- <p class="mt8"><strong>승인 유효시간 : </strong><span class="fontCor01">3분 00초</span></p> -->
+			<dl class="setLst quoteInput">
+				<dt class="setTit titQuoteInput">인증번호 입력</dt>
+				<dd><input type="text" id="certNum" class="inp quote" name="certNum" value="" /></dd>
+				<dd><input type="button" class="typeBtn btnCorrect" title="인증번호 받기" onclick="parent._phone.reApiCert();" align="absmiddle"/></dd>
+			</dl>
+		</div>		
+	</div>
+
+	<div class="btnSend">
+		<div class="btn">			
+			<a href="#" onclick="parent._phone.chkCert(daum.$('certNum').value);" title="확인"><img src="http://i1.daumcdn.net/img-contents/music/2009_home/phonemusic/bt_ok_1.gif" alt="확인"></a>
+			<a href="#" onclick="parent.daum.Music.Layer.clear();" title="닫기"><img src="http://i1.daumcdn.net/img-contents/music/2009_home/phonemusic/bt_close.gif" alt="닫기"></a>
+		</div>
+	</div>
+
+	<script type="text/javascript">	
+		daum.addEvent(window, "load", function(){ daum.$('certNum').focus(); });
+	</script>
+</div>	
+	
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+========= 모바일(인증번호체크) ========
+<br/>
+전화번호 : $command.getNumber <br/>
+결과코드 : $dto.apiResult.result <br/>
+결과메세지 : $dto.apiResult.resultMessage <br/>
+
+
+
+#*
+인증번호재전송
+예)http://music.daum.net/purchase/ring/resendcertnum.do?corpCd=SK&getNumber=01020094725
+
+확인버튼 클릭시 
+SK이면 인증번호 체크
+http://music.daum.net/purchase/ring/checkcertnum.json?getNumber=01020094725&certNum=6130&corpCd=SK
+
+
+SK인증번호 일치이거나
+LG면  결제내역페이지
+예)
+http://music_mobile.daum.net/mobile/ringPurchaseOption.do?songId=8125459&itemId=RIG0001&linkId=13050087788_SK_LO&corpCd=SK&getNumber=01031700332&optCd=SE&certNum=6130
+
+-->결제내역페이지의 경우 sk일때는 창의 크기가 달라지므로 분기필요할듯 
+$command.getOptCd값에 따라 분기
+설정코드(기본(NO), 시간대설정(TI), 발신자설정(SE), 기념일설정(DA))
+
+*#

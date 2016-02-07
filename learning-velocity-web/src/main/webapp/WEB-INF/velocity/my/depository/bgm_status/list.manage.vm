@@ -1,0 +1,161 @@
+	<div class="wrap_setup">
+		<div class="box_setup">
+			<div class="wrap_mysong">
+				<div class="box_list">
+					<div class="wrap_head">
+						<div class="wrap_search">
+							<div class="wrap_cate">
+								## TODO name, value 정리하고 form action 추가할 것 
+								<select id="sourceSelect" class="bg_search box_search" id="search_type">
+                					<option value="BGM">보유곡만</option>
+                					<option value="">전체곡</option>
+                				</select>
+								<script type="text/javascript">
+                                	var customSelect = new daum.Music.CustomSelect("sourceSelect", {
+                    					selectedCustomOptionAttributes: {
+                    						"class": "txt_cate"
+                    					},
+                    					customOptionContainerAttributes: {
+                    						"class": "list_cate"
+                    					}
+                    				});
+                                </script>
+								#*
+								<div class="bg_search box_search">
+									<span class="txt_cate">보유곡만</span>
+									<span class="bg_search bg_right">
+										<span class="ico_arrow"></span>
+									</span>
+								</div>
+								<ul class="list_cate hide" >
+									<li>
+										<input id="selOwn" name="qCate" class="screen_out"type="radio">
+										<label for="selOwn">보유곡만</label>
+									</li>
+									<li class="on">
+										<input id="selAll" name="qCate" class="screen_out"type="radio">
+										<label for="selAll">전체곡</label>
+									</li>
+								</ul>
+								*#
+							</div>
+							<div class="bg_search box_search">
+								<input class="inp_search" type="text" id="songKeyword" onKeypress="if(event.keyCode==13){daum.Music.BgmManage.goSearch();return false;}">
+							</div>
+							<input class="bg_search btn_search" type="submit" value="검색" onclick="daum.Music.BgmManage.goSearch();">
+						</div>
+					</div>
+					<div class="wrap_info">
+						<div class="line_info">
+							<span id="schTypeTit" class="txt_guide">보유곡</span>
+							<span id="schTot">
+								<span class="txt_bar"> | </span>
+								<span class="txt_quantity">총 <strong id="totCnt" class="fc_blue">0</strong> 곡</span>
+							</span>
+							<div id="totSort" class="wrap_order">
+								<a class="on" href="javascript:;" onclick="daum.Music.BgmManage.goSort(1);" id="sort1" title="최신구매순으로 보기">최신구매순</a>
+								<span class="txt_bar"> | </span>
+								<a href="javascript:;" onclick="daum.Music.BgmManage.goSort(2);" id="sort2" title="가나다순으로 보기">가나다순</a>
+							</div>
+							<!--<div id="schSort" class="hide">
+								<a href="javascript:;" onclick="daum.Music.BgmManage.goRefrash();" title="보유곡 보기">보유곡 목록</a>
+							</div>-->
+							<div class="wrap_order">
+								<a class="txt_holding hide" id="schSort" href="javascript:;" onclick="daum.Music.BgmManage.goRefrash();" title="보유곡 보기">보유곡 목록</a>
+							</div>
+						</div>
+					</div>
+					<div id="ownBox" class="wrap_list_song">
+						<!--<ul class="list_ownsong">
+							#foreach ($i in [1..10])
+							<li#if ($i == 2) class="on"#end>
+								#if ($i == 4)
+								<a class="btn_mymusic btn_pause" href="#" title="일시정지">일시정지</a>
+								#else
+								<a class="btn_mymusic btn_play" href="#" title="재생">재생</a>
+								#end
+								<span class="txt_title">나만 몰랐던 이야기</span>
+								<span class="txt_artist">아이유</span>
+							</li>
+							#end
+						</ul>-->
+					</div>
+				</div>
+				<div class="wrap_paging">
+					<span id="pageBox" class="paging bg_paging"></span>
+				</div>
+			</div>
+			<div class="wrap_btn_control">
+				<input class="btn_mymusic btn_in" type="button" value="넣기" id="btnPut">
+				<input class="btn_mymusic btn_out" type="button" value="빼기" id="btnPull">
+			</div>
+			<div class="wrap_choose">
+				<div class="box_list">
+					<div class="wrap_head">
+						<em class="ico_mymusic ico_tip">곡명 더블클릭으로 넣기/빼기를 편하게 해보세요</em>
+					</div>
+					<div class="wrap_info">
+						<div class="line_info">
+							<strong>선택곡</strong>
+							<span class="txt_bar"> | </span>
+							<span class="txt_quantity"><strong id="selCnt" class="fc_blue">0</strong>/<span id="maxCnt">0</span> 곡</span>
+						</div>
+					</div>
+					<div id="basketBox" class="wrap_list_song">
+						<!--<div  class="scroll2">
+							<ul class="list_choose">
+								#foreach ($i in [1..30])
+								<li#if ($i == 2) class="on"#end>
+									<span class="txt_title#if ($i == 4 || $i == 6) incoming#end">나만 몰랐던 이야기</span>
+									<span class="txt_artist">아이유</span>
+								</li>
+								#end
+							</ul>
+						</div>-->
+					</div>
+				</div>
+				<div class="wrap_order">
+					<div class="wrap_random">
+						#if( $command.getTarget_service() == "KIDS" || $StringUtils.equals("$!{cafeNode}","friends"))
+						<input type="hidden" name="shuffle_yn" value="N">
+						#else
+						<input id="chkRandom" class="inp_chk" type="checkbox" name="shuffle_yn" value="Y" #if("$!{bgmStatus.shuffleYN}" == "Y") checked #end id="randomPlay">
+						<label for="chkRandom" class="lab_chk">랜덤플레이</label>
+						#end
+					</div>
+					<div class="wrap_btn">
+						<a class="btn_mymusic btn_bottom" title="맨아래로 이동" onclick="daum.Music.BgmManage.goMove('bottom');">맨아래로</a>
+						<a class="btn_mymusic btn_down" title="아래로 이동" onclick="daum.Music.BgmManage.goMove('down');">아래로</a>
+						<a class="btn_mymusic btn_up" title="위로 이동" onclick="daum.Music.BgmManage.goMove('up');">위로</a>
+						<a class="btn_mymusic btn_top"title="맨위로 이동" onclick="daum.Music.BgmManage.goMove('top');">맨위로</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<input class="btn_mymusic btn_submit" type="submit" value="설정하기" onclick="daum.Music.BgmManage.goSubmit();">
+	</fieldset>
+</form>
+</div>
+<div id="flashContainer"></div>
+
+<script type="text/javascript">
+	domReady( function(){
+        daumMusic.JsPlayer.embedSWF( "flashContainer", null, daum.Music.BitPlayer.stop );
+	}); 
+	
+	var myBgmList = [];
+	#foreach($play in $bgmStatus.playlist)
+		var _isown = ("$command.getTarget_service()" == "CAFE" && "$play.userId" == "$!{userInfo.userId}")? true : false;
+		myBgmList.push({BgmTrackId:"$!{play.bgmTrackId}",SongId:"$!{play.songId}",Title:"$!{StringCutUtil.removeCarriageReturn($!{StringCutUtil.removeTagJSON($!{play.title})})}",keyArtistList:[ { "name": "$!{StringCutUtil.removeCarriageReturn($!{StringCutUtil.removeTagJSON($!{play.artist})})}" } ],IsOwn:_isown});
+	#end
+
+	#if($StringUtils.equals("$!{cafeNode}","friends"))
+	var _service = "CAFEFRIENDS";
+	#else
+	var _service = "$command.getTarget_service()";
+	#end
+
+	daum.Music.BgmManage.init( myBgmList, _service );
+	var BGMList = daum.Music.BgmManage;
+	//myBgmList = null;
+</script>

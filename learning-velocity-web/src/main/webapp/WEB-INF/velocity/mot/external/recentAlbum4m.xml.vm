@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<title>최신앨범</title>
+    <id>recentAlbum4m</id>
+	#foreach($album in $recommendAlbumList)
+		#if($velocityCount == 1)
+			<updated><![CDATA[$StringUtils.substring($!{album.releaseDt},0,4)-$StringUtils.substring($!{album.releaseDt},4,6)-$StringUtils.substring($!{album.releaseDt},6,8)T00:00:00]]></updated>
+		#end
+	#end
+	#foreach($album in $recommendAlbumList)
+	<entry>
+        <id><![CDATA[$!{album.albumId}]]></id>
+      	<title><![CDATA[#foreach($artist in $!{album.keyArtistList})#if($velocityCount > 1),#end$!artist.name#end-$!{album.title}]]></title>
+      	<author>
+			<name><![CDATA[
+			#foreach($artist in $!{album.keyArtistList})
+				#if($velocityCount > 1),#end
+                    $!artist.name
+			#end
+			]]></name>
+		</author>
+        <summary><![CDATA[#strCut($!album.description,200)]]></summary>
+      	<link href="$ImageUtil.getMobileImageUrl("$!{album.mainImage.filePath}", "94x94", "ALBUM", "C")" rel="enclosure" type="image/jpeg"/>			
+      	<link href="http://music.daum.net/album/main?album_id=$!album.albumId"/>
+        <updated><![CDATA[$StringUtils.substring($!{album.releaseDt},0,4)-$StringUtils.substring($!{album.releaseDt},4,6)-$StringUtils.substring($!{album.releaseDt},6,8)T00:00:00]]></updated>
+	</entry>			
+	#end
+</feed>

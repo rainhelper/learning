@@ -1,0 +1,42 @@
+#if(!$CollectionUtils.isEmpty($rightMenuList))##
+#***#<style type="text/css" scoped>##
+#***##foreach($motTemplete in $rightMenuList)##
+#***##***##if($StringUtils.isNotBlank("$!{motTemplete.linkUrl}"))##
+#***##***#.snb_sym li.snb_$!{foreach.count} .snb {background:url($!{motTemplete.imageUrl}) no-repeat;}##
+#***##***#.snb_sym li.snb_$!{foreach.count} .snb:hover,.snb_sym li.snb_$!{foreach.count} .snb_on{background:url($!{motTemplete.activatedImageUrl}) no-repeat}##
+#***##***##end##
+#***##end##
+#***#</style>##
+#end##
+	
+<a href="/sym/top" title="SYM"><h3 class="tit_sym">SYM SUPPROT YOUR MUSIC</h3></a>
+<ul class="snb_sym">
+#if(!$CollectionUtils.isEmpty($rightMenuList))
+	#foreach($motTemplete in $rightMenuList)
+		#if($StringUtils.isNotBlank("$!{motTemplete.linkUrl}"))
+			<li class="snb_$!{foreach.count}">
+				<div class="wrap_snb">
+					<span class="line #if(!$StringUtils.equals("$!{foreach.count}", "1"))short#end"></span>
+					<a class="snb#if($StringUtils.equals("$!{motTemplete.activatedYn}", "Y")) snb_on#end" href="$!{motTemplete.linkUrl.replaceAll('&', '&amp;')}" title="$!{motTemplete.title}" #if($StringUtils.contains("$!{motTemplete.linkUrl}", "serviceType=SYM") || $StringUtils.contains("$!{motTemplete.linkUrl}", "/sym/"))#{else}target="_blank"#end>$!{motTemplete.title}</a>
+				</div>
+			</li>
+		#end
+	#end
+#end
+	<li><span class="line"></span></li>
+</ul>
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+	
+우측메뉴<br/>
+#foreach($motTemplete in $rightMenuList)
+	타이틀 : $motTemplete.title <br/>
+	일반이미지 : $motTemplete.imageUrl <br/>
+	활성화이미지2 : $motTemplete.activatedImageUrl <br/>
+	링크 : $motTemplete.linkUrl <br/>
+	활성화여부 : $motTemplete.activatedYn <br/>
+	<br/><br/>
+#end
+$registHistoryYn Y면 <a href="/sym/registList.popup">링크(/sym/registList.popup)</a> 생성 아니면 땡
+
+#end

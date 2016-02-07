@@ -1,0 +1,173 @@
+#set( $how = "bgm")
+ 
+## 이용권 갯수
+#set ($totalDownloadCount = 0)
+#foreach($item in $bgmDownloadTicketOwnList)
+	#set ($totalDownloadCount = $totalDownloadCount + $item.remainder)
+#end
+#foreach($item in $bgmLimitDownloadTicketOwnList)
+	#set ($totalDownloadCount = $totalDownloadCount + $item.remainder)
+#end
+
+#if($totalDownloadCount>0)
+
+<div id="daumWrap" class="popup_music type_cart">
+	<div class="popup_head">
+		<h1>
+			<a class="bg_logo daum_logo" href="http://www.daum.net/" target="_blank">다음</a>
+			<span class="bg_logo tit_music">뮤직 구매하기</span>
+		</h1>
+	</div><!-- // popup_head -->
+	<div class="popup_body">
+		<form action="">
+			#print_CartSongList($how $albumCartList $songCartList $command $!{overLimitCartCount})
+			#print_CartPurchase($how $command.cart_action_type $totalDownloadCount)
+		</form>
+	</div><!-- // popup_body -->
+</div>
+#print_CartSubmitForm()
+#print_CartActionScript($!{albumCartList} $!{how} $totalDownloadCount $!{user.daumId} $command $!{denialList} $!{overLimitCartCount})
+
+#else
+<script type="text/javascript">
+    alert("2015년 6월 30일 다음뮤직 서비스 종료에 따라 상품 판매가 종료되었습니다. 이미 구매하신 이용권으로 음악감상 / MP3 다운로드 / BGM 구매는 6월 14일까지 가능합니다. \n그동안 이용해주셔서 감사합니다.");
+    window.opener='Self';
+    window.open('','_parent','');
+    window.close();
+</script>
+#end
+
+
+#*  
+<script type="text/javascript">
+var cartalbum = [];
+ 
+#set($preAId = "")
+#set($strSongId = "")
+#set($salePrice = 0)
+#set($price = 0)
+#set($count = 0)
+#foreach($item in $albumCartList)
+#if( $foreach.index==0 || $preAId == $!{item.song.album.albumId} )
+#if( $foreach.index>0)#set( $strSongId = $strSongId+ "/") #end
+#set( $strSongId = $strSongId + "$!{item.song.songId}")
+#set( $salePrice = $salePrice + $item.salePrice )
+#set( $price = $price + $item.price )
+#set($count = $count +1 )
+#else
+	#if( $foreach.index!=0 && $preAId != $!{item.song.album.albumId} )
+	cartalbum["$!{preAId}"]={type:"album", albumId:"$preAId", price:"$!price", salePrice:"$!salePrice", songCount:"$count", songIdList:"$!strSongId" };
+	#end
+	#set($strSongId = "")#set($salePrice = 0)#set($price = 0)#set($count = 0)
+#end
+#set( $preAId = $!{item.song.album.albumId} )
+#end
+cartalbum["$!{preAId}"]={type:"album", albumId:"$preAId",price:"$!price", salePrice:"$!salePrice", songCount:"$count", songIdList:"$!strSongId" };
+
+var songlist = [];
+#set($preAId = "")
+#set( $idx = 0 ) 
+#foreach($item in $albumCartList)
+#if( $idx==0 || $preAId != $!{item.song.album.albumId} )
+songlist["$!{item.song.album.albumId}"] = {"type":"album", "id":"$idx", "songId":"$!{item.song.album.albumId}",  "songTitle":"#escScript( $!{item.song.album.title} )", "artist":"$!item.song.album.keyArtistList.get(0).name", "salePrice":cartalbum["$!{item.song.album.albumId}"].salePrice, "price":cartalbum["$!{item.song.album.albumId}"].price, "isHave" :#if("$!{item.ownStatus}" == "Y")"true"#else"false"#end, "isBuy" :#if($!{item.song.MP3LinkId})"true"#else"false"#end, songIdList:cartalbum["$!{item.song.album.albumId}"].songIdList, songCount:cartalbum["$!{item.song.album.albumId}"].songCount };
+#set( $idx = $idx + 1 )
+#end
+#set( $preAId = $!{item.song.album.albumId} )
+#end
+ 
+#foreach($item in $songCartList)
+songlist["$!{item.song.songId}"] = {"type":"song", "id":"$idx", "songId" : "$!{item.song.songId}", "songTitle":"#escScript( $!{item.song.title} )", "artist":"$!item.song.keyArtistList.get(0).name", "salePrice":"$!{item.salePrice}", "price":"$!{item.price}", "isHave" :#if("$!{item.ownStatus}" == "Y")"true"#else"false"#end, "isBuy" :#if($!{item.song.MP3LinkId})"true"#else"false"#end, songIdList:"", songCount:"0"};
+#set( $idx = $idx + 1 ) 
+#end
+
+var cart = daum.Music.Cart; 
+daum.Music.Cart.init("cartList", {
+	form : document.frmCart,
+	song_list:songlist, 
+	album_in_song_list:cartalbum, 
+	how: "$!{how}", 
+	cart_action_type : "#if("$command.cart_action_type"=="GIFT")$command.cart_action_type#{else}PURCHASE#end",  
+	ticket_count : "$totalDownloadCount",
+	daum_cash : "#if($daumCashBalance==-9999)0#{else}$daumCashBalance#end",
+	
+	referer : "$!{command.referer}"
+	});
+
+## 선물하기	
+#if("$command.cart_action_type"=="GIFT")
+domReady( function(){
+    daum.Music.Gift.init(cart, songlist, {daumId:"$!{user.daumId}",  how:"$!{how}"} );
+}); 	
+#end
+</script>
+
+
+
+*#
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+
+로그인 후에 사용하셔야 값이 나옵니다.
+<br/><br/>
+선택곡, 유료곡, 무료곡 로직은 vm에서 처리한다고 전해 들었습니다.
+<br/><br/>
+선물하기 시에는 기존 url에 cart_action_type=GIFT 를 붙여주셔서 분기하심 됩니다.
+GIFT 여부 : $command.cart_action_type
+<br/><br/>
+refere : $command.referer<br/>
+
+
+다음캐시 : $daumCashBalance 
+(값을 가지고 오는데 실패하면 -9999값이 나옴.이때는 -와 같은 표시를 해주시면 됩니다. 로컬에서 하면 무조건 -9999)
+<br/><br/>
+장바구니 앨범리스트 : <br/>
+#foreach($item in $albumCartList)
+	제목 : $item.song.title<br/>
+	곡아이디 : $item.song.songId<br/>
+	#foreach($artist in $item.song.keyArtistList)
+		아티스트명 : $artist.name<br/>
+		아티스트아이디 : $artist.artistId<br/>
+		아티스트링크 : 아직 형식미정입니다.<br/>
+	#end
+	곡길이 : $item.song.getTrackLengthMinute()<br/>
+	노출가격 : $item.price<br/>
+	실제가격(부가세포함) : $item.salePrice<br/>
+	역인 앨범에 곡갯수 : $item.albumSongCount<br/>
+	앨범Id : $item.song.album.albumId<br/>
+	앨범명 : $item.song.album.title<br/>
+	#foreach($artist in $item.song.album.keyArtistList)
+		앨범아티스트명 : $artist.name<br/>
+		앨범아티스트아이디 : $artist.artistId<br/>
+		앨범아티스트링크 : 아직 형식미정입니다.<br/>
+	#end
+	<br/>
+#end
+장바구니 곡리스트 : <br/>
+#foreach($item in $songCartList)
+	제목 : $item.song.title<br/>
+	곡아이디 : $item.song.songId<br/>
+	#foreach($artist in $item.song.keyArtistList)
+		아티스트명 : $artist.name<br/>
+		아티스트아이디 : $artist.artistId<br/>
+		아티스트링크 : 아직 형식미정입니다.<br/>
+	#end
+	곡길이 : $item.song.getTrackLengthMinute()<br/>
+	노출가격 : $item.price<br/>
+	실제가격(부가세포함) : $item.salePrice<br/>
+	<br/>
+#end
+곡삭제 : http://music.daum.net/cart/cartdelete.do?song_id_list=257027/8212414&cart_item_type=BGM혹은MP3
+<br/><br/><br/><br/>
+
+BGM이용권정보:<br/>
+배경음악 이용권 남은 다운로드 갯수<br/>
+#set ($totalDownloadCount = 0)
+#foreach($item in $bgmDownloadTicketOwnList)
+	#set ($totalDownloadCount = $totalDownloadCount + $item.remainder)
+#end
+#foreach($item in $bgmLimitDownloadTicketOwnList)
+	#set ($totalDownloadCount = $totalDownloadCount + $item.remainder)
+#end
+/$totalDownloadCount/
+<br/>
+ 선물하기등 그 외 정보들은 모두 /vm/purchase/bgmcart.do를 보시면 됩니다.(모두 동일)
+#end

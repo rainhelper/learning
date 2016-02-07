@@ -1,0 +1,43 @@
+<script type="text/javascript">
+domReady(function(){
+	alert("SUPPORT YOUR MUSIC에 지원해 주셔서 감사합니다. 지원서가 성공적으로 제출되었습니다.");
+	parent.close();
+});
+</script>
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+
+아래의 정보로 접수가 완료됐습니다.<br/><br/><br/>
+아티스트명 : $symArtist.artistName<br/>
+이름 : $symArtist.candidateName<br/>
+전화번호 :$symArtist.phone<br/>
+이메일 :$symArtist.email<br/>
+지원동기 :$symArtist.applyMtv<br/>
+멤버 :$symArtist.member<br/>
+소개 :$symArtist.intro<br/>
+결성년도 :$symArtist.debutDt<br/>
+음반 발매 여부 :$symArtist.albumYn<br/>
+레이블 소속 여부 :$symArtist.lableYn<br/>
+활동 경력 :$symArtist.activity<br/>
+녹음 가능한 곡수 :$symArtist.songCnt<br/>
+커뮤니티 또는 홈페이지 주소 :$symArtist.homepageUrl<br/>
+기타 :$symArtist.etc<br/>
+이런음반 만들고 싶다 :$symArtist.goal<br/>
+==========================<br/>
+이미지 :<br/>
+#foreach($image in $symArtist.artistImages)
+	$image.filePath<br/>
+#end
+==========================<br/>
+song :<br/>
+#foreach($song in $symArtist.artistSongs)
+	곡주소 :$song.filePath<br/> 
+	곡명 :$song.title<br/>
+#end
+==========================<br/>
+vclip :<br/>
+#foreach($vclip in $symArtist.artistVclips)
+	링크 : $vclip.filePath<br/>
+#end
+
+#end

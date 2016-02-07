@@ -1,0 +1,57 @@
+#parse("/velocity/purchase/ticket/purchase/direct.popup.vm")
+
+## 쿠폰 이벤트
+#if($StringUtils.equals("$!{isGetMp3Coupon}", "Y"))
+<script type="text/javascript">
+(function(){
+	alert("Daum뮤직 모바일 시즌2 이벤트 참여자시네요! Mp3 40곡 다운로드 쿠폰이 추가 발급되었습니다. My페이지에서 확인하세요");
+})();
+</script>
+#end
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+## 사용 데이터
+#set( $title = "$!{purchaseTicket.order.item.title}" )
+#set( $price = "$!{purchaseTicket.order.item.salePrice}" )
+#set( $ticketId = "$!{purchaseTicket.id}" )## 티켓 '바로 사용'시 연결되는 $ticket.id
+#set( $isPeriodoc = ${purchaseTicket.order.item.periodic} )## 자동결제 여부
+#set( $isUseTicket = ${isAodUse} )## 상품 사용중 여부 (이미 사용중인 AOD 상품권이 있는지 여부)
+#set( $ticketType = ${purchaseTicket.order.item.itemType.code} )## 이용권 아이템 코드(이용권종류, AP:AOD, MP:MP3다운로드, AM:AOD+다운로드)
+#set( $term = ${purchaseTicket.order.item.term} )## 기간이 한정된 이용권의 경우 한정기간(한달이용권 -> 30)
+#set( $startDate = "$!{purchaseTicket.startDate}" )
+#set( $endDate = "$!{purchaseTicket.endDate}" )
+#set( $couponyn = $!{purchaseTicket.order.paymentType}) ## CP 쿠폰, !CP 일반결제
+<br/>
+$title<br/>
+$price<br/>
+$startDate<br/>
+$endDate<br/>
+$isPeriodoc<br/>
+$term<br/>
+쿠폰 받은 여부 - $!{isGetMp3Coupon}
+<br/>
+ 이벤트 <br/>
+#foreach($event in $eventList)
+	이벤트명 : $event.eventTitle <br/>
+	이미지 : $event.bannerUrl <br/>
+	시작일 : $event.startDate <br/>
+	종료일 : $event.endDate <br/>
+	당첨자발표일 : $event.winningDate <br/>
+	경품 : $event.description <br/>
+#end
+<br/>
+추천앨범<br/>
+#foreach($album in $recommendAlbumList)
+	앨범아이디 : $album.albumId <br/>
+	앨범명 : $album.title <br/>
+	앨범볼륨 : $album.volume <br/>
+	앨범이미지 : $album.mainImage.filePath <br/>
+	앨범재생여부 : $album.playYn <br/>
+	발매일 : $album.releaseDt <br/>
+	#foreach($artist in $album.keyArtistList)
+		아티스트명 : $artist.name<br/>
+		아티스트아이디 : $artist.artistId<br/>
+	#end
+	<br/><br/>
+#end
+#end

@@ -1,0 +1,14 @@
+<MUSICBARLIST>
+	#foreach($board in $recentBoardList)
+	<MUSICBAR>
+      	<TITLE><![CDATA[$board.title]]></TITLE>
+      	<SUBTITLE><![CDATA[$board.subTitle]]></SUBTITLE>
+      	<IMAGEURL><![CDATA[$board.imageUrl]]></IMAGEURL>			
+      	<LINKURL>http://music.daum.net/musicbar/musicbar/detail?board_id=$board.boardId</LINKURL>
+      	<SUMMARY><![CDATA[$board.summary]]></SUMMARY>
+      	<REGDTTM>$board.regdttm</REGDTTM>
+      	<REPLYCOUNT>$board.replyCount</REPLYCOUNT>
+      	<RECOMMENDCOUNT>$board.recommendCount</RECOMMENDCOUNT>
+	</MUSICBAR>			
+	#end
+</MUSICBARLIST>

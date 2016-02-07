@@ -1,0 +1,175 @@
+<style type="text/css">
+label {text-indent:-9999px;}
+
+.conSch {background:url(http://i1.daumcdn.net/img-contents/music/2008_home/playzone/ati_bg.gif) no-repeat;width:569px;height:39px;margin-bottom:15px;position:relative;}
+.conSch form {padding-left:20px;}
+.conSch p.rslt {text-align:center;padding-top:12px;width:483px;}
+.conSch a.reSch {position:absolute;right:10px;top:14px;font:11px Dotum,Helvetica,AppleGothic;}
+.conSch label {float:left;display:inline;}
+.conSch input {float:left;margin:9px 4px 0 0 ;}
+.conSch .inp {width:155px;}
+
+.grpSort .sort {background:url(http://i1.daumcdn.net/img-contents/music/2008_home/common/ico_sort02.gif) no-repeat;padding-right:10px;}
+.grpSort .on {background-position:100% 2px;font-weight:bold;}
+.grpSort .off {background-position:100% -17px;font-weight:normal;}
+.grpSortBrd .sort {background:url(http://i1.daumcdn.net/img-contents/music/2008_home/common/arrow_board.gif) no-repeat 100% 0px;padding-right:17px;height:13px;}
+.grpSortBrd .up {background-position:100% -30px;}
+.grpSortBrd .down {background-position:100% 0px;}
+
+.blue_d1,a.blue_d1:link,a.blue_d1:visited{color:#4E59E7;} a.blue_d1:hover {color:#4E59E7;}
+
+.conRslt {padding-left:20px;}
+.conRslt .conHead {display:block;float:left;width:100%;height:30px;}
+.conRslt .conHead .cnt {float:left;}
+.conRslt .conHead .grpSort {float:right;margin-left:10px;}
+.conRslt .lst {margin-top:20px;}
+.conRslt .lst .itm {padding:10px;}
+.conRslt .lst .itm .thumb img {float:left;margin-right:10px;}
+
+.btnSend {margin:10px auto 0;width:50px;}
+</style>
+
+<div class="con">
+<script type='text/javascript'>
+document.domain = "daum.net";
+function stripHTMLtag(string) { 
+   var objStrip = new RegExp(); 
+   objStrip = /[<][^>]*[>]/gi; 
+   return string.replace(objStrip, ""); 
+} 
+		
+var checkForm = function( form ){
+    if( form.query.value == "" ){
+       form.query.focus();
+       alert("검색어를 입력해 주세요");
+       return false;
+    }
+    return true;
+};
+
+var selectItem = function(id, value, artistid, artistname){
+    try {
+        opener.searchCallback(id, stripHTMLtag(value), artistid, artistname);
+        self.close();
+    } catch( e ){
+        alert("검색 결과를 정상적으로 전송할 수 없습니다.");   
+    }   
+};
+
+</script>
+#set($totalCount = $!{dto.songResult.totalResultsCount})
+#set($songList = $!{dto.songResult.documentList})
+    <div class="conSch">
+		<form action="/search/songPopup.do" method="get" onsubmit="return checkForm(this);" >
+			<fieldset>
+			<label class="em" for="pzArtiName" class="lArtiName">곡명</label> 
+			<input type="text" class="input" id="songName" name="query"  value="$!{command.query}">
+			<input type="image" src="http://i1.daumcdn.net/img-contents/music/2008_home/common/btn_search2.gif">
+			<input type="hidden" name="sortType" id="sortType" value="$!{command.sortType}">
+			<input type="hidden" name="type" value="$!{command.type}">
+			</fieldset>    
+	</form>
+    
+    <script type="text/javascript">UI.$("songName").focus();</script>
+	</div>
+  <!-- 검색결과 -->
+	<div class="conRslt">
+		<div class="conHead">
+#if( $StringUtils.equals( $command.query, "" ) )##
+		<p class="none">곡명을 입력 후 검색해 주세요</p>
+#else##
+		<p class="cnt">총 <em class="em">$!{totalCount}</em>건이 검색되었습니다.</p>
+		#if($totalCount > 0)##				
+		#set($url="$request.getRequestURI()?$request.getQueryString()")
+		<span class="grpSort">
+		<a href="/search/songPopup.do?query=#escUrl($!{command.query})&type=$!{command.type}&sortType=0" class="sort #if($url.indexOf("sortType=0")>=0) on #else off #end">정확도</a>
+		<span class="bar">|</span>
+		<a href="/search/songPopup.do?query=#escUrl($!{command.query})&type=$!{command.type}&sortType=1" class="sort #if($url.indexOf("sortType=1")>=0) on #else off #end">인기순</a>&nbsp;
+		</span>
+		#end##
+#end				
+		</div>
+#if($totalCount > 0)
+		<ul class="lst song clearfix">
+		#foreach($song in $songList)
+                #set ($keyArtistId = "")
+                #set ($keyArtistName = "")
+                #foreach($artist1 in $song.keyArtistList)
+                	#if($velocityCount > 1)
+                		#set ($keyArtistId = $keyArtistId + ";")
+                		#set ($keyArtistName = $keyArtistName + ";")
+                	#end
+                	#set ($keyArtistId = $keyArtistId + $artist1.artistDetailId)
+                	#set ($keyArtistName = $keyArtistName + $artist1.name)
+                #end
+	       <li class="itm#if( $foreach.index == 0 ) first#end">
+			<a href="javascript:;" onclick="selectItem( '$!{song.song_id}', '$!StringCutUtil.removeTag( $!{song.song_name} )', '$keyArtistId', '$keyArtistName' );" class="thumb"><img src="$ImageOldUtil.getImageUrl("$!{song.album_thumb}", $ImageOldUtil.ALBUM_52_52)" alt="$!{song.song_name}" width="52" height="52"></a>
+                <ul class="inf">
+                <li class="i1"><span class="blue_d1 b name">#strCut( "$!{song.song_name}" 44 )</span></li>
+                <li class="i2">
+                <label>아티스트</label><span class="dat">#if( $StringUtils.equals("$!{song.artist_name}","" )) - #else #strCut( "$!{song.artist_name}" 35 ) #end</span></li>
+                <li class="i3"><label>앨범</label><span class="dat">#if( $StringUtils.equals("$!{song.album_name}","")) - #else #strCut( "${song.album_name}" 26 )  #end</span></li>##$!{album.titlsSongId}
+                ##<li class="i4"><p class="btn"><input type="button" class="typeBtn btSelect" value="선택" title="선택" onclick="selectItem( '$!{song.album_id}', '#escScript($song.song_name)' );"></p></li>
+			    </ul>
+			</li>
+    #end
+           </ul>
+## 페이징
+#set ($url = "?query=" + "#escUrl($command.query)" + "&sortType=" + $command.sortType )
+#printPaging("${url}&page_no=", $dto.ph.pageNo, $dto.ph, "", 10)
+#end
+	</div>
+</div>
+
+<div class="btnSend">
+    <div class="btn">
+        <a id="btnConfirm" href="javascript:;" title="취소" onclick="closeWin();"><img src="http://i1.daumcdn.net/img-contents/music/2008_home/common/btn_cancel01.gif" alt="취소"></a>
+    </div>
+    ##<input type="button" value="닫기" title="닫기" class="typeBtn btPopCloseTxt" onclick="closeWin();">
+</div>
+	
+#**********
+<select id="searchRange" name="searchRange">
+	<option value="0" selected>곡</option>
+	<option value="1" #if("$!{command.searchRange}" == "1") selected #end>앨범</option>
+	<option value="2" #if("$!{command.searchRange}" == "2") selected #end>아티스트</option>
+</select>
+	
+<input type="text" value="$!{command.query}" onKeyDown="checkEnt();" id="query" name="query" />
+<input type="button" value="검색" onClick="search();"/>
+	
+#if($totalCount > 0)
+	총 $totalCount 건이 검색되었습니다.<br/>
+	<input type="radio" id="sortType" name="sortType" value="0" onclick="search();" checked/>정확도순
+	<input type="radio" id="sortType" name="sortType" value="1" onclick="search();" #if($!{command.sortType} == "1") checked #end/>최신도순
+	<input type="radio" id="sortType" name="sortType" value="2" onclick="search();" #if($!{command.sortType} == "2") checked #end/>인기도순
+	<br/>
+	<table border="1" class="list">
+		<tr>
+			<th class="c1" align="center">제목</th>
+			<th class="c2" align="center">아티스트명</th>
+			<th class="c3" align="center">앨범명</th>
+			<th class="c4" align="center">선택</th>
+		</tr>
+		#foreach($item in $songList)
+			<tr>
+				<td class="c1">$!{item.song_name}</td>
+				<td class="c2">$!{item.artist_name}</td>
+				<td class="c3">$!{item.album_name}</td>
+				<td class="c4"><a href="javascript:;" onclick="selectItem('$!{item.song_id}', '#escScript( $!{item.song_name} )', '#escScript( $!{item.artist_name} )', '#escScript( $!{item.album_name})')">선택</a></td>
+			</tr>
+		#end
+    </table>
+	<br/><br/>
+#else
+	검색결과가 없습니다.<br/>
+#end
+#set ($url = "?")
+#set ($url = "${url}query=$!{command.query}")
+#set ($url = "${url}&searchType=$!{command.searchType}")
+#set ($url = "${url}&searchRange=$!{command.searchRange}")
+#printPaging("${url}&pageNo=", $dto.ph.pageNo, $dto.ph)
+
+<input type="hidden" id="pageNo" name="pageNo" value="$!{command.pageNo}"/>
+</div>
+*#

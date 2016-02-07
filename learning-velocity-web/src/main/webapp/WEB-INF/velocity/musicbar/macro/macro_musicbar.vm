@@ -1,0 +1,645 @@
+
+#macro(getSymProcessTab $page)
+	#*
+	
+	접수기간 : $symInfo.regStrdttm ~ $symInfo.regEnddttm <br/>
+    접수정보 : $symInfo.regInfo<br/>
+    접수탭활성화여부 :$symInfo.regActiveYn<br/>
+	투표탭 활성화여부 : $symInfo.voteYn<br/>
+    투표 시작일 : $symInfo.voteStrdttm<br/>
+    투표 종료일 : $symInfo.voteEnddttm<br/>
+    펀드탭 활성화여부 : $symInfo.fundYn<br/>
+    펀드 시작일 : $symInfo.fundStrdttm<br/>
+    펀드 종료일 : $symInfo.fundEnddttm<br/>
+    스토리탭 활성화여부 : $symInfo.rvActiveYn<br/>
+	
+	*#
+	#set($symSeq = "$!{command.sym_seq}")
+
+    #if($StringUtils.equals("$!{symInfo.curStatus}", "E")) ## 외부펀딩
+	<ul class="tab_external">
+		<li>
+			<span class="tit_external">$!{symInfo.title} </span><span class="info">[$!{CheckDate.makeReleaseDate($!{symInfo.fundStrdttm})} ~ $StringUtils.right($!{CheckDate.makeReleaseDate($!{symInfo.fundEnddttm})}, 5)]</span>
+		</li>
+	</ul>
+   	#else
+    <ul class="tab_receipt">
+    	<li class="tab01">
+    		<a class="tab#if($StringUtils.equals("$!{page}", "regist")) tabOn#end" #if($StringUtils.equals("$!{symInfo.regActiveYn}", "Y"))href="$Link.relative("/sym/regist").param("sym_seq", "$!{command.sym_seq}")"#{else}onclick="alert('지금은 해당기간이 아닙니다.');return false;" #end>
+            	<span class="tit_slide_story">
+            		<span class="tit_tab_receipt">&nbsp;<span class="screen_out">뮤지션 접수</span></span>
+            	</span>
+				#if($StringUtils.isNotBlank("$!{symInfo.regStrdttm}"))
+				<span class="info">$!{CheckDate.makeReleaseDate($!{symInfo.regStrdttm})} ~ $StringUtils.right($!{CheckDate.makeReleaseDate($!{symInfo.regEnddttm})}, 5)</span>
+				#end
+    		</a>
+    	</li>
+    	<li class="tab02">
+    		<a class="tab#if($StringUtils.equals("$!{page}", "vote")) tabOn#end" #if($StringUtils.equals("$!{symInfo.voteYn}", "Y"))href="$Link.relative("/sym/vote").param("sym_seq", "$!{command.sym_seq}")"#{else}onclick="alert('지금은 해당기간이 아닙니다.');return false;"#end>
+        		<span class="tit_slide_story">
+        			<span class="tit_tab_receipt">&nbsp;<span class="screen_out">뮤지션 선정 투표</span></span>
+        		</span>
+				#if($StringUtils.isNotBlank("$!{symInfo.voteStrdttm}"))
+        		<span class="info">$!{CheckDate.makeReleaseDate($!{symInfo.voteStrdttm})} ~ $StringUtils.right($!{CheckDate.makeReleaseDate($!{symInfo.voteEnddttm})}, 5)</span>
+				#end
+    		</a>
+    	</li>
+    	<li class="tab03">
+    		<a class="tab#if($StringUtils.equals("$!{page}", "fund")) tabOn#end" #if($StringUtils.equals("$!{symInfo.fundYn}", "Y"))href="$Link.relative("/sym/fund/detail").param("sym_seq", "$!{command.sym_seq}")"#{else}onclick="alert('지금은 해당기간이 아닙니다.');return false;"#end>
+        		<span class="tit_slide_story">
+        			<span class="tit_tab_receipt">&nbsp;<span class="screen_out">Funding</span></span>
+        		</span>
+				#if($StringUtils.isNotBlank("$!{symInfo.fundStrdttm}"))
+    			<span class="info">$!{CheckDate.makeReleaseDate($!{symInfo.fundStrdttm})} ~ $StringUtils.right($!{CheckDate.makeReleaseDate($!{symInfo.fundEnddttm})}, 5)</span>
+				#end
+    		</a>
+    	</li>
+    	<li class="tab04">
+    		<a class="tab#if($StringUtils.equals("$!{page}", "story")) tabOn#end" #if($StringUtils.equals("$!{symInfo.rvActiveYn}", "Y"))href="$Link.relative("/sym/story/list").param("sym_seq", "$!{command.sym_seq}").param("menu_id", "$!{symInfo.rvMenuId}")"#{else}onclick="alert('등록된 내용이 없습니다.');return false;"#end>
+        		<span class="tit_slide_story">
+        			<span class="tit_tab_receipt">&nbsp;<span class="screen_out">Story</span></span>#if($StringUtils.equals("$!{symInfo.rvActiveYn}", "Y") && $StringUtils.isNotBlank("$!{boardCount}"))<span class="num">($!{boardCount})</span>#end
+        		</span>
+        		<span class="info">다양한 SYM 소식들</span>
+        		<span class="new" title="새소식" style="display:none;right:36px">새소식</span>
+    		</a>
+    	</li>
+    </ul>
+	#end
+#end
+
+#macro(getSymShareBtn $type $title $path $thumb)
+	#set( $URI = "#getter('URI', '')" )
+    #set( $PATH_URI = "#getter('PATH_URI', '')" )
+    #set( $DOMAIN = $URI.split($PATH_URI)[0] )
+	#set( $shareUrl = $DOMAIN + $path)
+    <div class="sns_share_sym"#if($StringUtils.equals("$!{type}", "top")) style="top:16px; right:19px"#else  style="top:7px; right:6px"#end>
+    	<div class="sns_sym" style="display:block">
+    		<a class="link sns_mypeople" title="마이피플로 보내기" href="#" onclick="daum.Music.Social.add('$!{command.sym_seq}','mypeople',{thumb: '$!{thumb}', link : '$!{shareUrl}', prefix : '$!{title}'},'musicbar');return false;"><span class="screen_out">마이피플</span></a>
+    		<a class="link btn_more" title="SNS 더보기" href="#" onclick="daum.Music.Sym.showSnsLayer();return false;"><span class="screen_out">더보기</span></a>
+    	</div>
+    	<div id="snsMoreLayer" class="sns_more" style="display:none">
+    		<a class="link sns_mypeople" title="마이피플로 보내기" href="#" onclick="daum.Music.Social.add('$!{command.sym_seq}','mypeople',{thumb: '$!{thumb}', link : '$!{shareUrl}', prefix : '$!{title}'},'musicbar');return false;"><span class="screen_out">마이피플</span></a>
+    		<a class="link sns_twitter" title="트위터로 보내기" href="#" onclick="daum.Music.Social.add('$!{command.sym_seq}','twitter',{thumb: '$!{thumb}', link : '$!{shareUrl}', prefix : '$!{title}'},'musicbar');return false;"><span class="screen_out">트위터</span></a>
+    		<a class="link sns_facebook" title="페이스북으로 보내기" href="#" onclick="daum.Music.Social.add('$!{command.sym_seq}','facebook',{thumb: '$!{thumb}', link : '$!{shareUrl}', prefix : '$!{title}'},'musicbar');return false;"><span class="screen_out">페이스북</span></a>
+    		<a class="link sns_nate" title="싸이월드로 보내기" href="#" onclick="daum.Music.Social.add('$!{command.sym_seq}','nate',{thumb: '$!{thumb}', link : '$!{shareUrl}', prefix : '$!{title}'},'musicbar');return false;"><span class="screen_out">싸이월드</span></a>
+    		<a class="link sns_me2day" title="미투데이로 보내기" href="#" onclick="daum.Music.Social.add('$!{command.sym_seq}','me2day',{thumb: '$!{thumb}', link : '$!{shareUrl}', prefix : '$!{title}'},'musicbar');return false;"><span class="screen_out">미투데이</span></a>
+<!--
+    		<a class="link sns_yozm" title="요즘으로 보내기" href="#" onclick="daum.Music.Social.add('$!{command.sym_seq}','yozm',{thumb: '$!{thumb}', link : '$!{shareUrl}', prefix : '$!{title}'},'musicbar');return false;"><span class="screen_out">요즘</span></a>
+-->
+    	</div>
+    </div><!-- end .sns_share_sym -->
+#end
+
+
+#*
+templeteName 종류
+AI : 통이미지
+BA : 텍스트 기본
+IT : 이미지 + 텍스트
+VC : 동영상
+SL : 곡리스트
+AL : 앨범형
+RT : 관련정보 탭형 
+WI : 작성자 정보
+VL : 동영상뷰어
+PO : 폴형
+
+templeteName, count, board, boardContents 
+*#
+
+## BA : 텍스트 기본
+#macro(printMusicBarTemplateBA $board)
+    <div class="cont_info#if($StringUtils.equals("$!{board.spaceYn}", "Y")) add_margin#end">
+    	#if( $StringUtils.isNotBlank("$!{board.title}") )<strong class="tit">$!{board.title}</strong>#end
+        #set($new_contents=$StringUtils.replace($!board.contents,"src",'width="698" height="393" src'))
+    	<p class="txt_desc">
+    		$!{new_contents}
+    	</p>				
+    </div>
+#end
+
+##AI : 통이미지
+#macro(printMusicBarTemplateAI $board)
+    <div class="cont_info#if($StringUtils.equals("$!{board.spaceYn}", "Y")) add_margin#end">
+    	#if( $StringUtils.isNotBlank("$!{board.title}") )<strong class="tit">$!{board.title}</strong>#end
+    	#if( $StringUtils.isNotBlank("$!{board.linkUrl}") )
+    	#set($url = $!{board.linkUrl})
+    	<a href="$!{board.linkUrl}" title="#escTitle($!{$board.title})"#if( $url.indexOf("http://music.daum.net") == -1 ) target="_blank"#end>
+    		<img alt="" src="$ImageUtil.getImageUrl("$!{board.imageUrl}", "698x0", "PHOTO", "R")"> ## 이미지 유틸 사용할지 말지 결정
+    	</a>
+    	#else
+    		<img alt="#escTitle($!{$board.title})" src="$ImageUtil.getImageUrl("$!{board.imageUrl}", "698x0", "PHOTO", "R")"> ## 이미지 유틸 사용할지 말지 결정
+    	#end
+    </div>
+#end
+
+##PO : 폴형
+#macro(printMusicBarTemplatePO $board)
+    <div id="temp$!{board.pollSeq}" class="cont_info cont_poll#if($StringUtils.equals("$!{board.spaceYn}", "Y")) add_margin#end">
+			<div class="wrap_poll">
+				#if( $!{board.pollTitle} )<strong class="tit"> $!{board.pollTitle}</strong>#end
+					<input type="hidden" name="menuId" value="$boardInfo.menuId"/>
+					<input type="hidden" name="boardId" value="$board.boardId"/>
+				<dl class="poll_info">
+					<dt class="tit_poll">총 참여자</dt>
+					<dd id="temp$!{board.pollSeq}_tot" class="txt_poll">$!{board.totalCount}<span class="txt_bar">|</span></dd>
+					<dt class="tit_poll">기간</dt>
+					<dd class="txt_poll">$!{CheckDate.makeReleaseDate($!{board.pollStartTime})} - $!{CheckDate.makeReleaseDate($!{board.pollEndTime})}</dd>
+				</dl>
+				<ul class="list_item">
+					#if(!$CollectionUtils.isEmpty($board.pollItemList))
+                		#foreach ($poll in $board.pollItemList)
+    					<li #if( $velocityCount == 1 )class="fst"#end>
+								<input type="radio" class="inp" name="pollId" id="$!{board.pollSeq}_$!{poll.pollId}" value="$!{poll.pollId}"/>
+								<label class="lab" for="$!{board.pollSeq}_$!{poll.pollId}" onclick="daum.Music.MusicBar.selectPollItem(this);">$!{poll.pollItem}</label></li>
+    					#end
+					#end
+				</ul>
+				<div class="wrap_btns">
+					#set($diff = $CheckDate.diffOfDate($board.pollEndTime))
+					#set($diff2 = $CheckDate.diffOfDate($board.pollStartTime))
+					<button class="btn_poll btn_vote" onclick="daum.Music.MusicBar.pollVote($!diff, $!diff2, $!{board.pollSeq}); return false;">투표</button>
+					<button class="btn_poll btn_result" onclick="daum.Music.MusicBar.showPollResult('$!{board.pollSeq}');">결과보기</button>
+				</div>
+			</div>
+		</div>
+#end
+
+##VC : 동영상
+#macro(printMusicBarTemplateVC $board)
+	<div class="cont_txtspace#if($StringUtils.equals("$!{board.spaceYn}", "Y")) add_margin#end">
+	#if(!$StringUtils.equals("$!{board.videoInfo.svcstatus}", "2"))
+		<div class="video_ready">해당 동영상이 준비중입니다.</div>
+	#else
+		#if( $!{board.title} )<strong class="tit"> $!{board.title}</strong>#end
+		#set($vid = $!{board.videoInfo.tvpotVId})#set($isPreVid = "N")
+        #if($StringUtils.equals("$!{board.videoInfo.FreeYn}", "N"))
+        	#if($StringUtils.isNotBlank("$!{musicUser}"))
+        		#if(!$StringUtils.equals("$!{board.authorizedPlayVideo}", "true"))
+        			#set($vid = $!{board.videoInfo.tvpotPreVId})#set($isPreVid = "Y")
+        		#end
+        	#else
+        		#set($vid = $!{board.videoInfo.tvpotPreVId})#set($isPreVid = "Y")
+        	#end
+		#end
+		<div class="box_player#if($StringUtils.equals($!{isPreVid},"Y")) info_charge#end">				
+    		<div id="body_my_player$!{board.templeteOrder}" width="698" height="393">
+	##			#if( $ua_result.isIphone == true || $ua_result.isIpad == true || $ua_result.isIpod == true )
+	##				<video src="http://rt.flvs.daum.net:8080/RTES/Redirect?vid=$!{board.videoInfo.tvpotVId}" controls width="686" height="484" poster=""></video>
+	##			#else
+					<script type="text/javascript">
+						daum.Music.VideoPlayer.add('body_my_player$!{board.templeteOrder}', '$!{vid}', {autoplay:false});
+					</script>
+	##			#end
+    		</div>
+			#if($StringUtils.equals($!{isPreVid},"Y"))
+			<div id="chargeInfo" class="wrap_charge $!{info_class}">
+				<strong>현재 이 뮤직비디오는 <span class="txt_preview">1분 미리보기</span>가 제공됩니다.</strong>
+				<p>음악듣기 이용권을 사용중인 회원님만 전곡감상이 가능합니다.</p>
+				##<p>음악듣기 이용권을 보유하신 회원님은 <a href="http://login.daum.net/accounts/loginform.do" title="로그인">로그인</a> 하시면 전체 뮤비를 보실 수 있습니다.<a href="#getter('GAIA_DOMAIN', '')/gaia/do/music/notice/read?articleId=79&bbsId=Notice" target="_blank" class="link_preview">뮤비 이용안내</a></p>
+				##<a href="/purchase/ticketitem/list" class="btn_comm btn_buy">이용권 구매</a>
+				##<a href="javascript:;" onclick="daum.Element.hide(daum.$('chargeInfo'));return false;" class="btn_comm btn_close">닫기</a>
+			</div>
+			#end
+			#if($CollectionUtils.isNotEmpty($!{board.htmlContents}))
+			<div class="box txt">$!{board.htmlContents}</div>
+			#end
+		</div>
+	#end	
+	</div>
+#end
+
+## PV : 포토 뷰어
+#macro(printMusicBarTemplatePV $board)
+<script type="text/javascript" src="/js/photo.ultra.light.box.min.js"></script>
+	<style type="text/css">
+		.photo_view_layer {position: relative;overflow:hidden;margin-top:0px;padding-bottom:29px;border: 1px solid #CED6D6;width: 693px;background-color: #F9F9F9;}
+		.photo_view_layer .layer_body_prev {position:absolute; top: 0; left:0; width:50%; cursor: url('http://s1.daumcdn.net/img-contents/music/2011_home/detail/arrow_left_ie.cur.ico'), w-resize;}
+		.photo_view_layer .layer_body_next {position:absolute; top: 0; right:0; width:50%; cursor: url('http://s1.daumcdn.net/img-contents/music/2011_home/detail/arrow_right_ie.cur.ico'), w-resize;}
+		.photo_view_layer .btn_consumer {margin-top:30px;width:150px;margin: 30px auto 0;}
+		.photo_view_layer .btn_consumer .btn_photo_view {float:left;width:148px;height:30px;margin-right:5px;background-position:0 -115px;text-indent:0;text-decoration:none}
+		.photo_view_layer .btn_consumer .btn_photo_view .size {display:block;height:29px;padding:0 3px 1px 71px;font:bold 11px/29px tahoma;color: #139fd0;text-align:center}
+		.cont_info .photo_view {overflow: hidden;width: 693px;max-height: 1200px;border: none;}
+		##.cont_info .photo_view .layer_body {position: absolute; overflow:hidden; top:0; left:0; width:100%; height:100%}
+		##.cont_info .photo_view .btn_prev{position: relative;background: none repeat scroll 0% 0% transparent; overflow: visible; height: auto; cursor: url('http://s1.daumcdn.net/img-contents/music/2011_home/detail/arrow_left_ie.cur.ico'), w-resize;}
+		###nextBtn{position: relative;background: none repeat scroll 0% 0% transparent; overflow: visible; height: auto; cursor: url('http://s1.daumcdn.net/img-contents/music/2011_home/detail/arrow_right_ie.cur.ico'), w-resize;}
+    </style>
+	
+	<div class="cont_info cont_view#if($StringUtils.equals("$!{board.spaceYn}", "Y")) add_margin#end">
+		#if( $StringUtils.isNotBlank("$!{board.photoTitle}") )<strong class="tit">$!{board.photoTitle}</strong>#end
+			#if(!$CollectionUtils.isEmpty($board.photoList) && $board.photoList.size() > 0)
+				#set($fstPhoto = $board.photoList.get(0))
+			#end
+		<div id="photo_view_$!{board.templeteOrder}" class="">
+			<div class="box_slide">
+    			<div class="slide">
+					<div id="wrap_listRoll_$!{board.templeteOrder}" class="wrap_listRoll">	## 롤링을 위해서 추가된 태그
+					<ul id="photoListRollUl_$!{board.templeteOrder}" class="list_photo">
+    					#if(!$CollectionUtils.isEmpty($board.photoList))
+    						#foreach($img in $board.photoList)
+                                ##<li id="photoThumb_$!{board.templeteOrder}_$velocityCount" class="roll #if($foreach.count == 1)fst #end">
+								<li class="roll #if($foreach.count == 1)fst #end">	
+    #*
+    								<a href="javascript:;" onclick="daum.Music.Imagene.MusicbarPhotoList.view(this, '$!{img.filePath}', '$!{img.imageId}' );" class="thumb_link">
+    									<img src="$ImageUtil.getImageUrl("$!{img.filePath}", "95x95", "PHOTO", "C")" width="95" height="95" alt=""/>
+    									<span class="thumb_boarder"></span>
+    								</a>
+    *#							
+    								##<a href="javascript:;" onClick="daum.Music.Imagene.MusicbarPhotoViewer.clickImage($!{board.templeteOrder}, $velocityCount);" class="thumb_link" id="thumbLink">
+									<a href="javascript:;" class="thumb_link">
+										<img src="$ImageUtil.getImageUrl("$!{img.filePath}", "95x95", "PHOTO", "C")" width="95" height="95" alt=""/>
+    									<span class="thumb_boarder"></span>
+    								</a>
+    							</li>
+    						#end
+    					#end	
+    				</ul>
+					</div>
+    			</div>
+        			<span class="btn_prev">
+                        <a id="msPhotoPrevBtn_$!{board.templeteOrder}" href="javascript:;" class="btn_detail prev_off">이전 사진</a>
+                    </span>
+        			<span class="btn_next">
+                        <a id="msPhotoNextBtn_$!{board.templeteOrder}" href="javascript:;" class="btn_detail next_on">이전 사진</a>
+                    </span>
+    		</div>
+    	</div>	
+			<div class="photo_view_layer">
+    			<div id="photo_view_box_$!{board.templeteOrder}" class="photo_view">
+					##<script type="text/template" id="itemListTmpl_$!{board.templeteOrder}"></script>
+					##<script type="text/template" id="itemListTmpl_$!{board.templeteOrder}"></script>
+					##<img width="694" height="463" alt="" id="musicbarPhotoView" class="thumb_big" src="$!{fstPhoto.filePath}"/>
+    			</div>
+				##<div class="layer_body">
+				<div id="layer_body_prev_$!{board.templeteOrder}" class="layer_body_prev">
+					<img style="display:block" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" width="100%" height="100%">
+        		##<a id="prevBtn" href="#none" class="btn_layer btn_prev">이전 사진</a>
+				</div>
+				<div id="layer_body_next_$!{board.templeteOrder}" class="layer_body_next">
+					<img style="display:block" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" width="100%" height="100%">
+        		##<a id="nextBtn" href="#none" class="btn_layer btn_next">다음 사진</a>
+				</div>	
+				##</div>
+				<div class="btn_consumer">
+					<span class="btn_detail btn_photo_view" id="photo_view_btn_$!{board.templeteOrder}">
+    					<span class="screen_out btn_ori">원본보기</span><em id="oriSize_$!{board.templeteOrder}" class="size ori_size"></em>
+    				</span>
+				</div>	
+			</div>
+    </div>
+	<script type="text/javascript" >
+    	(function() {
+			var imgList =  $board.photoListData;
+			var photoList = new daum.Music.Imagene.MusicbarPhotoList();
+			
+			//var viewerList = new daum.Music.Imagene.MusicbarPhotoViewer();
+			photoList.init(imgList, $board.templeteOrder);
+
+    		var msRoll = new daum.Music.ListRoll("photoListRollUl_$board.templeteOrder", {alimPopup:true, amount:6, duration:0.5, viewList:true, prevId:"msPhotoPrevBtn_$board.templeteOrder", nextId:"msPhotoNextBtn_$board.templeteOrder", defaultIdx:0,perGroup:true, loop:false,preonclassName:"prev_on",preoffclassName:"prev_off",	nextonclassName:"next_on",	nextoffclassName:"next_off", mouseEventFlag:true	});
+    		msRoll.render();
+			
+			//var photoList = new daum.Music.Imagene.MusicbarPhotoList();
+			photoList.setMsRoll(msRoll, $board.templeteOrder);
+			//daum.Music.Imagene.MusicbarPhotoList.select(daum.$$("#photoListRollUl_$board.templeteOrder li a")[0]);			
+			
+            var prevBtn = document.getElementById("layer_body_prev_$board.templeteOrder");
+            var nextBtn = document.getElementById("layer_body_next_$board.templeteOrder");
+
+            daum.addEvent(prevBtn,"click", photoList.prev);
+            daum.addEvent(nextBtn,"click", photoList.next);	
+			
+            //daum.addEvent(prevBtn,"click",daum.Music.Imagene.MusicbarPhotoViewer.prev);
+            //daum.addEvent(nextBtn,"click",daum.Music.Imagene.MusicbarPhotoViewer.next);			
+		})();
+	</script>
+	<script type="text/javascript" src="http://m1.daumcdn.net/svc/original/U03/cssjs/slide/slide-1.0.5.merged.js"></script>
+#end
+
+##VL : 동영상리스트
+#macro(printMusicBarTemplateVL $board)
+    <div class="cont_info cont_play#if($StringUtils.equals("$!{board.spaceYn}", "Y")) add_margin#end">
+		#if( $!{board.vclipTitle} )<strong class="tit"> $!{board.vclipTitle}</strong>#end
+
+	    #set($vid = $!{board.vclipList[0].tvpotVId})#set($isPreVid = "N")
+        #if($StringUtils.equals("$!{board.vclipList[0].FreeYn}", "N"))
+        	#if($StringUtils.isNotBlank("$!{musicUser}"))
+        		#if(!$StringUtils.equals("$!{board.vclipList[0].authorizedPlayVideo}", "true"))
+        			#set($vid = $!{board.vclipList[0].tvpotPreVId})#set($isPreVid = "Y")
+        		#end
+        	#else
+        		#set($vid = $!{board.vclipList[0].tvpotPreVId})#set($isPreVid = "Y")
+        	#end
+		#end
+		
+		<div class="box_player">
+			<div id="body_my_player_$!{board.templeteOrder}" width="698" height="398">
+				<iframe width="698" scrolling="no" height="398" frameborder="0" title="비디오 영역" charset="utf-8" src="http://videofarm.daum.net/controller/video/viewer/VideoView.html?vid=$!{vid}&amp;play_loc=daum_music&amp;width=698&amp;height=398&amp;autoplay=false&amp;smooth=true&amp;informal=true"></iframe>
+			</div>
+		</div>
+		#if($StringUtils.equals($!{isPreVid},"Y"))
+    		<div id="chargeInfo_$!{board.templeteOrder}" class="wrap_charge">
+        			<strong>현재 이 뮤직비디오는 <span class="txt_preview">1분 미리보기</span>가 제공됩니다.
+        			<strong><p>음악듣기 이용권을 사용중인 회원님만 전곡감상이 가능합니다.</p></strong></strong>
+    		</div>		
+		#end
+		<div id="itemListWrap_$!{board.templeteOrder}"></div>
+		<script type="text/template" id="itemListTmpl_$!{board.templeteOrder}">					
+			<div class="box_slide">
+    			<div class="slide">
+    				<div class="wrap_listRoll">	
+
+					<%
+						var ulId="listRollul_$!{board.templeteOrder}";
+					%>
+					
+					<ul id="<%=ulId%>" class="list_photo">
+					
+					<%
+						var len=obj.length;
+    					if(len == 0) {
+					%>
+						리스트가 없습니다.
+					<%
+    					} else {
+								var className = "";
+                            	for(var i=0, len=obj.length; i<len; i++) {
+								if(i%4==0){className =" fst"} else {className = "";} 
+					%>
+						<li class="roll<%=className%>">
+							<a href="javascript:;" class="thumb_link">
+                        		<img src="<%=obj[i].mainImage.filePath%>" width="138" height="103"  alt="" />
+                        		<span class="ico_comm ico_play">동영상</span>
+                        	</a>	
+                        	<div class="info">
+                        		<strong class="title">
+                        			<a href="/artist/vclip/detail?artist_id=<%=artistId%>&vclip_id=<%=obj[i].vclipId%>">
+										<% var adultYn = obj[i].adultYn;
+											 if(adultYn == "N"){ %>
+                        					<%=daum.Music.cutHighlightedKoreanString(obj[i].title, 11, "..")%>
+										<%} else{ %>
+                        					<%=daum.Music.cutHighlightedKoreanString(obj[i].title, 11, "..")%>
+										<%} %>
+										
+										<%if(adultYn == "Y"){ %>
+												<span class="ico_adult" title="19세 미만 청취 불가">&nbsp;</span>
+                                        <% }else if(adultYn == "A"){ %>
+                                        		<span class="ico_all" title="전체 이용 가능">&nbsp;</span>
+                                        <% }else if(adultYn == "2"){ %>
+                                        		<span class="ico_12" title="12세 이상 이용 가능">&nbsp;</span>
+                                        <% }else if(adultYn == "5"){ %>
+                                        		<span class="ico_15" title="15세 이상 이용 가능">&nbsp;</span>
+                                        <%} %>
+									
+									</a>
+                        		</strong>
+								<span class="artist">
+                        		<%=daum.Music.printArtistName(obj[i].keyArtistList, {len:18, tag:true})%>
+								</span>
+                        	</div>
+                        </li>			
+					<%
+						}
+					}	
+					%>						
+					</ul>
+				</div>	
+			</div>
+
+			<span class="btn_prev">
+				<a id="msPrevBtn_$board.templeteOrder" class="btn_detail prev_off" title="이전" href="javascript:;">이전 동영상</a>
+			</span>
+			<span class="btn_next">
+				<a id="msNextBtn_$board.templeteOrder" class="btn_detail next_on" title="다음" href="javascript:;">다음 동영상</a>
+			</span>			
+		</div>
+		</script>		
+	</div>
+	<script type="text/javascript" >
+    	(function() {
+    		var vclipListData = $board.vclipListData;
+    		var vclipList = new daum.Music.Imagene.MusicbarVclipList();
+    		vclipList.init(vclipListData, $board.templeteOrder);
+    		var msRoll = new daum.Music.ListRoll("listRollul_$board.templeteOrder", {alimPopup:true, amount:4, duration:0.5, viewList:true, prevId:"msPrevBtn_$board.templeteOrder", nextId:"msNextBtn_$board.templeteOrder", defaultIdx:0,perGroup:true, loop:false,preonclassName:"prev_on",preoffclassName:"prev_off",	nextonclassName:"next_on",	nextoffclassName:"next_off", mouseEventFlag:true	});
+    		msRoll.render();
+    		vclipList.setMsRoll(msRoll, $board.templeteOrder);
+    	})();
+		
+		//daum.Music.Imagene.MusicbarVclipList.select(daum.$$("#listRollul_$board.templeteOrder li a")[0]);
+	</script>
+#end
+
+##AL : 앨범형
+#macro(printMusicBarTemplateAL $board)
+	<div class="cont_info cont_album #if($StringUtils.equals("$!{board.spaceYn}", "Y")) add_margin#end">
+		#if( $StringUtils.isNotBlank("$!{board.albumTitle}") )<strong class="tit">$!{board.albumTitle}</strong>#end
+		<div class="album_info">
+			#foreach ($album in $board.albumList)
+			<div class="wrap_album_content#if($foreach.count == 1) fst#end">			
+				#printAlbumThumb( $album 4 "" "" )
+				<div class="info">
+					<dl>
+						<dt class="screen_out">앨범명</dt>
+						<dd class="tit_album">
+							#printAlbumName( $album "fc_etc" 40 3 true )
+						</dd>
+					</dl>
+					<dl>
+						<dt class="screen_out">아티스트 및 발매일</dt>
+						<dd class="txt_artist">
+							#printArtistName( $!{album.keyArtistList} '' 50 true )
+							#*#foreach ($artist in $album.keyArtistList)
+								#if( $StringUtils.equals("$!{artist.name}", "V.A") )
+								<span style="color:#404040;">$!{artist.name}</span>
+								#else
+								<a href="/artist/main?artist_id=$!{artist.artistId}" title="$!{artist.name} 상세가기">$!{artist.name}</a>	
+								#end
+							#end*#
+							<span class="txt_bar"> | </span> $!{CheckDate.makeReleaseDate($!{album.releaseDt})}
+						</dd>
+					</dl>
+					<dl>
+						<dt class="screen_out">타이틀곡</dt>
+						<dd class="titlesong">
+							#if( $album.masterSongList.size() != 0 )
+    							#foreach($song in $album.masterSongList)
+        							#if( $foreach.count == 1 )
+        								#printSongName( $song "ico_comm ico_listen" 40 true false false )
+        							#end
+								#end
+							#else
+								#foreach($song in $album.songList)
+									#if( $foreach.count == 1 )
+										#printSongName( $song "ico_comm ico_listen" 40 true false false)
+									#end
+								#end
+							#end
+						</dd>					
+					</dl>
+					<dl>
+						<dt class="screen_out">앨범설명</dt>
+						<dd class="desc">
+							<p>#stripHTML("#strCut($!{album.description}, 218)")</p> 
+						</dd>
+					</dl>
+				</div>
+			</div>
+			#end
+		</div>	
+	</div>
+#end
+
+
+##RT : 관련정보 탭형 
+#macro(printMusicBarTemplateRT $board)
+	<div class="cont_space#if($StringUtils.equals("$!{board.spaceYn}", "Y")) add_margin#end">
+		#if( $StringUtils.isNotBlank("$!{board.albumTitle}") )<strong class="tit">$!{board.albumTitle}</strong>#end
+		<div id="RelationInformation$!{board.templeteOrder}" class="relation_info">
+			#if( $StringUtils.isNotBlank( "$!{board.artistList}" ) )
+	##		<div class="wrap_ListRelatedArtist">
+				<h4 class="tab_bar tab_artist">
+					<a class="on relative_tab" href="javascript:;" title="관련 아티스트 탭 가기" #if( $StringUtils.isNotBlank( "$!{board.artistList}" ) && $StringUtils.isNotBlank( "$!{board.albumList}" ) )onclick="daum.Music.MusicBar.changeTab(event, 'ListRelatedAlbum$!{board.templeteOrder}', 'ListRelatedArtist$!{board.templeteOrder}', 'RelationInformation$!{board.templeteOrder}', 'WrapToggleForAlbum'); return false;"#end></a>
+				</h4>			
+				<div id="ListRelatedArtist$!{board.templeteOrder}" class="wrap_artist #if( $!{board.artistList.size()} < 6 )line_bottom#end">
+					<ul class="list_artist">
+					#foreach($artist in $board.artistList)
+						<li#if($foreach.count > 5) class="none"#end>
+							#printArtistThumb( $artist 3 )
+					##		#printArtistName( $artist.keyArtistList "tit_artist" 14 true )
+							<a class='tit_artist' href='/artist/main?artist_detail_id=$!{artist.artistId}' onclick='daum.Music.artistDetail($!{artist.artistId});return false;' title='#escTitle($!{artist.name})'>#strCut($!{artist.name}, 14)</a>
+						</li>
+					#end
+#*
+					#foreach ($album in $board.albumList)
+						#set($idx = $foreach.index)
+					#foreach($artist in $album.keyArtistList)
+						<li#if($idx > 4) class="none"#end>
+							#printArtistThumb( $artist 3 )
+							#printArtistName( $album.keyArtistList "tit_artist" 14 true )
+						</li>
+						#end
+					#end
+*#
+					</ul>
+					#if( $board.artistList.size() > 5 )
+					<div id="WrapToggleForArtist" class="wrap_folding">
+						<a class="link_unfold" href="javascrip:;" title="펼치기" onclick="daum.Music.MusicBar.toggleList(event, 'spread', 'ListRelatedAlbum$!{board.templeteOrder}', 'ListRelatedArtist$!{board.templeteOrder}'); return false;"><span class="arr_comm">펼치기</span></a>
+						<a class="link_fold" href="javascript:;" title="접기" onclick="daum.Music.MusicBar.toggleList(event, 'folding', 'ListRelatedAlbum$!{board.templeteOrder}', 'ListRelatedArtist$!{board.templeteOrder}'); return false;"><span class="arr_comm">접기</span></a>
+					</div>
+					#end
+				</div>
+			
+	##		</div>
+			#end
+			#if( $StringUtils.isNotBlank( "$!{board.albumList}" ) )
+	##		<div class="wrap_ListRelatedAlbum">
+				<h4 class="tab_bar tab_alumb" #if($StringUtils.isBlank("$!{board.artistList}"))style="left:0px;"#end>
+					<a class="#if($StringUtils.isBlank($!{board.artistList}))on#end relative_tab" href="javascript:;" title="관련앨범 탭 가기" #if( $StringUtils.isNotBlank( "$!{board.artistList}" ) && $StringUtils.isNotBlank( "$!{board.albumList}" ) )onclick="daum.Music.MusicBar.changeTab(event, 'ListRelatedArtist$!{board.templeteOrder}', 'ListRelatedAlbum$!{board.templeteOrder}', 'RelationInformation$!{board.templeteOrder}', 'WrapToggleForArtist'); return false;"#end></a>
+				</h4>
+				<div id="ListRelatedAlbum$!{board.templeteOrder}" class="wrap_album #if( $!{board.albumList.size()} < 6 )line_bottom#end" #if($StringUtils.isNotBlank("$!{board.artistList}"))style="display:none;"#end>
+					<ul class="list_album">
+					#foreach ($album in $board.albumList)
+						<li #if($foreach.count > 5)class="none"#end>
+							#printAlbumThumb( $album 3 "" "" )
+							#printAlbumName( $album "tit_album" 14 1 true )
+						</li>
+					#end
+					</ul>
+					#if( $board.albumList.size() > 5 )
+					<div id="WrapToggleForAlbum" class="wrap_folding">
+						<a class="link_unfold" href="javascrip:;" title="펼치기" onclick="daum.Music.MusicBar.toggleList(event, 'spread', 'ListRelatedAlbum$!{board.templeteOrder}', 'ListRelatedArtist$!{board.templeteOrder}'); return false;"><span class="arr_comm">펼치기</span></a>
+						<a class="link_fold" href="javascript:;" title="접기" onclick="daum.Music.MusicBar.toggleList(event, 'folding', 'ListRelatedAlbum$!{board.templeteOrder}', 'ListRelatedArtist$!{board.templeteOrder}'); return false;"><span class="arr_comm">접기</span></a>
+					</div>
+					#end
+				</div>
+				
+	##		</div>
+			#end
+		</div>
+	</div>
+#end
+
+##WI : 작성자 정보
+#macro(printMusicBarTemplateWI $board)
+    #set($nickName = $board.writerInfo.name.replaceAll("'","\\'").replaceAll('"','&quot;').replaceAll("\r\n","<br/>"))
+    #set($nickName = "#stripHTML($!{nickName})")
+    <div class="cont_info#if($StringUtils.equals("$!{board.spaceYn}", "Y")) add_margin#end">
+    	<div class="offer_info">
+    		<a class="thumb_link" href="javascript:;" title="$!{nickName}" onclick="daum.Music.MusicBar.linkToWriter('', '$!{nickName}'); return false;">
+    			<img height="74" width="74" src="$!{board.writerInfo.imageUrl}" alt="">
+    			<span class="line_thumb"></span>
+    		</a>
+    		<div class="info_desc">
+    			#if($StringUtils.isNotBlank("$!{board.writerInfo.companyName}"))<span class="fw_b">$!{board.writerInfo.companyName}</span><span class="txt_bar"> | </span>#end<a class="txt_user" onclick="daum.Music.MusicBar.linkToWriter('', '$!{nickName}'); return false;" href="javascript:;">#stripHTML("$!{board.writerInfo.name}") ($!{board.writerInfo.job})</a>
+    			<p class="desc">
+    				<span>#strCut($!{board.writerInfo.info}, 200)</span>
+    			</p>
+    			<span class="tit_website">
+    				<a href="$!{board.writerInfo.companyUrl}"#if( $url.indexOf("http://music.daum.net") == -1 ) target="_blank"#end>$!{board.writerInfo.companyUrl}</a>
+    			</span>
+    		</div >
+    		<span class="arr_comm link_more CT_ZONE_WRITTER_MORE">
+    			<a href="javascript:;" onclick="daum.Music.MusicBar.linkToWriter('', '$!{nickName}'); return false;">다른글 보러가기</a>
+    		</span>
+    	</div>
+    </div>
+#end
+
+##IT : 이미지 + 텍스트
+#macro(printMusicBarTemplateIT $board)
+	<div class="cont_info#if($StringUtils.equals("$!{board.spaceYn}", "Y")) add_margin#end">
+		#if( $StringUtils.isNotBlank("$!{board.title}") )<strong class="tit">$!{board.title}</strong>#end
+		#if( $StringUtils.isNotBlank("$!{board.linkUrl}") )
+		#set($url = $!{board.linkUrl})
+		<a class="#if($StringUtils.equals("$!{board.imageAlign}", "R"))thumb_right#{else}thumb_left#end" href="$!{board.linkUrl}" title="#escTitle($!{$board.title})"#if( $url.indexOf('http://music.daum.net') == -1 ) target="_blank"#end>
+			<img alt="" src="$!{board.imageUrl}" width="279"> ## 이미지 유틸 사용할지 말지 결정
+		</a>
+		#else
+		<span class="#if($StringUtils.equals("$!{board.imageAlign}", "R"))thumb_right#{else}thumb_left#end">
+			<img alt="$!{board.title}" src="$!{board.imageUrl}" width="279">
+		</span>
+		#end
+		<p class="txt_desc">
+			$!{board.contents}
+		</p>
+	</div>
+#end
+
+## SL : 곡리스트
+#macro(printMusicBarTemplateSL $board)
+	<div class="cont_space#if($StringUtils.equals("$!{board.spaceYn}", "Y")) add_margin#end">
+		#if( $StringUtils.isNotBlank("$!{board.songTitle}") )<strong class="tit">$!{board.songTitle}</strong>#end
+		<div class="album_songlist">
+			<div class="bg_thead">
+			##	onclick="controller.allChecking(this, {checkboxName:'trackCheckbox$!{board.templeteOrder}', allCheckbox:'allCheck$!{board.templeteOrder}'}); return false;"
+				<input type="checkbox" class="all_chk checking_td" id="allCheck$!{board.templeteOrder}" onclick="daum.Music.MusicBar.checkAll({checkboxName:'trackCheckbox$!{board.templeteOrder}', allCheckbox:'allCheck$!{board.templeteOrder}',container:'trackContainer$!{board.templeteOrder}'});">
+				<label class="screen_out" for="allCheck">전체선택</label>
+			</div>
+			#printListHeader( "base" )
+			#if(!$CollectionUtils.isEmpty($board.songList))
+				<table id="trackContainer$!{board.templeteOrder}" class="tbl_music" cellpadding="0" cellspacing="0">
+					#printListItems( "board" $board.songList $board.templeteOrder false)
+				</table>
+				<script type="text/javascript">
+					//new daum.Music.CheckBoxDrag("trackContainer$!{board.templeteOrder}");
+					//new daum.Music.selectByDrag().init("#trackContainer$!{board.templeteOrder} .track", "col_check");
+				</script>
+			#else
+				리스트가 없습니다.
+			#end
+			<div class="wrap_tool_btn">
+				<div class="tool_btn f_l">
+					#printListButtonMusicBarAndTop("song" "" $board.templeteOrder "" "")
+				</div>
+			</div>
+		</div>
+	</div>
+#end
+
+##LP : 생중계플레이어
+#macro(printMusicBarTemplateLP $board)
+	<div class="cont_txtspace#if($StringUtils.equals("$!{board.spaceYn}", "Y")) add_margin#end">
+	<iframe id="live_player" title='라이브 영상 제목' width="698" height="393" 
+		src="http://videofarm.daum.net/controller/live/viewer/Live.html?pdDaumId=$!{board.pdDaumId}&width=698&height=423&profile=MAIN" frameborder='0' scrolling='no'></iframe>
+	</div>
+#end
+

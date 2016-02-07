@@ -1,0 +1,37 @@
+#uaCheck()
+<div id="daumContent" class="cont_mov">
+	<h2 class="screen_out">뮤비</h2>
+	<div class="cont_navi">
+		##<h3 class="tit">인기 뮤비(타이틀수정해야함)</h3>
+		#if($StringUtils.contains("$!{requestURI}", "/chart"))
+			#set($title = "인기 뮤비")
+		#elseif($StringUtils.contains("$!{requestURI}", "/newest"))
+			#set($title = "최신 뮤비")
+		#elseif($StringUtils.contains("$!{requestURI}", "/type"))
+			#set($title = "라이브")
+		#else
+			#set($title = "$!{theme.title}")
+		#end
+		<h3 class="tit">#strCut("$!{title}", 30)</h3>
+		#btnPrev()
+	</div>
+
+	<div class="rank_mov">
+		<ol class="list_info list_thumb">
+			#foreach($vclip in $vclipList)
+				#mVideoList("vclip")
+            #end
+		</ol>
+		#mobilePaging($pagingUrl, $command.page_no, $pageHandler)
+	</div>
+	
+</div>
+
+#parse("/velocity/mobileweb/realtimeissue.vm")
+
+#stop
+
+$theme.title
+#foreach($vclip in $vclipList)
+#mVideoList()	
+#end

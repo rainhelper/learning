@@ -1,0 +1,126 @@
+<script id="timelineTmpl" type="text/x-jsrender">
+{{for}}
+	{{if #parent.index == 0}}
+	<li class="fst">
+		{{if song.songId != 0}}
+		<img src="{{:~getImageUrl(song.album.mainImage.filePath, "150x150", "ALBUM", "C")}}" width="115" height="115" class="thumb_img" alt="{{:song.title}}">
+		{{else}}
+		<img src="http://m1.daumcdn.net/img-media/mobile/m640/music/img_none1.jpg" width="115" height="115" class="thumb_img" alt="{{:title}}">
+		{{/if}}
+		<div class="timeline_info">
+			<div class="info_detail">
+				<span class="txt_time" data-time="{{:startTime}}"><span class="ico_now ico_time">방송시간 </span>방금</span>
+				<strong class="tit_song"><span class="screen_out">곡명 </span>{{if song.songId != 0}} {{:song.title}}{{else}}{{:title}}{{/if}}</strong>
+				<span class="txt_info"><span class="screen_out">프로그램 </span>{{:channel.channelName}} - {{:schedule.programName}}</span>
+			</div>
+			{{if song.songId != 0 && song.aodlinkId != "" && song.aodlinkId !="0"}}
+			<a href="#none" class="link_play" onclick="music.mobile.mMusicPlay.playSample('{{:song.songId}}','','close');"><span class="desc_info">미리듣기</span></a>
+			{{else}}
+			<a href="#none" class="link_play off"><span class="desc_info">미리듣기</span></a>
+			{{/if}}
+			{{if programId != null && programId !="" && channel.channelType == "1"}}
+			<a href="/onair/tv/detail?channelType={{:channel.channelType}}&programId={{:programId}}" class="link_select">
+			{{else programId != null && programId !="" && channel.channelType == "4"}}
+			<a href="/onair/radio/detail?channelType={{:channel.channelType}}&channelId={{:channel.channelId}}&programId={{:programId}}" class="link_select">
+			{{else programId == null || programId =="" }}
+			<a href="#none" class="link_select off">
+			{{/if}}<span class="desc_info">프로그램 선곡표</span></a>
+		</div>
+		{{if song.songId != 0 && song.aodlinkId != null && song.aodlinkId != "" && song.aodlinkId !="0"}}
+		<div id="sId_{{:song.songId}}" class="audio"></div>
+		{{/if}}
+
+	</li>
+	{{else}}
+	<li>
+		{{if song.songId != 0}}
+		<a href="/album/main?album_id={{:song.album.albumId}}" class="link_album">
+    		<img src="{{:~getImageUrl(song.album.mainImage.filePath, '150x150', 'ALBUM', 'C')}}" width="50" height="50" class="thumb_img" alt="{{:song.title}}">
+		{{else}}
+		<a href="#none" class="link_album">
+    		<img src="http://s1.daumcdn.net/img-contents/music/2014_home/nowsong/img_album.jpg"  width="50" height="50" class="thumb_img" alt="{{:title}}">
+		{{/if}}
+		</a>
+		<a href="#none" class="link_info" onclick="javascript:music.mobile.Timeline.moreViewLayer(this);">
+    		<span class="timeline_info">
+    			<span class="txt_time"><span class="ico_now ico_time">방송시간 </span><span class="txt_num" data-time="{{:startTime}}"></span></span>
+    			<strong class="tit_song"><span class="screen_out">곡명 </span>{{if song.songId != 0}}{{:song.title}}{{else}}{{:title}}{{/if}} - <span class="screen_out">아티스트명 </span>
+    			{{if song.songId != 0}}
+                	{{for song.keyArtistList}}
+                		{{:name}}{{if #index < #parent.data.size()-1}},{{/if}} 
+            		{{/for}}
+    			{{else}}
+    			 {{:artistName}}
+    			{{/if}}
+				</strong>
+    			<span class="txt_info"><span class="screen_out">프로그램 </span>{{:channel.channelName}} - {{:schedule.programName}}</span>
+    		</span>
+			<span class="btn_side"><span class="ico_now ico_fold">추가 제공 서비스 열기/닫기</span></span> <!-- 2014-03-26 추가 -->
+		</a>
+		<a href="#none" class="btn_side {{if song.songId == 0}}off{{/if}}" {{if song.songId != 0}} onclick="music.mobile.mMusicPlay.playSample('{{:song.songId}}','','close');" {{/if}}><span class="ico_now ico_listen">듣기</span></a>
+		
+		<div class="timeline_fold">
+			{{if song.songId != 0}}
+			{{:~printListItemButton(programId, "program", channel.channelType, channel.channelId)}}
+			{{:~printListItemButton(song.songId, "lyrics", song.lyricsYn, song.album.albumId)}}
+			{{:~printListItemButton(song.songId, "buy", song.mp3LinkId, song.album.albumId)}}
+			{{:~printListItemButton(song.songId, "app", song.aodlinkId, song.album.albumId)}}
+			{{else}}
+			<p class="txt_fold">서비스되지 않는 곡입니다.</p>
+			<span class="desc_fold desc_result"><a href="#none" class="link_timeline">통합검색 결과보기</a><!-- off 클래스 추가시 딤드 처리 --></span>
+			{{/if}}
+		</div>
+		{{if song.songId != 0 && song.aodlinkId != null && song.aodlinkId != "" && song.aodlinkId !="0"}}
+		<div id="sId_{{:song.songId}}" class="audio"></div>
+		{{/if}}
+	</li>
+	{{/if}}
+{{/for}}
+</script>
+
+<script id="timelineBottomTmpl" type="text/x-jsrender">
+{{for}}
+	<li>
+		{{if song.songId != 0}}
+		<a href="/album/main?album_id={{:song.album.albumId}}" class="link_album">
+    		<img src="{{:~getImageUrl(song.album.mainImage.filePath, '150x150', 'ALBUM', 'C')}}" width="50" height="50" class="thumb_img" alt="{{:song.title}}">
+		{{else}}
+		<a href="#none" class="link_album">
+    		<img src="http://s1.daumcdn.net/img-contents/music/2014_home/nowsong/img_album.jpg"  width="50" height="50" class="thumb_img" alt="{{:title}}">
+		{{/if}}
+		</a>
+		<a href="#none" class="link_info" onclick="javascript:music.mobile.Timeline.moreViewLayer(this);">
+    		<span class="timeline_info">
+    			<span class="txt_time"><span class="ico_now ico_time">방송시간 </span><span class="txt_num" data-time="{{:startTime}}"></span></span>
+    			<strong class="tit_song"><span class="screen_out">곡명 </span>{{if song.songId != 0}}{{:song.title}}{{else}}{{:title}}{{/if}}- <span class="screen_out">아티스트명 </span>
+    			{{if song.songId != 0}}
+                	{{for song.keyArtistList}}
+                		{{:name}}{{if #index < #parent.data.size()-1}},{{/if}} 
+            		{{/for}}
+    			{{else}}
+    			 {{:artistName}}
+    			{{/if}}			
+				</strong>
+    			<span class="txt_info"><span class="screen_out">프로그램 </span>{{:channel.channelName}} - {{:schedule.programName}}</span>
+    		</span>
+			<span class="btn_side"><span class="ico_now ico_fold">추가 제공 서비스 열기/닫기</span></span> <!-- 2014-03-26 추가 -->
+		</a>
+		<a href="#none" class="btn_side {{if song.songId == 0}}off{{/if}}" {{if song.songId != 0}} onclick="music.mobile.mMusicPlay.playSample('{{:song.songId}}','','close');" {{/if}}><span class="ico_now ico_listen">듣기</span></a>
+		
+		<div class="timeline_fold">
+			{{if song.songId != 0}}
+			{{:~printListItemButton(programId, "program", channel.channelType, channel.channelId)}}
+			{{:~printListItemButton(song.songId, "lyrics", song.lyricsYn, song.album.albumId)}}
+			{{:~printListItemButton(song.songId, "buy", song.mp3LinkId, song.album.albumId)}}
+			{{:~printListItemButton(song.songId, "app", song.aodlinkId, song.album.albumId)}}
+			{{else}}
+			<p class="txt_fold">서비스되지 않는 곡입니다.</p>
+			<span class="desc_fold desc_result"><a href="#none" class="link_timeline">통합검색 결과보기</a><!-- off 클래스 추가시 딤드 처리 --></span>
+			{{/if}}
+		</div>
+		{{if song.songId != 0 && song.aodlinkId != null && song.aodlinkId != "" && song.aodlinkId !="0"}}
+		<div id="sId_{{:song.songId}}" class="audio"></div>
+		{{/if}}
+	</li>
+{{/for}}
+</script>

@@ -1,0 +1,178 @@
+#uaCheck()
+#set($event_id = $request.getParameter("event_id"))
+<div id="daumContent" class="cont_spe">
+	<h2 class="screen_out">스페셜</h2>
+	<ul class="wrap_spemenu">
+		<li class="menu1"><a href="/event/main?event_id=$!event_id " class="pround"><span class="inner">스페셜홈</span></a></li>
+		<li class="menu2"><a href="/event/photo_vclip/list?event_id=$!event_id " class="pround"><span class="inner">포토동영상</span></a></li>
+		<li class="menu3"><a href="/event/detail?event_id=$!event_id " class="pround"><span class="inner">상세정보</span></a></li>
+		<li class="menu4 on"><a href="/event/eventInfo?event_id=$!event_id " class="pround"><span class="inner">이벤트</span></a></li>
+	</ul>
+	<div class="section_event">
+		<div class="wrap_head">
+			<h3 class="tit">Daum 뮤직 이벤트</h3>
+		</div>
+		<div class="wrap_notice">
+			<strong class="tit">$!event.eventTitle</strong>
+			<ul class="list_notice">
+				<li>
+					<span class="ico_music ico_dot"></span>
+					<span class="txt">
+						<span class="item">기간 : </span>
+						$!event.startDate ~ $!event.endDate
+					</span>
+				</li>
+				<li>
+					<span class="ico_music ico_dot"></span>
+					<span class="txt">
+						<span class="item">발표 : </span>
+						$!event.winningDate
+					</span>
+				</li>
+				<li>
+					<span class="ico_music ico_dot"></span>
+					<span class="txt">
+						<span class="item">경품 : </span>
+						$!event.description
+					</span>
+				</li>
+				<li>
+					<span class="ico_music ico_dot"></span>
+					<span class="txt">
+						<span class="item">당첨안내 : </span>
+						당첨자 발표는 PC웹 Daum뮤직에서 확인해주세요 공연 티켓경품은 배송되지 않고 현장에서 본인 확인 후 입장 가능하며 양도는 불가능합니다.
+					</span>
+				</li>
+			</ul>
+		</div>
+<script type="text/javascript" src="http://event.daum.net/javascripts/daumEvent.js"></script>
+		<div class="cmt_comm">
+			<div class="wrap_head">
+				<div class="wrap_tit">
+				   <strong class="tit fc_blue"><label for="id_eventcmt">이벤트 참여 댓글</label>
+				   </strong> 
+               </div>
+				<fieldset>  
+                    <legend class="screen_hide">이벤트 참여 댓글 작성</legend>
+                    <div class="write_cmtline">
+                        <input type="text"  name="comment" id="comment" class="inp_cmtline" value="" placeholder="댓글을 작성해주세요." onclick="music.mobile.login();" spellcheck="false">
+                        <a href="#" onclick="sendMobileApplication('$event.eventId', $event.eventKey,'','/event/detail?event_id=$event.eventId','내용을 넣어주세요.', 'comment'); return false;" class="bround btn_submit">등록</a>
+                    </div>
+                </fieldset>
+				<script type="text/javascript">
+						daum.$("commentContent").value = "";
+				</script>
+			</div>
+			<form id="" name="" method="post">
+				<fieldset>
+					<legend class="screen_hide">댓글리스트</legend>
+					<ul class="list_cmt">
+#foreach ($comment in $commentList)
+						<li>
+							<div class="content">
+								$comment.comment
+							</div>
+							<div class="info">
+								$comment.daumName
+								<span class="txt_bar"> | </span>
+								<span class="ff_hel">$CheckDate.dateFormat("yy.MM.dd", "HH:mm", "yyyy-MM-dd HH:mm", "$!{comment.regDate}")</span>
+							</div>
+						</li>
+#end
+					</ul>
+				</fieldset>
+			</form>
+			#mobilePaging($pagingUrl, $command.page_no, $pageHandler)
+		</div>
+	</div></div>
+#parse("/velocity/mobileweb/realtimeissue.vm")
+#*
+#getter('GAIA_DOMAIN')<br>
+$userInfo<br>
+
+$event.musicEventType = 5번 폴형 (ex. http://music.daum.net/event/detail?event_id=3276)<br>
+$event.musicEventType = 4번 폴형 (ex. http://music.daum.net/event/detail?event_id=3193)<br>
+$event.musicEventType = 3번 폴+댓글형 (ex. http://music.daum.net/event/detail?event_id=3194)<br>
+$event.musicEventType = 2번 구매대상 (ex. http://music.daum.net/event/detail?event_id=3541)<br>
+$event.musicEventType = 1 또는 null (ex. 기존것들 http://music.daum.net/event/detail?event_id=3192)<br>
+
+아티스트
+http://music.daum.net/event/detail?event_id=3194<br>
+
+앨범
+http://music.daum.net/event/detail?event_id=3193<br>
+http://music.daum.net/event/detail?event_id=3195<br>
+
+이벤트 기본정보<br>
+eventId : $event.eventId<br>
+eventKey : $event.eventKey<br>
+eventTitle : $event.eventTitle // 이벤트제목<br>
+startDate : $event.startDate // 이벤트 시작일<br>
+endDate : $event.endDate // 이벤트 종료일<br>
+winningDate : $event.winningDate // 발표일자<br>
+description : $event.description //이벤트 설명인데 현재 경품 내역용으로 입력하고있음<br>
+
+이벤트 추가 설정 정보<br>
+musicEventType : $event.musicEventType<br>
+musicEventSpecial : $event.musicEventSpecial<br>
+musicEventTitle : $event.musicEventTitle	// 추가설정한 이벤트 제목<br>
+musicAlbumId : $event.musicAlbumId<br>
+musicArtistId: $event.musicArtistId<br>
+musicPollItems : ${event.musicPollItems}<br>
+
+앨범정보<br>
+대표 이미지 : $album.mainImage.filePath<br>
+앨범명 : $album.title<br>
+발매일 : $album.releaseDt<br>
+</dl>
+
+
+앨범 구매이벤트인경우 곡 목록<br>
+<br>
+#foreach( $song in $songList )<br>
+$!{song.songId} : $!{song.title}<br>
+#end<br>
+
+뮤직스페셜<br>
+$!{musicSpecial}<br>
+
+아티스트 정보<br>
+대표 이미지 : $artist.mainImage.filePath<br>
+아티스트 명 : $artist.name<br>
+대표 곡정보 : $!{artistMainSong.title}<br>
+>>>>>>>> : $!{artistMainSong.AODLinkId}<br>
+>>>>>>>> : $!{artistMainSong.songId}<br>
+>>>>>>>> : $!{artistMainSong.album.albumId}<br>
+>>>>>>>> : $!{artistMainSong.album.title}<br>
+
+<br>
+$commentList
+==사용자 정보==<br>
+<br />
+${daumUser}
+${user}
+<br />
+
+==댓글입력(닫아놓음)==
+</br>
+<input type="text" name="comment">
+<button onclick="sendApplication('$event.eventId', $event.eventKey,'','http://music.daum.net/event/detail?event_id=$command.event_id','', 'comment'); return false;" >응모하기</button>
+<button onclick="refresh();" >리로딩</button>
+</br>
+<p>&nbsp</p>
+</br></br>
+
+==응모내용==
+<p>&nbsp</p>
+</br>
+
+${commentTotalCount}
+<br />
+
+#foreach ($comment in $commentList)
+	아이디 : $comment.daumId<br/>
+	이름 : $comment.daumName<br/>
+	댓글 : $comment.comment<br/>
+	<br/>
+#end
+*#

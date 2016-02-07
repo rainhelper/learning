@@ -1,0 +1,80 @@
+##서비스명 추출 (샘플용)
+#* 가이드 서비스명 추출이 실서비스와 맞지 않아 주석처리함 
+#set($ServiceName = "common")
+#if ($request.getRequestURI().split("/")[3] == "sample")
+	#set($ServiceName = $request.getRequestURI().split("/")[4].split("_")[0])
+#end
+*#
+
+##가이드에서는 추출해서 쓰지만 url 체계가 실서비스는  다르므로 그냥 직접 지정해주었다.
+#set($ServiceName = "music")
+
+## ###################################################### ## 서비스 구분 기본 정보
+##	"titService"	서비스명
+##	"relService"	유관서비스
+##	"btnSchHide"	검색아이콘 노출여부
+##	"btnAllHide"	전체보기 아이콘 노출여부
+##  "homeIos"		바로가기 아이콘 ios
+##  "homeAndHigh"	바로가기 아이콘 And HighDpi
+##  "homeAndLow"	바로가기 아이콘 And
+##	"appName"		노출앱 아이콘
+##	"app1_5X"		앱 아이콘 URL WVGA
+##	"app2X"			앱 아이콘 URL HVGA
+##	"gnbHome"		GNB 내 "홈" 메뉴명 존재시
+##	"gnbCount"		메뉴명 갯수
+##	"lnbCount"		하위메뉴명 갯수
+##	"gnbMenu"		메뉴명 Array
+##	"lnbMenu"		하위메뉴명 Array
+##	"gnbDiff"		메뉴명 통일 사이즈 여부
+##	"lnbDiff"		하위메뉴명 통일 사이즈 여부
+##	"gnbOpt"		메뉴내 별도 옵션 존재여부
+##	"lnbOpt"		하위메뉴내 별도 옵션 존재여부
+#set($serviceDef = {
+	"titService": "서비스명",
+	"relService": "유관서비스",
+	"btnSchHide" : false,
+	"btnAllHide" : false,
+	"homeIos" : "50B486AC01411A0002",
+	"homeAndHigh" : "50B4870401785A0002",
+	"homeAndLow" : "50B4871701100F0001",
+	"appName" : "daumapp",
+	"app1_5X" : "50AF593E0122560001",
+	"app2X" : "50AC7B96016B3A0003",
+	"gnbHome": "fst",
+	"gnbCount": 4,
+	"lnbCount": 5,
+	"gnbMenu": ["메뉴1","메뉴2","메뉴3","메뉴4","메뉴5","메뉴6","메뉴7"],
+	"lnbMenu": ["하위메뉴1","하위메뉴2","하위메뉴3","하위메뉴4","하위메뉴5","하위메뉴6"],
+	"gnbDiff" : false,
+	"lnbDiff" : false,
+	"gnbOpt" : false,
+	"lnbOpt" : false
+})
+
+## 미디어
+## ###################################################### ## 뉴스
+#if ($ServiceName == "news")
+	#set($serviceDef.titService="뉴스")
+	#set($serviceDef.relService="대선")
+	#set($serviceDef.gnbCount=7)
+	#set($serviceDef.lnbCount=6)
+	#set($serviceDef.gnbMenu=["홈","시사","경제","연예","국제","생활","IT"])
+	#set($serviceDef.lnbMenu=["주요뉴스","많이 본","댓글 많은","포토","TV","MY"])
+	#set($serviceDef.lnbDiff=true)
+
+## 컨텐츠
+## ###################################################### ## 뮤직
+#elseif ($ServiceName == "music")
+	#set($serviceDef.titService="뮤직")
+	#set($serviceDef.relService="영화")
+	#set($serviceDef.appName="musicapp")
+	#set($serviceDef.app1_5X="53EB1748041C4C0001")
+	#set($serviceDef.app2X="53EB1748041C4C0001")
+	#set($serviceDef.gnbCount=5)
+	#set($serviceDef.lnbCount=0)
+	#set($serviceDef.gnbMenu=["홈", "차트", "뮤직 BAR", "뮤비", "이달의 앨범"])
+	#set($serviceDef.gnbDiff=true)
+
+
+
+#end

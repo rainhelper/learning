@@ -1,0 +1,141 @@
+
+	#set($shareTitle = "SUPPORT YOUR MUSIC! : $!{symInfo.title}기")
+	#getSymShareBtn("regist" $shareTitle "/sym/regist?sym_seq=$!{command.sym_seq}" "$!{symInfo.filePath}")
+	
+	<div class="top_receipt">
+		<div class="cont_img">
+			<img class="img_banner" src="$!{symInfo.filePath}" width="828" height="194" title="" alt="SUPPORT YOUR MUSIC" />
+			<h3 class="tit_receipt tit_tab01">자신의 음악을 세상에  알리고 싶다면 지원하세요!</h3>
+			<div class="des des_tab01">DAUM뮤직과 민트페이퍼 그리고 네티즌
+				여러분들의 자발적 후원을 통해 음반 발매
+				및 공연을 통해 자신의 음악을 세상에 알릴
+				수 있는 기회를 제공합니다
+			</div>
+		</div>
+		
+		#getSymProcessTab("regist")
+		
+	</div>
+	<div class="content">	
+		<div class="receipt">
+			<table class="tbl_receipt" summary="지원서 접수하기">
+				<tbody>
+					<tr class="fst artist_award">
+						<th scope="row"><span class="bg_img">선정된 아티스트 특전</span></th>
+						<td>
+                            1. 외부 자본의 개입 없이 소셜 펀드레이징을 통해 모인 자금으로 음반을 제작할 수 있습니다. <br>
+                            2. 펀딩 성공 시 Daum뮤직에서 추가 후원금 100만원과 홍보 배너로 빵빵한 지원을 받게 됩니다.<br>
+                            3. 민트페이퍼의 지원(레코딩 스튜디오, 디자인, 멘토링 등)을 무상으로 받을 수 있습니다. <br>
+                            4. 민트페이퍼와 Daum뮤직을 통해 SYM 프로젝트 진행 과정을 꾸준히 알릴 수 있습니다. <br>
+                            5. 한 해 동안 다양한 방식으로 민트페이퍼의 지원을 받으며, 3팀의 프로젝트 완료 후 합동 공연 SYM <br> 
+								&nbsp;&nbsp;&nbsp;CIRCUIT에 참여하게 됩니다. 
+						</td>
+					</tr>
+					<tr class="how_apply">
+						<th scope="row"><span class="bg_img">지원방법</span></th>
+						<td>아래 ‘지원서 접수하기’를 통해 해당 항목을 빠짐없이 채워서 보내주세요. (프로필 사진 / 음원 <br>파일(데모/발매 음원 모두 가능)과 라이브 동영상을 필수로 첨부해야 함)</td>
+					</tr>
+					<tr class="precautions">
+						<th scope="row"><span class="bg_img">주의사항</span></th>
+						<td>
+							1. 지원서의 항목이 하나라도 빠져 있거나 성의 없이 작성한 경우, 첨부 파일(음원/동영상)을 형식에 <br>
+								&nbsp;&nbsp;&nbsp;맞게 보내지 않은 경우 선정 대상에서 제외됩니다.<br>
+								&nbsp;&nbsp;&nbsp;지원 마감 후 후보를 선정해 네티즌들에게 소개하고, 3~4팀의 후보를 대상으로 한 온라인 투표와 <br>
+								&nbsp;&nbsp;&nbsp;오프라인 오디션을 진행해 그 결과로 프로젝트에 참여할 최종 아티스트를 결정합니다. 해당 과정에서 <br> 
+								&nbsp;&nbsp;&nbsp;지원 시 작성한 소개와 음원, 영상이 온라인에 공개됩니다. <br>
+                            2. 지원 마감 후 후보를 선정해 네티즌들에게 소개하고, 3~4팀의 후보를 대상으로 온라인 투표와 오프라 <br> 
+								&nbsp;&nbsp;&nbsp;인 오디션을 진행합니다. <br>
+                            3. 온라인 투표(30%)+오프라인 오디션(30%)+프로젝트 매니저 심사(40%)를 합산하여 최종적으로 SYM<br>
+								&nbsp;&nbsp;&nbsp;프로젝트를 진행할 아티스트를 결정합니다. <br>
+                            4. 온라인 투표 및 펀드레이징 과정에서 지원 시 작성한 소개와 음원, 영상이 온라인에 무료로 공개됩니 <br> 
+								&nbsp;&nbsp;&nbsp;다. 
+						</td>
+					</tr>
+					<tr class="lst sprt_period">
+						<th scope="row"><span class="bg_img">지원기간</span></th>
+						#if($StringUtils.isNotBlank("$!{symInfo.regStrdttm}"))
+						<td>$!{CheckDate.makeReleaseDate($!{symInfo.regStrdttm})} ~ $StringUtils.right($!{CheckDate.makeReleaseDate($!{symInfo.regEnddttm})}, 5)</td>
+						#end
+					</tr>
+					#if($StringUtils.isNotBlank("$!{symInfo.regInfo}"))
+					<tr class="info">
+						<th scope="row"></th>
+						<td>$!{symInfo.regInfo}</td>
+					</tr>
+					#end
+				</tbody>
+			</table>
+			
+			#set($diff = $CheckDate.diffOfDate($symInfo.regEnddttm))
+			<div class="wrap_btn"><input type="button" class="btn_sm_app" title="지원서 접수하기" value="지원서 접수하기" onclick="daum.Music.Sym.openRegisterPopup('$!{symInfo.regActiveYn}', '$!{diff}', '$!{command.sym_seq}', '$!{user.userId}');"/></div>
+		</div>
+		
+		<div class="receipt line_top">			
+		#if( $StringUtils.isBlank("$!{event}") || !$event )
+    		<div id="gaiaiframe">
+        		<iframe onload="setBackgroundColor();" id="commentFrame" frameborder="0" width="100%" height="" scrolling="no" charset="utf-8" title="댓글 영역" src="#getter('GAIA_DOMAIN', '')/gaia/do/comment/commentList?bbsId=$!{symInfo.bbsId}&articleId=$!{symInfo.articleId}&templatePath=/content.htmp"></iframe>
+    		</div>
+			<script type="text/javascript">
+        		function setBackgroundColor(){
+					try {
+            			daum.Element.setStyle(daum.$$("body", daum.$("commentFrame").contentWindow.document.documentElement)[0],'background-color:#F7F7F4;');
+						daum.Element.setStyle(daum.$$(daum.$$(".bg_paging")[0], daum.$("commentFrame").contentWindow.document.documentElement)[0],'background:url(http://i1.daumcdn.net/img-contents/music/2011_home/sym/sym_pc/paging_comm.gif) no-repeat;');
+					} catch(e) {}
+            	}
+    		</script>
+    	#elseif($event && $StringUtils.equals("$!{symInfo.eventYn}", "Y"))
+			#printEvent($event $album $artist $songList)
+		#end
+		</div>
+	</div>
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+#*
+우측메뉴<br/>
+#foreach($motTemplete in $rightMenuList)
+	타이틀 : $motTemplete.title <br/>
+	일반이미지 : $motTemplete.imageUrl <br/>
+	활성화이미지2 : $motTemplete.activatedImageUrl <br/>
+	링크 : $motTemplete.linkUrl <br/>
+	활성화여부 : $motTemplete.activatedYn <br/>
+	<br/><br/>
+#end
+*#
+스토리갯수 : $boardCount <br/>
+sym정보 <br/>
+제목 : $symInfo.title<br/>
+이미지 : $symInfo.filePath<br/>
+시작일 : $symInfo.strdttm<br/>
+종료일 : $symInfo.enddttm<br/>
+접수정보<br/>
+접수기간 : $symInfo.regStrdttm ~ $symInfo.regEnddttm <br/>
+접수정보 : $symInfo.regInfo<br/>
+접수탭활성화여부 :$symInfo.regActiveYn<br/>
+게시판id : $symInfo.bbsId<br/>
+게시글id : $symInfo.articleId<br/>
+이벤트여부 : $symInfo.eventYn<br/>
+이벤트id : $symInfo.eventId<br/>
+현재 진행 정보 : $symInfo.curStatus R-> 접수탭 , V->투표탭, F->펀딩탭, S->스토리탭, E->외부펀딩<br/>
+<br/>
+event정보(이벤트댓글포함)<br/>
+$event $commentTotalCount $commentList $pageHandler
+	#if($event) 
+	#printEvent( $event $album $artist $songList )
+	#end
+	#if( $StringUtils.isBlank("$!{event}") || !$event )		## 4번도 있는데 아직 고려 사항임
+		<div><iframe id="commentFrame" frameborder="0" width="100%" height="" scrolling="no" charset="utf-8" title="댓글 영역" src="#getter('GAIA_DOMAIN', '')/gaia/do/comment/commentList?bbsId=$!{symInfo.bbsId}&articleId=$!{symInfo.articleId}&templatePath=/content.htmp"></iframe></div>
+	#elseif( $event && $event.musicEventType == 2 )
+		<div><iframe id="commentFrame" frameborder="0" width="100%" height="" scrolling="no" charset="utf-8" title="댓글 영역" src="#getter('GAIA_DOMAIN', '')/gaia/do/comment/commentList?bbsId=$!{symInfo.bbsId}&articleId=$!{symInfo.articleId}&templatePath=/content.htmp"></iframe></div>
+	#end
+====<br/>
+투표탭 활성화여부 : $symInfo.voteYn<br/>
+투표 시작일 : $symInfo.voteStrdttm<br/>
+투표 종료일 : $symInfo.voteEnddttm<br/>
+펀드탭 활성화여부 : $symInfo.fundYn<br/>
+펀드 시작일 : $symInfo.fundStrdttm<br/>
+펀드 종료일 : $symInfo.fundEnddttm<br/>
+스토리탭 활성화여부 : $symInfo.rvActiveYn<br/>
+스토리 menu_id : $symInfo.rvMenuId<br/>
+$user.userId	<br/> 
+$user 로그인 정보가 없으면 지원 못함. <a href="/sym/registForm.popup?sym_seq=$symInfo.symSeq" target="_blank">지원하기</a>
+#end

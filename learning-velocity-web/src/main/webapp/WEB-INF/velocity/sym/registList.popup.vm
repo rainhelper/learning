@@ -1,0 +1,52 @@
+<!-- popWrap -->
+<div id="popWrap" class="cont_myreceipt">
+	<!-- popHead -->
+	<div id="popHead">
+		<h1 class="logoArea">
+			<strong id="logo" class="text_imgpop">Support your music MY 접수 내역</strong>
+		</h1>
+	</div>
+	<!-- //popHead -->
+	<!-- popContent -->
+	<div id="popContent">
+		<div class="wrap">
+			<div class="line_bottom tit_myreceipt">
+				<strong class="text_imgpop text_myreceipt">MY 접수 내역</strong>
+			</div>
+			<ul class="list_myreceipt">
+			#if(!$CollectionUtils.isEmpty($registList))
+				#foreach($item in $registList)
+				<li class="line_bottom item_myreceipt">
+					<div class="box_receipt">
+						<span class="txt_date">$!{CheckDate.makeReleaseDate($!{item.regdttm})}</span>
+						<em class="txt_complete">$!{item.title}기 접수가 완료되었습니다.</em> 
+					</div>
+					<a href="/sym/registDetail.popup?candidateId=$!{item.candidateId}&resize=true" class="btn_pop btn_contcheck">내용확인</a>
+					##&userId=8D2Ui
+				</li>
+                #end
+    		#else
+    			<li class="line_bottom item_myreceipt">	
+    				<div class="inner">
+    					<em class="txt_nosupport">점수한 내역이 없습니다.</em>
+    				</div>
+    			</li>
+    		#end
+			</ul>
+			
+			<div class="btnArea">
+				<a class="btn_pop btn_confirm" onclick="window.close();return false;" href="javascript:;">확인</a>
+			</div>
+		</div>
+	</div>
+	<!-- //popContent -->
+</div>
+<!-- //popWrap -->
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+	
+#foreach($item in $registList)
+    $item.regdttm에 $item.title기 접수 완료 됐음 <a href="/sym/registDetail.popup?candidateId=$item.candidateId">상세접수내용확인</a><br/>
+#end
+
+#end

@@ -1,0 +1,55 @@
+#uaCheck()
+<div id="daumContent" class="cont_bar">
+	<h2 class="screen_out">뮤직 BAR</h2>
+	#SearchForm("only_top")
+	
+	<div class="section_category">
+		<div class="wrap_head">
+			<h3 class="tit">뮤직 BAR</h3>
+		</div>
+
+		<ul class="list_info list_category">
+		#foreach($motTemplete in $musicbarMenuList)
+			#if($StringUtils.isNotBlank("$!{motTemplete.linkUrl}") && !$StringUtils.equals("$!{motTemplete.title}","뮤직바 홈") && !$StringUtils.equals("$!{motTemplete.title}","뮤직게시판"))
+			#if($StringUtils.contains("$!{motTemplete.linkUrl}", "/musicbar/musicbar/"))
+				#set($mobileUrl = $StringUtils.replace("$!{motTemplete.linkUrl}", "/musicbar/musicbar/", "/musicbar/"))
+			#else
+				#set($mobileUrl = $!{motTemplete.linkUrl})
+			#end
+    		<li>
+    			<div class="wrap_cont">
+					<a href="$!{mobileUrl}" class="tit_chart">
+						<span class="f_l">$!{motTemplete.title}</span>
+						<span class="ico_music ico_arrow"></span>
+					</a>
+				</div>
+    		</li>
+			#end
+		#end
+		</ul>
+	</div>
+	
+</div>
+
+#parse("/velocity/mobileweb/realtimeissue.vm")
+
+#stop
+
+#foreach($motTemplete in $musicbarMenuList)
+		<li>
+			#if( $StringUtils.isEmpty("$!{motTemplete.linkUrl}") && !$StringUtils.equals("$!{motTemplete.title}","뮤직게시판"))
+			<span class="wrap_menu menu$!{foreach.count}"></span>
+			#else
+			<span class="wrap_menu#if( $StringUtils.equals("$!{motTemplete.activatedYn}","Y") )_on#end">
+				#if($StringUtils.contains("$!{motTemplete.linkUrl}","/musicbar/list")
+					|| $StringUtils.contains("$!{motTemplete.linkUrl}","/musicbar/djalbum"))
+				##ifelse($StringUtils.equals("$!{motTemplete.title}","DJ 추천음악"))
+				##<a href="/musicbar/list?menu_id" value="$!{motTemplete.activatedYn}" onmouseover="daum.Music.MusicBar.changeMenuTab(this, $!{foreach.count}); return false;">$!{motTemplete.title}</a>
+				<a href="http://m.music.daum.net$!{motTemplete.linkUrl}" value="$!{motTemplete.activatedYn}" onmouseover="daum.Music.MusicBar.changeMenuTab(this, $!{foreach.count}); return false;">$!{motTemplete.title}</a>
+				#end
+			</span>
+			#end
+		</li>
+#end
+
+

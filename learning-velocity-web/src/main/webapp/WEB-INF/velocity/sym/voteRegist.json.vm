@@ -1,0 +1,11 @@
+
+{
+	"message" : "$result" 
+}
+
+#*
+$result
+ALREADY : 이미 투표했음
+OK : 투표완료
+RETRY : 투표실패 재시도 하세요.
+*#

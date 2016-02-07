@@ -1,0 +1,198 @@
+#if(($!{videoCount}) && $!{videoCount} > 0)
+<div class="section_mv wrap_list_mv" id="videoSection">
+	<div class="wrap_title">
+		<h3 class="tit_search tit_mv">뮤직비디오</h3>
+		<span class="txt_bar"> | </span>
+		<span class="txt_quantity">총 <strong class="fc_blue ls_0">${videoCount}</strong> 건</span>
+	</div>
+	<ul id="searchVideoList" class="list_mv detail_music_video">
+	#if(!$CollectionUtils.isEmpty($videoList))
+		#foreach($video in $videoList)
+##		<li id="video$!{video.song_id}_$foreach.count" class="video_item#if($foreach.index % 5 == 4) lst#end" style="position:relative;">
+		<li class="video_item#if($foreach.index % 5 == 4) lst#end" style="position:relative;">
+			
+			#set($artistId = "#getArtistId($!{video})")
+        	#set($albumId = "$!{video.album.albumId}")
+        	#if($StringUtils.isBlank("$!{artistId}"))#set($artistId = "0")#end
+        	#if($StringUtils.isBlank("$!{albumId}"))#set($albumId = "0")#end
+        	
+        	#if($StringUtils.equals("$!{artistId}", "0"))
+        		#if($StringUtils.equals("$!{albumId}", "0"))  ##링크없음
+        			<span class="thumb_link">
+        		#else  ##앨범으로
+        			<a class="thumb_link" title="$!{video.song_name_tooltip}" href="/album/vclip/detail?album_id=$!{albumId}&amp;vclip_id=$!{video.vclipId}">
+        		#end
+        	#else  ##아티스트로
+        		<a class="thumb_link" title="$!{video.song_name_tooltip}" href="/artist/vclip/detail?artist_id=$!{artistId}&amp;vclip_id=$!{video.vclipId}" onclick="daum.Music.videoDetail('$!{video.vclipId}', '$!{artistId}');return false;">
+        	#end        	
+            	<img width="172" height="128" id="thumbLink$foreach.count" alt="$!{video.song_name_tooltip}" src="$ImageUtil.getImageUrl("$!{video.mv_thumb_url}", "172x128", "VCLIP")" class="thumb_img" index="$foreach.index" size="$!{videoList.size()}">
+            	<span class="ico_comm ico_play"></span>
+        	#if($StringUtils.equals("$!{artistId}", "0"))
+        		#if($StringUtils.equals("$!{albumId}", "0"))  ##링크없음
+        			</span>
+        		#else  ##앨범으로
+        			</a>
+        		#end
+        	#else  ##아티스트로
+        		</a>
+        	#end
+			
+			#*
+			##set($mvId = $StringUtils.split("$!{video.mv_id}", "|")[0])
+			#if((!$CollectionUtils.isEmpty($video.keyArtistList) && $video.keyArtistList.size() > 1) || ($CollectionUtils.isEmpty($video.keyArtistList)))
+			<a class="thumb_link" title="$!{video.song_name_tooltip}" href="/album/vclip/detail?album_id=$!{video.album_id}&vclip_id=${video.vclipId}" onclick="daum.Music.videoDetail($!{video.vclipId}, '', '', $!{video.album_id});return false;">
+			#else
+			<a class="thumb_link" title="$!{video.song_name_tooltip}" href="/artist/vclip/detail?artist_id=$!{video.artist_id}&vclip_id=${video.vclipId}, '|').get(0)" onclick="daum.Music.videoDetail($!{video.vclipId}, $!{video.artist_id});return false;">
+			#end
+##				<img width="172" height="128" count="$foreach.count" albumId="$!{video.album_id}" songId="$!{video.song_id}" artistId="$!{video.artist_id}" vclipId="$StringUtils.split($!{video.mv_id}, "|").get(0)" id="thumbLink$foreach.count" alt="$!{video.song_name_tooltip}" src="$ImageUtil.getImageUrl("$!{video.mv_thumb}", "172x128", "VCLIP")" class="thumb_img" size="$!{videoList.size()}">
+		        <img width="172" height="128" id="thumbLink$foreach.count" alt="$!{video.song_name_tooltip}" src="$ImageUtil.getImageUrl("$!{video.mv_thumb_url}", "172x128", "VCLIP")" class="thumb_img" index="$foreach.index" size="$!{videoList.size()}">
+				<span class="ico_comm ico_play"></span>
+			</a>
+			*#	
+			
+			<div class="wrap_info">
+				#if($StringUtils.isNotBlank("$!{video.mv_name}"))
+				<span class="wrap_title">
+					#printSearchVideoName2($!{video}, '', 20, true)
+					#*
+    				#if($StringUtils.isNotBlank("$!{video.artist_id}") || $StringUtils.isNotBlank("$!{video.mv_id}"))
+					<a title="$!{video.song_name_tooltip}" href="/artist/vclip/detail?artist_id=$!{video.artist_id}&vclip_id=$!{mvId}" onclick="daum.Music.videoDetail($!{mvId}, $!{video.artist_id});return false;">$!{video.song_name}</a>
+					#else
+					<span>$!{video.song_name}</span>
+					#end
+					#if($StringUtils.equals("$!{vclip.adultYn}", "Y")) <span class="ico_adult" title="19세 미만 청취 불가">&nbsp;</span>#end##
+					*#
+				</span>
+				#end
+				
+				<span class="wrap_artist">
+					#printSearchArtistName( $!{video.keyArtistList} "" 25 true )
+				</span>
+				#* 
+				#if($StringUtils.isNotBlank("$!{video.artist_name}"))
+				<span class="wrap_artist">
+    				#if($StringUtils.isNotBlank("$!{video.artist_id}") && !$StringUtils.equals("$!{video.artist_id}","0"))
+					<a title="$!{video.artist_name}" href="/artist/main?artist_id=$!{video.artist_id}" onclick="daum.Music.artistDetail($!{video.artist_id});return false;" >$!{video.artist_name}</a>
+					#else
+					<span>$!{video.artist_name}</span>
+					#end
+				</span>
+				#end
+				*#  
+				#if($StringUtils.isNotBlank("$!{video.regDateTime}"))
+				<em class="txt_date">$!{CheckDate.makeReleaseDate($!{video.regDateTime})}</em>
+				#end
+				
+			</div>
+		</li>
+		
+##		#if( $foreach.index % 5 == 4 || $foreach.count == $videoList.size() )
+##		<li class="hide open_direct" id="opendirect$foreach.index"></li>
+##		#end
+		
+		#end
+		
+	#end
+	</ul>
+	#if($!{videoCount} > 10)
+	<div class="wrap_folding">
+		<a href="#videoSection" id="btnVideoListFold" class="btn_fold">접기</a>
+		<a href="javascript:;" id="btnVideoListUnFold" class="btn_unfold">펼치기</a>
+		<a href="/search/vclip/list?query=$!{query}" class="link_more">뮤직비디오 더보기</a>
+	</div>
+	
+	<script type="text/javascript">
+		var videoExtendView = new daum.Music.ExtendView({
+			"btnUnFoldId" : "btnVideoListUnFold",
+    		"btnFoldId" : "btnVideoListFold",
+    		"containerId" : "searchVideoList",
+			"contentTag" : ".video_item",
+			"jsonUrl" : "/search/vclip/list_for_unfolding.json",
+			"query" : "$!{command.encodedQuery}",
+			"type" : "video",
+			"totalCount" : "$!{videoCount}",
+			"defaultNum" : 10
+		});
+	</script>
+	#else 
+	<div class="wrap_more">
+		<a href="/search/vclip/list?query=$!{query}" class="link_more">뮤직비디오 더보기</a>
+	</div>
+	#end
+	#printVideoCover()
+	
+	<script type="text/javascript">
+    	var VideoDataList = [];
+    	#foreach( $video in $videoList )
+    		VideoDataList.push({
+				linkType : #if(!$CollectionUtils.isEmpty($video.keyArtistList.size()) && $StringUtils.equals("$!{video.keyArtistList.size()}", "1"))"artist",#else "album",#end
+    			vclipId : "$!{video.vclipId}",
+    			songId : "$!{video.song.songId}",
+    			albumId : "$!{video.album.albumId}",
+    			artistId : "$!{video.artist_id}",
+    			count : "$!{foreach.count}",
+    			size : "$!{$videoList.size()}"
+    		});
+			daum.Music.DTO.Control.add(
+				{ 
+					songId: "$!video.song_id", 
+					keyArtistList: [
+						#foreach($keyArtist in $video.keyArtistList)
+							{ artistId: "$!keyArtist.artistId", name: "$!keyArtist.name" }#if($velocityHasNext),#end
+						#end
+					]
+				}
+			);
+    	#end
+		if(controller === undefined) {
+    		var controller = new daum.Music.ListPrototype();
+		}
+    	daum.Music.Video.init({containerId: "searchVideoList", listType:"video", pageType: "chart", totalCount:$videoList.size(), imgString:"thumbLink", colCount:5, isPromotion:false, arrow:false});
+    </script>
+</div>
+#end
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+
+<!-- 뮤직비디오 -->
+	#if(($!{videoCount}) && $!{videoCount} > 0)
+		<div class="collTitle"><h3>뮤직비디오 <span class="num">($!{dto.videoResult.getStartNum()}-$!{dto.videoResult.getEndNum(4)} / 총  ${videoCount}건)</span></h3></div>
+		<div id="wMvArea" class="collWid collTot">
+			<ul class="lst clearfix">
+			#foreach($video in $videoList)
+				#set ( $count = $foreach.index + 1 )
+				<li class="itm #if($foreach.index == 0) first #end">
+					##툴팁에는 전체 타이틀 길이 적용
+					<a href="#" onclick="viewVideo('$!{video.song_id}', '$!{video.mv_id}');return false;" onclick="return gLink(null, 'MCTY', '1', '1');"><img src="$ImageOldUtil.getImageUrl("$!{video.mv_thumb}", $ImageOldUtil.VIDEO_141_99)" width="141" height="99" class="thumb fl" alt="#getStrongText($!{video.song_name_tooltip})"></a><span class="nIcon"></span>
+					<ul class="inf fl">
+						<li class="i1"><a href="#" onclick="viewVideo('$!{video.song_id}', '$!{video.mv_id}');return false;" class="abm stit" title="뮤직비디오명" onclick="return gLink(null, 'MCTY', '2', '1');">$!{video.song_name}</a>							
+							#if($StringUtils.equals("$!{video.mv_adult_yn}","Y"))
+							<span class="btSetTitleIcon icoProductAdult">&nbsp;</span>
+							#end
+						</li>
+						#if($StringUtils.isNotEmpty("$!{video.artist_name}")||$StringUtils.isNotEmpty("$!{video.album_name}"))
+						<li class="i2">
+						#if($StringUtils.isNotEmpty("$!{video.artist_name}"))
+							#if($StringUtils.isNotEmpty("$!{video.artist_id}") && !$StringUtils.equals("$!{video.artist_id}","0"))<a href="/artist/artist.do?artistId=$!{video.artist_id}" class="gray_d2" onclick="return gLink(null, 'MCTY', '3', '1');">$!{video.artist_name}</a>#else $!{video.artist_name}#end 
+						#end
+						#if($StringUtils.isNotEmpty("$!{video.album_name}")) 
+							#if($StringUtils.isNotEmpty("$!{video.artist_name}"))<span class="vline"> | </span>#end
+							<a href="/album/album.do?albumId=$!{video.album_id}" class="gray_d2" onclick="return gLink(null, 'MCTY', '4', '1');">$!{video.album_vol} $!{video.album_name}</a>
+						#end
+						</li>
+						#end
+					</ul>
+				</li>					
+			#end
+			</ul>
+		</div>
+		#if($!{videoCount} > 4)
+			<div class="moreArea"><a href="/search/video.do?query=$!{command.encodedQuery}" onclick="return gExtraLink(this, 'MCTY', '1')">뮤직비디오 더보기</a></div>
+		#else
+			<div class="nmoreArea"></div>
+		#end
+		#if($dto.videoResult.isDrawingEndLine)
+		<div id="line"></div><hr/>
+		#end
+	#end
+#end

@@ -1,0 +1,13 @@
+#if("$!{callback}" != "")
+if (typeof(${callback}) == "function") ${callback} (
+#end
+{
+	"names" : [
+#foreach($cacheName in $cacheNames)
+		#if(${foreach.index} > 0),#end"${cacheName}"
+#end
+	]
+}
+#if("$!{callback}" != "")
+);
+#end

@@ -1,0 +1,161 @@
+#parse("/velocity/onair/common/menu.vm")
+<h3 class="screen_out">TV BGM</h3>
+
+<div class="now_detail">
+	<div class="detail_recomm">
+		<ul class="list_recomm" id="swiper"  style="width:990px">
+
+		</ul>
+	</div>
+	
+	#printOnairProgramListPaging($programList)
+	
+</div>
+
+
+## swiper setting
+<script type="text/javascript">
+var programListJSON = [##
+#***##set($selectedPageNo = 0)
+#***##set($pageIndex = 0)
+#***##foreach($program in $programList)##
+#***##***##set($imgsrc = $ImageUtil.getMobileImageUrl("$!{program.programImage}", "190x165", "", "C"))##
+#***##***##if($MathTool.mod($foreach.index, 5) == 0 && !$foreach.first),#set($pageIndex = $pageIndex+1)#end##
+#***##***##if($MathTool.mod($foreach.index, 5) == 0)##
+
+{ items :[ ##
+#***##***##end
+#***##***##if($MathTool.mod($foreach.index, 5) != 0), #end##
+#***##***##if("$!{program.programId}" == "$!{command.programId}")#set($selectedPageNo = $pageIndex)#end##		
+	{"programId" : "$!{program.programId}",
+	"imageSrc" : "$!imgsrc",
+	"programMasterName" : "$!{program.programMasterName}",
+	"description" : "$!{program.description}",
+	"channelName" : "$!{program.channel.channelName}",
+	"channelId" : "$!{program.channel.channelId}",
+	"channelType" : "$!{program.channel.channelType}",
+	"mediaType" : "${command.mediaType}",
+	"broadcastTime" : "$!{program.broadcastTime}"
+	}##
+#***##***##if($MathTool.mod($foreach.index, 5) == 4 || $foreach.last)##
+	
+	]
+}##
+#***##***##end##		
+#***##***##end##	
+];##
+
+initOnairProgramList(programListJSON,"/onair/tv?", ONAIR_TV_PROGRAM_ITEM_TEMPLATE,'','', '$!{selectedPageNo}', '$!{selectedProgram.programId}');
+
+</script>
+
+#parse("/velocity/onair/common/trsonglist.vm")
+
+
+#*
+</br>
+</br>
+스크립트로 곡리스트 그리기
+</br>
+#foreach($schedule in $sameDateScheduleList)
+	<a href="javascript:;" onclick="songListView.changeSonglist($!{selectedProgram.channelId},$!{selectedProgram.channelType},$!{schedule.tvProgramId},$!{schedule.programStartTime},$!{schedule.programEndTime});return false;">
+	$CheckDate.makeBroadCastTime("$!selectedProgram.broadcastTime")
+    </a>
+#end
+</br>
+
+
+편성표있는 날짜 보여주기 <br/>
+#foreach($schedule in $scheduleList)
+	방송일: ${schedule.startDate} / </br>
+	방송시작시간: ${schedule.programStartTime}/ </br>
+	방송끝시간: ${schedule.programEndTime} </br>
+#end
+
+
+#foreach($program in $programList)
+	프로그램ID: ${program.programId} / </br>
+	프로그램명: ${program.programMasterName} / </br>
+	프로그램이미지 : <img src="$ImageUtil.getImageUrl("$!{program.programImage}", "210x210", "", "S")" width="45" height="45"> ${program.programImage} </br>
+	프로그램 설명 : $!{program.description} </br>
+	채널명: ${program.channelName} / </br>
+	채널ID: ${program.channelId} / </br>
+	채널Type: ${program.channelType} / </br>
+	방송시간: ${program.broadcastTime} / </br></br></br>
+#end
+
+</br></br></br></br>
+
+selectedProgram
+
+programId: ${selectedProgram.programId} </br>
+channelType: $selectedProgram.channelType </br>
+channelId: $selectedProgram.channelId </br>
+channelName : $selectedProgram.channelName
+programMasterName: $selectedProgram.programMasterName </br>
+$CheckDate.makeBroadCastTime("$!selectedProgram.broadcastTime") </br>
+
+
+시그널 송 </br>
+song.songId : $selectedProgram.song.songId </br>
+song.album.albumId : $selectedProgram.song.album.albumId </br>
+song.title : $selectedProgram.song.title </br>
+artist.name : 
+#if(${selectedProgram.song.keyArtistList.size()} > 0)
+	#foreach($artist in ${selectedProgram.song.keyArtistList})
+     <a href="/artist/main?artist_id=${artist.artistId}"> ${artist.name} </a>
+	#end
+	
+#end
+<br/>
+
+편성표있는 날짜 보여주기 <br/>
+#foreach($schedule in $scheduleList)
+	방송일: ${schedule.startDate} / </br>
+	방송시작시간: ${schedule.programStartTime}/ </br>
+	방송끝시간: ${schedule.programEndTime} </br>
+#end
+
+</br></br>
+
+동일한 날짜에 속한 편성표 목록 </br>
+#foreach($schedule in $sameDateScheduleList)
+	방송일: ${schedule.startDate} / </br>
+	방송시작시간: ${schedule.programStartTime}/ </br>
+	방송끝시간:${schedule.programEndTime} </br>
+	tv프로그램Id: ${schedule.tvProgramId} / </br>
+#end
+
+</br></br>
+선택된 편성표 </br>
+	방송일: ${lastSchedule.startDate} / </br>
+	방송시작시간: ${lastSchedule.programStartTime}/ </br>
+	방송끝시간:${lastSchedule.programEndTime} </br>
+
+
+
+
+
+
+
+	</br></br>
+곡 목록 <br/>
+
+<table>
+#foreach($channelSong in $songList)
+	<tr>
+		<td><img src='$ImageUtil.getImageUrl("$!{channelSong.song.album.mainImage.filePath}", "33x33", "ALBUM", "C")'></td>
+		<td>${channelSong.song.title}</td>
+		<td>${channelSong.song.songId}</td>
+		<td>
+	#if(${channelSong.song.keyArtistList.size()} > 0)
+		#foreach($artist in ${channelSong.song.keyArtistList})
+         <a href="http://music.daum.net/artist/main?artist_id=${artist.artistId}"> ${artist.name} </a>
+		#end
+	#end
+		</td>
+		<td>${channelSong.channel.channelName}</td>
+	</tr>
+#end
+</table>
+*#

@@ -1,0 +1,91 @@
+#uaCheck()
+<div id="daumContent" class="cont_now" role="main">
+<div id="mArticle">
+#if(!$StringUtils.equals("$!{isDaumMusicApp}", "true"))
+#parse("/velocity/mobileweb/onair/common/menu.vm")
+#end
+	<h3 class="screen_out">라디오 편성표</h3>
+<div class="now_radio">
+	<div class="detail_radio">
+		<div id="swiper" class="radio_slide list_radio" style="width: 100%;">		
+		</div>
+	</div>
+	
+	<div id="programListPagingWrap" class="paging_now">
+		<span class="inner_paging">
+			<button type="button" class="btn_paging btn_prev"><span class="ico_now ico_prev">이전</span></button>
+			<span id="pagingToggle" class="paging_num">
+				
+			</span>
+			<button type="button" class="btn_paging btn_next"><span class="ico_now ico_next">다음</span></button>
+		</span>
+	</div>
+	
+	
+</div>
+
+
+#set($topDataLen = 8)
+## swiper setting
+<script type="text/javascript">
+var programListJSON = [##
+#***##foreach($program in $programList)##
+#***##if($foreach.index == 9)#break#end##
+#***##***##set($imgsrc = $ImageUtil.getMobileImageUrl("$!{program.programImage}", "206x162", "", "C"))##
+#***##***##if($MathTool.mod($foreach.index, 3) == 0 && !$foreach.first),#end##
+#***##***##if($MathTool.mod($foreach.index, 3) == 0)##
+
+{ items :[ ##
+#***##***##end
+#***##***##if($MathTool.mod($foreach.index, 3) != 0),#end##
+		
+	{"programId" : "$!{program.programId}",
+	"imageSrc" : "$!imgsrc",
+	"programMasterName" : "$!{program.programMasterName}",
+	"description" : "$!{program.description}",
+	"channelName" : "$!{program.channelName}",
+	"channelId" : "$!{program.channelId}",
+	"channelType" : "$!{program.channelType}",
+	"broadcastTime" : "$CheckDate.makeBroadCastTime($!{program.broadcastTime})"
+	}##
+#***##***##if($MathTool.mod($foreach.index, 3) == 2 || $foreach.last || $foreach.index == $topDataLen  )##
+	
+	]
+}##
+#***##***##end##		
+#***##***##end##	
+];##
+
+initOnairProgramList(programListJSON,"/onair/radio/detail?", ONAIR_PROGRAM_ITEM_TEMPLATE);
+
+</script>
+
+
+<strong class="screen_out">라디오 편성표 리스트</strong>
+<ul class="list_detail">
+	#foreach($program in $programList)##
+	#if($foreach.index > $topDataLen)
+	<li>
+		<a href="/onair/radio/detail?channelId=$!{program.channelId}&programId=$!{program.programId}" class="link_detail">
+			<strong class="tit_detail">$!{program.programMasterName}</strong>
+			<span class="desc_detail">$!{program.channelName} $CheckDate.makeBroadCastTime($!{program.broadcastTime})</span>
+			<span class="desc_recomm"><span class="ico_now ico_recomm">추천</span>$!{program.recommendCount}</span> <!-- 최대 5자리 -->
+		</a>
+	</li>
+	#end
+	#end
+</ul>
+
+	
+<div class="info_sort">
+	<span class="txt_sort">더 많은 선곡표를 보고 싶다면</span>
+	<span class="desc_sort"><a href="/onair/radio/genre/list" class="link_sort">장르별 찾기</a></span>
+	<span class="desc_sort"><a href="/onair/radio/channel/list" class="link_sort">채널로 찾기</a></span>
+</div>
+
+#SearchForm("only_bottom")
+
+
+</div>
+</div>
+#parse("/velocity/mobileweb/realtimeissue.vm")		

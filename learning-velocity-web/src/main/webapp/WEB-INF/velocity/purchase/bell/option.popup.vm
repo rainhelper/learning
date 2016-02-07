@@ -1,0 +1,68 @@
+<div id="wPhone" class="popWrap">	
+	<div id="wSelSong">		
+	<form name="frm">
+		<div class="titCon"><h3 class="bg3">결제 내역</h3></div>
+		<dl class="setLst setLstDot">
+			<dt class="pl15 wid68"><strong class="fontCor01">결제상품</strong></dt>
+			<dd><strong class="fontCor02">#strCut("$!{dto.mobileItemInfo.title}", 20)</strong><span class="bar">|</span><strong class="fontCor02">$!{dto.mobileItemInfo.itemName}</strong></dd>
+		</dl>
+		<dl class="setLst">
+			<dt class="pl15 wid68"><strong class="fontCor01">받는사람</strong></dt>
+			<dd><strong class="fontCor02">$StringCutUtil.getFullPhoneNum("$!{command.getNumber}")</strong></dd>
+		</dl>
+		<dl class="setLst">
+			<dt class="pl15 wid68"><strong class="fontCor01">결제금액</strong></dt>
+			<dd><strong class="fontCor02">#toCurrency($!{dto.mobileItemInfo.price})원</strong> (부가세 10%가 추가됩니다.)</dd>
+		</dl>
+		<dl class="setLst" id="payType">
+			<dt class="setTit titAccountWay">결제수단 선택</dt>
+			<dd><input type="radio" name="payment_type" id="payMobile" checked="true" class="radio" value="MOBILE"><label for="payMobile">휴대폰 결제</label>&nbsp;&nbsp;</dd>
+			<dd><input type="radio" name="payment_type" id="payCash" class="radio" value="DAUMCASH"><label for="payCash">Daum 캐쉬 결제</label></dd>
+		</dl>
+		<script type="text/javascript">daum.Music.OnOffClass(daum.$('payType'), {tagName:'input'});</script>
+	</form>
+	</div>
+
+	<div class="btnSend">
+		<div class="btn">			
+			<a href="/purchase/bell/list.popup?songId=$!{dto.mobileItemInfo.songId}" title="이전 단계로 가기"><img src="http://i1.daumcdn.net/img-contents/music/2009_home/phonemusic/bt_pre.gif" alt="이전으로"></a>
+			<a href="#" onclick="_phone.pay();" title="결제하기"><img src="http://i1.daumcdn.net/img-contents/music/2009_home/phonemusic/bt_ok_1.gif" alt="확인"></a>
+			<a href="#" onclick="window.close();" title="닫기"><img src="http://i1.daumcdn.net/img-contents/music/2009_home/phonemusic/bt_close.gif" alt="닫기"></a>
+		</div>
+	</div>
+	<script type="text/javascript">
+	var itemPurchase = {
+	'song_id_list':'$!{command.songId}'
+	, 'itemId':'$!{command.itemId}'
+	, 'getNumber':'$!{command.getNumber}'
+	#if($!{command.sendNumber}), 'sendNumber':'$!{command.sendNumber}'#end
+	};
+	
+	var _phone = new daum.Music.Phone({type:"bell"});
+	
+	daum.addEvent(window, 'load', function(){
+		daum.Browser.resizePop(470, 350);
+	}); 
+	</script>
+</div>	
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+========= 모바일(벨옵션) ========
+<br/>
+곡제목 : $dto.mobileItemInfo.title <br/>
+곡아이디 : $dto.mobileItemInfo.songId <br/>
+#foreach ($artist in $dto.mobileItemInfo.keyArtistList)
+	아티스트아이디 : $artist.artistId<br/>
+	아티스트명 : $artist.name<br/>
+#end
+ITEMID : $dto.mobileItemInfo.itemId <br/>
+ITEMNAME : $dto.mobileItemInfo.itemName <br/>
+가격 : $dto.mobileItemInfo.price <br/>
+<br/>
+#end

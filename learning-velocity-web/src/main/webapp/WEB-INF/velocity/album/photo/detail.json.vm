@@ -1,0 +1,91 @@
+##이미지  $!{photoList}
+##이미지 수 $!{photoCount}
+##선택된 이미지의 orderNo
+ 
+#set($number = ($orderNo - 1) % $!{onePageCnt})
+#foreach($image in $photoList)
+	#if( $StringUtils.equals("$!image.imageId","$!command.image_id") || ( $orderNo == 0 && $foreach.index == 0 ) || (!$!command.image_id && ($orderNo % $!{onePageCnt}!=0) && $foreach.index==0 ))
+		#if( $number > 0 )
+			#set( $prevNumber = ($number - 1) )
+			#set( $prevImage = $ListTool.get( $photoList, $prevNumber) )
+		#end
+		#set( $selectedImage = $image)
+		#if( $number <= $photoList.size() )
+			#set( $nextNumber = ($number + 1))
+			#if( $nextNumber < $!{onePageCnt})
+					#set( $nextImage = $ListTool.get($photoList,$nextNumber) ) 
+					##set( $nextImage = $photoList.get($nextNumber) )
+			#end
+		#end
+	#end
+#end
+##페이지 no
+#set($pageNo = $command.page_no)
+#set($nextNo = $pageNo + 1)
+#set($prevNo = $pageNo - 1)
+#set($lastPage = $MathTool.ceil( $MathTool.div($photoCount, $!{onePageCnt})))
+{
+ "onpageCount" : "$!{onePageCnt}",
+	"orderNo" : "$!{orderNo}",
+	"number" : "$!{number}",
+    "selectedImage" : {
+        "id" : "$!{selectedImage.imageId}"
+        ,"url" : "$!{selectedImage.filePath}"
+        ,"order" : "$orderNo"
+    }
+    ,"page" : {
+        "pageNo" : "$!{pageNo}"
+        ,"totalCount" : "$!{lastPage}"
+		,"totalImageCount" : "$!{photoCount}"
+    }
+    ,"nextImage" : {
+        "id" :#if($number==5)"$!{postImage.imageId}"#else"$!{nextImage.imageId}"#end
+    }
+    ,"prevImage" : {
+        "id" : #if($number==0)#if($StringUtils.equals("$!{preImage.imageId}","0"))""#{else}"$!{preImage.imageId}"#end#else"$!{prevImage.imageId}"#end
+    }
+    ,"thumbnails" : [
+#foreach($image in $photoList)
+#if($foreach.index != 0),#end
+	{
+		"id" : "$!{image.imageId}"
+		,"url" : "$!ImageUtil.getImageUrl("$!{image.filePath}","95x95", "PHOTO", "C")"
+		,"width" : 95
+		,"height" : 95
+	}	
+#end    
+	]
+	,"album" : {
+		"id" : "$!{album.albumId}",
+		"title" : "$!{EscapeUtil.escapeJsonString($!{album.title})}",
+		"typeName" : "$!{album.typeName}",
+		"volume" : "$!{album.volume}",
+		"releasedt" : "$CheckDate.makeReleaseDate("$!{album.releaseDt}")",
+		"url" : "$ImageUtil.getImageUrl("$!{album.mainImage.filePath}", "42x42", "ALBUM")",
+		"artists" : [
+		#foreach($artist in $album.keyArtistList) 
+		#if($foreach.index != 0),#end
+			{
+				"artistId" : "$!{artist.artistId}"
+				,"name" : "$!{EscapeUtil.escapeJsonString($!{artist.name})}"
+			}	
+		#end 
+		],
+		"songs" : [
+		#foreach($song in $album.masterSongList)
+		#if($foreach.index != 0),#end
+			{
+				"id" : "$!{song.songId}"
+				,"title" : "#strCut($!{song.title},30)"
+				,"aodYn" : "$!{song.AODLinkId}"
+			}	
+		#end
+		]
+	}
+	,"artist" : {
+		"id" : "$!{artist.artistId}",
+		"name" : "$!{EscapeUtil.escapeJsonString($!{artist.name})}",
+		"url" : "$ImageUtil.getImageUrl("$!{artist.mainImage.filePath}", "35x35", "ARTIST")"
+	}
+	
+}

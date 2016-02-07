@@ -1,0 +1,9 @@
+{
+	"DaumId": "$!{user.daumId}",
+	"DaumName": "$!{user.daumName}",
+	"DaumCashRemainder": "$!{daumCashRemainder}"
+}
+#*
+$!{user}
+$!{daumCashRemainder}
+*#

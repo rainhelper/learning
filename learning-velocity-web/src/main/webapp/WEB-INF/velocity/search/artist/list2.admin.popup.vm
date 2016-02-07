@@ -1,0 +1,120 @@
+#set($base = $Link.absolute($requestURI))$base.setParam("query", "$!command.query", false)$base.setAppendParams(false)
+#set($count = $dto.artistResult.totalResultsCount)
+#set($artistList = $dto.artistResult.documentList)
+#set($sortAccuracyHref = $base.param("sortType", "0"))
+#set($sortPopularityHref = $base.param("sortType", "1"))
+#set($openerType = $Params.openertype)
+<script type='text/javascript'>
+document.domain = "daum.net";
+function stripHTMLtag(string) { 
+   var objStrip = new RegExp(); 
+   objStrip = /[<][^>]*[>]/gi; 
+   return string.replace(objStrip, ""); 
+} 
+		
+var selectItem = function(id, value){
+    try {
+    	if ('$command.target' == 'artist')
+        	opener.searchArtistCallBack(id, stripHTMLtag(value));
+        else
+        	opener.searchActorCallBack(id, stripHTMLtag(value));
+        self.close();
+    } catch( e ){
+        alert("검색 결과를 정상적으로 전송할 수 없습니다.");   
+    }   
+};
+
+</script>
+
+<div class="daum_popup">
+	<div class="popup_artist">
+		<div class="popup_head">
+			<h1 class="tit_popup tit_search ir_pm">아티스트 찾기</h1>
+		</div>
+		<div class="popup_body">
+			<div class="wrap_artist_info">
+	      		<form method="get">
+		      		<fieldset>
+		      			<legend class="screen_out">아티스트 검색 폼</legend>
+						<input type="hidden" name="openertype" value="$!openerType">
+			      		<input type="hidden" name="adminYn" value="Y">
+			      		<input type="hidden" name="target" value="$command.target">
+			      		<dl class="wrap_search">
+			      			<dt><label for="inpSearch">아티스트명</label></dt>
+			      			<dd>
+			      				<input class="inp_search" type="text" name="query" value="$!command.query"/>
+			      				<input class="btn_popup btn_search" type="submit" value="검색"/>
+			      			</dd>
+			      		</dl>
+			      		<div class="wrap_result">
+							#if($count > 0)
+			      			<div class="wrap_info">
+			      				<p class="txt_search">총 <em>$!count</em>건이 검색되었습니다.</p>
+			      				<span class="wrap_menu">
+									#if(!$StringUtils.isNotBlank("$!Params.sortType") || $StringUtils.equals($Params.sortType , "0"))
+			      					<em class="link_option">정확도</em>
+									#else
+			      					<a href="$!sortAccuracyHref">정확도</a>
+									#end
+			      					<span class="txt_bar">|</span>
+									#if($Params.sortType && $StringUtils.equals($Params.sortType , "1"))
+			      					<em class="link_option">최신순</em>
+									#else
+			      					<a href="$!sortPopularityHref">최신순</a>
+									#end
+			      				</span>
+			      			</div>
+							#else
+							<div class="txt_want"><strong>검색결과가 없습니다</strong></div>
+							#end
+			      			<div class="list_artist">
+			      				<ul>
+									#foreach($artist in $artistList)
+    									#set($title = $artist.artist_name.replaceAll("<.*?>", ""))
+										#set($artistType = $artist.artist_type)
+										#set($birthday = $CheckDate.makeReleaseDate($artist.birthDt))
+										#set($activityStr = "$!{artist.bandTypeName} $!artist.creditTitle.replaceAll('\|', ', ')")
+    			      					<li>
+											<a href="javascript:;" onclick="selectItem( '$!{artist.docid}', '$!{title}' );"  class="thumb_link">
+												#set($imgSrc = $ImageUtil.getImageUrl("$!{artist.mainImage.filePath}", "60x60", "ARTIST", "C"))
+												<img width="60" height="60" src="$!imgSrc" alt="">
+												<span class="line_thumb"></span>
+											</a>
+										    <div class="artist_info">
+    			      							<strong><a href="javascript:;" onclick="selectItem( '$!{artist.docid}', '$!{title}' );" >$!title</a></strong>
+												#if($StringUtils.isNotBlank($activityStr))
+    			      							<dl>
+                                        			<dt>활동</dt>
+                                                	<dd>$!{artist.bandTypeName}#if("$!{artist.bandTypeName}" != "" && "$!artist.creditTitle" != "") <span class="txt_bar">, </span> #end$!artist.creditTitle.replaceAll("\|", ", ")</dd>
+    			      							</dl>
+												#end
+												#if($StringUtils.equals("$artistType", "Group") || $StringUtils.equals("$artistType", "Band") || $StringUtils.equals("$artistType", "None") || $StringUtils.equals("$artistType", "One man") || $StringUtils.equals("$artistType", "Duet"))
+													#if(!$StringUtils.equals("$!{artist.debut_date}", "00000000"))
+        			      							<dl>
+        			      								<dt>결성</dt>
+        			      								<dd class="date">$!StringUtils.left($!{artist.debut_date}, 4)</dd>
+        			      							</dl>
+													#end
+												#else
+													#if(!$StringUtils.equals("$!birthday", "0000"))
+        			      							<dl>
+        			      								<dt>출생</dt>
+        			      								<dd class="date">$!birthday</dd>
+        			      							</dl>
+													#end
+												#end
+    			      						</div>
+    			      					</li>
+									#end
+			      				</ul>
+			      			</div>
+							#set ($url = "?query=" + "$!{command.encodedQuery}" + "&sortType=" + $command.sortType +"&openertype=" + $openerType + "&adminYn=Y")
+							#printPaging("$url&page_no=", $dto.ph.pageNo, $dto.ph, "", 10)
+			      		</div>
+						<div class="wrap_cancle"><input class="btn_popup btn_cancle" type="reset" value="취소" onclick="window.close();"></div>
+			      	</fieldset>
+      			</form>
+			</div>
+		</div>
+	</div>
+</div>

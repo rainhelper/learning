@@ -1,0 +1,21 @@
+#if( $isIos == true )
+	#if($!{iosImageUrl} != "" && $!{iosImageLink} != "" && $!{iosImageTitle} != "" && $!{iosBackgroundImageUrl} != "")
+		<a href="$!{iosImageLink}" class="bnr_music" style="background-image:url($!{iosBackgroundImageUrl})">
+			<img src="$!{iosImageUrl}" width="320" height="50" class="thumb_bnr" alt="$!{iosImageTitle}">
+		</a>
+	#end
+    
+#elseif( $isAndroid == true)
+	#if($!{androidImageUrl} !="" && $!{androidImageLink} != "" && $!{androidImageTitle} != "" && $!{androidBackgroundImageUrl} != "")
+		<a href="$!{androidImageLink}" class="bnr_music" style="background-image:url($!{androidBackgroundImageUrl})">
+			<img src="$!{androidImageUrl}" width="320" height="50" class="thumb_bnr" alt="$!{androidImageTitle}">
+		</a>
+	#end
+	
+#else
+	#if($!{androidImageUrl} !="" && $!{androidImageLink} != "" && $!{androidImageTitle} != "" && $!{androidBackgroundImageUrl} != "")
+		<a href="$!{androidImageLink}" class="bnr_music" style="background-image:url($!{androidBackgroundImageUrl})">
+			<img src="$!{androidImageUrl}" width="320" height="50" class="thumb_bnr" alt="$!{androidImageTitle}">
+		</a>
+	#end
+#end

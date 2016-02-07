@@ -1,0 +1,55 @@
+#parse("/velocity/onair/common/menu.vm")
+<h3 class="screen_out">라디오 선곡표</h3>
+	
+
+<div class="now_detail">
+	#parse("/velocity/onair/radio/tabmenu.vm")
+	<h4 class="screen_out">추천</h4>
+
+	<div class="detail_recomm">
+		<ul class="list_recomm" id="swiper"  style="width:990px">
+
+		</ul>
+	</div>
+	
+	#printOnairProgramListPaging($programList)
+	
+</div>
+	
+## swiper setting
+<script type="text/javascript">
+var programListJSON = [##
+#***##set($selectedPageNo = 0)
+#***##set($pageIndex = 0)
+#***##foreach($program in $programList)##
+#***##***##set($imgsrc = $ImageUtil.getMobileImageUrl("$!{program.programImage}", "190x165", "", "C"))##
+#***##***##if($MathTool.mod($foreach.index, 5) == 0 && !$foreach.first),#set($pageIndex = $pageIndex+1)#end##
+#***##***##if($MathTool.mod($foreach.index, 5) == 0)##
+
+{ items :[ ##
+#***##***##end
+#***##***##if($MathTool.mod($foreach.index, 5) != 0),#end##
+#***##***##if("$!{program.programId}" == "$!{command.programId}")#set($selectedPageNo = $pageIndex)#end##		
+	{"programId" : "$!{program.programId}",
+	"imageSrc" : "$!imgsrc",
+	"programMasterName" : "$!{program.programMasterName}",
+	"description" : "$!{program.description}",
+	"channelName" : "$!{program.channel.channelName}",
+	"channelId" : "$!{program.channel.channelId}",
+	"channelType" : "$!{program.channel.channelType}",
+	"broadcastTime" : "$CheckDate.makeBroadCastTime($!{program.broadcastTime})"
+	}##
+#***##***##if($MathTool.mod($foreach.index, 5) == 4 || $foreach.last)##
+	
+	]
+}##
+#***##***##end##		
+#***##***##end##	
+];##
+
+initOnairProgramList(programListJSON,"/onair/radio/recomm?", ONAIR_TV_PROGRAM_ITEM_TEMPLATE, '','', '$!{selectedPageNo}', '$!{selectedProgram.programId}');
+
+</script>
+
+
+#parse("/velocity/onair/common/trsonglist.vm")

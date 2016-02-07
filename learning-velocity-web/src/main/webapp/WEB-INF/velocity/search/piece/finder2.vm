@@ -1,0 +1,631 @@
+
+#set($creditCount = $!{dto.groupCreditResult.totalResultsCount})##활동별검색
+#if($!{dto.groupCreditResult.documentList})#set($creditList = $!{dto.groupCreditResult.documentList})#end
+#set($typeCount = $!{dto.groupTypeResult.totalResultsCount})##대상별검색
+#if($!{dto.groupTypeResult.documentList})#set($typeList = $!{dto.groupTypeResult.documentList})#end
+#set($nationCount = $!{dto.groupNationResult.totalResultsCount})##국가별 검색 결과 수
+#if($!{dto.groupNationResult.documentList})#set($nationList = $!{dto.groupNationResult.documentList})#end
+#set($genreCount = $!{dto.groupGenreResult.totalResultsCount})##장르별 검색 결과 수
+#if($!{dto.groupGenreResult.documentList})#set($genreList = $!{dto.groupGenreResult.documentList})#end
+#set($releaseYearCount = $!{dto.groupReleaseYearResult.totalResultsCount})##발매년도 별 검색 결과 수
+#if($!{dto.groupReleaseYearResult.documentList})#set($releaseYearList = $!{dto.groupReleaseYearResult.documentList})#end
+
+#if($StringUtils.equals($!{dto.tab},"artistResult")) ## 아티스트 - 사용안함, 활동은 따로 분리
+	#set($typeListArr = "보컬¶앨범명¶아티스트명¶편곡")
+	#set($typeCate = "활동")
+	#set($genreCate = "장르")
+#elseif($StringUtils.equals($!{dto.tab},"songResult")) ## 곡
+	#set($typeListArr = "곡명¶앨범명¶아티스트명¶작사&작곡&편곡자명")
+	#set($typeCate = "검색대상")
+	#set($genreCate = "곡장르")
+#elseif($StringUtils.equals($!{dto.tab},"albumResult")) ## 앨범
+	#set($typeListArr = "앨범명¶아티스트명")
+	#set($typeCate = "검색대상")
+	#set($genreCate = "앨범장르")
+#end
+
+#set ($artistUrl = "&artistId=$!{command.artistId}")
+#set ($creditUrl = "&creditId=$!{command.creditId}")
+#set ($rangeUrl = "&searchRange=$!{command.searchRange}")
+#set ($nationUrl = "&nationId=$!{command.nationId}")
+#set ($genreUrl = "&genreId=$!{command.genreId}")
+#set ($releaseUrl = "&releaseYear=$!{command.releaseYear}")
+#set ($listenUrl = "&listenFilter=$!{command.listenFilter}")
+#set ($mp3Url = "&mp3Filter=$!{command.mp3Filter}")
+#set ($bgmUrl = "&bgmFilter=$!{command.bgmFilter}")
+#set ($route = "")
+
+#if($!{creditCount} > 0 || $!{typeCount} > 0 || $!{nationCount} > 0 || $!{genreCount} > 0 || $!{releaseYearCount} > 0)	
+<div class="wrap_cate">
+	<div class="box_cate">
+	
+	#if($StringUtils.equals($!{dto.tab},"artistResult"))
+		
+		## 활동별 검색
+		#set ($publicUrl = "?query=$!{command.encodedQuery}" + $artistUrl + $nationUrl + $genreUrl + $releaseUrl + $listenUrl + $mp3Url + $bgmUrl)
+		<div class="col_cate fst">
+			<span class="txt_cate">활동</span>
+			<div class="wrap_list_keyword">
+				<ul class="list_keyword list_credit">
+					<li class="all #if(!$StringUtils.isNotBlank("$!{command.creditId}"))on#end">
+						<a href="${publicUrl}" title="전체"><span>전체</span></a>
+					</li>
+				#set($creditSelectedIndex = 0)
+				#if(!$CollectionUtils.isEmpty($!{creditList}))
+					#foreach($credit in $creditList)
+					<li #if($StringUtils.equals($!{command.creditId},$!{credit.id}))class="on"#set($creditSelectedIndex = $foreach.count)#end>
+						<a href="${publicUrl}&creditId=$!{credit.id}" title="$!{credit.name}"><span>$StringUtils.replace("$!{credit.name}", "|", ",")</span></a>
+					</li>
+					#if($StringUtils.equals($!{command.creditId},$!{credit.id}))#set($creditKeyword = $StringUtils.replace("$!{credit.name}", "|", ","))#end
+					#end
+				#else
+					<li></li>
+				#end
+				</ul> 
+				
+				#if($creditList.size() > 4)
+				<a id="btnCreditUnFold" class="link_unfold arr_comm" href="javascript:;">더보기</a>
+				<a id="btnCreditFold" class="link_fold arr_comm" href="javascript:;">접기</a>
+
+            	<script type="text/javascript">
+            		daum.Music.adjustView({
+            			"btnUnFoldId" : "btnCreditUnFold",
+            			"btnFoldId" : "btnCreditFold",
+            			"contentSelector" : ".wrap_list_keyword .list_credit li",
+            			"type" : "control",
+						"defaultNum" : 5
+						#if($!{creditSelectedIndex} > 4)
+						,"view" : "show"
+						#end
+            		});
+            	</script>
+				#end
+				
+			</div>
+		</div>
+		#if($StringUtils.isNotBlank("$!{creditKeyword}"))#set ($route = $route + " > " + $creditKeyword)#end
+		
+		## 국가별 검색
+		##if(($!{nationCount}) && $!{nationCount} > 0)
+		#set ($publicUrl = "?query=$!{command.encodedQuery}" + $artistUrl + $creditUrl + $rangeUrl + $genreUrl + $releaseUrl + $listenUrl + $mp3Url + $bgmUrl)
+		<div class="col_cate">
+			<span class="txt_cate">국가</span>
+			<div class="wrap_list_keyword">
+				<ul class="list_keyword list_nation">
+					<li class="all #if(!$StringUtils.isNotBlank("$!{command.nationId}"))on#end">
+						<a href="${publicUrl}" title="전체"><span>전체</span></a>
+					</li>
+				#set($nationSelectedIndex = 0)
+				#if(!$CollectionUtils.isEmpty($!{nationList}))
+					#foreach($nation in $nationList)
+					<li #if($StringUtils.equals($!{command.nationId},$!{nation.id}))class="on"#set($nationSelectedIndex = $foreach.count)#end>
+						<a href="${publicUrl}&nationId=$!{nation.id}" title="$!{nation.name}"><span>$!{nation.name}</span></a>
+					</li>
+					#if($StringUtils.equals($!{command.nationId},$!{nation.id}))#set($nationKeyword = $!{nation.name})#end
+					#end
+				#else
+					<li></li>
+				#end
+				</ul>
+				
+				#if($nationList.size() > 4)
+				<a id="btnNationUnFold" class="link_unfold arr_comm" href="javascript:;">더보기</a>
+				<a id="btnNationFold" class="link_fold arr_comm" href="javascript:;">접기</a>
+
+            	<script type="text/javascript">
+            		daum.Music.adjustView({
+            			"btnUnFoldId" : "btnNationUnFold",
+            			"btnFoldId" : "btnNationFold",
+            			"contentSelector" : ".wrap_list_keyword .list_nation li",
+            			"type" : "control",
+						"defaultNum" : 5
+						#if($nationSelectedIndex > 4)
+						,"view" : "show"
+						#end
+            		});
+            	</script>
+				#end
+			</div>
+		</div>
+		#if($StringUtils.isNotBlank("$!{nationKeyword}"))#set ($route = $route + " > " + $nationKeyword)#end
+		##end
+		
+	#else
+		
+		## 대상별 검색
+		##if(($!{typeCount}) && $!{typeCount} > 0)
+		#set ($publicUrl = "?query=$!{command.encodedQuery}" + $artistUrl + $creditUrl + $nationUrl + $genreUrl + $releaseUrl + $listenUrl + $mp3Url + $bgmUrl)
+		<div class="col_cate fst">
+			<span class="txt_cate">$!{typeCate}</span>
+			<div class="wrap_list_keyword">
+				<ul class="list_keyword list_type">
+					<li class="all #if(!$StringUtils.isNotBlank("$!{command.searchRange}") || $StringUtils.equals("$!{command.searchRange}", "default"))on#end">
+						<a href="${publicUrl}" onclick="daum.Music.setChartOrder('btnMoreInfo', '$!{publicUrl}');return false;" title="전체"><span>전체</span></a>
+					</li>
+					#set($typeSelectedIndex = 0)
+					#foreach($type in $StringUtils.split($!{typeListArr}, "¶") )
+					<li #if($StringUtils.equals($!{command.searchRange},"$!{foreach.index}"))class="on"#set($typeSelectedIndex = $foreach.count)#end>
+						<a href="${publicUrl}&searchRange=$!{foreach.index}" onclick="daum.Music.setChartOrder('btnMoreInfo', '$!{publicUrl}&searchRange=$!{foreach.index}');return false;" title="$!{type}"><span>$!{type}</span></a>
+						#set($typeCount = $foreach.index)
+					</li>
+					#if($StringUtils.equals($!{command.searchRange},"$!{foreach.index}"))#set($typeKeyword = $!{type})#end
+					#end
+				</ul> 
+				
+				#if($typeCount > 4)
+				<a id="btnTypeUnFold" class="link_unfold arr_comm" href="javascript:;">더보기</a>
+				<a id="btnTypeFold" class="link_fold arr_comm" href="javascript:;">접기</a>
+
+            	<script type="text/javascript">
+            		daum.Music.adjustView({
+            			"btnUnFoldId" : "btnTypeUnFold",
+            			"btnFoldId" : "btnTypeFold",
+            			"contentSelector" : ".wrap_list_keyword .list_type li",
+            			"type" : "control",
+						"defaultNum" : 5
+						#if($typeSelectedIndex > 4)
+						,"view" : "show"
+						#end
+            		});
+            	</script>
+				#end
+			</div>
+		</div>
+		#if($StringUtils.isNotBlank("$!{typeKeyword}"))#set ($route = $route + " > " + $typeKeyword)#end
+		##end
+		
+		##발매연도별 검색
+		##if(($!{releaseYearCount}) && $!{releaseYearCount} > 0)
+		#set ($publicUrl = "?query=$!{command.encodedQuery}" + $artistUrl + $creditUrl + $nationUrl + $rangeUrl + $genreUrl + $listenUrl + $mp3Url + $bgmUrl)
+		<div class="col_cate">
+			<span class="txt_cate">발매연도</span>
+			<div class="wrap_list_keyword" style="height:auto;">
+				<ul class="list_keyword list_year">
+					<li class="all #if(!$StringUtils.isNotBlank("$!{command.releaseYear}"))on#end">
+						<a href="${publicUrl}" onclick="daum.Music.setChartOrder('btnMoreInfo', '$!{publicUrl}');return false;" title="전체"><span>전체</span></a>
+					</li>
+				#if(!$CollectionUtils.isEmpty($!{releaseYearList}))
+					#set($yearSelectedIndex = 0)
+					#foreach($year in $releaseYearList)
+					<li #if($StringUtils.equals($!{command.releaseYear},$!{year.id}))class="on"#set($yearSelectedIndex = $foreach.count)#end>
+						<a href="${publicUrl}&releaseYear=$!{year.release_year}" onclick="daum.Music.setChartOrder('btnMoreInfo', '$!{publicUrl}&releaseYear=$!{year.id}');return false;" title="$!{year.id}"><span>$!{year.id}</span></a>
+					</li>
+					#if($StringUtils.equals($!{command.releaseYear},$!{year.id}))#set($yearKeyword = $!{year.id})#end
+					#end
+				#else
+					<li></li>
+				#end
+				</ul>
+				
+				
+				#if(!$CollectionUtils.isEmpty($!{releaseYearList}) && $releaseYearList.size() > 4)
+				<a id="btnYearUnFold" class="link_unfold arr_comm" href="javascript:;">더보기</a>
+				<a id="btnYearFold" class="link_fold arr_comm" href="javascript:;">접기</a>
+
+            	<script type="text/javascript">
+            		daum.Music.adjustView({
+            			"btnUnFoldId" : "btnYearUnFold",
+            			"btnFoldId" : "btnYearFold",
+            			"contentSelector" : ".wrap_list_keyword .list_year li",
+            			"type" : "control",
+						"defaultNum" : 5
+						#if($!{yearSelectedIndex} > 4)
+						,"view" : "show"
+						#end
+            		});
+            	</script>
+				#end
+			</div>
+		</div>
+		#if($StringUtils.isNotBlank("$!{yearKeyword}"))#set ($route = $route + " > " + $yearKeyword)#end
+		##end
+		
+	#end
+
+		##장르별 검색
+        #if(!$StringUtils.equals($!{dto.tab},"artistResult"))
+		#set ($publicUrl = "?query=$!{command.encodedQuery}" + $artistUrl + $creditUrl + $rangeUrl + $nationUrl + $releaseUrl + $listenUrl + $mp3Url + $bgmUrl)
+		<div class="col_cate">
+			<span class="txt_cate">$!{genreCate}</span>
+			<div class="wrap_list_keyword" style="height:auto;">
+				<ul class="list_keyword list_genre">
+					<li class="all #if(!$StringUtils.isNotBlank("$!{command.genreId}"))on#end">
+						<a href="${publicUrl}" onclick="daum.Music.setChartOrder('btnMoreInfo', '$!{publicUrl}');return false;" title="전체"><span>전체</span></a>
+					</li>
+				#if(!$CollectionUtils.isEmpty($!{genreList}))
+					#set($genreSelectedIndex = 0)
+					#foreach($genre in $genreList)
+					#if($StringUtils.isNotBlank($!{genre.id}))
+					<li #if($StringUtils.equals($!{command.genreId},$!{genre.id}))class="on"#set($genreSelectedIndex = $foreach.count)#end>
+						<a href="${publicUrl}&genreId=$!{genre.id}" onclick="daum.Music.setChartOrder('btnMoreInfo', '$!{publicUrl}&genreId=$!{genre.id}');return false;" title="$!{genre.name}"><span>$!{genre.name}</span></a>
+					</li>
+					#if($StringUtils.equals($!{command.genreId},$!{genre.id}))#set($genreKeyword = $!{genre.name})#end
+					#end
+					#end
+				#else
+					<li></li>
+				#end
+				</ul>
+				
+				#if(!$CollectionUtils.isEmpty($!{genreList}) && $genreList.size() > 4)
+				<a id="btnGenreUnFold" class="link_unfold arr_comm" href="javascript:;">더보기</a>
+				<a id="btnGenreFold" class="link_fold arr_comm" href="javascript:;">접기</a>
+
+            	<script type="text/javascript">
+            		daum.Music.adjustView({
+            			"btnUnFoldId" : "btnGenreUnFold",
+            			"btnFoldId" : "btnGenreFold",
+            			"contentSelector" : ".wrap_list_keyword .list_genre li",
+            			"type" : "control",
+						"defaultNum" : 5
+						#if($!{genreSelectedIndex} > 4)
+						,"view" : "show"
+						#end
+            		});
+            	</script>
+				#end
+			</div>
+		</div>
+		#if($StringUtils.isNotBlank("$!{genreKeyword}"))#set ($route = $route + " > " + $genreKeyword)#end
+		#end
+	
+	#if( $StringUtils.equals($!{dto.tab},"songResult") || $StringUtils.equals($!{dto.tab},"albumResult") )
+		#set ($publicUrl = "?query=$!{command.encodedQuery}" + $artistUrl + $creditUrl + $rangeUrl + $nationUrl + $releaseUrl + $genreUrl)
+		<div class="col_cate">
+			<span class="txt_cate">구매옵션</span>
+			<div class="wrap_list_keyword">
+				<ul class="list_keyword">
+					<li class="all #if(!$StringUtils.isNotBlank("$!{command.listenFilter}") && !$StringUtils.isNotBlank("$!{command.mp3Filter}") && !$StringUtils.isNotBlank("$!{command.bgmFilter}"))on#end">
+						<a href="${publicUrl}" onclick="daum.Music.setChartOrder('btnMoreInfo', '$!{publicUrl}');return false;" title="전체"><span>전체</span></a>
+					</li>
+					
+					<li #if($StringUtils.isNotBlank("$!{command.listenFilter}"))class="on"#end>
+						<a href="${publicUrl}&amp;listenFilter=y" onclick="daum.Music.setChartOrder('btnMoreInfo', '$!{publicUrl}&amp;listenFilter=y');return false;" title="$!{genre.class_name}"><span>듣기가능</span></a>
+					</li>
+					#if($StringUtils.equals($!{dto.tab},"albumResult") || $StringUtils.equals($!{dto.tab},"songResult"))
+					<li #if($StringUtils.isNotBlank("$!{command.mp3Filter}"))class="on"#end>
+						<a href="${publicUrl}&amp;mp3Filter=y" onclick="daum.Music.setChartOrder('btnMoreInfo', '$!{publicUrl}&amp;mp3Filter=y');return false;" title="$!{genre.class_name}"><span>MP3구매가능</span></a>
+					</li>
+					#end
+					<li #if($StringUtils.isNotBlank("$!{command.bgmFilter}"))class="on"#end>
+						<a href="${publicUrl}&amp;bgmFilter=y" onclick="daum.Music.setChartOrder('btnMoreInfo', '$!{publicUrl}&amp;bgmFilter=y');return false;" title="$!{genre.class_name}"><span>BGM구매가능</span></a>
+					</li>
+					#if($StringUtils.isNotBlank("$!{command.listenFilter}"))#set($filterKeyword = "듣기가능")#end
+					#if($StringUtils.isNotBlank("$!{command.mp3Filter}"))#set($filterKeyword = "MP3구매가능")#end
+					#if($StringUtils.isNotBlank("$!{command.bgmFilter}"))#set($filterKeyword = "BGM구매가능")#end
+				</ul>
+			</div>
+		</div>
+		#if($StringUtils.isNotBlank("$!{filterKeyword}"))#set ($route = $route + " > " + $filterKeyword)#end
+	#end
+		
+		<span class="bg_btm"></span>
+	</div>
+</div>
+#end	
+
+########################################################################
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+
+#if($StringUtils.equals($dto.tab, "all"))
+    #set($rightSongList = $dto.getArtistSongGroupList())
+	#set($rightSongCount = $dto.groupArtistResult.totalResultsCount)
+#else
+	#set($rightArtistList = $dto.getArtistSongGroupList())
+	#set($rightArtistCount = $dto.groupArtistResult.totalResultsCount)
+#end
+#set($nationCount = $dto.groupNationResult.totalResultsCount)	##국가별 검색 결과 수
+#set($nationList = $dto.groupNationResult.documentList)
+#set($genreCount = $dto.groupGenreResult.totalResultsCount)	##장르별 검색 결과 수
+#set($genreList = $dto.groupGenreResult.documentList)
+#set($releaseYearCount = $dto.groupReleaseYearResult.totalResultsCount) ##발매년도 별 검색 결과 수
+#set($releaseYearList = $dto.groupReleaseYearResult.documentList)
+#set($typeCount = $dto.groupTypeResult.totalResultsCount) ##대상별검색
+#set($typeList = $dto.groupTypeResult.documentList)
+
+#*
+#if($StringUtils.equals($!{dto.tab},"artistResult"))
+	#set($typeListArr = "")	##대상별검색
+#end
+	
+#if($StringUtils.equals($!{dto.tab},"songResult"))
+##	#set($typeListArr = "곡명¶앨범¶아티스트(가수)¶작곡,작사자¶OST (삽입곡)")	##대상별검색
+	#set($typeListArr = "곡명¶앨범¶아티스트(가수)¶작곡,작사자")	##대상별검색
+#end
+
+#if($StringUtils.equals($!{dto.tab},"albumResult"))
+##	#set($typeListArr = "앨범제목¶아티스트(가수)¶앨범 참여자")	##대상별검색
+	#set($typeListArr = "앨범제목¶아티스트(가수)")	##대상별검색
+#end
+
+#if($StringUtils.equals($!{dto.tab},"videoResult")) 
+##	#set($typeListArr = "곡명¶아티스트(가수)¶참여 아티스트¶출연자")	##대상별검색
+	#set($typeListArr = "곡명¶아티스트(가수)")	##대상별검색
+#end
+	
+#if($StringUtils.equals($!{dto.tab},"lyricResult"))
+	#set($typeListArr = "곡명¶앨범¶아티스트(가수)¶가사내용")	##대상별검색
+#end
+	
+#if($StringUtils.equals($!{dto.tab},"bgmResult"))
+	#set($typeListArr = "곡명¶앨범¶아티스트(가수)¶작곡,작사자¶OST (삽입곡)")	##대상별검색
+#end
+*#
+	<hr/><h2>우측날개 영역</h2>
+
+	##<div class="rightBlank"></div>
+	
+<script type="text/javascript"> 
+function _jsFolding(obj,display) {		
+	if(display=="show") {
+		UI.$(obj+"Close").style.display = "block";
+		UI.$(obj+"More").style.display = "none";
+	} else {
+		UI.$(obj+"Close").style.display = "none";
+		UI.$(obj+"More").style.display = "block";
+	}
+	var obj = UI.$(obj);
+	for(i in obj.getElementsByTagName('li')) {
+		if(obj.getElementsByTagName('li')[i].className!="") {
+			obj.getElementsByTagName('li')[i].className=display;
+		}
+	}	
+}
+</script>
+#set ($artistUrl = "&artistId=$!{command.artistId}")
+#set ($typeUrl = "&typeId=$!{command.typeId}")
+#set ($genreUrl = "&genreId=$!{command.genreId}")
+#set ($nationUrl = "&nationId=$!{command.nationId}")
+#set ($releaseUrl = "&releaseYear=$!{command.releaseYear}")
+###set ($activeUrl = "&activeYear=$!{command.activeYear}")
+#set ($rangeUrl = "&searchRange=$!{command.searchRange}")
+#set ($listenUrl = "&listenFilter=$!{command.listenFilter}")
+#set ($mp3Url = "&mp3Filter=$!{command.mp3Filter}")
+#set ($bgmUrl = "&bgmFilter=$!{command.bgmFilter}")
+
+##대상별 검색
+#*
+#if(($!{typeCount}) && $!{typeCount} > 0)	
+	<div id="rTarget" class="rBox t1">
+		<div class="title titleTarget"> 
+			<h4>대상별 검색</h4>
+		</div>	
+		
+		#set ($publicUrl = "?query=$!{command.encodedQuery}" + $genreUrl + $nationUrl)
+		#if( $StringUtils.isNotEmpty("$!{command.typeId}") )
+			<ul class="icn_radio" id="byTarget">
+				<li><a href="${publicUrl}" class="base"><span class="off">전체</span></a></li>
+				#foreach($type in $typeList)
+					<li #if($StringUtils.equals($!{command.typeId},$!{type.type_id})) #else class="" #end><a href="${publicUrl}&typeId=$!{type.type_id}" class="base"><span class="#getCompareOnOff($!{command.typeId}, $!{type.type_id})">$!{type.type_name}</span></a> ($!{type.g_count}건)</li>
+				#end
+			</ul>
+		#else
+			<ul class="icn_radio" id="byTarget">
+				<li><a href="${publicUrl}" class="base"><span class="on">전체</span></a></li>
+				#set ($count = 0)			
+				#foreach($type in $typeList)
+					<li #if($foreach.index > 3)class="hide"#end><a href="${publicUrl}&typeId=$!{type.type_id}" class="base"><span class="off">$!{type.type_name}</span></a> ($!{type.g_count}건)</li>
+					#set ($count = $count+1)
+				#end
+			</ul>
+			#if($count > 4)
+				<div id="byTargetMore" class="sMore" style="display:block;"><a href="javascript:_jsFolding('byTarget','show');">더보기</a></div> 
+				<div id="byTargetClose" class="sMore2" style="display:none;"><a href="javascript:_jsFolding('byTarget','hide');">접기</a></div> 
+			#end
+		#end				
+	</div>
+#end
+*#
+##대상별 검색 (곡/앨범/뮤직/가사/배경음악)
+#if( $StringUtils.isNotEmpty("$!{typeListArr}") )
+	<div id="rTarget" class="rBox t1">
+		<div class="title titleTarget"> 
+			<h4>대상별 검색</h4>
+		</div>	
+		#set ($publicParam = $artistUrl + $genreUrl + $releaseUrl + $listenUrl + $bgmUrl)
+		#set ($publicUrl = "?query=$!{command.encodedQuery}" + $publicParam )
+		#if( $StringUtils.isNotEmpty("$!{command.searchRange}") && !$StringUtils.equals("$!{command.searchRange}", "default"))
+			<ul class="icn_radio" id="byTarget">
+				<li><a href="${publicUrl}" class="base" onclick="return gClickLink('1', '1', 'target');"><span class="off">전체</span></a></li>				
+				#foreach($type in $StringUtils.split($!{typeListArr}, "¶") )
+					#set ( $count = $foreach.index + 2 )
+					<li #if($StringUtils.equals("$!{command.searchRange}","${foreach.index}")) #else class="" #end><a href="${publicUrl}&searchRange=${foreach.index}" class="base" onclick="return gClickLink('$!{count}', '1', 'genre');"><span class="#getCompareOnOff("$!{command.searchRange}", "${foreach.index}")">$!{type}</span></a></li>
+				#end
+			</ul>
+		#else
+			<ul class="icn_radio" id="byTarget">
+				<li><a href="${publicUrl}" class="base" onclick="return gClickLink('1', '1', 'target');"><span class="on">전체</span></a></li>
+				#set ($count = 0)
+				#foreach($type in $StringUtils.split($!{typeListArr}, "¶") )
+					#set ( $count = $foreach.index + 2 )
+					<li><a href="${publicUrl}&searchRange=${foreach.index}" class="base" onclick="return gClickLink('$!{count}', '1', 'genre');"><span class="off">$!{type}</span></a></li>
+				#end
+			</ul>			
+		#end				
+	</div>
+#end
+
+##아티스트별 곡검색(통합검색 탭에서만)
+#if(($!{rightSongCount}) && $!{rightSongCount} > 0)	
+	<div id="rArtistList" class="rBox t1">
+		<div class="title titleArtistL"> 
+			<h4>아티스트별 곡검색</h4>
+		</div>
+		#set ($publicParam = $typeUrl + $genreUrl + $releaseUrl  + $rangeUrl)
+		#set ($publicUrl = "?query=$!{command.encodedQuery}" + $publicParam)		
+		#set ($count = 1)
+		#if( $StringUtils.isNotEmpty("$!{command.artistId}") )
+			<ul class="icn_radio" id="byArtist">
+				<li><a href="${publicUrl}" class="base" onclick="return gClickLink('1', '$!{count}', 'artist');"><span class="off">전체</span></a></li>
+				#foreach($right in $rightSongList)
+					#set ($count = $count+1)
+					#if ($foreach.index < 10)
+					<li #if($StringUtils.equals($!{command.artistId},$!{right.artist_id})) #else class="" #end><a href="/search/song?query=$!{command.encodedQuery}&artistId=${right.artist_id}" class="base" onclick="return gClickLink('1', '$!{count}', 'artist');"><span class="#getCompareOnOff($!{command.artistId}, $!{right.artist_id})">#strCut($!{right.artist_name},22)</span></a></li>
+					#end
+				#end		
+			</ul>
+		#else
+			<ul class="icn_radio" id="byArtist">
+				<li><a href="${publicUrl}" class="base" onclick="return gClickLink('1', '$!{count}', 'artist');"><span class="on">전체</span></a></li>							
+				#foreach($right in $rightSongList)
+					#set ($count = $count+1)
+					#if ($foreach.index < 10)
+					<li #if($foreach.index > 3)class="hide"#end><a href="/search/song?query=$!{command.encodedQuery}&artistId=${right.artist_id}" class="base" onclick="return gClickLink('1', '$!{count}', 'artist');"><span class="off">#strCut($!{right.artist_name},22)</span></a></li>
+					#end
+				#end
+			</ul>
+			#if($count > 4)
+				<div id="byArtistMore" class="sMore" style="display:block;"><a href="javascript:_jsFolding('byArtist','show');">더보기</a></div> 
+				<div id="byArtistClose" class="sMore2" style="display:none;"><a href="javascript:_jsFolding('byArtist','hide');">접기</a></div> 
+			#end
+		#end
+	</div>
+#end
+
+##아티스트 별 검색(나머지 탭에서)
+#if(($!{rightArtistCount}) && $!{rightArtistCount} > 0)
+	<div id="rArtistList" class="rBox t1">
+		<div class="title titleArtistL"> 
+			<h4>아티스트별 검색</h4>
+		</div>
+		#set ($publicParam = $typeUrl + $genreUrl + $releaseUrl  + $rangeUrl + $listenUrl + $bgmUrl)
+		#set ($publicUrl = "?query=$!{command.encodedQuery}" + $publicParam)		
+		#if( $StringUtils.isNotEmpty("$!{command.artistId}") )
+			<ul class="icn_radio" id="byArtist">
+				<li><a href="${publicUrl}" class="base"><span class="off">전체</span></a></li>
+				#foreach($artist in $rightArtistList)
+					#if ($foreach.index < 10)
+					<li #if($StringUtils.equals($!{command.artistId}, "$!{artist.artist_id}")) #else class="" #end><a href="${publicUrl}&artistId=${artist.artist_id}" class="base"><span class="#getCompareOnOff($!{command.artistId}, "$!{artist.artist_id}")">#strCut($!{artist.artist_name},22)</span></a></li>
+					#end
+				#end
+			</ul>
+		#else
+			<ul class="icn_radio" id="byArtist">
+				<li><a href="${publicUrl}" class="base"><span class="on">전체</span></a></li>
+				#set ($count = 0)			
+				#foreach($artist in $rightArtistList)
+					#if ($foreach.index < 10)
+					<li #if($foreach.index > 3)class="hide"#end><a href="${publicUrl}&artistId=${artist.artist_id}" class="base"><span class="off">#strCut($!{artist.artist_name},22)</span></a></li>
+					#set ($count = $count+1)
+					#end
+				#end
+			</ul>
+			#if($count > 4)
+				<div id="byArtistMore" class="sMore" style="display:block;"><a href="javascript:_jsFolding('byArtist','show');">더보기</a></div> 
+				<div id="byArtistClose" class="sMore2" style="display:none;"><a href="javascript:_jsFolding('byArtist','hide');">접기</a></div> 
+			#end
+		#end
+	</div>
+#end
+
+
+##국가별 검색
+#if(($!{nationCount}) && $!{nationCount} > 0)	
+	<div id="rNation" class="rBox t1">
+		<div class="title titleNational"> 
+			<h4>국가별 검색</h4>
+		</div>	
+		#set ($publicParam = $artistUrl + $genreUrl + $releaseUrl  + $rangeUrl)
+		#set ($publicUrl = "?query=$!{command.encodedQuery}" + $publicParam)
+		#if( $StringUtils.isNotEmpty("$!{command.nationId}") )
+			<ul class="icn_radio" id="byNational">
+				<li><a href="${publicUrl}" class="base" onclick="return gLink(null, 'R1AY', '1', '1');"><span class="off">전체</span></a></li>
+				#foreach($nation in $nationList)
+					#set ( $count = $foreach.index + 1 )
+					<li #if($StringUtils.equals($!{command.nation},$!{nation.nationName})) #else class="" #end><a href="${publicUrl}&nationId=$!{nation.nation_id}" class="base" onclick="return gLink(null, 'R1AY', '2', '$!{count}');"><span class="#getCompareOnOff($!{command.nationId}, $!{nation.nation_id})">$!{nation.nation_name}</span></a> ($!{nation.g_count}건)</li>
+				#end
+			</ul>
+		#else
+			<ul class="icn_radio" id="byNational">
+				<li><a href="${publicUrl}" class="base" onclick="return gLink(null, 'R1AY', '1', '1');"><span class="on">전체</span></a></li>			
+				#foreach($nation in $nationList)
+					#set ( $count = $foreach.index + 1 )
+					<li #if($foreach.index > 3)class="hide"#end><a href="${publicUrl}&nationId=$!{nation.nation_id}" class="base" onclick="return gLink(null, 'R1AY', '2', '$!{count}');"><span class="off">$!{nation.nation_name}</span></a> ($!{nation.g_count}건)</li>
+				#end
+			</ul>			
+			#if($count > 4)
+				<div id="byNationalMore" class="sMore" style="display:block;"><a href="javascript:_jsFolding('byNational','show');">더보기</a></div> 
+				<div id="byNationalClose" class="sMore2" style="display:none;"><a href="javascript:_jsFolding('byNational','hide');">접기</a></div> 
+			#end
+		#end				
+	</div>
+#end
+
+##장르별 검색
+#if(($!{genreCount}) && $!{genreCount} > 0)	
+	<div id="rGenre" class="rBox t1">
+		<div class="title titleGenre"> 
+			<h4>장르별 검색</h4>
+		</div>
+		#set ($publicParam = $artistUrl + $typeUrl + $releaseUrl  + $rangeUrl + $listenUrl + $bgmUrl)
+		#set ($publicUrl = "?query=$!{command.encodedQuery}" + $publicParam)
+		#if( $StringUtils.isNotEmpty("$!{command.genreId}"))
+			<ul class="icn_radio" id="byGenre">				
+				<li><a href="${publicUrl}" class="base" onclick="return gClickLink('1', '1', 'genre');"><span class="off">전체</span></a></li>
+				#foreach($genre in $genreList)
+					#set ($count = $foreach.index+1)
+					#if($StringUtils.isNotEmpty($!{genre.class_id}))
+					<li #if($StringUtils.equals($!{command.genreId},$!{genre.class_id})) #else class="" #end><a href="${publicUrl}&genreId=$!{genre.class_id}" class="base" onclick="return gClickLink('2', '$!{count}', 'genre');"><span class="#getCompareOnOff($!{command.genreId}, $!{genre.class_id})">$!{genre.class_name}</span></a> ($!{genre.g_count}건)</li>
+					#end
+				#end
+			</ul>
+		#else
+			<ul class="icn_radio" id="byGenre">				
+				<li><a href="${publicUrl}" class="base" onclick="return gClickLink('1', '1', 'genre');"><span class="on">전체</span></a></li>		
+				#foreach($genre in $genreList)
+					#set ($count = $foreach.index+1)
+					#if($StringUtils.isNotEmpty($!{genre.class_id}))
+					<li #if($foreach.index > 3)class="hide"#end><a href="${publicUrl}&genreId=$!{genre.class_id}" class="base" onclick="return gClickLink('2', '$!{count}', 'genre');"><span class="off">$!{genre.class_name}</span></a> ($!{genre.g_count}건)</li>
+					#end
+				#end
+			</ul>
+			#if($count > 4)
+			<div id="byGenreMore" class="sMore" style="display:block;"><a href="javascript:_jsFolding('byGenre','show');">더보기</a></div> 
+			<div id="byGenreClose" class="sMore2" style="display:none;"><a href="javascript:_jsFolding('byGenre','hide');">접기</a></div> 
+			#end
+		#end
+	</div>
+#end
+
+##발매연도별 검색
+#if(($!{releaseYearCount}) && $!{releaseYearCount} > 0)	    
+	<div id="rYear" class="rBox t1">
+		<div class="title titleYear"> 
+			<h4>발매연도별 검색</h4>
+		</div>	
+		#set ($publicParam = $artistUrl + $typeUrl + $genreUrl  + $rangeUrl + $listenUrl + $bgmUrl)
+		#set ($publicUrl = "?query=$!{command.encodedQuery}" + $publicParam)	
+		#if( $StringUtils.isNotEmpty("$!{command.releaseYear}") )
+			<ul class="icn_radio" id="byYear">
+				<li><a href="${publicUrl}" class="base" onclick="return gClickLink('1', '1', 'release');"><span class="off">전체</span></a></li>
+				#foreach($year in $releaseYearList)
+					#set ($count = $foreach.index+1)
+					#if ($foreach.index < 10)
+    				#if($StringUtils.isNotEmpty($!{year.release_year}))
+    				<li #if($StringUtils.equals($!{command.releaseYear},$!{year.release_year})) #else class="" #end><a href="${publicUrl}&releaseYear=$!{year.release_year}" class="base" onclick="return gClickLink('2', '$!{count}', 'release');"><span class="#getCompareOnOff($!{command.releaseYear}, $!{year.release_year})">$!{year.release_year}년도</span></a> ($!{year.g_count}건)</li>
+    				#end
+    				#end
+				#end
+			</ul>
+		#else
+			<ul class="icn_radio" id="byYear">
+				<li><a href="${publicUrl}" class="base" onclick="return gClickLink('1', '1', 'release');"><span class="on">전체</span></a></li>
+				#foreach($year in $releaseYearList)
+					#set ($count = $foreach.index+1)
+					#if ($foreach.index < 10)
+					#if($StringUtils.isNotEmpty($!{year.release_year}))
+					<li #if($foreach.index > 3)class="hide"#end><a href="${publicUrl}&releaseYear=$!{year.release_year}" class="base" onclick="return gClickLink('2', '$!{count}', 'release');"><span class="off">$!{year.release_year}년도</span></a> ($!{year.g_count}건)</li>
+					#end
+					#end
+				#end
+			</ul>
+			#if($count > 4)
+			<div id="byYearMore" class="sMore" style="display:block;"><a href="javascript:_jsFolding('byYear','show');">더보기</a></div> 
+			<div id="byYearClose" class="sMore2" style="display:none;"><a href="javascript:_jsFolding('byYear','hide');">접기</a></div>
+			#end 
+		#end
+	</div>        	
+#end
+        
+#end

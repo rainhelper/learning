@@ -1,0 +1,50 @@
+{
+"list" :[
+	#foreach($song in $songCommentList)
+	#if($songCommentList.indexOf($song) != 0),#end
+	{
+		"songId" : "$song.songId",
+		"title" : "$song.title",
+		"trackLength" : "$song.getTrackLengthMinute()",
+		"typeCd" : "$!{song.typeCd}",
+		"lyricsYn" : "$song.lyricsYn",
+		"AODLinkId" : "$song.AODLinkId",
+		"MP3LinkId":"$!{song.MP3LinkId}",
+		"BGMLinkId":"$!{song.BGMLinkId}",
+		"albumId" : "$song.album.albumId",
+		"albumTitle" : "$song.album.title",
+		"releaseDate" : "$song.album.releaseDt",
+		"userRequestId" : "$song.userRequestId",
+		"userRegistDate" : "$song.regdttm",
+		"recommendCount" : "$song.recommendCount",
+		"userId" : "$song.getEncodedUserId()",
+		"nickName" : "$song.nickName",
+		"keyArtistList" : [
+    		#if($song.keyArtistList.size()>0)
+			#foreach($artist in $song.keyArtistList)
+	    		#if($song.keyArtistList.indexOf($artist) != 0),#end
+				{
+				"artistId" : "$!{artist.artistId}",
+				"name" : "$!{artist.name}"
+				}
+			#end
+			#end
+    	],
+    	"featArtistList": [
+			#foreach($artist in $song.featArtistList)
+				#if($velocityCount > 0),#end
+				{
+					"artistId":"$!{artist.artistId}",
+					"name":"$!{artist.name}"
+				} 
+			#end
+		],
+		"vclipLinkId":"$!{song.vclipLinkId}",
+		"tvpotVId":"$!{song.tvpotVId}",
+		"bellSalesStatus":"$!{song.bellSalesStatus}",
+		"ringSalesStatus":"$!{song.ringSalesStatus}"
+	}
+	#end
+	]
+}
+

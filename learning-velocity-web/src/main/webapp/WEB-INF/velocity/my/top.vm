@@ -1,0 +1,319 @@
+<style type="text/css">
+	#recommendGenreList {overflow:hidden;position:relative;height:196px;}
+	.article_my {position:relative;}
+	.article_my .section_interest .wrap_album .list_album li {float:left;}
+	.article_my .genre_frame {position:absolute;top:0;left:30px;border:0px;width:698px;height:255px;overflow:hidden;z-index:100}
+
+	.layer_alim .info_body .list_alim {height:92px;}
+	.article_my .section_interest .cont_navi {position:absolute;top:22px;right:-1px;}
+
+	.wrap_list_menu .list_submenu li .wrap_listbtn {display:none;}
+	.wrap_list_menu .list_submenu li.on .wrap_listbtn {display:block;}
+</style>
+<div class="wrap_cont article_my">
+	<div class="section_interest">
+		<div class="wrap_title">
+			<h3 class="tit_mymusic tit_interest">관심장르 추천신보</h3>
+			<a class="btn_mymusic btn_editgenre" title="장르편집" type="button" onclick="daum.Music.My.Genre.toggleEditor(daum.$$('.section_interest'));return false;">장르편집</a>
+		</div>		
+
+		<div  class="wrap_album" >
+			<div style="#calcRecommendGenreSize($!{recommendedGenreList})">
+        		<ul class="list_album" id="recommendGenreList">
+        		#if(!$CollectionUtils.isEmpty($recommendedGenreList))
+        		#foreach($item in $recommendedGenreList)
+        			<li class="roll">
+        				#printAlbumSet($item "")
+        			</li>
+        		#end
+        		#end
+        		</ul>
+			</div>
+		</div>
+		
+		#if($!totalCnt && $totalCnt > 5)
+		<div class="cont_navi">
+			<a id="msPrevBtn" title="이전" class="btn_comm btn_prev off_prev" type="button" onclick="dynamicRoll.moveToLeft(this);">이전</a>
+			<a id="msNextBtn" title="다음" class="btn_comm btn_next" type="button" onclick="dynamicRoll.moveToRight(this);">다음</a>
+		</div>
+		#end
+	</div>	
+	
+	## 관심장르 편집
+	#printInterestedGenre("top")
+ 
+	<div class="wrap_music_chart">
+		<h3 class="screen_out">MY 뮤직차트</h3>
+		<div class="wrap_tab">
+			<ul class="tab_mycont tab_my">
+				<li #if( $StringUtils.isBlank("$!{command.top_service}"))class="on"#end>
+					<a class="tab_playlist" href="/my/top">기본 재생목록</a>
+				</li>
+				<li #if( $StringUtils.equals("$!{command.top_service}", "FREQUENT"))class="on"#end>
+					<a class="tab_enjoy" href="/my/top?top_service=FREQUENT">즐겨 듣는 음악</a>
+				</li>
+				<li #if( $StringUtils.equals("$!{command.top_service}", "RECENT"))class="on"#end>
+					<a class="tab_lately" href="/my/top?top_service=RECENT">최근 들은 음악</a>
+				</li>
+			</ul>
+		</div>
+		<div class="music_chart">
+			<div class="wrap_tool_btn">
+				<div class="tool_btn">
+					#printListButton("song" "listen" "" "" "")
+					#*
+					#if( !$StringUtils.equals("$!{command.top_service}", "FREQUENT")) ##즐겨듣는음악 리스트에서 삭제버튼 노출끔
+						#printListButton( "del", "controlBtn" )
+					#end
+*#
+					##<input class="btn_comm btn_delete" title="삭제" value="삭제" type="button">
+				</div>
+			</div>
+			<div class="bg_thead">
+				<input id="allCheck" class="all_chk" type="checkbox">
+				<label for="allCheck" class="screen_out">전체선택</label>			
+			</div>
+		#if(!$CollectionUtils.isEmpty($myList))	
+			<ul id="trackContainer" class="list_music">			
+				#printListItems( "song_li" $myList  "" true) 
+			</ul>
+    	#else
+    		<div class="wrap_nodata">
+				#if( $StringUtils.isBlank("$!{command.top_service}"))<strong>저장된 곡이 없습니다.</strong>#end
+				#if( $StringUtils.equals("$!{command.top_service}", "FREQUENT"))<strong>즐겨 듣는 음악이 없습니다.</strong>#end
+				#if( $StringUtils.equals("$!{command.top_service}", "RECENT"))<strong>최근 들은 노래가 없습니다.</strong>#end
+    		</div>	
+    	#end
+    		<div class="wrap_tool_btn">
+    			<div class="tool_btn">
+    				#printListButtonFoot("song" "listen" "" "" "")
+					#*
+					#if( !$StringUtils.equals("$!{command.top_service}", "FREQUENT")) ##즐겨듣는음악 리스트에서 삭제버튼 노출끔
+						#printListButton( "del", "controlBtn" )
+					#end
+					*#
+    			</div>
+    		</div>
+			<span class="arr_comm link_more">
+				<a class="" 
+					#if( $StringUtils.equals("$!{command.top_service}", "FREQUENT"))
+						href="/my/frequent/list"
+					#elseif( $StringUtils.equals("$!{command.top_service}", "RECENT"))	
+						href="/my/recent/song/list"
+					#else	
+						href="/my/playList/detail?playlist_id=$!{playListId}"
+					#end>총 <em class="fc_blue" id="totalCount">$!{myCount}</em>곡 더보기</a>
+			</span>
+			#if(!$CollectionUtils.isEmpty($myList))
+    		<script type="text/javascript">
+			daum.Music.Playlist.init({id:"$!{playListId}"});
+        	</script>
+			#end
+		</div>
+	</div>
+</div>
+#printSNSList( $myList )
+<script type="text/javascript">
+
+var controller = new daum.Music.ListPrototype();
+controller.initialize({tag:'li', MySection:true});
+
+#if(!$CollectionUtils.isEmpty($recommendedGenreList))
+#if( $totalCnt > 5)
+var dynamicRoll = new daum.Music.DynamicRollerView({totalGenreListNum:"$totalCnt", prevBtnId:"msPrevBtn", nextBtnId:"msNextBtn", el:"recommendGenreList", itemSelector:"li", amount:5});
+//	var msRoll = new daum.Music.ListRoll("recommendGenreList", {amount:5, duration:0.2, viewList:true, prevId:"msPrevBtn", nextId:"msNextBtn", defaultIdx:0, loop:false, preonclassName:"prev_on" ,preoffclassName:"off_prev",	nextonclassName:"next_on",	nextoffclassName:"next_off"	});
+//	msRoll.render();
+#end
+#else
+daum.addEvent(window, 'load', function(){
+//daum.Music.My.genreModify(daum.$$('.article_my')[0]);
+daum.Music.My.Genre.toggleEditor(daum.$$('.section_interest'));return false;
+}); 
+#end
+
+#if(!$CollectionUtils.isEmpty($announceList))
+var announceList = [
+#foreach($item in $announceList)
+#if($foreach.index >0),#end{link:"$!{item.announceSeq}", announceSeq:$!{item.announceSeq}, text:"#escScriptStrip($!{item.description})", url:"$!{item.targetUrl}"}
+#end
+];
+#end
+
+//new daum.Music.CheckBoxDrag("trackContainer");
+//var checkboxDrag = daum.Music.selectByDrag().init("#trackContainer .track", "col_check");
+</script>
+
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+	  
+<div id="FTMessage">
+---------------------<br/>
+FT 체크<br/>
+---------------------<br/>	
+1. 왼쪽 메뉴 - 공지사항 데이타 확인<br/>
+ 
+
+	<br>
+</div>
+ 
+<br>
+# 상단 -----------------------------------------
+$!{firstTicket.order.item.title}
+#if($ticketOwnCount > 0)
+	#if($ticketOwnCount > 1) 외 ${ticketOwnCount}건#end
+	#else없음
+	#end
+
+<br/>음악감상잔여일 : $aodLeftDay 일 || #if($!{dto.aodEndDate}) ~ $!CheckDate.makeReleaseDate($!{dto.aodEndDate}) 까지 #end <br/>
+
+mp3잔여곡 : 
+#if($!{dto.mp3EndDate}) ~ $!CheckDate.makeReleaseDate($!{dto.mp3EndDate}) 까지 #end 
+#if($!{dto.aodDownloadEndDate}) ~ $!CheckDate.makeReleaseDate($!{dto.aodDownloadEndDate}) 까지 #end 
+
+#if(${dto.aodDownloadRemainder} > 0)${dto.aodDownloadRemainder}곡#if(${dto.downloadRemainder} > 0),#end<br/>#end
+#if(${dto.aodDownloadRemainder} > 0 && ${dto.downloadRemainder} <= 0)다운로드가 가능합니다.#end
+#if(${dto.downloadRemainder} > 0)무제한 ${dto.downloadRemainder}곡 다운로드가 가능합니다.#if(${dto.aodDownloadRemainder} <= 0)<br />&nbsp;#end#end
+#if(${dto.aodDownloadRemainder} <= 0 && ${dto.downloadRemainder} <= 0)MP3 다운로드 가능곡이 없습니다.<br/>#end
+
+<br/>bgm잔여곡 : #if($!{dto.bgmDownloadRemainder}) 0 #end   #if($!{bgmEndDate}) || ~$!CheckDate.makeReleaseDate($!{bgmEndDate}) 까지 #end <br/>
+보유MP3 : #if($!{myMp3Count}) $myMp3Count #else 0 #end <br/> 
+보유BGM : #if($!{myBgmCount}) $myBgmCount #else 0 #end <br/><br/>
+
+#set ($title = $!{command.getTop_service()})
+#if($title == "FREQUENT") #set ( $re_title = "즐겨 듣는 음악" )
+#elseif($title == "RECENT") #set ( $re_title = "최근 들은 음악" )
+#else #set ( $re_title = "기본재생목록" )
+#end
+<br>
+-----------------------------------------
+<br>
+
+* 현재 선택된 playListId값 : [$playListId]
+<b>왼쪽레프트정보</b><br/>
+변경사진 : ${ProfileFarm.getUrl55x55("$left.userId")} <br>
+다음이름: $left.cpDaumName <br/>
+전화번호 $left.cpNumber <br/>
+유저아뒤 : $left.userId <br/>
+
+<br>
+MY 뮤직<br/> 
+플레이리스트 $left.myPlayCount <br/>
+
+#foreach($item in $left.myPlayList)<br/>
+	ㅡ순서: $item.playListId || 이름: $item.playListName ($item.totalPlayCnt) || 디폴트: $item.gubunCd
+#end <br/>
+
+<br/>
+즐겨 듣는 음악 <br/>
+최근 들은 음악 <br/>
+관심음악 : $left.favoriteCount <br/>
+관심음악제일마지막에 저장된 탭 : $left.lastSavedObjType <br/>
+구매음악 : $left.ownCount <br/>
+		
+MY관리 <br/>
+이용권현황 $left.ticketOwnCount <br/>
+내알림  $left.announceCount <br/>
+내설정 <br/>
+
+공지사항 <br/><br/>
+#foreach($item in $left.recentNoticeList)<br/>
+	#if($foreach.index < 4)
+		$item.get("SUBJECT") ||  $item.get("URL") <br />
+	#end
+#end <br />	
+<br>
+
+<b>상단</b><br/>
+$!{firstTicket.order.item.title}
+#if($ticketOwnCount > 0)
+	#if($ticketOwnCount > 1) 외 ${ticketOwnCount}건#end
+	#else없음
+	#end
+
+<br/>음악감상잔여일 $dto.aodLeftDay <br/>
+ || #if($!{dto.aodEndDate}) ~ $!CheckDate.makeReleaseDate($!{dto.aodEndDate}) 까지 #end <br/>
+
+mp3잔여곡 : 
+#if($!{dto.mp3EndDate}) ~ $!CheckDate.makeReleaseDate($!{dto.mp3EndDate}) 까지 #end 
+#if($!{dto.aodDownloadEndDate}) ~ $!CheckDate.makeReleaseDate($!{dto.aodDownloadEndDate}) 까지 #end 
+
+#if(${dto.aodDownloadRemainder} > 0)${dto.aodDownloadRemainder}곡#if(${dto.downloadRemainder} > 0),#end<br/>#end
+#if(${dto.aodDownloadRemainder} > 0 && ${dto.downloadRemainder} <= 0)다운로드가 가능합니다.#end
+#if(${dto.downloadRemainder} > 0)무제한 ${dto.downloadRemainder}곡 다운로드가 가능합니다.#if(${dto.aodDownloadRemainder} <= 0)<br />&nbsp;#end#end
+#if(${dto.aodDownloadRemainder} <= 0 && ${dto.downloadRemainder} <= 0)MP3 다운로드 가능곡이 없습니다.<br/>#end
+
+<br/>bgm잔여곡 : #if($!{dto.bgmDownloadRemainder}) 0 #end   #if($!{bgmEndDate}) || ~$!CheckDate.makeReleaseDate($!{bgmEndDate}) 까지 #end <br/>
+보유MP3 : #if($!{myMp3Count}) $myMp3Count #else 0 #end <br/> 
+보유BGM : #if($!{myBgmCount}) $myBgmCount #else 0 #end <br/><br/>
+
+#set ($title = $!{command.getTop_service()})
+#if($title == "FREQUENT") #set ( $re_title = "즐겨 듣는 음악" )
+#elseif($title == "RECENT") #set ( $re_title = "최근 들은 음악" )
+#else d#set ( $re_title = "기본재생목록" )
+#end
+
+<b>가운데</b><br/>
+#if($!{recommendedGenreList}) 
+	
+관심장르추천신보(총 $recommendedGenreList.size()개)<br/>
+	#foreach($item in $recommendedGenreList)
+		앨범테그 : $item.tagType <br/>
+		앨범타입CD : $item.typeCd <br/>
+		앨범타입네임 : $item.typeName <br/>
+		앨범볼륨 : $item.volume <br/>
+		장르코드 : $item.genre.genreCode<br/>
+		앨범아이디 : $item.albumId<br/>
+		타이틀 : $item.title<br/>
+		듣기여부 : $item.playYn<br/>
+		발매일 : $CheckDate.makeReleaseDate($!{item.releaseDt})<br/>
+		이미지주소 : $item.mainImage.filePath<br/>
+		#foreach($artist in $item.keyArtistList)
+			아티스트명 : $artist.name (아이디: $artist.artistId)
+		#end
+		#foreach($song in $item.masterSongList)
+			곡ID : $song.songId  || 타이틀 : $song.title || 듣기ID : $song.AODLinkId
+	<br/>-------------------------------------------------------<br/>
+		#end
+	#end	
+#else
+추천신보받아요!<br/>
+	#foreach($item in $genreList)
+	대: $item.genreName ($item.genreCode) <br/>
+		#foreach($genre in $item.genreList)
+			ㅡ $genre.genreName  ($genre.genreCode)<br/>
+		#end
+	#end
+#end 
+
+<b>노래리스트</b><br/>
+<br/>보고있는노래: $re_title <br/> 
+곡수: #if($!{myCount}) $myCount #else 0 #end <br/>
+$myList.size()/
+/$myList/
+	#foreach($item in $myList)
+		노래아이디: $item.songId <br/>
+		노래제목: $item.title <br/>
+		성인곡여부: $item.adultYn <br/>
+		가사여부: $item.lyricsYn <br/>	
+		뮤직비디오아이디 (널이면 비활성화) : $item.vclipLinkId <br/>
+		MP3아이디 (널이면 비활성화): $item.MP3LinkId <br/>
+		듣기아이디(널이면 비활성화): $item.AODLinkId <br/>
+		BGM아이디(널이면 비활성화): $item.BGMLinkId <br/>	
+		듣기판매상태(널이면 비활성화): $item.AODSaleStatus <br/>
+		MP3판매상태(널이면 비활성화): $item.MP3SaleStatus <br/>
+		BGM판매상태(널이면 비활성화): $item.BGMSaleStatus <br/>
+		Bell판매상태(널이면 비활성화): $item.bellSalesStatus <br/>
+		ring판매상태(널이면 비활성화): $item.ringSalesStatus <br/>
+		앨범아이디 : $item.album.albumId <br/>
+		#foreach($artist in $item.keyArtistList)
+			아티스트명 : $artist.name<br/>
+			아티스트아이디 : $artist.artistId<br/>
+		#end
+	
+		#foreach($artist in $item.featArtist)
+			피쳐링아티스트명 : $artist.name<br/>
+			피쳐링아티스트아이디 : $artist.artistId<br/>
+		#end
+<br/>-------------------------------------------------------<br/>
+	#end
+#end

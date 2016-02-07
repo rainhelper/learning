@@ -1,0 +1,72 @@
+<div id="daumContent" class="cont_app">
+	<h2 class="screen_out">뮤직App</h2>
+	<div class="wrap_gate">
+		<div class="info_music">
+#set ( $objIdList = $StringUtils.split( $command.obj_id_list, "/" ) )
+#set ( $objIdListCount = -1 )
+#foreach ($obj in $objIdList)
+	#set ( $objIdListCount = $objIdListCount + 1 )
+#end
+
+#if($command.obj_type == "SO")
+#foreach($song in $songList)
+	#if($objIdListCount > 0)
+		#if($foreach.first)
+			<dl class="music">
+				<dt class="title">$!{song.title} 외 $!{objIdListCount}곡</dt>
+				<dd class="info">
+					<em class="name">#foreach($artist in $song.keyArtistList)#if($foreach.index>0), #end$artist.name#end</em><span class="txt_bar">|</span>
+					<span class="album">#strCut("$!{song.album.title}", 20)</span>
+				</dd>
+			</dl>
+			#set ( $imageFilePath = $ImageUtil.getImageUrl("$!{song.album.mainImage.filePath}", "110x110", "ALBUM") )
+		#end
+    #set ( $appLink = "daumMusic://open?type=list&songId=$!{command.obj_id_list}" )
+    #else
+			<dl class="music">
+				<dt class="title">$!{song.title}</dt>
+				<dd class="info">
+					<em class="name">#foreach($artist in $song.keyArtistList)#if($foreach.index>0), #end$artist.name#end</em><span class="txt_bar">|</span>
+					<span class="album">#strCut("$!{song.album.title}", 20)</span>
+				</dd>
+			</dl>
+    #set ( $imageFilePath = $ImageUtil.getImageUrl("$!{song.album.mainImage.filePath}", "110x110", "ALBUM") )
+	#set ( $appLink = "daumMusic://open?type=song&albumId=$!{song.album.albumId}&songId=$!{song.songId}" )
+    #end
+#end
+
+#elseif($command.obj_type == "AL")
+#foreach($album in $albumList)
+			<dl class="music">
+				<dt class="title">$!{album.title}</dt>
+				<dd class="info">
+					<em class="name">#foreach($artist in $album.keyArtistList)#if($foreach.index>0), #end$artist.name#end</em><span class="txt_bar">|</span>
+					<span class="album">#strCut("$!{album.title}", 20)</span>
+				</dd>
+			</dl>
+    #set ( $imageFilePath = $ImageUtil.getImageUrl("$!{album.mainImage.filePath}", "110x110", "ALBUM") )
+    #set ( $appLink = "daumMusic://open?type=album&albumId=$!{album.albumId}" )
+	#*
+	#if($objIdListCount > 0)
+    #set ( $appLink = "daumMusic://open?type=list&songId=$!{command.obj_id_list}" )
+    #else
+    #set ( $appLink = "daumMusic://open?type=song&albumId=$!{song.album.albumId}&songId=$!{song.songId}" )
+	#end
+	*#
+#end
+#end
+			<a href="$!{appLink}" class="thumb_album">
+				<img wdith="94" height="94" src="$!{imageFilePath}" class="thumb_img" alt="앨범이름">
+				<span class="tnumb_bg"></span>
+			</a>
+		</div>
+		<p class="txt_explain">
+			<span class="txt_gate">해당곡을 바로 들으시려면 daum 뮤직앱이 필요합니다</span>
+		</p>
+		<div class="btn_musicapp">
+			<a href="$!{appLink}" class="btn_music btn_play">뮤직 앱 에서 바로 재생</a>
+			<a href="http://itunes.apple.com/kr/app/id411835583" class="btn_music btn_install">Daum 뮤직 앱 설치하기</a>
+		</div>
+	</div>
+</div> 
+#parse("/velocity/mobileweb/realtimeissue.vm")

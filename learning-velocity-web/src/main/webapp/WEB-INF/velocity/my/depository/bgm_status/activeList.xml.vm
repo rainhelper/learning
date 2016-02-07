@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data> 
+	<bgmcnt>$!{bgmActiveListCount}</bgmcnt>
+	<bgmlist>
+#foreach($item in $bgmActiveList)
+		<bgm>
+			<bgmtrackid>$!{item.bgmTrackId}</bgmtrackid>
+			<title><![CDATA[$!{item.songTitle}]]></title>
+			<artist><![CDATA[$!{item.artistName}]]></artist>
+			<songid>$!{item.songId}</songid>
+		</bgm>
+#end 
+	</bgmlist>
+</data>

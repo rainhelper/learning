@@ -1,0 +1,587 @@
+##<iframe width="100%" scrolling="no" height="" frameborder="0" src="http://local.bbs.music.daum.net/gaia/do/comment/commentList?bbsId=C008&amp;articleId=1370&amp;templatePath=/content.htmp" title="댓글 영역" charset="utf-8" id="commentFrame"></iframe>
+#if($StringUtils.equals("$!{symInfo.curStatus}", "E"))
+	#set($shareTitle = "SUPPORT YOUR MUSIC! : $!{symInfo.title}")
+#else							
+	#set($shareTitle = "SUPPORT YOUR MUSIC! : $!{symInfo.title}기")
+#end
+	#getSymShareBtn("fund" $shareTitle "/sym/fund/detail?sym_seq=$!{command.sym_seq}" "$!{symInfo.filePath}")
+	
+	<div class="top_receipt">
+		<div class="cont_img">
+			<img class="img_banner" src="$!{symInfo.filePath}" width="828" height="194" title="" alt="SUPPORT YOUR MUSIC" />
+			<h3 class="tit_receipt tit_tab03">음반 제작을 위한후원 펀드레이징
+			차가운체리</h3>
+			<div class="des des_tab03">후원에 참여하면 결혼식 축가, 아티스트와
+				함께 하는 소수 정예 MT, 공연 초대,
+				코러스 참여 등 다양한 혜택이!
+			</div>
+		</div>
+		
+		#getSymProcessTab("fund")
+		
+	</div>
+
+	<div class="content funding">
+		<div class="donation">
+			<div class="f_l intro_donation">
+		#foreach ($item in $contentList)
+			
+			#if($StringUtils.equals("$!{item.templateName}", "BA")) ##텍스트 기본
+				
+			<div #if($StringUtils.equals("$!{item.spaceYn}", "Y"))class="add_margin"#end>
+				#if($StringUtils.isNotBlank("$!{item.title}"))<h4 class="tit_best_band">$!{item.title}</h4>#end
+				<div class="des #if($StringUtils.equals("$!{item.spaceYn}", "Y")) add_margin#end">
+					<p class="text_des">$!{item.contents}</p>
+				</div>
+			</div>
+				
+			#elseif($StringUtils.equals("$!{item.templateName}", "AI")) ## 이미지
+			
+			<div #if($StringUtils.equals("$!{item.spaceYn}", "Y"))class="add_margin"#end>
+				#if($StringUtils.isNotBlank("$!{item.title}"))<h4 class="tit_best_band">$!{item.title}</h4>#end
+				#if($StringUtils.isNotBlank("$!{item.imageUrl}"))
+				<div class="des">
+					<p class="text_des">
+						<img src="$!{item.imageUrl}" alt=""/>
+					</p>
+				</div>
+				#end
+			</div>
+			
+			#elseif($StringUtils.equals("$!{item.templateName}", "TW")) ## 트위터 
+			
+			<div #if($StringUtils.equals("$!{item.spaceYn}", "Y"))class="add_margin"#end>
+				#if($StringUtils.isNotBlank("$!{item.twitterInfo.get('content')}"))
+				<div class="des">
+    				#if($StringUtils.isNotBlank("$!{item.twitterId}"))<h4 class="tit_best_band tit_bb_aft_twit">$!{item.twitterId}이 트위터에 남긴 이야기</h4>#end
+    				<ul class="twitter_post">
+    					<li>
+    						#if($StringUtils.isNotBlank("$!{item.twitterInfo.get('image_url')}"))
+    						<div class="thumb">
+    							<img src="$ImageUtil.getImageUrl("$!{item.twitterInfo.get('image_url')}", "48x48", "ARTIST", "C")" width="48" height="48" alt=""/>
+    						</div>
+    						#end
+    						<div class="meta">
+    							##<span class="to_nickname">@mariny0330</span>
+    							<p class="txt_reply">$!{item.twitterInfo.get("content")}</p>
+    							<p class="profile">
+    								<span class="time">$!{item.twitterInfo.get("writedttm")}</span>
+    								<span class="txt_bar">|</span>
+    								<a class="nickname" href="${item.twitterInfo.get("channel_url")}" target="_blank">$!{item.twitterInfo.get("sns_name")}</a>
+    								<span class="txt_bar">|</span>
+    								<a class="view_twitter" href="$!{item.twitterInfo.get("url")}" target="_blank">트위터 원문보기</a>
+    							</p>
+    						</div>
+    					</li>
+    				</ul>
+				</div>
+				#end
+			</div>
+				
+			#elseif($StringUtils.equals("$!{item.templateName}", "VC")) ## 비디오
+			
+			<div #if($StringUtils.equals("$!{item.spaceYn}", "Y"))class="add_margin"#end>
+				#if($StringUtils.isNotBlank("$!{item.title}"))<h4 class="tit_best_band">$!{item.title}</h4>#end
+				<div class="des">
+					##<p class="text_des mv_player">
+						<div id="body_my_player$!{item.templateOrder}" width="480" height="270">
+						#if($StringUtils.isNotBlank("$!{item.videoInfo.tvpotVId}"))
+							#set($vid = $!{item.videoInfo.tvpotVId} )
+						#else
+							#set($filePath = $Display.alt($!{item.filePath}, ""))
+							#set($vid = $item.vclipUrl.replaceAll('.*=(.*)','$1') )
+						#end
+        					<script type="text/javascript">
+        						daum.Music.VideoPlayer.add('body_my_player$!{item.templateOrder}', '$!{vid}', {autoplay:false});
+        					</script>
+                		</div>
+					##</p>
+				</div>
+			</div>
+			
+			#elseif($StringUtils.equals("$!{item.templateName}", "SL")) ## 곡리스트
+			
+			<div class="#if($StringUtils.equals("$!{item.spaceYn}", "Y")) add_margin#end">
+				#if($StringUtils.isNotBlank("$!{item.songTitle}"))<h4 class="tit_best_band tit_bb_aft_tbl">$!{item.songTitle}</h4>#end
+				#if(!$CollectionUtils.isEmpty($item.songList))
+				<div class="section_textual list_best_band">
+					<div class="album_songlist">
+        				<div class="bg_thead">
+        				##	onclick="controller.allChecking(this, {checkboxName:'trackCheckbox$!{board.templateOrder}', allCheckbox:'allCheck$!{board.templateOrder}'}); return false;"
+        					<input type="checkbox" class="all_chk checking_td" id="allCheck$!{item.templateOrder}" onclick="daum.Music.MusicBar.checkAll({checkboxName:'trackCheckbox$!{item.templateOrder}', allCheckbox:'allCheck$!{board.templateOrder}',container:'trackContainer$!{board.templateOrder}'});">
+        					<label class="screen_out" for="allCheck">전체선택</label>
+        				</div>
+        				#printListHeader( "base" )
+    					<table id="trackContainer$!{item.templateOrder}" class="tbl_music" cellpadding="0" cellspacing="0">
+    						#printListItems( "board_fund" $item.songList $item.templateOrder false)
+    					</table>
+        				<div class="wrap_tool_btn">
+        					<div class="tool_btn f_l">
+        						#printListButton("song" "" $item.templateOrder "" "")
+        					</div>
+        				</div>
+        			</div>
+				</div>
+				#end
+			</div>
+				
+			#end
+			
+		#end
+
+		## 곡리스트 DTO set
+    	#foreach ($item in $contentList)
+			#if($StringUtils.equals("$!{item.templateName}", "SL"))
+				#printSNSList( $item.songList )
+			#end
+    	#end
+    	<script type="text/javascript">
+    	var controller = new daum.Music.ListPrototype();
+    	controller.initialize({isMusicBar : true});
+    	//daum.Music.MusicBar.setBoardInfo({boardId:'$!{boardInfo.boardId}', adminId:'$!{adminRoleId}', encodeUserId:'$!{encodedUserId}', totalRecomCount:'$!{totalRecomCount}', bestRecomCount:'$!{bestRecomCount}'});
+    	</script>
+		
+			</div>
+			
+			<div class="f_r info_donation">
+				<div class="show_donation">
+					<ul class="donations">
+						<li class="bulk">
+							<div class="col_lbl"><strong class="lbl lbl_bulk">현재후원액</strong></div>
+							<div class="col_meta">
+								<span class="wrap_no">
+								#if($StringUtils.isNotBlank("$!{fund.totalAmount}"))	
+									#set($currentFormat = "#toCurrency($fund.totalAmount)")
+									#set($len = $currentFormat.length() - 1)
+									#foreach($index in [0..$len])
+										#if($StringUtils.equals("$StringUtils.mid($currentFormat, $index, 1)", ","))
+										<span class="no dot">.</span>
+										#else
+										<span class="no no_$StringUtils.mid($currentFormat, $index, 1)">$StringUtils.mid($currentFormat, $index, 1)</span>
+										#end
+									#end	
+								#end
+								</span>
+								<span class="lbl won">원</span>
+							</div>
+						</li>
+						<li class="sponsorship">
+							<div class="col_lbl"><strong class="lbl lbl_sponsorship">후원달성률</strong></div>
+							<div class="col_meta">
+								<span class="wrap_no">
+									
+								#if($StringUtils.isNotBlank("$!{fund.percentage}"))
+    								#set($percentage = $!{fund.percentage} + "")
+									#set($len = $!{percentage.length()} - 1)
+									#foreach($index in [0..$len])
+										#if($StringUtils.equals("$StringUtils.mid($!{percentage}, $index, 1)", "."))
+										<span class="no dot">.</span>
+										#else
+										<span class="no no_$StringUtils.mid($!{percentage}, $index, 1)">$StringUtils.mid($!{percentage}, $index, 1)</span>
+										#end
+									#end
+								#end
+								</span>
+								<span class="lbl percent">%</span>
+							</div>
+						</li>
+						<li class="figure">
+							<div class="col_lbl"><strong class="lbl lbl_figure">목표액</strong></div>
+							<div class="col_meta">
+								<span class="num">#toCurrency($!{fund.targetAmount})</span>
+								<span class="lbl won">원</span>
+							</div>
+						</li>
+						<li class="participants">
+							<div class="col_lbl"><strong class="lbl lbl_participants">참여자</strong></div>
+							<div class="col_meta">
+								#if($StringUtils.equals("$!{fund.symSeq}", "2"))
+								<span class="num">77</span>
+								#else
+								<span class="num">$!{fund.participant}</span>
+								#end
+								<span class="lbl persons">명</span>
+							</div>
+						</li>
+						<li class="remainder">
+							<div class="col_lbl"><strong class="lbl lbl_remainder">남은기간</strong></div>
+							<div class="col_meta">
+								<span class="num">$!{fund.leftDay}</span>
+								<span class="lbl day">일</span>
+								<span class="num">$!{fund.leftHour}</span>
+								<span class="lbl hour">시간</span>
+							</div>
+						</li>
+					</ul>
+					#set($diff = $CheckDate.diffOfDate($!{fund.endDateTime}))
+					<div class="wrap_btn#if($StringUtils.isNotBlank("$!{diff}") && $MathTool.toNumber($diff) > 0) success#end">
+						#if($StringUtils.isNotBlank("$!{diff}") && $MathTool.toNumber($diff) > 0)
+						<span id="btn_success" class="btn btn_success">후원성공</span>
+						#else
+							#if($StringUtils.equals("$!{symInfo.curStatus}", "E"))
+            					<input type="hidden" name="eventId" value="$event.eventId"/>
+            					<input type="hidden" name="eventKey" value="$event.eventKey"/>								
+							#end
+						<a id="btn_donation" class="btn btn_donation" href="#" onclick="daum.Music.Sym.openDonationPopup('$!{command.sym_seq}', '$!{user.userId}', '$!{agree.getIsExist()}', '$!{fund.artist.artistId}', '$!{fund.fundId}', '$!{symInfo.curStatus}');return false;">후원하기</a>
+						#end
+					</div>
+				</div>
+				<div class="wrap_donation">
+					<ul class="goal_music">
+						#if($StringUtils.equals("$!{symInfo.curStatus}", "E"))
+						<li>후원 보상을 위해 주최측에 전화번호, 주소
+							등이 제공됩니다. 결제 전 개인정보 제공동의에 
+						체크해주세요.</li>
+						<li><a title="배송지와 연락처 수정하러 가기" href="https://user.daum.net/modifyuser/modifyuser.daum?t__nil_loginbox=modify2">배송지와 연락처 수정하러 가기 >></a></li>
+						#else
+						<li>기간 내 목표액 달성 성공시 Daum뮤직에서
+						100만원을 추가 후원합니다.</li>
+						<li>후원 보상을 위해 민트페이퍼에 전화번호, 주소
+							등이 제공됩니다. 결제 전 개인정보 제공동의에
+						체크해주세요.</li>
+						<li>후원문의 <span class="email">mintpaper@mpmg.co.kr</span></li>
+						<li><a title="배송지와 연락처 수정하러 가기" href="https://user.daum.net/modifyuser/modifyuser.daum?t__nil_loginbox=modify2">배송지와 연락처 수정하러 가기 >></a></li>
+						#end
+					</ul>
+					<strong class="tit_comm tit_supporters">금액별 후원자 보상</strong>
+					<dl class="supporters">
+						##오른쪽 금액별 후원자 보상 
+                        #foreach ($item in $itemList)
+							## dt1k 이건 머임?
+							<dt class="dt dt1k"><span class="sub"><strong>#toCurrency($!{item.fundPrice})원</strong>#if($StringUtils.equals("$!{item.firstComeYn}", "Y"))(선착순 #toCurrency("$!{item.firstComeCount}")명)#end</span><span class="wrap_boost"><span class="boost">후원</span> <em class="fc_red">#toCurrency("$!{item.supportCount}")</em></span></dt>
+							<dd class="txt">$!{item.firstComeDesc}</dd>
+                        #end
+					</dl>
+				</div>
+			</div>
+		</div>
+		
+		<div id="donationListWrapper" class="list_donation"></div>
+			
+		<script type="text/template" id="donationTmpl">
+			<strong class="tit_comm tit_donation">네티즌 후원금</strong>
+			<table class="tbl_donation" summary="네티즌 후원금">
+				<colgroup>
+					<col width="155">
+					<col width="80">
+					<col>
+				</colgroup>
+				<thead>
+					<tr>
+						<th scope="col" class="col_sponsor">후원자</th>
+						<th scope="col" class="col_donations">후원금</th>
+						<th scope="col" class="col_word">아티스트에게 한마디</th>
+					</tr>
+				</thead>
+				<tbody>
+					<%
+					var len = historyList.length;
+					if(historyList.length == 0) {
+					%>
+						<tr class="total_donation">
+    						<td colspan="3" class="no_sponsor">아직 후원자가 없습니다.</td>
+    					</tr>
+					<%
+					} else {
+						for(var i=0,len=historyList.length; i<len; i++) {
+					%>
+    					<tr <%if(historyList[i].onOff==="OFF") {%>class="total_donation"<%}%>>
+    						<td class="col_sponsor"><strong>
+							<%if(historyList[i].onOff==="OFF") {%>오프라인 후원금<%}else{%><%=historyList[i].userName%><%}%></strong></td>
+    						<td class="col_donations"><strong><%=historyList[i].fundPrice%>원</strong></td>
+    						<td class="col_word">
+								<p class="txt"><%=historyList[i].message%>
+								<%if(historyList[i].onOff!=="OFF") {%>
+								<span class="date"><%=historyList[i].fundDate%></span>
+								<%}%>
+								</p>
+							</td>
+    					</tr>
+					<%
+						}
+					}	
+					%>
+				</tbody>
+			</table>
+			
+			<div class="wrap_paging ">
+				<%
+				var totalPageNo = Math.floor(totalCnt / 10.0001) + 1,
+					currentPageNo = parseInt(hist_page_no),
+					start = Math.floor(currentPageNo / 10.0001) * 10 + 1,
+					len = totalPageNo < (start+9) ? totalPageNo+1 : (start+10);
+				%>
+				<span class="paging bg_paging">
+    				
+    				<%if(currentPageNo === 1) {%>
+    				<span class="bg_paging btn_fst fst_off">1</span>
+    				<%} else {%>
+    				<a title="첫 페이지로" href="javascript:;" class="bg_paging btn_fst" onclick="daum.Music.Sym.movePage($!{command.sym_seq}, 1)">1</a>
+    				<%}%>
+    				
+    				<%if(currentPageNo < 11 ) {%>
+    				<span class="bg_paging btn_prev prev_off">이전</span>
+    				<%} else {%>
+    				<a title="이전 페이지로" href="javascript:;" class="bg_paging btn_prev" onclick="daum.Music.Sym.movePage($!{command.sym_seq}, <%=start-1%>)">이전</a>
+    				<%}%>
+    				
+    				<%
+    				for(var i=start;i<len;i++) {
+    					if(currentPageNo !== (i)) {
+    				%>
+    					 	<a href="javascript:;" onclick="daum.Music.Sym.movePage($!{command.sym_seq}, <%=i%>)"><%=i%></a>				
+					<%  } else { %>
+    						<span class="screen_out">현재페이지</span>	<em><%=i%></em>
+    				<%
+    					}
+    				}
+    				%>
+    				
+    				<%if(start + 10 > totalPageNo) {%>
+        			<span class="bg_paging btn_next next_off">다음</span>
+    				<%} else {%>
+        			<a title="다음 페이지로" href="javascript:;" class="bg_paging btn_next" onclick="daum.Music.Sym.movePage($!{command.sym_seq}, <%=start+10%>)">다음</a>
+    				<%}%>
+    				
+    				<%if(currentPageNo === totalPageNo) {%>
+    				<span class="bg_paging btn_lst lst_off">3</span>	
+    				<%} else {%>
+    				<a title="마지막 페이지로" href="javascript:;" class="bg_paging btn_lst" onclick="daum.Music.Sym.movePage($!{command.sym_seq}, <%=totalPageNo%>)">3</a>
+    				<%}%>
+				</span>
+			</div>
+		</script>
+		
+		<script type="text/javascript">
+			daum.Music.Sym.donationListInit($!{command.sym_seq});
+			daum.Music.Sym.parentCallback = function () {
+				daum.Music.Sym.donationListInit($!{command.sym_seq});
+			}
+		</script>
+		
+		##<div class="gaia">
+		##if( $StringUtils.isBlank("$!{event}") || !$event )
+    	##	<div id="gaiaiframe">
+        ##		<iframe onload="setBackgroundColor();" id="commentFrame" frameborder="0" width="100%" height="" scrolling="no" charset="utf-8" title="댓글 영역" src="#getter('GAIA_DOMAIN', '')/gaia/do/comment/commentList?bbsId=$!{symInfo.bbsId}&articleId=$!{symInfo.articleId}&templatePath=/content.htmp"></iframe>
+    	##	</div>
+    	##	<script type="text/javascript">
+        ##		function setBackgroundColor(){
+		##			try {
+        ##   			daum.Element.setStyle(daum.$$("body", daum.$("commentFrame").contentWindow.document.documentElement)[0],'background-color:#F7F7F4;');
+		##				daum.Element.setStyle(daum.$$(daum.$$(".bg_paging")[0], daum.$("commentFrame").contentWindow.document.documentElement)[0],'background:url(http://i1.daumcdn.net/img-contents/music/2011_home/sym/sym_pc/paging_comm.gif) no-repeat;');
+		##			} catch(e) {}
+        ##    	}
+    	##	</script>
+    	## #elseif($event && $StringUtils.equals("$!{symInfo.eventYn}", "Y"))
+		##	#printEvent($event $album $artist $songList)
+		## #end
+		## </div>
+	</div>
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+스토리갯수 : $boardCount <br/>
+##후원하기버튼을 누르면, 우선 개인정보 동의를 받아야합니다. 만약 아래의 여부가 N면 개인정보창을 띄워주세요.
+$user.userId
+$!{musicUser}
+개인정보동의여부(중복결제가 가능합니다) : $!{agree.getIsExist()} <br/>
+우측메뉴<br/>
+#foreach($motTemplete in $rightMenuList)
+	타이틀 : $motTemplete.title <br/>
+	일반이미지 : $motTemplete.imageUrl <br/>
+	활성화이미지2 : $motTemplete.activatedImageUrl <br/>
+	링크 : $motTemplete.linkUrl <br/>
+	활성화여부 : $motTemplete.activatedYn <br/>
+	<br/><br/>
+#end
+
+투표탭 활성화여부 : $symInfo.voteYn<br/>
+투표 시작일 : $symInfo.voteStrdttm<br/>
+투표 종료일 : $symInfo.voteEnddttm<br/>
+펀드탭 활성화여부 : $symInfo.fundYn<br/>
+펀드 시작일 : $symInfo.fundStrdttm<br/>
+펀드 종료일 : $symInfo.fundEnddttm<br/>
+스토리탭 활성화여부 : $symInfo.rvActiveYn<br/>
+스토리 menu_id : $symInfo.rvMenuId<br/>
+현재 default url : $symInfo.curDefaultUrl<br/>
+
+## https://user.daum.net/privagree/privinfoagree.daum 여기를 띄워주세요! 
+<a href="https://user.daum.net/privagree/privinfoagree.daum?svcId=8561&codeName=music_sym&returnUrl=http://music.daum.net/sym/fund/support.popup" ></a>
+
+	
+##페이지 기본정보 	
+현재 기수 : $fund.symSeq </br>
+현재 기수의 펀딩 아티스트의 아이디 : $fund.artist.artistId </br>
+현재 기수의 펀딩 아티스트의 이름 : $fund.artist.name </br>
+이 페이지의 활성화 여부 : $fund.fundActiveYn </br>
+펀딩하는 아이디 : $fund.fundId </br>
+현재후원액 : $fund.totalAmount </br>
+펀드 시작일 : $fund.startDateTime </br>
+펀드 종료일 : $fund.endDateTime </br>
+후원달성율 : $fund.percentage </br>
+목표액 :  $fund.targetAmount </br>
+참여자 수: $fund.participant </br>  
+남은기간 : $fund.leftDay 일 $fund.leftHour 시간 </br>
+이 펀딩과 연결된 앨범 : $fund.albumId </br>
+이 펀딩과 연결된 컨텐츠 아이디 : $fund.contentId </br>
+eventId : $fund.symInfo.eventId </br>
+bbsId : $fund.symInfo.bbsId </br>
+articleId  : $fund.symInfo.articleId </br>
+</br></br></br>
+
+##오른쪽 금액별 후원자 보상 
+#foreach ($item in $itemList)
+	금액 : $item.fundPrice  || 선착순 여부: $item.firstComeYn  || 선착순 인원수 : $item.firstComeCount ||현재 후원한 인원 : $item.supportCount  || 내용 : $item.firstComeDesc 
+	</br>
+#end
+</br></br>
+
+
+
+##템플릿 리스트
+#foreach ($item in $contentList)
+	#if($item.templateName == "BA") ##텍스트 기본
+	<b>BA</b> <br/>
+		상단 공백여부 : $item.spaceYn</br>
+		순서: $item.templateOrder</br>
+		제목: $item.title</br>
+		내용: $item.contents</br></br>
+	#elseif($item.templateName == "AI") ##통이미지
+	<b>AI</b> <br/>
+		상단 공백여부 : $item.spaceYn</br>
+		순서: $item.templateOrder</br>
+		제목: $item.title</br>
+		링크: $item.linkUrl</br>
+		이미지주소: $item.imageUrl</br></br>
+	#elseif($item.templateName == "TW") ##트위터아이디
+	<b>TW</b> <br/>
+		상단 공백여부 : $item.spaceYn</br>
+		순서: $item.templateOrder</br>
+		트위터아이디: $item.twitterId</br>
+		
+		트위터에 남긴 이야기 : $item.twitterInfo.get("content") <br/>
+    	트위터원문보기URL : $item.twitterInfo.get("url") <br/>
+    	트위터sns아이디 : $item.twitterInfo.get("sns_name") <br/>
+		트위어sns아이디 누르면 넘어갈 url : $item.twitterInfo.get("channel_url") <br/> 
+		트위터쓰인 날짜 : $item.twitterInfo.get("writedttm") <br/> 
+		이미지주소 : $item.twitterInfo.get("image_url") <br/> 
+		
+		
+	#elseif($item.templateName == "VC") ##동영상
+	<b>VC</b> <br/>
+		상단 공백여부 : $item.spaceYn</br>
+		순서: $item.templateOrder</br>
+		제목: $item.title</br>
+		비디오ID: $item.id</br>
+		티비팟vid(비디오id가 있을경우) : $item.videoInfo.tvpotVId</br>
+		비디오주소: $item.vclipUrl</br>
+		내용: $item.htmlContents</br></br>
+	#elseif($item.templateName == "SL") ##곡리스트
+	<b>SL</b> <br/>
+		상단 공백여부 : $item.spaceYn</br>
+		순서: $item.templateOrder</br>
+		곡 리스트:<br/>
+		곡 리스트제목:$item.songTitle<br/>
+		#foreach ($song in $item.songList)
+			곡아이디: $song.songId<br/>
+			곡명 : $song.title<br/>
+			앨범아이디 : $song.album.albumId<br/>
+			앨범명 : $song.album.title<br/>
+			#foreach ($artist in $song.keyArtistList)
+				아티스트아이디 : $artist.artistId<br/>
+				아티스트명 : $artist.name<br/>
+			#end
+			가사유무 : $song.lyricsYn<br/>
+			aodLinkId : $song.AODLinkId<br/>
+			bgmLinkId : $song.BGMLinkId<br/>
+			mp3LinkId : $song.MP3LinkId<br/>
+			링 : $song.ringSalesStatus<br/>
+			패키지 : $song.album.packageSaleYn<br/>			
+		#end
+		<br/>
+	#end
+#end
+
+
+##이벤트가 있으면 가이아 댓글 대신에 이벤트 정보와 댓글을 보여준다<br/>
+#if($event)
+	이벤트 정보 <br/>
+	이벤트 타입 : $event.musicEventType<br/>
+	eventId : $event.eventId<br/>
+	eventKey : $event.eventKey<br/>
+	eventTitle : $event.eventTitle // 이벤트제목<br/>
+	startDate : $event.startDate // 이벤트 시작일<br/>
+	endDate : $event.endDate // 이벤트 종료일<br/>
+	winningDate : $event.winningDate // 발표일자<br/>
+	description : $event.description //이벤트 설명인데 현재 경품 내역용으로 입력하고있음<br/><br/>
+	
+	#if($event.musicAlbumId)
+		앨범정보<br/>
+		대표 이미지 : $album.mainImage.filePath<br/>
+		앨범명 : $album.title<br/>
+		아티스트<br/>
+		#foreach($artist in $album.keyArtistList)
+			아티스트명 : $artist.name<br/>
+			아티스트아이디 : $artist.artistId<br/>
+		#end
+		대표곡<br/>
+		#foreach( $song in $album.masterSongList )
+			$!{song.songId} : $!{song.title}<br/>
+		#end
+	#end
+	
+	#if($event.musicEventType == "2")
+		앨범 구매이벤트인경우 곡 목록<br/>
+		#foreach( $song in $songList )
+			$!{song.songId} : $!{song.title}<br/>
+		#end
+	#end
+	<br/>
+	
+	#if($event.musicArtistId)
+		아티스트 정보<br/>
+		대표 이미지 : $artist.mainImage.filePath<br/>
+		$artist.name<br/>
+		$artist.masterSongList<br/>
+		#foreach( $song in $artist.masterSongList )
+			$!{song.songId} : $!{song.title}<br/>
+		#end
+	#end
+	
+	
+	</br>
+	==댓글입력(닫아놓음)==
+	</br>
+	<input type="text" name="comment">
+	##<button onclick="sendApplication('$event.eventId', $event.eventKey,'','http://music.daum.net/event/detail?event_id=$command.eventId','', 'comment'); return false;" >응모하기</button>
+	<button onclick="refresh();" >리로딩</button>
+	</br>
+	<p>&nbsp</p>
+	</br></br>
+	
+	==응모내용==
+	<p>&nbsp</p>
+	</br>
+	#foreach ($comment in $commentList)
+		아이디 : $comment.daumId<br/>
+		이름 : $comment.daumName<br/>
+		댓글 : $comment.comment<br/>
+		<br/>
+	#end
+	
+	#foreach($motTemplete in $motTempleteList)
+		$motTemplete
+		이미지 : $motTemplete.imageUrl <br/>
+		링크 : $motTemplete.linkUrl <br/>
+		<br/><br/>
+	#end
+	<b>하단 이벤트 배너</b><br /> 
+#foreach($motTemplete in $motTempleteList)
+	$motTemplete
+	이미지 : $motTemplete.imageUrl <br/>
+	링크 : $motTemplete.linkUrl <br/>
+	<br/><br/>
+#end
+	## 댓글 page
+	#printPaging($pagingUrl, $command.page_no, $pageHandler, "", 10)
+#end
+#end

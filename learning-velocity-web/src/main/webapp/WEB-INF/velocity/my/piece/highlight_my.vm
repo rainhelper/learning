@@ -1,0 +1,71 @@
+<div class="section_status">
+	<h3 class="screen_out">이용현황</h3>
+	#if($StringUtils.equals("$!{left.ticketOwnCount}","0"))
+	<div class="wrap_noticket">
+		## 이용권이 없는 경우 - 이미지 영역http://s1.daumcdn.net/img-contents/music/2011_home/my/my_top_bn_1.jpg
+		<a href="#" title="이용권 구매하기" onclick="alert('2015년 6월 30일 다음뮤직 서비스 종료에 따라 상품 판매가 종료되었습니다. 이미 구매하신 이용권으로 음악감상 / MP3 다운로드 / BGM 구매는 6월 14일까지 가능합니다. \n그동안 이용해주셔서 감사합니다.'); return false;">이용권 구매하기</a>
+	</div>
+	#else
+	<div class="wrap_ticket">
+		<div class="ticket_info">
+			<a href="/my/own_ticket/ticket/list" title="MY 이용권"><h4 class="tit_mymusic tit_usefruct">MY 이용권</h4></a>
+			<span class="info_use">				
+				<span class="ico_mymusic ico_use">사용중</span>	
+				<span class="info_desc">
+					<a href="/my/own_ticket/ticket/list" class="ff_arial f_l">$!{ticketOwnCount}</a><span class="use_num f_l"> 개 </span>
+					#if(!$StringUtils.equals("$!{ticketOwnCount}","0"))<em class="txt_desc f_l" title="$!{dto.getFirstTicketOwnInfo().getOrder().getItem().getTitle()}">(#strCut($!{dto.getFirstTicketOwnInfo().getOrder().getItem().getTitle()},25)#printTopTicketOwnCount($ticketOwnCount))</em>#end
+				</span>
+				<div class="wrap_apply">
+					<a class="btn_mymusic btn_control" title="관리" href="/my/own_ticket/ticket/list">관리</a>
+				</div>
+			</span>
+		</div>
+		
+		<dl class="wrap_rest songrest">
+			<dt class="tit_mymusic tit_song">음악감상 잔여일</dt>
+			<dd class="txt_num">
+				<a href="/my/own_ticket/ticket/list" class="num fc_w">$dto.getAodLeftDate()</a> 일
+			</dd>
+			<dt class="screen_out">유효기간</dt>
+			<dd class="txt_date">#if($!{dto.aodEndDate}) ~ $!CheckDate.makeReleaseDate($!{dto.aodEndDate})#end</dd>
+		</dl>
+		<dl class="wrap_rest">
+			<dt class="tit_mymusic tit_mp3">MP3 잔여곡</dt>
+			<dd class="txt_num">
+				<a href="/my/own_ticket/ticket/list" class="num fc_w">
+					#toCurrency($!{dto.getDownloadRemainderAsLong()})</a> 곡
+			</dd>
+			<dt class="screen_out">유효기간</dt>
+			<dd class="txt_date">
+				#if($StringUtils.isNotBlank("$!{dto.mp3EndDate}")) ~ $!CheckDate.makeReleaseDate($!{dto.mp3EndDate})
+				#elseif($StringUtils.isNotBlank("$!{dto.aodDownloadEndDate}")) ~ $!CheckDate.makeReleaseDate($!{dto.aodDownloadEndDate})
+				#end</dd>
+		</dl>
+		<dl class="wrap_rest">
+			<dt class="tit_mymusic tit_bgm">BGM 잔여곡</dt>
+			<dd class="txt_num">
+				<a href="/my/own_ticket/ticket/list" class="num fc_w">#if($StringUtils.isNotBlank("$!{dto.bgmDownloadRemainder}"))#toCurrency($!{dto.bgmDownloadRemainder})#{else}0#end</a> 곡
+			</dd>
+			<dt class="screen_out">유효기간</dt>
+			<dd class="txt_date">#if($StringUtils.isNotBlank("$!{bgmEndDate}")) ~ $!CheckDate.makeReleaseDate($!{bgmEndDate})#end</dd>
+		</dl>
+	</div>
+	
+	<div class="wrap_ownsong">
+		<div class="tit_cont">
+			<a href="/my/depository/mp3/list" title="MY 보유 음악"><h4 class="tit_mymusic tit_usesong">MY 보유음악</h4></a>
+			<p class="info_desc">구매한 MP3는 <a href="/my/depository/mp3/list" title="MP3 구매음악">MY뮤직&gt;구매음악&gt;MP3</a> 에서 재 다운로드가 가능합니다.</p>
+		</div>
+		<div class="wrap_own">
+			<dl class="mp3_own">
+				<dt class="tit_mymusic tit_mp3own">보유 MP3</dt>
+				<dd class="txt_num"><a href="/my/depository/mp3/list" class="num fc_w"> #if($StringUtils.isNotBlank("$!{dto.getMp3OwnCount()}"))#toCurrency($!{dto.getMp3OwnCount()})#{else}0#end</a> 곡</dd>
+			</dl>
+			<dl class="bgn_own">
+				<dt class="tit_mymusic tit_bgmown">보유 BGM</dt>
+				<dd class="txt_num"><a href="/my/depository/bgm/list" class="num fc_w"> #if($StringUtils.isNotBlank("$!{dto.getBgmOwnCount()}")) #toCurrency($!{dto.getBgmOwnCount()})#{else}0#end</a> 곡</dd>
+			</dl>
+		</div>
+	</div>
+	#end
+</div>

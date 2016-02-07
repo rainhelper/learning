@@ -1,0 +1,89 @@
+#set($type="MP3")
+
+#set($hasEvent = false)
+#if($!{eventList} && $!{eventList.size()} > 0)
+	#set($hasEvent = true)
+#end
+<div id="daumWrap" class="daum_popup#if($hasEvent) popup_event#end">
+	<div class="popup_music type_complete">
+		<div class="popup_head">
+			<h1>
+				<a class="bg_logo daum_logo" href="http://www.daum.net/">다음</a>
+				<span class="bg_logo tit_music">뮤직 구매하기</span>
+			</h1>
+		</div><!-- // popup_head -->
+		<div class="popup_body">
+			<form action="#">
+				#if($exception)
+				##if(false)
+					#parse("/velocity/purchase/common/complete_error.vm")
+				#else
+				#if($hasEvent) 
+					#printCartFooter($!{eventList}, $!{recommendAlbumList})
+				#end
+				<div class="cart_perfect perfect_type2#if($hasEvent) box_present#end">	
+					#printCartPurchaseInfoGift($!{type} $totalPurchaseCount $purchaseTotalPrice $receiverList $command)
+					<p class="desc">선물하신 내역은 <a href="/my/depository/gift/list"  class="line" target="_blank" >MY뮤직 &gt; 구매음악 &gt; 선물한 음악</a> 에서 확인하세요.</p>
+					<div class="wrap_btns">
+						<span class="box_button">
+							#printBtnPopList("gift" $hasEvent)
+						</span>
+					</div>
+				</div>
+				#if(!$hasEvent) 
+					#printCartFooter($!{eventList}, $!{recommendAlbumList})
+				#end
+				#end
+			</form>
+		</div><!-- // popup_body -->
+	</div>
+</div>
+#printScriptCompleteWindowResize()
+	
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+총 구매곡 ($totalPurchaseCount) 개 <br/>
+구매곡 아이디리스트 : $purchaseSongIdList <br/>
+총가격 : $purchaseTotalPrice <br/>
+#foreach($receiver in $receiverList )
+	$receiver <br/>
+#end
+<br/>
+구매곡 정보리스트<br/>
+#foreach($song in $purchaseSongList)
+	곡아이디: $song.songId<br/>
+	곡명 : $song.title<br/>
+	앨범아이디 : $song.album.albumId<br/>
+	앨범명 : $song.album.title<br/>
+	앨범커버 : $song.album.mainImage.filePath <br/>
+	#foreach ($artist in $song.keyArtistList)
+		아티스트아이디 : $artist.artistId<br/>
+		아티스트명 : $artist.name<br/>
+	#end
+	</br>
+#end
+<br/>
+이벤트 <br/>
+#foreach($event in $eventList)
+	이벤트명 : $event.eventTitle <br/>
+	이미지 : $event.bannerUrl <br/>
+	시작일 : $event.startDate <br/>
+	종료일 : $event.endDate <br/>
+	당첨자발표일 : $event.winningDate <br/>
+	경품 : $event.description <br/>
+#end
+<br/>
+추천앨범 (이벤트가 없을때만 나옴)<br/>
+#foreach($album in $recommendAlbumList)
+	앨범아이디 : $album.albumId <br/>
+	앨범명 : $album.title <br/>
+	앨범볼륨 : $album.volume <br/>
+	앨범이미지 : $album.mainImage.filePath <br/>
+	앨범재생여부 : $album.playYn <br/>
+	발매일 : $album.releaseDt <br/>
+	#foreach($artist in $album.keyArtistList)
+		아티스트명 : $artist.name<br/>
+		아티스트아이디 : $artist.artistId<br/>
+	#end
+	<br/><br/>
+#end
+#end

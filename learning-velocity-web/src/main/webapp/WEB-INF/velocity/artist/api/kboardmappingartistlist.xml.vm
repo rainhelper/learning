@@ -1,0 +1,32 @@
+#if("$!{artistList}" != "")
+<Artists>
+#foreach($artist in $artistList)
+	<Artist>
+		<ArtistDetailId>$!{artist.ArtistDetailId}</ArtistDetailId>
+#if("$!{artist.name}" != "")
+		<ArtistName><![CDATA[$!{artist.name}]]></ArtistName>
+#else
+		<ArtistName/>
+#end
+
+#if("$!{artist.nameKorLang}" != "")
+		<NameKorLang><![CDATA[$!{artist.nameKorLang}]]></NameKorLang>
+#else
+		<NameKorLang/>
+#end
+
+#if("$!{artist.nameKorPron}" != "")
+		<NameKorPron><![CDATA[$!{artist.nameKorPron}]]></NameKorPron>
+#else
+		<NameKorPron/>
+#end
+
+#if("$!{artist.synonymKeyword}" != "")
+		<Synonyms><![CDATA[$!{artist.synonymKeyword}]]></Synonyms>
+#else
+		<Synonyms/>
+#end
+	</Artist>
+#end
+</Artists>
+#end

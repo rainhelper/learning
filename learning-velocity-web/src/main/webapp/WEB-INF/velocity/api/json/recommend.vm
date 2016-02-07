@@ -1,0 +1,16 @@
+#if("$!{callback}" != "")
+if (typeof(${callback}) == "function") ${callback} (
+#end
+{
+	"recommendResult" : {
+		"type" : "${recommendResult.resultType}",
+		"message" : "${recommendResult.message}"
+		#*
+		"type" : "$!Escape.escapeJava(${recommendResult.resultType})",
+		"message" : "$!Escape.escapeJava(${recommendResult.message})"
+		*#
+	}
+}
+#if("$!{callback}" != "")
+);
+#end

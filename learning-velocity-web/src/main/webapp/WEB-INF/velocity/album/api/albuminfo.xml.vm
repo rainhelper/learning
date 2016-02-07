@@ -1,0 +1,21 @@
+<Music>
+	<Album>
+		<AlbumId><![CDATA[$!{album.albumId}]]></AlbumId>
+		<AlbumName><![CDATA[$!{album.title}]]></AlbumName>
+		<ReleaseDate><![CDATA[$!{album.releaseDt}]]></ReleaseDate>
+        <SalesAgentName><![CDATA[$!{album.salesAgentName}]]></SalesAgentName>
+		<RcmYn><![CDATA[$!{album.rcmYn}]]></RcmYn>
+		<PlayYn><![CDATA[$!{album.playYn}]]></PlayYn>
+		<ArtistId><![CDATA[$!{}]]></ArtistId>
+		<ArtistDetailId><![CDATA[$!{artist.artistId}]]></ArtistDetailId>
+		<ArtistName><![CDATA[$!{artist.name}]]></ArtistName>
+		<TitleSongId><![CDATA[$!{masterSong.songId}]]></TitleSongId>
+		<TitleSongName><![CDATA[$!{masterSong.title}]]></TitleSongName>
+		<AOD><![CDATA[$!{masterSong.AODLinkId}]]></AOD>
+		<AvgScore><![CDATA[]]></AvgScore>
+		<ScoreCount><![CDATA[]]></ScoreCount>
+		<FilePath><![CDATA[$!{album.mainImage.filePath}]]></FilePath>
+		<ImageContent><![CDATA[$!{album.mainImage.content}]]></ImageContent>
+		<Volumn><![CDATA[$!{album.volume}]]></Volumn>
+	</Album>
+</Music>

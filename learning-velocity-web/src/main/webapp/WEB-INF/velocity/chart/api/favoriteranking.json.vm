@@ -1,0 +1,11 @@
+var SecMusicRank=[
+#foreach($item in $chartSongList)
+	#if($chartSongList.indexOf($item) != 0),#end
+	{
+		title : "$!{item.title}",
+		artist : "",
+		url : "http://music.daum.net/album/main?album_id=$!{item.album.albumId}&song_id=$!{item.songId}",
+		img : "$!{item.album.mainImage.filePath}"
+	}
+#end
+];

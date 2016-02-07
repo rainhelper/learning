@@ -1,0 +1,36 @@
+
+<div class="section_notice">
+	#if( !!$recentNoticeList && $recentNoticeList.size() > 0)
+	<h3 class="tit_top tit_notice">공지사항</h3>
+	<a class="link_notice" href="#replaceAmp($!{recentNoticeList.get(0).get('URL')})">$!{recentNoticeList.get(0).get("SUBJECT")}</a>
+	#end
+	<ul class="list_link">
+		<li class="fst">
+			<a class="tab_top link_app" href="http://search.daum.net/search?nil_suggest=btn&w=tot&DA=SBC&q=%EB%B0%A9%EA%B8%88%EA%B7%B8%EA%B3%A1%EC%95%B1" target="_blank">뮤직 앱</a>
+		</li>
+		<li>
+			<span class="bar">|</span>
+			<a class="tab_top link_faq" href="http://cs.daum.net/faq/65.html" target="_blank">뮤직 FAQ</a>
+		</li>
+		<li>
+			<span class="bar">|</span>
+			<a class="tab_top link_help" href="/common/musicguide?info_type=player" target="_blank">플레이어 도움말</a>
+		</li>
+		<li>
+			<span class="bar">|</span>
+			<a class="tab_top link_download" href="/common/musicguide?info_type=downloader" target="_blank">다운로더</a>
+		</li>
+		<li>
+			<span class="bar">|</span>
+			<a class="tab_top link_mk_komca" href="http://www.kdce.or.kr/user/ctf/clmsCtfTransList.do?NmberBusiRegNo=2118675615&amp;websiteName=music.daum.net" onclick="Music.newWin(this.href,'clmsCtfTransList','menubar=no,toolbar=no,location=no,scrollbar=yes,width=617,height=712' target="_blank"); return false;">음악저작권 이용허락 인증</a>
+		</li>
+	</ul>
+</div>
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+#foreach($notice in $recentNoticeList)
+	제목 : $notice.get("SUBJECT") <br/>
+	링크 : $notice.get("URL") <br/>
+	<br/><br/>
+#end
+#end

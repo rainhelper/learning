@@ -1,0 +1,40 @@
+<div id="daumContent" class="cont_bar">
+	<h2 class="screen_out">뮤직 BAR 상세정보</h2>
+	<div class="section_barcont">
+		<div class="cont_navi">
+			<h3 class="tit">투표 결과보기</h3>
+				<a href="/musicbar/detail?board_id=$!{board.boardId}" class="bround btn_prev" title="이전">
+				<span class="ico_music ico_arrow"></span>이전
+			</a>
+			</div>
+		<div class="cont_poll">
+			<div class="wrap_poll">
+				#if( $!{board.pollTitle} ) <strong class="tit_bar fc_blue"> $!{board.pollTitle} </strong> #end
+				<dl class="poll_info">
+					<dt class="tit_info">총 참여자</dt>
+					<dd>$board.totalCount</dd>
+					<dt class="tit_info">기간 :</dt>
+					<dd> $!{CheckDate.makeReleaseDate($!{board.pollStartTime})} - $!{CheckDate.makeReleaseDate($!{board.pollEndTime})} </dd>
+				</dl>
+				<table class="tbl_result" border="0" cellspacing="0" cellpadding="0">
+					<caption class="screen_hide">투표 결과</caption>
+					<thead>
+					<tr>
+						<th class="screen_out">문항</th>
+						<th class="screen_out">백분율</th>
+					</tr>
+					</thead>
+					<tbody>
+#foreach ($poll in $board.pollItemList)
+					<tr>
+						<td class="txt_item#if($foreach.count == 1) fst#end">$!{poll.pollItem}</td>
+						<td class="txt_percent#if($foreach.count == 1) fst#end">$!{poll.pollPerc}%</td>
+					</tr>	
+#end	
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+#parse("/velocity/mobileweb/realtimeissue.vm")	

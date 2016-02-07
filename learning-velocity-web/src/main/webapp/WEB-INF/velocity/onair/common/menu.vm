@@ -1,0 +1,6 @@
+#set( $URI = "#getter('URI', '')" )##
+			<ul class="tab_now">
+				<li #if( $URI.indexOf("/onair/timeline") > -1  || $URI.indexOf("/onair/search") > -1 )class="on"#end><a href="/onair/timeline" class="link_tab link_now" title="방금 그 곡">방금 그 곡</a></li>
+				<li #if( $URI.indexOf("/onair/radio") > -1 )class="on"#end><a href="/onair/radio/recomm" class="link_tab link_radio" title="라디오 선곡표">라디오 선곡표</a></li>
+				<li #if( $URI.indexOf("/onair/tv") > -1 )class="on"#end><a href="/onair/tv" class="link_tab link_bgm" title="TV BGM">TV BGM</a></li>
+			</ul>

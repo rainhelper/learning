@@ -1,0 +1,81 @@
+#set($description = "")
+#set($titleMap = {
+	
+	"onair": {
+		"timeline" : {
+			"title" : "방금그곡"
+		},
+		"radio" : {
+			"recomm" :{
+				"title" : "$!{selectedProgram.programMasterName} 선곡표 $!{lastSchedule.startDate.substring(0,4)}-$!{lastSchedule.startDate.substring(4,6)}-$!{lastSchedule.startDate.substring(6,8)}",
+				"image" : "$!{selectedProgram.programImage}",
+				"description" : "#strCut($!{selectedProgram.description}, 260)"
+			},
+			"channel" :{
+				"title" : "$!{selectedProgram.programMasterName} 선곡표 $!{lastSchedule.startDate.substring(0,4)}-$!{lastSchedule.startDate.substring(4,6)}-$!{lastSchedule.startDate.substring(6,8)}",
+				"image" : "$!{selectedProgram.programImage}",
+				"description" : "#strCut($!{selectedProgram.description}, 260)"
+			},
+			"genre" :{
+				"title" : "$!{selectedProgram.programMasterName} 선곡표 $!{lastSchedule.startDate.substring(0,4)}-$!{lastSchedule.startDate.substring(4,6)}-$!{lastSchedule.startDate.substring(6,8)}",
+				"image" : "$!{selectedProgram.programImage}",
+				"description" : "#strCut($!{selectedProgram.description}, 260)"
+			}
+		},
+		"tv" : {
+			"title" : "$!{selectedProgram.programMasterName} 선곡표 $!{lastSchedule.startDate.substring(0,4)}-$!{lastSchedule.startDate.substring(4,6)}-$!{lastSchedule.startDate.substring(6,8)}",
+			"image" : "$!{selectedProgram.programImage}",
+			"description" : "#strCut($!{selectedProgram.description}, 260)"
+		}
+	}
+})
+
+###if($StringUtils.contains("#getter('PATH_URI', '')", "musicbar/detail") && $StringUtils.isNotBlank("$!{boardInfo.imageUrl}") )
+##	<meta property="og:image" content="$!{boardInfo.imageUrl}">
+###end
+###if($StringUtils.contains("#getter('PATH_URI', '')", "musicbar/detail") && $StringUtils.isNotBlank("$!{boardContents.boardTempleteList[0].imageUrl}") )
+##	<meta property="og:image" content="$!{boardContents.boardTempleteList[0].imageUrl}">
+###end
+#if($StringUtils.contains("#getter('PATH_URI', '')", "/album/main"))
+    #if($StringUtils.isNotBlank("$!{album.mainImage.filePath}"))
+    <meta property="og:image" content="$ImageUtil.getImageUrl("$!{album.mainImage.filePath}", "200x200", "")"/>
+    #else
+    <meta property="og:image" content="http://m1.daumcdn.net/svc/image/U03/common_icon/557673530569150003"/>
+    #end
+#elseif($StringUtils.contains("#getter('PATH_URI', '')", "musicbar/detail"))
+    #if($StringUtils.isNotBlank("$!{boardInfo.imageUrl}"))
+    <meta property="og:image" content="$ImageUtil.getImageUrl("$!{boardInfo.imageUrl}", "200x200", "", "R")"/>
+    #else
+    <meta property="og:image" content="http://m1.daumcdn.net/svc/image/U03/common_icon/557673530569150003"/>
+    #end
+#elseif($StringUtils.contains("#getter('PATH_URI', '')", "/artist/main"))
+    #if($StringUtils.isNotBlank("$!{artist.mainImage.filePath}"))
+    <meta property="og:image" content="$ImageUtil.getImageUrl("$!{artist.mainImage.filePath}", "200x200", "")"/>
+    #else
+    <meta property="og:image" content="http://m1.daumcdn.net/svc/image/U03/common_icon/557673530569150003"/>
+    #end
+#elseif($StringUtils.contains("#getter('PATH_URI', '')", "/artist/vclip"))
+    #if($StringUtils.isNotBlank("$!{song.vclip.mainImage.filePath}"))
+    <meta property="og:image" content="$ImageUtil.getImageUrl("$!{song.vclip.mainImage.filePath}", "200x200", "")"/>
+    #else
+    <meta property="og:image" content="http://m1.daumcdn.net/svc/image/U03/common_icon/557673530569150003"/>
+	#end
+#elseif($StringUtils.contains("#getter('PATH_URI', '')", "/onair/"))
+	#getOpenGraphData($titleMap, "#getter('PATH_URI', '')")
+	<meta property="og:title" content="$!{title} | Daum">
+    #if($StringUtils.isNotBlank("$!{image}") )
+    <meta property="og:image" content="$!{image}">
+    #else
+    <meta property="og:image" content="http://m1.daumcdn.net/svc/image/U03/common_icon/557673530569150003">
+	#end
+	#if($StringUtils.isNotBlank("$!{description}"))
+		#set ($description = $!{description} + " - 방금 전 TV와 라디오에서 나온 그 노래가 궁금하다면?! 이제 Daum뮤직 - 방금그곡 에서 실시간으로 확인하세요. 혹은 다음 검색창에 '방금그곡'을 입력하세요!")
+	#else
+		#set ($description = "방금 전 TV와 라디오에서 나온 그 노래가 궁금하다면?! 이제 Daum뮤직 - 방금그곡 에서 실시간으로 확인하세요. 혹은 다음 검색창에 '방금그곡'을 입력하세요!")
+	#end	
+    <meta property="og:site_name" content="Daum 뮤직">
+#else	
+<meta property="og:image" content="http://m1.daumcdn.net/svc/image/U03/common_icon/557673530569150003"/>
+#end
+<meta property="og:description" content="$!{description}"/> 
+<meta name="keywords" content="다음" />

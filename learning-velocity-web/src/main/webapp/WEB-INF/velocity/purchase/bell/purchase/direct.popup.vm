@@ -1,0 +1,7 @@
+#parse("/velocity/purchase/common/phone/complete.vm")
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+통신사 : $!{purchaseInfo.corpCd} <br/>
+받은번호 : $!{purchaseInfo.getNumber} <br/>
+보낸번호 : $!{purchaseInfo.sendNumber} <br/>
+아이템아이디 : $!{purchaseInfo.itemId} <br/>
+#end	

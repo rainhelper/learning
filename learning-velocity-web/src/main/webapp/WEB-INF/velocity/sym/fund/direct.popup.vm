@@ -1,0 +1,77 @@
+<!-- popWrap -->
+<div id="popWrap" class="cont_payment">
+	<!-- popHead -->
+	<div id="popHead">
+		<h1 class="logoArea">
+			<strong id="logo" class="text_imgpop">Support your music 지원서</strong>
+		</h1>
+	</div>
+	<!-- //popHead -->
+	<!-- popContent -->
+	<div id="popContent">
+		#if($exception)
+		##if(false)
+			#parse("/velocity/purchase/common/complete_error.vm")
+		#else
+		<div class="wrap pay_complete">
+			#if($StringUtils.equals("$!{symInfo.curStatus}", "E"))
+			<p><em class="text_pink">$!{symInfo.title}</em> 프로젝트에 <em class="text_pink">#toCurrency($!{result.fundPrice})원</em> 후원하셨습니다.<br>
+			#else
+			<p>아티스트 <em class="text_pink">$!{artist.name}</em>님에게 <em class="text_pink">#toCurrency($!{result.fundPrice})원</em> 후원하셨습니다.<br>
+			#end
+				CD등 금액에 따른 보상물품이 배송될 주소지를 <br>
+			Daum 회원정보에서 다시 한번 확인해 주세요! <a href="https://user.daum.net/modifyuser/modifyuser.daum" title="회원정보 수정하기" target="_blank" class="edit_member_info">회원정보 수정하기</a></p>
+			<p class="btn_consumer">
+				<strong class="text_imgpop">SYM에 후원한 내용을  여러분의 SNS로 보내보세요</strong>
+				<span class="btn_sns">
+					<a onClick="daum.Music.Social.add('','mypeople',  null, '', true);return false;" title="마이피플로 보내기" href="javascript:;" class="btn_comm btn_my CT_ZONE_BTN_MYPEOPLE"><span class="screen_out">마이피플</span></a>
+					<a onClick="daum.Music.Social.add('','facebook',  null, '', true);return false;" title="페이스북으로 보내기" href="javascript:;" class="btn_comm btn_facebook CT_ZONE_BTN_FACEBOOK"><span class="screen_out">페이스북</span></a>
+					<a onClick="daum.Music.Social.add('','twitter',  null, '', true);return false;" title="트위터로 보내기" href="javascript:;" class="btn_comm btn_twitter CT_ZONE_BTN_TWITTER"><span class="screen_out">트위터</span></a>
+					<a onClick="daum.Music.Social.add('','nate',  null, '', true);return false;" title="싸이월드로 보내기" href="javascript:;" class="btn_comm btn_cyworld CT_ZONE_BTN_CYWORLD"><span class="screen_out">싸이월드</span></a>
+					<a onClick="daum.Music.Layer.view({el:this, wrapper:daum.$$('.daum_popup')[0], type:'snsButton2', classname:'layer_sns_share2', arrow:null, left:-53, top:-2, action:'click', asType:'fund', id:'', isCallback:true});" title="SNS 더보기" href="javascript:;" class="btn_comm btn_more CT_ZONE_BTN_SNSMORE"><span class="screen_out">더보기</span></a>
+				</span>
+				
+                <script type="text/javascript">
+                    daum.Music.Social.setParams({
+						thumb : #if($StringUtils.equals("$!{symInfo.curStatus}", "E")) '$!{symInfo.filePath}',#{else} '$!{artist.mainImage.filePath}',#end	
+                        link : #if($StringUtils.isNotBlank("$!{symInfo.curDefaultUrl}"))'http://' + location.host + '$!{symInfo.curDefaultUrl}',#{else}'http://music.daum.net/sym/top',#end
+                		prefix :#if($StringUtils.equals("$!{symInfo.curStatus}", "E")) '#escScript($!{symInfo.title}) 프로젝트에 #toCurrency($!{result.fundPrice})원 후원하였습니다.',#{else} '아티스트 #escScript($!{artist.name})님에게 #toCurrency($!{result.fundPrice})원 후원하였습니다.',#end
+					});
+                </script>
+			</p>
+			<div class="btnArea">
+				<button class="btn_pop btn_confirm" type="button" onclick="popupClose();return false;">확인</button>
+			</div>
+		</div>
+		#end
+	</div>
+	<!-- //popContent -->
+</div>
+<!-- //popWrap -->
+
+<script type="text/javascript">
+	//domReady(function(){
+		window.resizeTo(480, 350);
+	//});
+	
+	function popupClose() {
+		//opener.daum.Music.Sym.parentCallback();
+		opener.location.reload();
+	 	window.close();
+		
+	}
+	
+</script>
+
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+현재 default url : $symInfo.curDefaultUrl<br/>
+##아티스트 이름
+$artist.name </br></br>
+
+##아티스트 메인이미지
+$artist.mainImage.filePath </br></br>
+
+##후원금액
+$result.fundPrice </br></br>
+#end

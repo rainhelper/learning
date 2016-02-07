@@ -1,0 +1,7 @@
+<h1>Photo Viewer Ajax application 을 위 history 용 dummy page 입니다.</h1>
+<script type="text/javascript">
+document.domain = "daum.net";
+var getHash = function() {
+	return decodeURIComponent( document.location.search.split('hash=')[1] );
+};
+</script>

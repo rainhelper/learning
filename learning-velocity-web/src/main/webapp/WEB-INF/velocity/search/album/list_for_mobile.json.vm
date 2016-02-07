@@ -1,0 +1,22 @@
+{
+"channel" : {
+	"totalCount": "$dto.totalCount",
+	"item" :[
+	#foreach($item in $dto.albumResult.documentList)
+	#if($foreach.index > 0)
+		,
+	#end
+		{
+                "ALBUM_ID": "$!{item.docid}",
+                "ALBUM_NAME": "$!{StringCutUtil.removeTagJSON($!{item.album_name})}",
+                "THUMB": "$!{item.album_thumb_url}",
+                "ALBUM_VOL": "$!{item.album_volume}",
+                "SINGER_TYPE": "$!{item.singer_type}",
+                "ARTIST_NAME": "$!{StringCutUtil.removeTagJSON($!{item.artist_name})}",
+                "ARTIST_ID": "$!{item.artist_id}",
+                "RELEASE_DTTM": "$!{item.release_date}"
+		}
+	#end
+			]
+			}
+}

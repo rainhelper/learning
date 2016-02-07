@@ -1,0 +1,82 @@
+<div class="wrap_cont section_favorite">
+	<h3 class="tit_mymusic tit_interest">관심 음악</h3>
+	<div class="wrap_tab">
+		<ul class="tab_mycont tab_interest">
+			<li><a href="/my/favorite/album/list" class="tab_album">관심 앨범</a></li>
+			<li><a href="/my/favorite/artist/list" class="tab_artist">관심 아티스트</a></li>
+			<li><a href="/my/favorite/vclip/list" class="tab_seemv">관심 뮤비</a></li>
+			<li class="on"><a href="/my/favorite/musicbar/list" class="tab_txt">관심 글</a></li>
+		</ul>					
+	</div>
+	<div class="wrap_seekalbum wrap_desc">
+		<div class="wrap_tool_btn">			
+			<div class="tool_btn f_l">
+				#printDeleteBtn("BO")
+			</div>
+			<em class="txt_quantity f_l">총 <strong id="myCount" class="fc_blue" id="myCount">#if($!{myCount}) #toCurrency($myCount) #else 0 #end</strong> 개</em>	
+			<div class="sort_option f_r">
+				#if($StringUtils.equals("$!{command.getOrdering()}","RECENT_DESC")||$StringUtils.isBlank("$!{command.getOrdering()}"))#set($classNameDate = "link_option")#end
+				#if($StringUtils.equals("$!{command.getOrdering()}","RELEASE_DESC"))#set($classNameRelease = "link_option")#end
+				#if($StringUtils.equals("$!{command.getOrdering()}","ALPHANUMERIC_ASC"))#set($classNameTitle = "link_option")#end
+				<a class="$!{classNameDate}" href="/my/favorite/musicbar/list?ordering=1">저장순</a><span class="txt_bar">|</span>
+				<a class="$!{classNameRelease}" href="/my/favorite/musicbar/list?ordering=2">최신순</a><span class="txt_bar">|</span>
+				<a class="$!{classNameTitle}" href="/my/favorite/musicbar/list?ordering=3">제목순</a>
+			</div>		
+		</div>
+		#if(!$CollectionUtils.isEmpty($myList))
+		<div class="wrap_txt">
+			<ul id="trackContainer" class="list_interest">
+				#foreach($board in $myList)
+				<li id="track$!{board.boardId}">
+					<input class="inp_check" type="checkbox" name="trackCheckbox" value="$!{board.boardId}">
+					<a class="thumb_link" href="/musicbar/musicbar/detail?menu_id=$!{command.menu_id}&board_id=$!{board.boardId}" title="$!{board.title} 바로가기">
+						<img width="146" height="92" src="$ImageUtil.getImageUrl("$!{board.imageUrl}", "image", "PHOTO", "")" alt="">
+						<span class="line_thumb"></span>
+					</a>
+					<div class="wrap_info">
+						<strong class="tit">
+							#if($StringUtils.isNotBlank("$!{board.subTitle}"))<span class="fc_etc">[$!{board.subTitle}]</span>#end
+							<a class="tit_info" href="/musicbar/musicbar/detail?menu_id=$!{command.menu_id}&board_id=$!{board.boardId}" title="$!{board.title}">#strCut($!{board.title}, 80)</a>
+						</strong>
+						<p class="txt_desc">
+							<a href="/musicbar/musicbar/detail?menu_id=$!{command.menu_id}&board_id=$!{board.boardId}">#if($StringUtils.isNotBlank("$!{board.subTitle}"))#strCut("#stripHTML($!{board.summary})", 160)#{else}#strCut("#stripHTML($!{board.summary})", 250)#end</a>
+						</p>
+						<span class="txt_origin">
+							#if( $StringUtils.isNotBlank("$!{board.writer.nickName}") )
+        					<a class="txt_name" href="javascript:;" onclick="daum.Music.MusicBar.linkToWriter('$!{command.menu_id}', '$!{board.writer.nickName}'); return false;" title="$!{board.writer.nickName}" >$!{board.writer.nickName}</a>	
+        					<span class="txt_bar"> | </span>
+        					#end
+                            <span class="txt_day">$!{CheckDate.makeReleaseDate($!{board.regdttm})}</span>
+						</span>
+					</div>
+				</li>
+				#end
+			</ul>	
+		</div>
+		<div class="btm_mymusic">
+			<div class="wrap_tool_btn f_l">
+				<div class="tool_btn">
+					#printDeleteBtn("BO")
+				</div>
+
+			</div>
+			##page
+			#printPaging($pagingUrl $command.page_no $pageHandler "f_l" 10)
+		</div>
+		#else
+		<div class="wrap_nodata">
+			<strong>관심 글이 없습니다</strong>
+		</div>
+		<div class="wrap_tool_btn">
+			<div class="tool_btn">
+				#printDeleteBtn("BO")
+			</div>
+		</div>
+		#end
+		<script type="text/javascript">
+		//new daum.Music.DragnSelect(document,"trackContainer",{liclassName:"listli",containment:"trackContainer"});
+		var controller = new daum.Music.ListPrototype();
+		controller.initialize({MySection:true});
+    	</script>
+	</div>
+</div>

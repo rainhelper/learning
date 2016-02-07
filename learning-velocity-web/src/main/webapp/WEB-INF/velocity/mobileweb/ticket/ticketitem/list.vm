@@ -1,0 +1,140 @@
+#uaCheck()
+#set( $ticketId = ["APG0027","APG0026","APMOG0034","APMOG0033","AMG0020","AMG0019","AMG0022","AMG0021","MCG0011","MCG0015","MCG0018","MCG0017","MCG0020","MCG0019","MCG0022","MCG0021"])
+
+<div id="daumContent"  class="cont_buy" role="main">
+	<h2 class="screen_out">이용권</h2>
+	<!-- 2014-07-21 수정 시작 -->
+#printPurchaseMenuMobile("2")
+	<div class="buy_ticket buy_purchase">
+		<h3 class="screen_out">이용권 구매</h3>
+		<ul class="list_purchase">
+			<li>
+				<strong class="tit_purchase">스트리밍 무제한</strong>
+				<span class="txt_detail">PC + 스마트폰에서 무제한 전곡듣기</span>
+				<a href="#none" class="link_purchase link_streaming" onclick="javascript:music.mobile.Ticket.buyTicket('$!{ticketId[0]}','')">
+					<span class="txt_purchase">매월 자동결제<span class="txt_discount">10%</span></span>
+					<span class="txt_price">5,400<span class="txt_unit">원</span></span>
+					<span class="ico_ticket"></span>
+				</a>
+				<a href="#none" class="link_purchase" onclick="javascript:music.mobile.Ticket.buyTicket('$!{ticketId[1]}','')">
+					<span class="txt_purchase">30일 이용권</span>
+					<span class="txt_price">6,000<span class="txt_unit">원</span></span>
+					<span class="ico_ticket"></span>
+				</a>
+			</li>
+			<li>
+				<strong class="tit_purchase">스마트폰 무제한</strong>
+				<span class="txt_detail">PC, 스마트폰에서 무제한 전곡듣기 +<br>스마트폰에서 무제한 대여</span>
+				<a href="#none" class="link_purchase link_streaming"  onclick="javascript:music.mobile.Ticket.buyTicket('$!{ticketId[2]}','')">
+					<span class="txt_purchase">매월 자동결제<span class="txt_discount">10%</span></span>
+					<span class="txt_price">7,200<span class="txt_unit">원</span></span>
+					<span class="ico_ticket"></span>
+				</a>
+				<a href="#none" class="link_purchase"  onclick="javascript:music.mobile.Ticket.buyTicket('$!{ticketId[3]}','')">
+					<span class="txt_purchase">30일 이용권</span>
+					<span class="txt_price">8,000<span class="txt_unit">원</span></span>
+					<span class="ico_ticket"></span>
+				</a>
+			</li>
+			<li>
+				<strong class="tit_purchase">MP3 30곡 + 무제한 듣기</strong>
+				<span class="txt_detail">PC, 스마트폰에서 MP3 30곡 다운로드 +<br>무제한 전곡듣기</span>
+				<a href="#none" class="link_purchase link_mp3plus"  onclick="javascript:music.mobile.Ticket.buyTicket('$!{ticketId[4]}','')">
+					<span class="txt_purchase">매월 자동결제<span class="txt_discount">10%</span></span>
+					<span class="txt_price">8,100<span class="txt_unit">원</span></span>
+					<span class="ico_ticket"></span>
+				</a>
+				<a href="#none" class="link_purchase"  onclick="javascript:music.mobile.Ticket.buyTicket('$!{ticketId[5]}','')">
+					<span class="txt_purchase">30일 이용권</span>
+					<span class="txt_price">9,000<span class="txt_unit">원</span></span>
+					<span class="ico_ticket"></span>
+				</a>
+			</li>
+			<li>
+				<strong class="tit_purchase">MP3 100곡 + 무제한 듣기</strong>
+				<span class="txt_detail">PC, 스마트폰에서 MP3 100곡 다운로드 +<br>무제한 전곡듣기</span>
+				<a href="#none" class="link_purchase link_mp3plus" onclick="javascript:music.mobile.Ticket.buyTicket('$!{ticketId[6]}','')">
+					<span class="txt_purchase">매월 자동결제<span class="txt_discount">10%</span></span>
+					<span class="txt_price">11,700<span class="txt_unit">원</span></span>
+					<span class="ico_ticket"></span>
+				</a>
+				<a href="#none" class="link_purchase" onclick="javascript:music.mobile.Ticket.buyTicket('$!{ticketId[7]}','')">
+					<span class="txt_purchase">30일 이용권</span>
+					<span class="txt_price">13,000<span class="txt_unit">원</span></span>
+					<span class="ico_ticket"></span>
+				</a>
+			</li>
+			<li>
+				<strong class="tit_purchase">MP3 30곡</strong>
+				<span class="txt_detail">PC, 스마트폰에서 MP3 30곡 다운로드<br>다운 받은 MP3 평생 소장, 모든 기기 가능</span>
+				<a href="#none" class="link_purchase link_mp3" onclick="javascript:music.mobile.Ticket.buyTicket('$!{ticketId[8]}','')">
+					<span class="txt_purchase">매월 자동결제<span class="txt_discount">10%</span></span>
+					<span class="txt_price">5,400<span class="txt_unit">원</span></span>
+					<span class="ico_ticket"></span>
+				</a>
+				<a href="#none" class="link_purchase"  onclick="javascript:music.mobile.Ticket.buyTicket('$!{ticketId[9]}','')">
+					<span class="txt_purchase">30일 이용권</span>
+					<span class="txt_price">6,000<span class="txt_unit">원</span></span>
+					<span class="ico_ticket"></span>
+				</a>
+			</li>
+			<li>
+				<strong class="tit_purchase">MP3 40곡</strong>
+				<span class="txt_detail">PC, 스마트폰에서 MP3 40곡 다운로드<br>다운 받은 MP3 평생 소장, 모든 기기 가능</span>
+				<a href="#none" class="link_purchase link_mp3" onclick="javascript:music.mobile.Ticket.buyTicket('$!{ticketId[10]}','')">
+					<span class="txt_purchase">매월 자동결제<span class="txt_discount">10%</span></span>
+					<span class="txt_price">6,300<span class="txt_unit">원</span></span>
+					<span class="ico_ticket"></span>
+				</a>
+				<a href="#none" class="link_purchase" onclick="javascript:music.mobile.Ticket.buyTicket('$!{ticketId[11]}','')">
+					<span class="txt_purchase">30일 이용권</span>
+					<span class="txt_price">7,000<span class="txt_unit">원</span></span>
+					<span class="ico_ticket"></span>
+				</a>
+			</li>
+			<li>
+				<strong class="tit_purchase">MP3 50곡</strong>
+				<span class="txt_detail">PC, 스마트폰에서 MP3 50곡 다운로드<br>다운 받은 MP3 평생 소장, 모든 기기 가능</span>
+				<a href="#none" class="link_purchase link_mp3" onclick="javascript:music.mobile.Ticket.buyTicket('$!{ticketId[12]}','')">
+					<span class="txt_purchase">매월 자동결제<span class="txt_discount">10%</span></span>
+					<span class="txt_price">7,200<span class="txt_unit">원</span></span>
+					<span class="ico_ticket"></span>
+				</a>
+				<a href="#none" class="link_purchase" onclick="javascript:music.mobile.Ticket.buyTicket('$!{ticketId[13]}','')">
+					<span class="txt_purchase">30일 이용권</span>
+					<span class="txt_price">8,000<span class="txt_unit">원</span></span>
+					<span class="ico_ticket"></span>
+				</a>
+			</li>
+			<li>
+				<strong class="tit_purchase">MP3 100곡</strong>
+				<span class="txt_detail">PC, 스마트폰에서 MP3 100곡 다운로드<br>다운 받은 MP3 평생 소장, 모든 기기 가능</span>
+				<a href="#none" class="link_purchase link_mp3" onclick="javascript:music.mobile.Ticket.buyTicket('$!{ticketId[14]}','')">
+					<span class="txt_purchase">매월 자동결제<span class="txt_discount">10%</span></span>
+					<span class="txt_price">9,000<span class="txt_unit">원</span></span>
+					<span class="ico_ticket"></span>
+				</a>
+				<a href="#none" class="link_purchase" onclick="javascript:music.mobile.Ticket.buyTicket('$!{ticketId[15]}','')">
+					<span class="txt_purchase">30일 이용권</span>
+					<span class="txt_price">10,000<span class="txt_unit">원</span></span>
+					<span class="ico_ticket"></span>
+				</a>
+			</li>
+		</ul>
+		<strong class="tit_notice">이용권 구매 안내</strong>
+		<ul class="list_notice">
+			<li><em class="emph_notice">이용권 구매 시 부가세 10%가 별도 청구됩니다.</em></li>
+			<li>30일권 상품은 구매 후 최대 30일 이내에 <a href="/my/own_ticket/ticket/list" class="link_notice">이용권 관리</a>에서 사용하기를 클릭해야 하며, 30일 이후부터 자동으로 이용권 사용이 시작됩니다.</li>
+			<li>본 상품은 구매일로부터 7일 이내 청약철회가 가능합니다. 단, 이용권 구매 후 전곡듣기를 1건이라도 사용하셨거나 다운로드를 1곡이라도 사용 시에는 취소, 환불이 불가능합니다. </li>
+			<li>사용중인 음악감상 이용권이 있을 경우에는 다른 음악감상 이용권은 구매하실 수 없습니다.</li>
+			<li>스마트폰 무제한 이용권에 제공되는 대여 기능은 노래 재생 시 WIFI나 데이터를 사용하지 않는 기능으로, 스마트폰 무제한 이용권을 사용중인 기간에만 제공됩니다.</li>
+			<li>MP3는 모든 기기에서 사용가능하며, 일부 MP3는 음원 권리사의 요청으로 구매 후 1년만 재다운로드가 가능합니다.</li>
+			<li>기간 내에 사용하지 않은 MP3 이용권은 이월되지 않습니다.</li>
+			<li>음원 권리사의 요청에 따라 MP3 다운로드 기기는 3대로 제한되며, 스마트폰 무제한 다운로드 기기는 2대로 제한 됩니다.</li>
+		</ul>
+	</div>
+	<!-- 2014-07-21 수정 끝 -->
+</div>
+#parse("/velocity/mobileweb/ticket/ticketitem/ticket.vm")
+
+#parse("/velocity/mobileweb/realtimeissue.vm")

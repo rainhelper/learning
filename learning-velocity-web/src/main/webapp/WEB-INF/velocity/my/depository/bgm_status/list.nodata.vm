@@ -1,0 +1,14 @@
+	    <div class="wrap_setup">
+			<div class="wrap_nodata">
+			#if( $command.getTarget_service() == "CAFE" )
+				<p class="txt_explain">카페지기나 운영자로 활동하고 계신 카페가 없습니다</p>
+				<a href="http://cafe.daum.net/_c21_/mine_main?t__nil_loginbox=cafelist" target="_blank" class="btn_mymusic btn_listcheck">내 카페 목록 확인하기</a>
+			#elseif( $command.getTarget_service() == "BLOG" )
+				<p class="txt_explain">블로그 개설 후 이용하시거나, <br>블로그 배경음악 사용 설정을 <span class="txt_point">&quot;사용&quot;</span>으로 변경 후 이용해 주세요</p>
+				<a href="http://blog.daum.net/_blog/_top/sub/makeBlogEnter.do" target="_blank" class="btn_mymusic btn_blog" title="블로그 가기">블로그가기</a>
+			#elseif( $command.getTarget_service() == "KIDS" )
+				<p class="txt_explain">마이짱 개설 후 이용하시거나, <br>마이짱에서 배경음악 사용 설정을  <span class="txt_point">&quot;사용&quot;</span>으로 변경 후 이용해주세요</p>
+				<a href="http://my.kids.daum.net/myzzang/do/profile/joinForm" target="_blank" class="btn_mymusic btn_kids" title="키즈짱 가기">키즈짱</a>
+			#end
+			</div>
+		</div>

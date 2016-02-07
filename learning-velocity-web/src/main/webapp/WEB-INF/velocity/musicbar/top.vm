@@ -1,0 +1,229 @@
+<div class="article_musicbar_top">
+	<div class="section_new">
+		<h3 class="tit_bar tit_new">최신글</h3>
+		<ul class="list_thumb">
+			#foreach($board in $recentBoardList)
+			<li#if($recentBoardList.size() == ($foreach.count)) class="lst"#end>
+				<div class="wrap_thumb">
+					<a class="thumb_link" href="/musicbar/musicbar/detail?menu_id=$!{board.menuId}&board_id=$!{board.boardId}" title="$!{board.title} 바로가기">
+						<img width="220" height="138" alt="" src="$ImageUtil.getImageUrl("$!{board.imageUrl}", "220x138", "PHOTO", "C")" style="height:138px;">
+						<span class="line_thumb"></span>
+					</a>
+				</div>
+				<div class="wrap_info">
+					<strong class="tit">
+						<a href="/musicbar/musicbar/detail?menu_id=$!{board.menuId}&board_id=$!{board.boardId}" title="$!{board.title} 바로가기">#if($StringUtils.isNotEmpty($!{board.subTitle}))<span class="fc_etc">[$!{board.subTitle}] </span>#end#strCut("#stripHTML($!{board.title})", 54)</a>
+					</strong>
+					<p class="txt_desc">
+						<a href="/musicbar/musicbar/detail?menu_id=$!{board.menuId}&board_id=$!{board.boardId}">#if( $!{board.subTitle} != "" )#strCut("#stripHTML($!{board.summary})", 350)#{else}#strCut("#stripHTML($!{board.summary})", 430)#end</a>
+					</p>
+					#*
+					#set($idx = 0)
+					#foreach($song in $board.songList)
+						#if( $StringUtils.isNotBlank("$!{song.AODLinkId}"))
+						#set($idx = $idx + 1)
+						#if( $idx < 3 )
+						<span class="song_listen #if($idx == 2)type_listen#end">
+								#printSongArtistName( $song "ico_comm ico_listen" 60 true )
+						</span>
+						#end
+						#end
+					#end
+					*#
+				</div>
+				<a href="/musicbar/musicbar/list?menu_id=$!{board.menuId}" class="btn_comm btn_more">더보기</a>
+			</li>
+			#end
+		</ul>
+	</div>
+	<div class="section_best">
+		<h3 class="tit_bar tit_best">인기글</h3>
+		<ul class="list_thumb">
+			#foreach($board in $bestBoardList)
+			<li#if($bestBoardList.size() == ($foreach.index+1)) class="lst"#end>
+				<div class="wrap_thumb">
+					<a class="thumb_link" href="/musicbar/musicbar/detail?menu_id=$!{board.menuId}&board_id=$!{board.boardId}" title="$!{board.title} 바로가기">
+						<img alt="" src="$ImageUtil.getImageUrl("$!{board.imageUrl}", "220x138", "PHOTO", "C")" style="height:138px;">
+						<span class="line_thumb"></span>
+					</a>
+				</div>
+				<div class="wrap_info">
+					<strong class="tit">
+						<a href="/musicbar/musicbar/detail?menu_id=$!{board.menuId}&board_id=$!{board.boardId}" title="$!{board.title} 바로가기">#if($StringUtils.isNotEmpty($!{board.subTitle}))<span class="fc_etc">[$!{board.subTitle}] </span>#end#strCut("#stripHTML($!{board.title})", 54)</a>
+					</strong>
+					<p class="txt_desc">
+						<a href="/musicbar/musicbar/detail?menu_id=$!{board.menuId}&board_id=$!{board.boardId}">#if( $!{board.subTitle} != "" )#strCut("#stripHTML($!{board.summary})", 350)#{else}#strCut("#stripHTML($!{board.summary})", 430)#end</a>
+					</p>
+					#*
+					#set($idx = 0)
+					#foreach($song in $board.songList)
+						#if( $StringUtils.isNotBlank("$!{song.AODLinkId}"))
+						#set($idx = $idx + 1)
+						#if( $idx < 3 )
+						<span class="song_listen #if($idx == 2)type_listen#end">
+							#printSongArtistName( $song "ico_comm ico_listen" 60 true )
+						</span>
+						#end
+						#end
+					#end
+					*#
+				</div>
+				<a href="/musicbar/musicbar/list?menu_id=$!{board.menuId}" class="btn_comm btn_more">더보기</a>
+			</li>
+			#end
+		</ul>
+	</div>
+</div>
+<script type="text/javascript">
+var controller = new daum.Music.ListPrototype();
+controller.initialize();
+</script>
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+우측메뉴<br/>
+#foreach($motTemplete in $rightMenuList)
+	타이틀 : $motTemplete.title <br/>
+	일반이미지 : $motTemplete.imageUrl <br/>
+	활성화이미지2 : $motTemplete.activatedImageUrl <br/>
+	링크 : $motTemplete.linkUrl <br/>
+	활성화여부 : $motTemplete.activatedYn <br/>
+	<br/><br/>
+#end
+
+상단 배너(5개인데 2개만 운영하면 2개만 나옴)<br/>
+#foreach($motTemplete in $upBannerList)
+	이미지 : $motTemplete.imageUrl <br/>
+	링크 : $motTemplete.linkUrl <br/>
+	<br/><br/>
+#end
+
+하단 배너<br/>
+#foreach($motTemplete in $downBannerList)
+	이미지 : $motTemplete.imageUrl <br/>
+	링크 : $motTemplete.linkUrl <br/>
+	<br/><br/>
+#end
+
+최신 dj추천앨범 3개<br/>
+#foreach($album in $djAlbumList)
+	앨범아이디 : $album.albumId <br/>
+	앨범명 : $album.title <br/>
+	앨범볼륨 : $album.volume <br/>
+	앨범이미지 : $album.mainImage.filePath <br/>
+	앨범장르 : $album.genre.genreGroupName > $album.genre.genreName <br/>
+	앨범재생여부 : $album.playYn <br/>
+	#foreach($masterSong in $album.masterSongList)
+		타이틀곡명 : $masterSong.title <br/> 
+		타이틀곡아이디 : $masterSong.songId <br/> 
+		타이틀곡듣기여부 : $masterSong.AODLinkId <br/>
+	#end
+	발매일 : $album.releaseDt <br/>
+	#foreach($artist in $album.keyArtistList)
+		아티스트명 : $artist.name<br/>
+		아티스트아이디 : $artist.artistId<br/>
+		아티스트링크 : 아직 형식미정입니다.<br/>
+	#end
+	추천dj아이디 : $album.recommendDj.djId<br/>
+	추천dj이미지 : $album.recommendDj.imageUrl<br/>
+	추천dj이미지 : $ImageUtil.getImageUrl("$!{$album.recommendDj.imageUrl}", "90x90", "PHOTO", "C")<br/>
+	추천dj명 : $album.recommendDj.nickName<br/>
+	추천dj추천평 : $album.recommendDj.comments<br/>
+	추천곡명 : $album.recommendDj.songList.get(0).title <br/> 
+	추천곡아이디 : $album.recommendDj.songList.get(0).songId <br/> 
+	추천곡듣기여부 : $album.recommendDj.songList.get(0).AODLinkId <br/>
+	추천일 : $album.recommendDj.regdttm <br/>
+	<br/><br/>
+#end
+최신  뮤직바 2개<br/>
+#foreach($board in $recentBoardList)
+	뮤직바아이디 : $board.boardId <br/>
+	글제목 : $board.title <br/>
+	카테고리 : $board.subTitle <br/>
+	요약 : $board.summary <br/>
+	이미지 : $board.imageUrl <br/>
+	추천수 : $board.recommendCount <br/>
+	댓글수 : $board.replyCount <br/>
+	등록일 : $board.regdttm <br/>
+	작성자 : $board.writer.nickName <br/>
+	링크 : http://music.daum.net/musicbar/musicbar/detail?menu_id=$board.menuId&board_id=$board.boardId <br/><br/>
+	#foreach($song in $board.songList)
+		곡제목 : $song.title<br/>
+		곡아이디 : $song.songId<br/>
+		가사유무 : $song.lyricsYn<br/>
+		듣기아이디(널이면 비활성화) : $song.AODLinkId<br/>
+		MP3아이디 (널이면 비활성화) : $song.MP3LinkId<br/>
+		BGM아이디(널이면 비활성화) : $song.BGMLinkId<br/>
+		벨소리 서비스 여부 : $song.bellSalesStatus<br/>
+		통화연결음 서비스 여부 : $song.ringSalesStatus<br/>
+		아티스트 :<br/>
+		#foreach($artist in $song.keyArtistList)
+			아티스트명 : $artist.name<br/>
+			아티스트아이디 : $artist.artistId<br/>
+		#end
+		<br/>
+	#end
+	<br/>
+#end
+<br/><br/>
+인기  뮤직바 2개<br/>
+#foreach($board in $bestBoardList)
+	뮤직바아이디 : $board.boardId <br/>
+	글제목 : $board.title <br/>
+	카테고리 : $board.subTitle <br/>
+	요약 : $board.summary <br/>
+	이미지 : $board.imageUrl <br/>
+	추천수 : $board.recommendCount <br/>
+	댓글수 : $board.replyCount <br/>
+	등록일 : $board.regdttm <br/>
+	작성자 : $board.writer.nickName <br/>
+	링크 : http://music.daum.net/musicbar/musicbar/detail?menu_id=$board.menuId&board_id=$board.boardId <br/><br/>
+	#foreach($song in $board.songList)
+		곡제목 : $song.title<br/>
+		곡아이디 : $song.songId<br/>
+		가사유무 : $song.lyricsYn<br/>
+		듣기아이디(널이면 비활성화) : $song.AODLinkId<br/>
+		MP3아이디 (널이면 비활성화) : $song.MP3LinkId<br/>
+		BGM아이디(널이면 비활성화) : $song.BGMLinkId<br/>
+		벨소리 서비스 여부 : $song.bellSalesStatus<br/>
+		통화연결음 서비스 여부 : $song.ringSalesStatus<br/>
+		아티스트 :<br/>
+		#foreach($artist in $song.keyArtistList)
+			아티스트명 : $artist.name<br/>
+			아티스트아이디 : $artist.artistId<br/>
+		#end
+		<br/>
+	#end
+	<br/>
+#end
+<br/><br/>
+#foreach($song in $chartSongList)
+	순위 : $song.rank<br/>
+	변동순위 : $song.modRank<br/>
+	곡제목 : $song.title<br/>
+	곡아이디 : $song.songId<br/>
+	가사유무 : $song.lyricsYn<br/>
+	뮤직비디오유무 : $song.vclipLinkId<br/>
+	티비팟아이디 : $song.tvpotVId<br/>
+	앨범제목 : $song.album.albumId<br/>
+	앨범아이디 : $song.album.title<br/>
+	앨범이미지 : $song.album.mainImage.filePath<br/>
+	썸네일 : $ImageUtil.getImageUrl("$!{album.mainImage.filePath}", "45x45", "ALBUM"))<br/>
+	듣기아이디(널이면 비활성화) : $song.AODLinkId<br/>
+	MP3아이디 (널이면 비활성화) : $song.MP3LinkId<br/>
+	BGM아이디(널이면 비활성화) : $song.BGMLinkId<br/>
+	벨소리 서비스 여부 : $song.bellSalesStatus<br/>
+	통화연결음 서비스 여부 : $song.ringSalesStatus<br/>
+	아티스트 :<br/>
+	#foreach($artist in $song.keyArtistList)
+		아티스트명 : $artist.name<br/>
+		아티스트아이디 : $artist.artistId<br/>
+	#end
+	피쳐링아티스트 :<br/>
+	#foreach($artist in $song.featArtist)
+		아티스트명 : $artist.name<br/>
+		아티스트아이디 : $artist.artistId<br/>
+	#end
+	뮤직바제목 : $song.musicBar.title<br/>
+	뮤직바링크 : http://music.daum.net/musicbar/musicbar/detail?menu_id=$song.musicBar.menuId&board_id=$song.musicBar.boardId <br/><br/>
+	<br/>
+#end
+#end

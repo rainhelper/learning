@@ -1,0 +1,14 @@
+{
+	"user" : "$!{user.userId}",
+	"exception" : "$!{exception.message}",
+	"errorCode" : "$!{exception.code}",
+	"item" : {
+		"title" : "$!{item.title}",
+		"itemType" : "$!{item.itemType}",
+		"periodic" : "$!{item.periodic}",
+		"price" : "$!{item.price}"
+	}
+}
+#*
+http://music.daum.net/coupon/confirm.json?coupon_id=CVW9AQJ2U7NEWM34MQCU
+*#

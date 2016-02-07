@@ -1,0 +1,112 @@
+## 사용 데이터
+#set( $title = "$!{purchaseTicket.order.item.title}" )
+#set( $price = "$!{purchaseTicket.order.item.salePrice}" )
+#set( $ticketId = "$!{purchaseTicket.id}" )## 티켓 '바로 사용'시 연결되는 $ticket.id
+#set( $isPeriodoc = ${purchaseTicket.order.item.periodic} )## 자동결제 여부
+#set( $isUseTicket = ${isAodUse} )## 상품 사용중 여부 (이미 사용중인 AOD 상품권이 있는지 여부)
+#set( $ticketType = ${purchaseTicket.order.item.itemType.code} )## 이용권 아이템 코드(이용권종류, AP:AOD, MP:MP3다운로드, AM:AOD+다운로드)
+#set( $startDate = "$!{purchaseTicket.startDate}" )
+#set( $endDate = "$!{purchaseTicket.endDate}" )
+#set( $couponyn = $!{purchaseTicket.order.paymentType}) ## CP 쿠폰, !CP 일반결제
+
+<div id="daumWrap" class="daum_popup">
+	<div class="popup_music type_complete">
+		<div class="popup_head">
+			<h1>
+				<a class="bg_logo daum_logo" href="http://www.daum.net/">다음</a>
+				<span class="bg_logo tit_pass_complete">뮤직 이용권 구매완료</span>
+			</h1>
+		</div><!-- // popup_head -->
+		<div class="popup_body">
+			<form action="#">
+				<div class="cart_perfect perfect_type#if($exception)_error#{else}2#end">
+				#if($exception)
+					#parse("/velocity/purchase/common/complete_error.vm")
+				#else
+					<h2 class="screen_out">구매 완료</h2>
+					<strong class="info"><span class="ticket">$!{title}</span> <br>구매완료 되었습니다.</strong>
+					<p class="money">
+						<span class="screen_out">결제금액 : </span>
+						<span class="txt_price">#toCurrency($!{price})<span class="screen_out">원</span></span>
+					</p>
+					
+					<p class="desc">
+					#if($!{isPeriodoc}==true)
+					사용기간 : $!{CheckDate.makeReleaseDate($!{startDate})} ~ $!{CheckDate.makeReleaseDate($!{endDate})}
+					<br>
+					#end
+						이용권 현황은 <a href="/my/own_ticket/ticket/list" class="line" target="_blank">MY뮤직 &gt; 이용권 현황</a>에서 확인하세요.
+					</p>
+ 
+					<div class="wrap_btns">
+						<span class="box_button">
+						#if($StringUtils.equals("$!{isPeriodoc}", "true") || $StringUtils.equals("$!{ticketType}","BT"))
+							<a class="btn_popup btn_close" href="#" onclick="window.close();return false;" >닫기</a>
+						#else
+							
+							##daum.Music.PurchasePopup.goAndClose(window, '/my/own_ticket/ticket/list?order_id=
+							<a class="btn_popup btn_just" href="#"  onclick='daum.Music.Ticket.Using("$!{purchaseTicket.order.orderId}");return false;' target="_blank">바로 사용하기</a>
+							<a class="btn_popup btn_after" href="#" onclick="window.close();return false;" >나중에 사용하기</a>
+						#end	
+						</span>
+					</div>
+				#end	
+				</div>
+            	#printCartFooter("", $!{recommendAlbumList})
+			</form>
+		</div><!-- // popup_body -->
+	</div>
+</div>
+#printScriptCompleteWindowResize()
+
+#if(  $StringUtils.equals("$!{command.debugmode}","2") )
+<div id="FTMessage">
+-----------------------------------------
+FT 체크 (화이링)
+-----------------------------------------
+<br/> 1. 앨범 리스트 css확인및 링크 확인( 변경된다고 함)  
+<br/> 2. 이벤트 데이타 확인
+
+</div>
+## 사용 데이터
+#set( $title = "$!{purchaseTicket.order.item.title}" )
+#set( $price = "$!{purchaseTicket.order.item.salePrice}" )
+#set( $ticketId = "$!{purchaseTicket.id}" )## 티켓 '바로 사용'시 연결되는 $ticket.id
+#set( $isPeriodoc = ${purchaseTicket.order.item.periodic} )## 자동결제 여부
+#set( $isUseTicket = ${isAodUse} )## 상품 사용중 여부 (이미 사용중인 AOD 상품권이 있는지 여부)
+#set( $ticketType = ${purchaseTicket.order.item.itemType.code} )## 이용권 아이템 코드(이용권종류, AP:AOD, MP:MP3다운로드, AM:AOD+다운로드)
+#set( $startDate = "$!{purchaseTicket.startDate}" )
+#set( $endDate = "$!{purchaseTicket.endDate}" )
+#set( $couponyn = $!{purchaseTicket.order.paymentType}) ## CP 쿠폰, !CP 일반결제
+<br/>
+$title<br/>
+$price<br/>
+$startDate<br/>
+$endDate<br/>
+$isPeriodoc<br/>
+<br/>
+ 이벤트 <br/>
+#foreach($event in $eventList)
+	이벤트명 : $event.eventTitle <br/>
+	이미지 : $event.bannerUrl <br/>
+	시작일 : $event.startDate <br/>
+	종료일 : $event.endDate <br/>
+	당첨자발표일 : $event.winningDate <br/>
+	경품 : $event.description <br/>
+#end
+<br/>
+추천앨범 (이벤트가 없을때만 나옴)<br/>
+#foreach($album in $recommendAlbumList)
+	앨범아이디 : $album.albumId <br/>
+	앨범명 : $album.title <br/>
+	앨범볼륨 : $album.volume <br/>
+	앨범이미지 : $album.mainImage.filePath <br/>
+	앨범재생여부 : $album.playYn <br/>
+	발매일 : $album.releaseDt <br/>
+	#foreach($artist in $album.keyArtistList)
+		아티스트명 : $artist.name<br/>
+		아티스트아이디 : $artist.artistId<br/>
+	#end
+	<br/><br/>
+#end
+#end

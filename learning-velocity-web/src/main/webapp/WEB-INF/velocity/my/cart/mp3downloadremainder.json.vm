@@ -1,0 +1,16 @@
+{
+	"DaumId": "$!{user.daumId}",
+	"DaumName": "$!{user.daumName}",
+	"Mp3DownloadRemainder": "$!{mp3DownloadRemainder}",
+	"OwnYn": "$!{ownYn}",
+	"EventYn": "$!{eventYn}",
+	"FreeMp3Count": "$!{freeMp3Count}",
+	"FreeMp3SongIdList": "$!{freeMp3SongIdList}",
+	"OwnSongIdList": "$!{ownSongIdList}",
+	"PossibleMp3DownloadSongIdList": "$!{possibleMp3DownloadSongIdList}",
+	"PossibleMp3PurchaseSongIdList": "$!{possibleMp3PurchaseSongIdList}",
+	"AlbumPackageSaleMp3PurchaseSongIdList": "$!{albumPackageSaleMp3PurchaseSongIdList}",
+	"HoldbackYn": "$!{holdbackYn}",
+	"PartialPurchaseYn": "$!{partialPurchaseYn}",
+	"PossibleMp3PurchaseSongIdListByWeb" : "$!{possibleMp3PurchaseSongIdListByWeb}"
+}

@@ -1,0 +1,103 @@
+	<div class="popup_type2"> <!-- 퀴즈시작 popup_type1, 나머지 popup_type2 -->
+		<div class="popup_head">
+			<h1><a href="http://music.daum.net" target="_blank" class="btn_music">Daum 뮤직</a></h1>
+		</div>
+		<div class="popup_body">
+		<form name="quizForm" action="/quiz_event/result.popup" method="post">
+			<input type="hidden" name="event_key" value="$event_key">
+			<input type="hidden" name="obj_id" value="1">
+			<strong class="screen_out">뮤직퀴즈 풀고 커피&amp;도넛 받자!</strong>
+			<div class="wrap_quiz">
+				<em class="quiz"><span class="screen_out">문제 : </span>$!{quizEvent.question}</em>
+				<ul class="list_choice" id="choiceList">
+					<li class="on" onclick="daum.Music.RadioCostom.choice(0);"><a href="#none" class="ico_radio">$!{quizEvent.example1}</a></li><!-- .on -->
+					<li onclick="daum.Music.RadioCostom.choice(1);"><a href="#none" class="ico_radio">$!{quizEvent.example2}</a></li>
+					<li onclick="daum.Music.RadioCostom.choice(2);"><a href="#none" class="ico_radio">$!{quizEvent.example3}</a></li>
+					<li onclick="daum.Music.RadioCostom.choice(3);"><a href="#none" class="ico_radio">$!{quizEvent.example4}</a></li>
+				</ul>
+			</div>
+			<div class="wrap_display">
+				<em>정답수</em>
+				<ul class="list_display">
+					<li#if($correctCount>0) class="on"#end><span class="ico_correct">1개 정답</span></li>
+					<li#if($correctCount>1) class="on"#end><span class="ico_correct">2개 정답</span></li>
+					<li#if($correctCount>2) class="on"#end><span class="ico_correct">3개 정답</span></li>
+					<li#if($correctCount>3) class="on"#end><span class="ico_correct">4개 정답</span></li>
+					<li#if($correctCount>4) class="on"#end><span class="ico_correct">5개 정답</span></li>
+				</ul>
+				<a href="javascript:;" onclick="document.quizForm.submit();return false;" class="btn_quiz btn_confirm">확인</a><!-- 확인 btn_confirm, 다음문제 btn_next, 당첨확인 btn_all, 재도전 btn_replay -->
+			</div>
+		</form>
+		</div>
+		<div class="popup_foot">
+			<a href="http://music.daum.net/promotion/quiz2011/index.html" target="_blank" class="event_more">이벤트 자세히 보기</a>
+
+		</div>
+		<a href="javascript:;" onclick="self.close();return false;" class="btn_close">닫기</a>
+	</div>
+
+	<script type="text/javascript">
+	(function ($dm) {
+	$dm.RadioCostom = function(){
+		var _cur = 0;
+		var _radios = daum.$$('#choiceList li');
+
+		return {
+			choice : function( idx ){
+				daum.Element.removeClassName( _radios[_cur], "on" );
+				daum.Element.addClassName( _radios[idx], "on" );
+				_cur = idx;
+				document.quizForm.obj_id.value = idx + 1;
+			}
+		}
+	}();
+	})( daum.Music );
+
+	if( !!opener ){
+		opener.location.href = '$!{quizEvent.hintUrl}';
+	} else {
+		window.open( '$!{quizEvent.hintUrl}', '_blank' );
+	}
+	setTimeout(function(){window.focus();}, 500);
+	//daum.Event.addEvent(window, "blur", function(){window.focus();}); 
+	</script>
+
+
+#*
+		model.addAttribute("event_key", CipherUtils.getDaumEnc(key));
+		model.addAttribute("quizEvent", lstAll.get(Integer.parseInt(quizIds[number])));
+		model.addAttribute("number", number+1);
+		model.addAttribute("result", result);
+
+		model.addAttribute("correctCount", correctCount);
+
+		String key = userId + "|" + number.toString() + "|" + quizs + "|" + answers;
+		model.addAttribute("event_key", CipherUtils.getDaumEnc(key));
+		model.addAttribute("number", number);
+		model.addAttribute("result", result);
+*#
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+<pre>
+질문 : $quizEvent.question
+보기 1: $quizEvent.example1
+보기 2: $quizEvent.example2
+보기 3: $quizEvent.example3
+보기 4: $quizEvent.example4
+힌트 url: $quizEvent.hintUrl
+
+진행번호 : $number
+맞춘갯수 : $correctCount
+
+event_key : $event_key
+
+
+hidden 필드로  result로 post
+<form action="result" method="post">
+event_key는 계속 넘겨주면 됩니다.
+<input type="hidden" name="event_key" value="$event_key">
+선택한 답을 obj_id 로 보냄
+<input name="obj_id" value="0">
+<input type=submit>
+</form>
+</pre>
+#end

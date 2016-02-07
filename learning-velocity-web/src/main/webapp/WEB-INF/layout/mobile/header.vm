@@ -1,0 +1,116 @@
+#uaCheck()
+#parse("/layout/mobile/service_def.vm")
+#if(!$StringUtils.equals("$!{isDaumMusicApp}", "true"))
+
+##<div id="daumHead" class="#if ($serviceDef.gnbCount == 0 && $serviceDef.lnbCount == 0)only_head#end#if ($ServiceName == "shoppinghow" || $ServiceName == "dic") gnb_open#end"> ## GNB 노출 안하는경우 only_head 클래스 추가 / 쇼핑하우 카테고리 오픈시 cate_open 추가
+<div id="daumHead" class="d_head d_head_light">
+    <div class="tit_daum">
+	##		<h1 class="tit_daum">
+		#if($isWVGA)
+		##<a href="http://m.daum.net/" id="daumLogo" class="link_daum"><img src="http://m1.daumcdn.net/svc/image/U03/common_icon/526776B4042520000A" width="71" height="33" alt="Daum"></a>
+            <a href="http://m.daum.net/" id="daumLogo" class="link_daum"><img src="http://m1.daumcdn.net/svc/image/U03/common_icon/52E1CEEA0379830003" width="60" height="24" alt="Daum"></a>
+		#else
+		##<a href="http://m.daum.net/" id="daumLogo" class="link_daum"><img src="http://m1.daumcdn.net/svc/image/U03/common_icon/526776B4042520000A" width="47" height="22" alt="Daum"></a>
+            <a href="http://m.daum.net/" id="daumLogo" class="link_daum"><img src="http://m1.daumcdn.net/svc/image/U03/common_icon/52E1CEEA0379830003" width="40" height="16" alt="Daum"></a>
+		#end
+	##<a href="#getter( 'SERVICE_MOBILE_DOMAIN', '')" id="daumServiceLogo" class="link_service"><span class="tit_service inner_service"><span class="ir_wa">${serviceDef.titService}</span></span></a>
+        <a href="/top" id="daumServiceLogo" class="link_service tit_service"><span class="ir_wa">${serviceDef.titService}</span></a>
+        </h1>
+	##		#if ($serviceDef.relService != "")
+	##		<strong class="screen_out">관련 서비스</strong>
+	##		<a href="http://m.movie.daum.net/" class="link_relate">${serviceDef.relService}</a>
+	##		#end
+    </div>
+##		<div class="wrap_util">
+    <!-- 레이어 펼침 : layer_on 클래스 추가 -->
+	#if (!$serviceDef.btnSchHide)
+	##<a href="http://mtop.search.daum.net/" id="link_search" class="link_util"><span class="img_g ico_search">통합검색::after</span></a>
+        <a href="http://mtop.search.daum.net/" id="link_search" class="link_search"><span class="img_g ico_search">통합검색</span></a>
+	#end
+##			#if (!$serviceDef.btnAllHide)
+##			##<a href="http://m.daum.net/site.daum?t__nil_header=sitemap" id="link_all" class="link_util"><span class="img_g ico_all_view">전체서비스</span></a>
+##			<a href="#none" id="btn_navigation" class="link_all"><span class="ico_dot"></span><span class="ico_dot"></span><span class="ico_dot"></span><span class="txt_label">관련 서비스 펼치기</span></a>
+##			#end
+##		</div>
+#*
+		<div id="daumNavigationLayer" class="service_layer hide">
+			<ul class="list_service">
+				<li>
+		     #* WEB2APP START
+             * 아래 a#web2app 요소는 web2app (웹페이지에서 앱 실행하기) 기능을 위한 엘리먼트 입니다.
+             * 다른 앱으로 커스터마이징 하고자 할 경우 아래 attribute 들을 상황에 맞게 수정해주시면 됩니다.
+             * 별도 javascript API 가 필요한 경우는 `dongtl.modules.web2app` 모듈을 활용하시면 됩니다.
+             *
+             * feature:
+             *  - app이 존재할 경우 해당 앱을 실행합니다.
+             *  - app이 존재하지 않을 경우 설치페이지(스토어)로 이동합니다.
+             *  - 지원하지 않는 플랫폼일 경우 통합검색결과 페이지로 이동합니다.
+             *
+             * attribute 설명:
+             *  - href: 앱실행 custom url scheme
+             *  - data-appstore-url: 애플 앱스토어 상세 페이지 URL
+             *  - data-googleplay-url: 구글 스토어 상세 페이지 URL
+             *  - data-search-keyword: 앱 검색 결과용 query keyword
+##             #
+
+            ## 아래 velocity #if구문은 'Daum앱' 이용시에 'Daum앱' 아이콘을 숨기기 위한 구문입니다.
+            ## 홍보할 앱이 'Daum앱'이 아닌 경우엔 아래 velocity #if 구문은 삭제하여 주세요.
+					<a id="web2app" class="link_webapp" role="application"
+						href="javascript:;"
+						data-app-intent="intent://open#Intent;scheme=daummusic://home;package=net.daum.entertainment.music.android;end"
+						data-app-scheme="daummusic://open"
+						data-search-keyword="뮤직앱"
+						data-app-id="7"
+			##			data-confirm-message="뮤직앱을 설치하시면 언제 어디서나 200만곡의 노래들을 손쉽게 감상하실 수 있습니다. 설치하시겠습니까?"
+						data-appstore-url="itms-apps://itunes.apple.com/kr/app/id411835583?mt=8 "
+						data-googleplay-url="market://details?id=net.daum.entertainment.music.android">
+						#if($isWVGA)
+							##<img src="http://m1.daumcdn.net/svc/image/U03/common_icon/${serviceDef.app1_5X}" width="36" height="38" class="img_webapp" alt="${serviceDef.titService}앱">
+							<img src="http://m1.daumcdn.net/svc/image/U03/common_icon/${serviceDef.app1_5X}" width="43" height="43" class="img_webapp" alt="${serviceDef.titService}앱">
+						#else
+							##<img src="http://m1.daumcdn.net/svc/image/U03/common_icon/${serviceDef.app2X}" width="24" height="25" alt="${serviceDef.titService}앱">
+							<img src="http://m1.daumcdn.net/svc/image/U03/common_icon/${serviceDef.app2X}" width="29" height="29" class="img_webapp" alt="${serviceDef.titService}앱">
+						#end
+						<span class="txt_webapp">뮤직앱</span>
+						<em class="img_g ico_app"></em>
+						## WEB2APP END
+					</a>
+				</li>
+				<li>
+					<a href="http://m.movie.daum.net/" class="link_webapp">
+						<span class="txt_webapp">영화</span>
+					</a>
+				</li>
+				<li>
+					<a href="http://m.media.daum.net/m/entertain/" class="link_webapp">
+						<span class="txt_webapp">연예</span>
+					</a>
+				</li>
+			</ul>
+			<a href="http://m.daum.net/site.daum?t__nil_header=sitemap" class="link_sitemap">전체서비스<span class="img_g ico_arr"></span>
+			</a>
+			<a id="daumNavigationHideBtn" href="#none" class="screen_out">관련 서비스 접기</a>
+		</div>
+*#
+</div>
+
+<!-- START 서비스 GNB / LNB 영역 =========================================== -->
+
+## gnb 메뉴 Start
+##	<h2 class="screen_out">뮤직 메뉴</h2>
+##	<ul id="gnbdWrap" class="gnb_comm" role="navigation">
+##		<li class="gnb_w1 fst #if($!requestURI.indexOf("/mobileweb/top") >-1 || $!requestURI.indexOf("/mobileweb/?") >-1 || $!requestURI.endsWith("/mobileweb/") || $!requestURI.indexOf("/event/") >-1 || $StringUtils.contains("$!{requestURI}", "/sym/")) on#end"><a href="/top" class="link_menu">홈</a></li>
+##		<li class="gnb_w2 #if($!requestURI.indexOf("/chart/") >-1)on#end"><a href="/chart/main" class="link_menu">차트</a></li>
+##		<li class="gnb_w3 #if($!requestURI.indexOf("/musicbar/") >-1)on#end"><a href="/musicbar/top" class="link_menu">뮤직 BAR</a></li>
+##		<li class="gnb_w4 #if(!$StringUtils.contains("$!requestURI", "/artist/") && !$StringUtils.contains("$!requestURI", "/album/") && $!requestURI.indexOf("/vclip/") >-1)on#end"><a href="/vclip/top" class="link_menu">뮤비</a></li>
+##		<li class="gnb_w5 lst #if($!requestURI.indexOf("/onair/") >-1)on#end"><a href="/onair/timeline" class="link_menu">방금그곡</a></li>
+##<li class="gnb_w5 lst #if($!requestURI.indexOf("/imagene/") >-1)on#end"><a href="/imagene/main" class="link_menu">이달의 앨범</a></li>
+##<li class="menu4 #if($!requestURI.indexOf("/appIntro") >-1)on#end"><a href="/appIntro">뮤직앱 </a></li>
+##	</ul>
+## gnb 메뉴 End
+<!-- END 서비스 GNB / LNB 영역 ============================================= -->
+
+
+</div>
+#end
+

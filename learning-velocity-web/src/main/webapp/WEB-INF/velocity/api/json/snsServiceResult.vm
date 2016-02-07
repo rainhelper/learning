@@ -1,0 +1,16 @@
+#if("$!{callback}" != "")
+if (typeof(${callback}) == "function") ${callback} (
+#end
+{
+	"snsServiceResult" : {
+		"type" : "${snsServiceResult.resultType}",
+		"message" : "${snsServiceResult.message}"
+		#*
+		"type" : "$!Escape.escapeJava(${snsServiceResult.resultType})",
+		"message" : "$!Escape.escapeJava(${snsServiceResult.message})"
+		*#
+	}
+}
+#if("$!{callback}" != "")
+);
+#end

@@ -1,0 +1,207 @@
+<div class="wrap_special">
+	<div style="width:100%;height:100%;background:#f0f0f0;">
+	##	운영영역. 통짜이미지로 가신다 함. 698 * 208
+	<ul id="topeventlist" class="top_event_list">
+	#foreach($motTemplete in $motTempleteList)
+	#if($StringUtils.isNotBlank("$!{motTemplete.linkUrl}") )
+	<li id="num_event_$foreach.count" #if($foreach.count == 1 )class="event_top_banner on"#else class="event_top_banner"#end><a href="$!{motTemplete.linkUrl}" title="이벤트">
+		<img src="$!{motTemplete.imageUrl}" width="698" height="230" alt="이벤트">
+	</a></li>
+	#end
+	#end
+	</ul>
+	</div>
+	<div id="btn_event_list" class="wrap_nav">
+	#foreach($motTemplete in $motTempleteList)
+	#if( $StringUtils.isNotBlank("$!{motTemplete.linkUrl}") )
+		#if($foreach.count == 1)
+		<a id="btn_event_num$!{foreach.count}" class="num_event num$!{foreach.count}_on" onclick="daum.Music.Event.choiceEvent($!{foreach.index});return false;" href="#">1</a>
+		#else
+		<a id="btn_event_num$!{foreach.count}" class="num_event num$!{foreach.count}" onclick="daum.Music.Event.choiceEvent($!{foreach.index});return false;" href="#">2</a>
+		#end
+	#end
+	#end
+	</div>
+</div>
+<div class="wrap_tab">
+	#if($StringUtils.equals("$!{eventType}","album")||$StringUtils.isBlank("$!{eventType}"))#set($eventServiceId = 50)#set($tab1 = " on")#end
+	#if($StringUtils.equals("$!{eventType}","perform"))#set($eventServiceId = 51)#set($tab2 = " on")#end
+	#parse("/velocity/event/piece/tab.vm")
+	#*
+	<ul class="tab_cont tab_event">
+		#if($StringUtils.equals("$!{eventType}","album")||$StringUtils.isBlank("$!{eventType}"))#set($eventServiceId = 50)#set($albumEventType = "on")#end
+		#if($StringUtils.equals("$!{eventType}","perform"))#set($eventServiceId = 51)#set($performEventType = "on")#end
+		<li class="event_menu1 $!{albumEventType}">
+			<a href="/event/list?service_id=50" title="앨범/기획 이벤트">
+				앨범&amp;기획
+				<span class="txt_num">($!{albumEventCount})</span>
+			</a>
+		</li>
+		<li class="event_menu2 $!{performEventType}">
+			<a href="/event/list?service_id=51" title="공연초대 이벤트">
+				공연초대
+				<span class="txt_num">($!{performEventCount})</span>
+			</a>
+		</li>
+		<li class="event_menu3">
+			<a href="/event/freesong/list" title="무료음악감상 이벤트">
+				무료음악감상
+				<span class="txt_num">($!{freeAodEventCount})</span>
+			</a>
+		</li>
+		<li class="event_menu4">
+			<a href="/event/winner/list" title="당첨자발표">
+				당첨자발표
+				<span class="txt_num">($!{winnerEventCount})</span>
+			</a>
+		</li>
+	</ul>
+	*#
+	<h3 class="screen_out">앨범&amp;기획</h3>
+	<div class="sort_option">
+		#if($StringUtils.equals("$!{command.sort_type}","6")||$StringUtils.isBlank("$!{command.sort_type}"))#set($classNameNew = "link_option")#end
+		#if($StringUtils.equals("$!{command.sort_type}","7"))#set($classNameClose = "link_option")#end
+		<a class="$!{classNameNew}" href="/event/list?service_id=$!{eventServiceId}&sort_type=6" title="최신순 정렬">최신순</a>
+		<span class="txt_bar"> | </span>
+		<a class="$!{classNameClose}" href="/event/list?service_id=$!{eventServiceId}&sort_type=7" title="마감일순 정렬">마감일</a>
+	</div>
+</div>
+<ul class="list_event">
+#foreach($event in $eventList)
+
+#set($hide = "false")
+#if( $StringUtils.isBlank("$!{event.winningDate}") && $StringUtils.equals("$!{eventType}","perform") && $MathTool.toNumber($CheckDate.diffOfDate("$!{event.endDate}")) > 0)
+	#set($hide = "true")
+#end
+
+#if($StringUtils.equals("$!{hide}", "false"))
+<li>
+	<a class="thumb_link" a href="$!{event.linkUrl}" title="$!{event.eventTitle}">
+		<img src="$!{event.bannerUrl}" width="242" height="86" alt="$!{event.eventTitle}">
+		<span class="line_thumb"></span>
+		#if($StringUtils.equals("$!{event.musicEventSpecial}","Y"))<span class="ico_event ico_special"></span>#end
+	</a>
+	<div class="wrap_info_type1">
+		<strong class="wrap_title">
+			#set($diffDate = $Number.toNumber($CheckDate.diffOfDate($event.endDate)))
+			#set($ico_event = '')
+			#set($evTitlen = 52)
+			#if($diffDate > 0)
+				#set($ico_event = '<span class="ico_event ico_limit">마감</span>')
+				#set($evTitlen = 42)
+			#else
+				#if($diffDate > -3)
+				#set($ico_event = '<span class="ico_event ico_approach">마감임박</span>')
+				#set($evTitlen = 42)
+				#end
+			#end
+			##<a href="/event/detail?event_id=$!{event.eventId}" title="$!{event.eventTitle}">#strCut($!{event.eventTitle},$evTitlen)</a>
+			##뮤직바 가로 이슈땜에 제목은 event.linkUrl 이용해서 링크 걸음
+			<a href="$!{event.linkUrl}" title="$!{event.eventTitle}">#strCut($!{event.eventTitle},$evTitlen)</a>
+			$!{ico_event}
+		</strong>
+		<dl class="wrap_col">
+			<dt class="tit_info show">기간</dt>
+			<dd class="txt_info">#printDateWithName($event.startDate true) ~ #printDateWithName($event.endDate true)</dd>
+		</dl>
+		<dl class="wrap_col">
+			<dt class="tit_info show">발표</dt>
+			<dd class="txt_info">#printDateWithName($event.winningDate true)</dd>
+		</dl>
+		<dl class="wrap_col">
+
+			<dt class="tit_info show">경품</dt>
+			<dd class="txt_info">
+				#set( $len = 56 )
+				#foreach($present in $event.presentList)
+				#if($len >2 )
+				#if($foreach.index > 0)<span class="txt_bar"> | </span>#end
+				#set( $printName = "$!{present.title}" + " $!{present.quantity}"+"명")
+				#set( $printName = "#strCut($!{printName}, $len)" )
+				$!{printName}
+				#set( $len = $len - $StringCutUtil.getStringByte($!{printName}) )##
+				#end
+				#end
+			</dd>
+		</dl>
+	</div>
+
+</li>
+#end
+
+#end
+</ul>
+
+##page
+#printPaging($pagingUrl, $command.page_no, $pageHandler, "", 10)
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+#*
+이벤트 메뉴
+http://music.daum.net/event/list
+
+http://music.daum.net/event/list?service_id=50&sort_type=7&page_no=1
+
+service_id : [50 =>앨범&기획, 51 => 공연]
+    값 없으면 최신거 있는 tab 노출됨
+
+sort_type : [6 => 최신순, 7 => 마감일순]
+    값 없으면 최신순 default
+
+page_no : [1,2,3,4....]
+    값 없으면 1
+
+title 옆에 이미지 tag 붙이는 기준
+마감임박 : 마감종료일 3일전부터
+마감 : 마감되었을때
+*#
+
+$command.sort_type
+$command.service_id
+
+상단 이벤트 롤링 데이터 입니다. ~ <br />
+#foreach($motTemplete in $motTempleteList)
+	1<br/>
+	$motTemplete<br /><br />
+	${motTemplete.imageUrl}<br />
+	${motTemplete.linkUrl}<br />
+#end
+<br />
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+"albumEventCount" : "$!{albumEventCount}"<br>
+"performEventCount" : "$!{performEventCount}"<br>
+"freeAodEventCount" : "$!{freeAodEventCount}"<br>
+"winnerEventCount" : "$!{winnerEventCount}"<br>
+
+## tab 표시 :: album => 앨범&기획 :: perform => 공연
+"eventType" : "$!{eventType}"<br>
+
+"eventList"<br>
+#foreach($event in $eventList)
+	"eventId" : "$!{event.eventId}"<br>
+	"title" : "$!{event.eventTitle}"<br>
+	"startDate" : "$!{event.startDate}"<br>
+	"endDate" : "$!{event.endDate}"<br>
+	"diff" : "$Number.toNumber($CheckDate.diffOfDate($event.endDate))" <br/>
+	"winningDate" : "$!{event.winningDate}"<br>
+	"linkUrl" : "$!{event.linkUrl}"<br>
+	"bannerUrl" : "$!{event.bannerUrl}"<br>
+	"musicSpecail" : "$!{event.musicSpecail}"<br>
+	"presentList"<br>
+		#foreach($present in $event.presentList)
+			"id" : "$!{present.id}"<br>
+			"winningRank" : "$!{present.winningRank}"<br>
+			"title" : "$!{present.title}"<br>
+			"quantity" : "$!{present.quantity}"<br>
+		#end
+	<br>
+#end
+<br>
+#end
+

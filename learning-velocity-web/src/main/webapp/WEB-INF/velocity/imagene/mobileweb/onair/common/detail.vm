@@ -1,0 +1,315 @@
+#uaCheck()
+#set($recommObjType = "onair")
+#if($StringUtils.equals("$!{command.channelType}","4"))
+	#set($link = "/onair/radio/detail")
+#else
+	#set($link = "/onair/tv/detail")
+#end
+
+#set($minDay = "20140204")
+
+<div id="daumContent" class="cont_now" role="main">
+<div id="mArticle">
+	<div class="now_navi">
+		<h3 class="tit_navi">
+			$!{selectedProgram.programMasterName}
+			#if($StringUtils.equals("$!{selectedProgram.weekendYn}", "Y"))
+				(주말)
+			#end	
+		</h3>
+		<a href="javascript:;" class="btn_prev" onclick="window.history.back();"><span class="ico_now ico_prev"></span>이전</a>
+	</div>
+	
+	<strong class="screen_out">방송 상세 정보</strong>
+	
+	<div class="now_song">
+    	<dl class="song_detail">
+    		<dt class="tit_detail">방송</dt>
+    		<dd class="desc_detail">
+				$!{selectedProgram.channelName}
+				$!CheckDate.makeBroadCastTime("$!selectedProgram.broadcastTime")
+				#set($nowDateTime =  $MathTool.toNumber($CheckDate.getNowDateTime()))
+        		#if( $nowDateTime >= $MathTool.toNumber($lastSchedule.programStartTime) &&  $nowDateTime <= $MathTool.toNumber($lastSchedule.programEndTime) )
+        			<em class="txt_onair">방송중</em>
+        		#end
+			</dd>
+    	</dl>		
+
+
+<script type="text/javascript">
+/**
+ * sns 공유하기
+ * @param {String} 포스팅시 링크에 적용될 문장
+ */
+doc = document;
+doc.loc = music.mobile.replaceURL();
+var sourceId = 2;
+var prefix = '$!{selectedProgram.programMasterName} 선곡표 $!{lastSchedule.startDate.substring(0,4)}-$!{lastSchedule.startDate.substring(4,6)}-$!{lastSchedule.startDate.substring(6,8)}';
+var url = doc.loc;
+
+var shareSNS = {
+	"prefix" : prefix,
+	"link" : url,
+	"sourceId" : sourceId
+}
+</script>
+		
+
+    	<div class="song_btns">
+    		<span class="desc_song"><a href="javascript:;" class="link_song link_recomm" onclick="music.mobile.recommendByToken.call('$!{selectedProgram.programId}','$!recommObjType','$!{securitytoken}');return false;"><span class="ico_now ico_recomm">추천</span> <span id="recommend_$!{selectedProgram.programId}">$!{selectedProgram.recommendCount}</span></a></span>
+    		
+
+			
+		
+			#snsLayer()
+			<div class="cl_b"></div>
+			<div id="socialShareMoreViewContainer"></div>
+				
+    	</div>
+    </div>
+	
+	<div id="parentCalwrap" class="now_date"> <!-- date_open 클래스 추가시 달력 활성화 -->
+    	<strong class="screen_out">날짜</strong>
+    	<a href="$!{link}?channelId=$!{selectedProgram.channelId}&channelType=$!{selectedProgram.channelType}&programId=$!{selectedProgram.programId}" class="btn_today">최신</a>
+
+		
+		<div id="dateCon">
+			<div class="date_cont">
+				#if($StringUtils.isNotBlank("$prevCurrentDay") && $MathTool.toNumber("$!{prevCurrentDay}") > $MathTool.toNumber("$!{minDay}") )
+					<a class="link_date" href="?searchDate=$prevCurrentDay&channelId=$!{selectedProgram.channelId}&channelType=$!{selectedProgram.channelType}&programId=$!{selectedProgram.programId}"><span class="ico_now ico_prev">이전 날</span></a>
+				#else
+					<em class="link_date"><span class="ico_now ico_prev">이전 날</span></em>
+				#end	
+			
+	        		<span class="cont_date"><span class="date_num">$CheckDate.makeReleaseDate("$!{lastSchedule.startDate}")</span>($CheckDate.getDayNameByDate("$!{lastSchedule.startDate}"))</span>
+				#if($StringUtils.isNotBlank("$!{nextCurrentDay}") && $MathTool.toNumber($CheckDate.diffOfDate("$!{nextCurrentDay}")) > -1)
+					
+					<a class="link_date" href="?searchDate=$!{nextCurrentDay}&channelId=$!{selectedProgram.channelId}&channelType=$!{selectedProgram.channelType}&programId=$!{selectedProgram.programId}"><span class="ico_now ico_next">다음 날</span></a>
+				#else
+					<em class="link_date"><span class="ico_now ico_next">다음 날</span></em>
+				#end 
+	        </div>
+
+	    </div>
+		<div id="monthCon">
+
+	    </div>
+		<div id="calendarBtnCon">
+			#if($StringUtils.isNotBlank("$!{lastSchedule.startDate}"))
+			<a  href="javascript:;" class="btn_calendar" onclick="calendarLayer.toggle('$!{lastSchedule.startDate}','$!{selectedProgram.channelId}','$!{selectedProgram.channelType}','$!{selectedProgram.programId}');return false;"><span class="ico_now ico_calendar">달력 열기/닫기</span></a>
+			#end
+	    </div>
+		<div id="calwrap" class="calendar_comm">
+    		
+    	</div>
+    </div>
+
+	
+	#if($sameDateScheduleList.size() > 1)
+	<ul class="tab_sort">
+	#foreach($schedule in $sameDateScheduleList)	
+	<li class="link_broadcast" data-starttime="$!{schedule.programStartTime}">	
+    	<a id="broadcastTimeBtn_$!{foreach.index}"  href="javascript:;" class="link_tab" onclick="songListView.changeSonglist($!{selectedProgram.channelId},$!{selectedProgram.channelType},$!{schedule.tvProgramId},$!{schedule.programStartTime},$!{schedule.programEndTime});return false;">
+    		<span class="txt_num">$CheckDate.makeBroadCastTime("$!{schedule.programStartTime}")</span> 방송
+    	</a>
+	</li>
+	#end
+	</ul>
+	#end
+	
+	
+	<strong class="screen_out">곡 리스트</strong>
+	<ul id="trackContainer" class="list_timeline list_program">
+	#set($songIdArr = [])
+	#foreach($channelSong in $songList)
+    	
+		#if($StringUtils.isNotBlank("$!{channelSong.song.songId}") && "$!{channelSong.song.songId}" != "0")
+			## 유니크하게 값이 들어가도록  기존에 값이 있는지 확인한다.
+			#if(!$ListTool.contains($songIdArr,"$!{channelSong.song.songId}"))	
+				#if("$!{channelSong.song.AODLinkId}" != "" && "$!{channelSong.song.AODLinkId}" !="0")
+					#set($temp =$songIdArr.add("$!{channelSong.song.songId}"))
+				#end
+			#end	
+			##set($songId = "$!{channelSong.song.songId}")
+			#set($offSongCn = "")
+			#set($offArtistCn = "")
+		#else
+    		##set($songId = "0")
+			#set($offSongCn = "off")
+			#set($offArtistCn = "off")
+		#end
+		#set($timeStamp = $CheckDate.makeBroadCastTime($channelSong.startTime.substring(8,12)))	
+
+    		<li class="track">
+			
+			##스크립트로 그릴때 사용	
+    		##<input class="inp_comm" type="hidden" name="trackCheckbox" value="$!{songId}" />
+        		<a href="javascript:;" class="link_info" onclick="javascript:music.mobile.Timeline.moreViewLayer(this);return false;">
+        			<span class="timeline_time"><span class="screen_out">방송시간 </span><span class="txt_num">$!timeStamp</span></span>
+        			
+					#if("$!{channelSong.song.album.albumId}" != "0" && "$!{channelSong.song.album.mainImage.filePath}" != "")
+            		<img src='$ImageUtil.getMobileImageUrl("$!{channelSong.song.album.mainImage.filePath}", "100x100", "ALBUM", "C")' width="35" height="35" class="thumb_img" alt="${channelSong.title}">
+            		#else
+            		<img src="http://m1.daumcdn.net/img-media/mobile/m640/music/img_none2.jpg"  width="35" height="35" class="thumb_img" alt="${channelSong.title}">
+            		#end
+					
+        			<span class="timeline_info">
+        				<strong class="tit_song $!{offSongCn}"><span class="screen_out">곡명 </span>
+							#if(${channelSong.songId} != 0)
+								#strCut(${channelSong.song.title}, 50)
+								#adultIcon($!{channelSong.song.adultYn})
+							#else 
+								#strCut(${channelSong.title}, 50)
+							#end
+						</strong>
+        				<span class="txt_info $!{offArtistCn}"><span class="screen_out">아티스트 </span>
+							#if("$!{channelSong.song.songId}" != "0")
+        						#set($artistCount = 0)
+        						#set($etcArtistCount = 0)
+        						#foreach($songArtist in $!{channelSong.song.keyArtistList})
+        							#set($artistCount = $artistCount +1)
+    								#set($strCutLen = 30)
+        							#if($!{channelSong.song.keyArtistList.size()} == 1)
+        								#set($strCutLen = 50)
+        							#end								
+        							#strCut(${songArtist.name}, $strCutLen, "..")#if($artistCount < $!{channelSong.song.keyArtistList.size()} && $artistCount < 2),#end
+        							#if($artistCount == 2) #set($etcArtistCount = $!{channelSong.song.keyArtistList.size()} - 2) #break #end
+        						#end
+        						#if($etcArtistCount > 0)
+        						외 ${etcArtistCount}명 
+        						#end
+        					#else #strCut($!{channelSong.artistName}, 50, "..")
+        					#end
+						</span>
+        			</span>
+        			<span class="btn_side"><span class="ico_now ico_fold">추가 제공 서비스 열기/닫기</span></span>
+        		</a>
+        		<a href="javascript:;" class="btn_side #if("$!{channelSong.song.songId}" == 0 || "$!{channelSong.song.AODLinkId}" == "" || "$!{channelSong.song.AODLinkId}" =="0")btn_off#end" #if("$!{channelSong.song.songId}" != 0 && "$!{channelSong.song.AODLinkId}" != "" && "$!{channelSong.song.AODLinkId}" !="0") onclick="music.mobile.mMusicPlay.playSample('${channelSong.song.AODLinkId}_$foreach.index','','close');" #end><span class="ico_now ico_listen">듣기</span></a>
+        		<div class="timeline_fold">
+        			#btnPlayListOnAirDetail($!{channelSong.song.songId}, "lyrics", $!{channelSong.sogn.lyricsYn}, $!{channelSong.song.album.albumId})
+        			#btnPlayListOnAirDetail($!{channelSong.song.album.albumId}, "album", $!{channelSong.song.AODLinkId}, $!{channelSong.song.album.albumId})
+					#btnPlayListOnAirDetail($!{channelSong.song.songId}, "buy", $!{channelSong.song.MP3LinkId}, $!{channelSong.song.album.albumId})
+					#btnPlayListOnAirDetail($!{channelSong.song.songId}, "app", $!{channelSong.song.AODLinkId}, $!{channelSong.song.album.albumId})
+        		</div>
+        		#if("$!{channelSong.song.songId}" != 0 && "$!{channelSong.song.AODLinkId}" != "" && "$!{channelSong.song.AODLinkId}" !="0")
+        		<div id="sId_${channelSong.song.songId}_$foreach.index" class="audio"></div>
+        		#end
+        	</li>
+    	
+    	
+	
+	#end	
+		
+	</ul>
+	
+	
+	#set( $PATH = "#getter('PATH_URI', '')" )
+	<script type="text/javascript">
+	// 곡리스트
+	
+	var songListViewParam = {
+		channelId : "$!{selectedProgram.channelId}",
+		channelType : "$!{selectedProgram.channelType}",
+		programId : "$!{selectedProgram.programId}",
+		programStartTime : "$!{lastSchedule.programStartTime}",
+		programEndTime : "$!{lastSchedule.programEndTime}"
+	}	
+		
+	var songListView = new music.mobile.ScriptView({
+		"initLoadData" : false,
+		"songContainerId" : "trackContainer",
+		"jsonUrl" : "/onair/programSonglist.json",
+		"type" : "song", 
+		"dataParam" : songListViewParam,
+		"programStartTime":"$!{lastSchedule.programStartTime}"
+	});
+
+		// 달력
+	var dateViewParam = {
+		searchDate :"$!{lastSchedule.startDate}",
+		channelId : "$!{selectedProgram.channelId}",
+		channelType : "$!{selectedProgram.channelType}",
+		mediaType : "$!{selectedProgram.mediaType}",
+		programId : "$!{selectedProgram.programId}",
+		tagId : "$!{selectedGenre.tagId}"
+	}
+
+	var dateView = new music.mobile.ScriptView({
+		"initLoadData" : false,
+		"dataAjaxCall" : false,
+		"dateContainerId" : "dateCon",
+		"calentBtnContainerId" :  "calendarBtnCon",
+		"songContainerId" : "trackContainer",
+		"jsonUrl" : "/onair/programScheduleSongList.json",
+		"type" : "date",
+		"dataParam" : dateViewParam,
+		"path" : "$!PATH",
+		"programStartTime":"$!{lastSchedule.programStartTime}"
+		
+	});
+	
+	
+	// 달력
+	var dateViewParam = {
+		searchDate :"$!{lastSchedule.startDate}",
+		channelId : "$!{selectedProgram.channelId}",
+		channelType : "$!{selectedProgram.channelType}",
+		programId : "$!{selectedProgram.programId}",
+		tagId : "$!{selectedGenre.tagId}"
+	}
+	
+	// 레이어 달력	
+	var calendarLayer = new music.mobile.OnairCalendar(
+		{
+			selectedDay : "$!{lastSchedule.startDate}",
+			dataParam : dateViewParam,
+			jsonUrl : "/onair/programScheduleList.json",
+			calContainerId : "calwrap",
+			parentCalwrapId : "parentCalwrap",
+			dateContainerId : "monthCon",
+			calentBtnContainerId :  "calendarBtnCon",
+			useScheduleDays : true,
+			selectDateAddFunc : dateView.changeDate.bind(dateView),
+			minDay : "$!minDay"
+		}
+	);
+	</script>
+	
+		
+		<div id="wrapListenByApp">
+		#if($ua_result.os.ios)
+			#if($MathTool.toNumber($ua_result.browser.major) > 3)
+				<a id="listenByApp" href="javascript:;" class="link_sort link_app" ><span class="ico_now ico_listen"></span>앱에서 전곡듣기</a>
+				
+				## 스크립트르 그릴때 쓰는 함수
+				##<a id="listenByApp" href="javascript:;" class="link_sort link_app" onclick="music.mobile.Onair.listenByApp('trackContainer');return false;"><span class="ico_now ico_listen"></span>앱에서 전곡듣기</a>
+			#else
+				<a href="javascript:;" class="link_sort link_app" onclick="alert('사용하시는 IOS 버전에서는 지원하지 않는 기능입니다. IOS를 최신버전으로 업그레이드 해 주세요');"><span class="ico_now ico_listen"></span>앱에서 전곡듣기</a>
+			#end
+		#elseif(($ua_result.os.android && $StringUtils.equals("$!{command.for_android_app}", "Y")))
+				<a id="listenByApp" href="javascript:;" class="link_sort link_app"><span class="ico_now ico_listen"></span>앱에서 전곡듣기</a>
+				
+				## 스크립트르 그릴때 쓰는 함수
+				##<a id="listenByApp" href="javascript:;" class="link_sort link_app" onclick="music.mobile.Onair.listenByApp('trackContainer');return false;"><span class="ico_now ico_listen"></span>앱에서 전곡듣기</a>
+		#end
+		</div>
+		
+<script type="text/javascript">		
+#if($CollectionUtils.isNotEmpty($!{songIdArr}))
+daum.Event.addEvent( window, "load", function(){
+	var el = daum.$("listenByApp");
+	if(el) {
+		daum.Event.addEvent(el, "click", function() {
+			music.mobile.mMusicPlay.playOnApp('SO', '$StringUtils.join($songIdArr, "/")', '');
+		});
+	}
+});
+#else
+daum.Element.hide("wrapListenByApp");
+#end
+</script>		
+	#SearchForm("only_bottom")
+	
+</div>
+</div>
+#parse("/velocity/mobileweb/realtimeissue.vm")	

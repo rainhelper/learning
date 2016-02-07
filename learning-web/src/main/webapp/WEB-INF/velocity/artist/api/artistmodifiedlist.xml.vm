@@ -1,0 +1,35 @@
+<cia>
+	<serviceid>music</serviceid>
+	<sectionid>artist_list_xml</sectionid>
+	<itemid></itemid>
+	<title>아티스트  최신 목록 (수정순)</title>
+	<list>
+	#foreach($artist in $artistList)
+		<object>
+			<serviceid>music</serviceid>
+			<sectionid>artist</sectionid>
+			<itemid>$!{artist.artistId}</itemid>
+			<title><![CDATA[$!{EscapeUtil.escapeJsonString($!{artist.name})}]]></title>
+			<synonym>
+				<list>
+				#foreach($synonym in $artist.getSynonymList())
+					<value><![CDATA[$!{synonym}]]></value>
+				#end
+				</list>
+			</synonym>
+			<link><![CDATA[http://music.daum.net/artist/main?artist_id=$!{artist.artistId}]]></link>
+			<image><![CDATA[$!{artist.mainImage.filePath}]]></image>
+			<point><![CDATA[]]></point>
+			<point_cnt><![CDATA[]]></point_cnt>
+			<mod_dttm><![CDATA[$!{artist.modDateTime}]]></mod_dttm>
+			<status><![CDATA[#if("$!{artist.svcstatus}" == "2") "Y" #else "N" #end]]></status>
+		</object>
+	#end
+	</list>
+	<paging>
+		<page>$!{pageHandler.pageNo}</page>
+		<count_per_page>$!{pageHandler.onePageCnt}</count_per_page>
+		<page_count>$!{pageHandler.totalPage}</page_count>
+		<count>$!{pageHandler.totalCnt}</count>
+	</paging>
+</cia>

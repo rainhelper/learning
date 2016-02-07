@@ -1,0 +1,34 @@
+{
+	"serviceid" : "music",
+	"sectionid" : "album_list",
+	"title" : "앨범 최신 목록 (수정순)",
+	"list" :[
+	#foreach($album in $albumList)
+		{
+		    "serviceid":"music",
+		    "sectionid":"album",
+		    "albumid" : "$!{album.albumId}",
+		    "title" : "$!{EscapeUtil.escapeJsonString($!{album.title})}",
+		    "subtitle" : "$!{EscapeUtil.escapeJsonString($!{album.subTitle})}",
+		    "synonym" : [
+		    #foreach($synonym in $album.synonymList)
+		    	"$!{synonym}"#if($velocityHasNext),#end
+		    #end
+		    ],
+		    "link" : "http://music.daum.net/album/main?album_id=$!{album.albumId}",
+		    "image" : "$!{album.mainImage.filePath}",
+		    "point" : "",
+		    "point_cnt" : "",
+		    "mod_dttm" : "$!{album.modDateTime}",
+		    "status" : #if("$!{album.svcstatus}" == "2") "Y" #else "N" #end
+		}#if($velocityHasNext),#end
+	#end
+	]
+	,
+	"paging" : {
+		"page": $!{pageHandler.pageNo},
+		"count_per_page" : $!{pageHandler.oneBlockCnt},
+		"page_count" : $!{pageHandler.totalPage},
+		"count" : $!{pageHandler.totalCnt}
+	}
+}

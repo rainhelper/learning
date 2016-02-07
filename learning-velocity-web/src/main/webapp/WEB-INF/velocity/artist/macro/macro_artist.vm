@@ -1,0 +1,761 @@
+## 아티스트 차트 Navi Tab
+#macro(printDetailChartNaviTab $songType)
+    <ul class="category_navi">
+    	<li class="fst #if($StringUtils.equals("$!{songType}", "TOTAL"))on#end">
+			<a href="/artist/song/list?artist_id=$!{command.artist_id}&amp;song_type=TOTAL"><span class="cate_total f_l">종합</span><em class="f_l">(#toCurrency(${songCount.get("TOTALCOUNT")}) 곡)</em></a>
+		</li>
+		#if(!$StringUtils.equals("${songCount.get('REGULARCOUNT')}", "0"))
+    	<li #if($StringUtils.equals("$!{songType}", "REGULAR"))class="on"#end>
+			<a href="/artist/song/list?artist_id=$!{command.artist_id}&amp;song_type=REGULAR"><span class="cate_sale f_l">발매곡</span>	<em class="f_l">(#toCurrency(${songCount.get("REGULARCOUNT")}) 곡)</em></a>
+		</li>
+		#end
+		#if(!$StringUtils.equals("${songCount.get('OWNBANDCOUNT')}", "0"))
+    	<li #if($StringUtils.equals("$!{songType}", "OWNBAND"))class="on"#end>
+    		<a href="/artist/song/list?artist_id=$!{command.artist_id}&amp;song_type=OWNBAND"><span class="cate_belong f_l">소속그룹곡</span><em class="f_l">(#toCurrency(${songCount.get("OWNBANDCOUNT")}) 곡)</em></a>	
+    	</li>	
+		#end
+		#if(!$StringUtils.equals("${songCount.get('PARTCOMPILCOUNT')}", "0"))
+    	<li #if($StringUtils.equals("$!{songType}", "PARTCOMPIL"))class="on"#end>
+    		<a href="/artist/song/list?artist_id=$!{command.artist_id}&amp;song_type=PARTCOMPIL"><span class="cate_partic f_l">참여곡</span><em class="f_l">(#toCurrency(${songCount.get("PARTCOMPILCOUNT")}) 곡)</em></a>	
+    	</li>
+		#end
+    </ul>
+#end
+
+## 아티스트 상세 Navi Tab
+#macro(printDetailNaviTab $artist $album)
+	#set( $URI = "#getter('URI', '')" )
+	#if($StringUtils.isNotBlank("$!{artist.artistId}"))#set($artistId = $!{artist.artistId})#elseif(!$CollectionUtils.isEmpty($!{album.keyArtistList}))#set($artistId = $!{album.keyArtistList[0].artistId})#end
+	#if($StringUtils.isNotBlank("$!{album.albumId}"))#set($albumId = $!{album.albumId})#end
+	
+	<ul class="tab_detail">
+		#set($hasArtistInfo = true)#set($dir = "artist")
+		#if($URI.indexOf('/artist/main') == -1 && $URI.indexOf('/song/list') == -1 && $URI.indexOf('/album/list') == -1)
+		#set($hasArtistInfo = false)#set($dir = "album")
+			##if($StringUtils.isNotBlank("$!{artist.artistId}") && (($CollectionUtils.isEmpty($!{album.keyArtistList}) || (!$CollectionUtils.isEmpty($!{album.keyArtistList}) && $!{album.keyArtistList.size()} == 1 && !$StringUtils.equals("$!{album.keyArtistList[0].artistId}", "0")))))
+			#if($StringUtils.isNotBlank("$!{artist.artistId}") || (($CollectionUtils.isEmpty($!{album.keyArtistList}) || (!$CollectionUtils.isEmpty($!{album.keyArtistList}) && $!{album.keyArtistList.size()} == 1 && !$StringUtils.equals("$!{album.keyArtistList[0].artistId}", "0")))))
+				#set($hasArtistInfo = true)#set($dir = "artist")
+			#elseif($URI.indexOf('/artist/photo/detail') != -1) ## 아티스트 포토의 경우만 예외 (뮤직비디오는 앨범을 따라 가지만 포토는 아티스트를 따라가야만 한다.) 
+				#set($hasArtistInfo = true)#set($dir = "artist")
+			#end
+		#end
+
+		#if($hasArtistInfo)
+		<li class="home"><a class="CT_ZONE_DETAILTAB1#if($URI.indexOf('/artist/main') !=-1) on#end" href="/artist/main?artist_id=$!{artistId}" title="아티스트 홈">아티스트 홈</a></li>
+		<li class="chart"><a class="CT_ZONE_DETAILTAB2#if($URI.indexOf('/artist/song/') !=-1) on#end" href="/artist/song/list?artist_id=$!{artistId}" title="인기차트">인기차트</a></li>	
+		#end
+		<li class="album"><a class="CT_ZONE_DETAILTAB3#if($URI.indexOf('/album/main') !=-1 || $URI.indexOf('/album/list') !=-1) on#end" href="#if($hasArtistInfo)/artist/album/list?artist_id=$!{artistId}#else/album/main?album_id=$!{albumId}#end" title="앨범">앨범</a></li>	
+		<li class="music_video"><a class="CT_ZONE_DETAILTAB4#if($URI.indexOf('/vclip/') !=-1) on#end" href="/$dir/vclip/list?album_id=$!{albumId}#if($hasArtistInfo)&amp;artist_id=$!{artistId}#end" title="뮤직비디오">뮤직비디오</a></li>
+		<li class="photo"><a class="CT_ZONE_DETAILTAB5#if($URI.indexOf('/photo/') !=-1) on#end" href="/$dir/photo/list?album_id=$!{albumId}&amp;artist_id=$!{artistId}" title="포토">포토</a></li>
+	</ul>
+#end
+
+
+## 아티스트 상세 Navi Tab Bar
+#macro(printDetailNaviTabBar $artist $album)
+#set( $URI = "#getter('URI', '')" )##
+#printDetailNaviTab($artist $album)##
+#if($URI.indexOf('/artist/main') !=-1)##
+#***#<strong class="tit_artist">##
+#***##***##set($nameList = [$!{artist.nameKorLang},$!{artist.nameOrgLang},$!{artist.nameEngLang},$!{artist.realName},$!{artist.nickName}])##
+#***##***##set($hasItem = false)#foreach($name in $nameList)#if($StringUtils.isNotBlank("$!{name}"))#set($hasItem = true)#end#end##
+#***##***##set($prevName = false)##
+#***##***##set($nickNameString = "")##
+#***##***##foreach($name in $nameList)#if($StringUtils.isNotBlank("$!{name}"))#if($prevName)#set($nickNameString = $nickNameString + ", ")#end#set($nickNameString = $nickNameString + $name)#set($prevName = true)#end#end##
+#***##***##set( $a = "#escTitle($!artist.name)" )
+#***##***##set( $a = $a.replaceAll("'","\'") )
+#***##***##set($nickNameLen = 30)#if($StringUtils.isNotBlank("$!{artist.name}"))#set($nickNameLen = 54 - $artist.name.length())#end
+#***##***#<a href="#" title="$!{a} #if($StringUtils.isNotBlank("$nickNameString"))($nickNameString)#end">#strCut($!{artist.name}, 30)##
+#***##***##***#<em class="fs_12">#if($StringUtils.isNotBlank("$nickNameString")) (#strCut($nickNameString, $nickNameLen))#end</em>##
+#***##***#</a>##
+#***#</strong>##
+#elseif($URI.indexOf('/song/list') !=-1 || $URI.indexOf('/album/list') !=-1)##
+#***##set( $url = [["song/list","인기차트"], ["album/list","앨범"], ["vclip/list","뮤직비디오"], ["photo/list","포토"]] )##
+#***#<div class="wrap_route">##
+#***##***#<div class="txt_status">##
+#***##***##printArtistThumb( $artist 1 )##
+#***##***##***#<strong class="fst_txt"><a class="artist_name" href="/artist/main?artist_id=$!{artist.artistId}" onclick="daum.Music.artistDetail($!{artist.artistId});return false;">$!{artist.name}</a></strong><strong class="arr_comm">&nbsp;</strong>##
+#***##***##***##foreach( $item in $url)##
+#***##***##***##***##if($URI.indexOf($item[0]) !=-1)##
+#***##***##***##***##set( $link = $item[0] )##
+#***##***##***##***#<strong><span class="fs_11">&nbsp;</span><a href="/artist/$!{link}?artist_id=$!{artist.artistId}&album_id=$!{command.album_id}">$item[1]</a></strong>##
+#***##***##***##***##end##
+#***##***##***##end##
+#***##***#</div>##
+#***#</div>##
+#else##
+#***#<div class="wrap_route">##
+#***##***#<div class="txt_status">##
+#***##if($URI.indexOf('/album/') !=-1)##
+#***##***##if(!$CollectionUtils.isEmpty($!{album.keyArtistList}) && !$StringUtils.equals("$!{album.keyArtistList[0].artistId}", "0") && $!{album.keyArtistList.size()} == 1)##
+#***##***##***##printArtistThumb( $album.keyArtistList[0] 1 )##
+#***##***##else##
+#***##***##***##set($noImgClass = "no_img")##
+#***##***##end##
+#***##***# ##if( (!$CollectionUtils.isEmpty($album.keyArtistList) && !$StringUtils.equals("$!{album.keyArtistList[0].artistId}", "0")) || $CollectionUtils.isEmpty($album.keyArtistList) && $StringUtils.isNotBlank("$!{artist.artistId}") )##
+#***##***##***#<strong class="fst_txt $!{noImgClass} f_l">#printArtistName( $album.keyArtistList "artist_name key_artist" 15 true )</strong><strong class="arr_comm">&nbsp;</strong>##
+#***##***# ##else##
+#***##***##***# ##<strong class="fst_txt $!{noImgClass}"><span class="artist_name">V.A</span></strong><strong class="arr_comm">&nbsp;</strong>##
+#***##***# ##end##
+#***##else##
+#***##***##if( $StringUtils.isNotBlank("$!{artist}") )##
+#***##***##***##printArtistThumb( $artist 1 )##
+#***##***##else##
+#***##***##***##set($noImgClass = "no_img")##
+#***##***##end##
+#***##***##if(($StringUtils.isNotBlank("$!{command.artist_id}") && !$StringUtils.equals("$!{command.artist_id}", "0")) || ($StringUtils.isBlank("$!{album}") && $StringUtils.isNotBlank("$!{artist}")))##
+#***##***##***#<strong class="fst_txt $!{noImgClass}"><a title="$!{artist.name}" onclick="daum.Music.artistDetail('$!{artist.artistId}');return false;" href="/artist/main?artist_id=$!{artist.artistId}" class="artist_name">#strCut("$!{artist.name}", 15)</a></strong><strong class="arr_comm">&nbsp;</strong>##
+#***##***##else##
+#***##***##***#<strong class="fst_txt $!{noImgClass}">#printArtistName( $album.keyArtistList "artist_name" 15 true )</strong><strong class="arr_comm">&nbsp;</strong>##
+#***##***##end##
+#***##end##
+#***##if($URI.indexOf('/album/main') !=-1)##
+#***##***##if((!$CollectionUtils.isEmpty($!{album.keyArtistList}) && $album.keyArtistList.size() == 1 && !$StringUtils.equals("$!{album.keyArtistList[0].artistId}", "0")) || ($StringUtils.isNotBlank("$!{command.artist_id}") && !$StringUtils.equals("$!{command.artist_id}", "0")))##
+#***##***##***#<strong class="arr_comm"><a href="/artist/album/list?album_id=$!{album.albumId}&artist_id=$!{artist.artistId}">앨범</a>&nbsp;</strong>##
+#***##***##***#<strong>##
+#***##***##***##printAlbumName( $!{album} "fw_b fc_etc" 30 3 true) ##
+#***##***##***#</strong>##
+#***##***##else##
+#***##***#<strong class="arr_comm">##
+#***##***##***##printAlbumName( $!{album} "fw_b fc_etc" 30 3 true) ##
+#***##***#</strong>##
+#***##***#<strong><span class="fs_11">&nbsp;</span><a href="/album/main?album_id=$!{album.albumId}&artist_id=$!{artist.artistId}">앨범</a>&nbsp;</strong>##
+#***##***##end##
+#***##elseif($URI.indexOf('album/vclip/') !=-1)##
+#***##***##if(!$CollectionUtils.isEmpty($!{album.keyArtistList}) && $album.keyArtistList.size() == 1 && !$StringUtils.equals("$!{album.keyArtistList[0].artistId}", "0"))##
+#***##***#<strong><span class="fs_11">&nbsp;</span><a href="/album/vclip/list?artist_id=$!{artist.artistId}&album_id=$!{command.album_id}">뮤직비디오</a>&nbsp;</strong>##
+#***##***##else##
+#***##***#<strong class="arr_comm">##
+#***##***##***##printAlbumName( $!{album} "fw_b fc_etc" 30 3 true) ##
+#***##***#</strong>##
+#***##***#<strong><span class="fs_11">&nbsp;</span><a href="/album/vclip/list?artist_id=$!{artist.artistId}&album_id=$!{command.album_id}">뮤직비디오</a>&nbsp;</strong>##
+#***##***##end##
+#***##elseif($URI.indexOf('album/photo/') !=-1)##
+#***##***##if(!$CollectionUtils.isEmpty($!{album.keyArtistList}) && $album.keyArtistList.size() == 1 && !$StringUtils.equals("$!{album.keyArtistList[0].artistId}", "0"))##
+#***##***##***#<strong><span class="fs_11">&nbsp;</span><a href="/album/photo/list?artist_id=$!{artist.artistId}&album_id=$!{command.album_id}">포토</a>&nbsp;</strong>##
+#***##***##else##
+#***##***##***#<strong class="arr_comm">##
+#***##***##***##printAlbumName( $!{album} "fw_b fc_etc" 30 3 true) ##
+#***##***##***#</strong>##
+#***##***##***#<strong><span class="fs_11">&nbsp;</span><a href="/album/photo/list?artist_id=$!{artist.artistId}&album_id=$!{command.album_id}">포토</a>&nbsp;</strong>##
+#***##***##end##
+#***##elseif($URI.indexOf('artist/vclip/') !=-1)##
+#***##***##if( !$CollectionUtils.isEmpty($!{artist.artistId}) )##
+#***##***##***#<strong><span class="fs_11">&nbsp;</span><a href="/artist/vclip/list?artist_id=$!{artist.artistId}&album_id=$!{command.album_id}">뮤직비디오</a>&nbsp;</strong>##
+#***##***##end##
+#***##elseif($URI.indexOf('artist/photo/') !=-1)##
+#***##***##if( !$CollectionUtils.isEmpty($!{artist.artistId}) )##
+#***##***##***#<strong><span class="fs_11">&nbsp;</span><a href="/artist/photo/list?artist_id=$!{artist.artistId}&album_id=$!{command.album_id}">포토</a>&nbsp;</strong>##
+#***##***##end##
+#***##end##
+#***##***#</div>##
+#***#</div>##
+#end##
+#end##
+
+#macro(printArtistDetailName $artist)
+#***##set($nameList = [$!{artist.nameKorLang},$!{artist.nameOrgLang},$!{artist.nickName}])##
+#***#$!{artist.name}#foreach($name in $nameList)#if($StringUtils.isNotBlank("$!{name}"))#if($foreach.index == 0)(#else,#end$!{name}#else#if($foreach.index != 0))#end#break#end#end##
+#end
+
+## 아티스트 상세 아티스트 썸네일
+#macro(printArtistDetailHighlightThumbnail $artist)
+	##printArtistThumb( $artist 4 )
+##	#if($StringUtils.isNotBlank("$!{artist.mainImage.filePath}"))
+##	<a title="#escTitle($!{artist.name})" href="/artist/photo/list?artist_id=$!{artist.artistId}#if($StringUtils.equals('$!{artist.mainImage.imageId}', '0'))&image_id=$!{artist.mainImage.imageId}#end" class="thumb_link">
+##	#else
+	<span class="thumb_link">
+##	#end
+		#set($imgSrc = $ImageUtil.getImageUrl("$!{artist.mainImage.filePath}", "160x160", "ARTIST"))
+		<img width="160" height="160" src="$!imgSrc" alt="">
+		<span class="line_thumb"></span>
+##	#if($StringUtils.isNotBlank("$!{artist.mainImage.filePath}"))
+##	</a>
+##	#else
+	</span>
+##	#end
+	
+##	#if($StringUtils.isNotBlank("$!{artist.mainImage.filePath}"))
+##	<a class="btn_detail link_photomore" href="/artist/photo/list?artist_id=$!{artist.artistId}">포토 더보기</a>
+##	#end
+#end
+
+## 아티스트 상세 활동명
+#macro(printArtistDetailInfoActivityName $artistNameList)
+	#if(!$CollectionUtils.isEmpty($artistNameList))
+	<dt class="tit_detail tit_groupname">활동명</dt>
+	<dd>
+		#foreach($name in $artistNameList)#if($foreach.index != 0),#end $name#end
+	</dd>
+	#end
+#end
+
+## 아티스트 상세 데뷔정보
+#macro(printArtistDetailInfoDebut $artist)
+	#if($StringUtils.isNotBlank("$!{artist.debutInfo}") || $StringUtils.isNotBlank("$!{artist.debutDt}"))
+	<dt class="tit_detail tit_debut">데뷔</dt>
+	<dd>
+		##$!StringUtils.left($!{artist.debutDt}, 4)년 
+		##if($!{artist.debutDt.length()} > 4)$StringUtils.mid($!{artist.debutDt}, 4, 2)#end
+		#if($StringUtils.isNotBlank("$!{artist.debutInfo}"))
+		$!{artist.debutInfo}
+		#else
+		$!{CheckDate.makeReleaseDate($!{artist.debutDt})}#if($StringUtils.equals("$!{artist.debutDt.length()}", "4"))년#end 	
+		#end
+	</dd>
+	#end
+#end
+
+## 아티스트 상세 사이트
+#macro(printArtistDetailInfoSite $artist)
+	#if(!$CollectionUtils.isEmpty($artist.siteList))
+	<dt class="tit_detail tit_site">사이트</dt>
+	<dd>
+		#foreach($site in $artist.siteList)
+			#if($foreach.index != 0)<span class="txt_bar"> | </span>#end
+			$site
+        #end
+	</dd>
+	#end
+#end
+
+## 아티스트 상세 아티스트 공통 버튼 세트
+#macro(printArtistDetailHighlightBtnSet $type $artist $album $albumListenAble)
+#*
+	#if($StringUtils.equals("$!{type}", "artist"))
+		#set($id = $artist.artistId)
+		#set($recomNum = $artist.recommendCount)
+	#elseif($StringUtils.equals("$!{type}", "album"))
+		#set($id = $album.albumId)
+		#set($recomNum = $album.recommendCount)
+	#end
+	<a class="btn_comm btn_recom CT_ZONE_BTN_RECOM" href="javascript:;" onclick="daum.Music.API.Recommend.sendByToken({id:'$id', el:'recomNum', contents:'$!{type}', user:'#if($StringUtils.isNotEmpty($!{user.userId}))Y#end', token:'$!securitytoken'});return false;" title="추천하기"><span class="screen_out">추천</span><em id="recomNum" class="num_recom">$recomNum</em></a>
+	<a class="btn_comm btn_interest CT_ZONE_BTN_INTEREST" href="javascript:;" title="관심등록하기" onclick="daum.Music.API.Favorite.send({id:'$id', contents:'$!{type}', el:this});"><span class="screen_out">관심등록</span></a>
+	<a class="btn_comm btn_reply CT_ZONE_BTN_REPLY" href="javascript:;" title="댓글쓰기" onclick="daum.Music.focusComment();return false;"><span class="screen_out">댓글쓰기</span></a>
+	#if($StringUtils.equals("$!{type}", "artist"))
+    	#set($link = "http://music.daum.net/artist/main?artist_id=$!{artist.artistId}")
+		#if($StringUtils.isNotBlank("$!{artist.mainImage.filePath}"))
+			#set($thumb = $ImageUtil.getImageUrl("$!{artist.mainImage.filePath}", "160x160", "ARTIST"))
+		#else
+			#set($thumb = "")
+		#end
+    	#set($prefix = "#printArtistDetailName($artist)")
+	#elseif($StringUtils.equals("$!{type}", "album"))
+		#if($StringUtils.isNotBlank("$!{artist.artistId}"))#set($artist_name = "#printArtistDetailName($artist) - ")#else #set($artist_name = "V.A - ")#end
+		#set($link = "http://music.daum.net/album/main?album_id=$!{album.albumId}")
+    	#set($thumb = $ImageUtil.getImageUrl("$!{album.mainImage.filePath}", "42x42", "ALBUM"))
+		#set($album_name = $StringUtils.trim("#printAlbumName($album '' 0 5 false)"))
+    	##set($prefix = "$!{artist_name}$!{album_name}")
+    	#set($prefix = "#printArtistName( $album.keyArtistList 'artist_name' 50 false ) - $!{album_name}")
+	#end
+	#set($prefix = $prefix.replaceAll('"', '&quot;'))
+	#set($prefix = "#escScript($!{prefix})")
+	
+	##if(!$StringUtils.equals("$!{albumListenAble}", "false")) 듣기 여부와 상관없이 보내기 보이게 수정
+	#if($StringUtils.equals("$!{type}", "artist"))#printSnsButton($id "snsButton2" $!{link} $!{prefix} $type)#else#printSnsButton($id "" $!{link} $!{prefix} $type)#end
+	<script type="text/javascript">
+		daum.Music.Social.setSnsThumb('$!{thumb}');
+	</script>
+	##end
+*#
+	#if( $!{adminRoleId} && $!{adminRoleId} > 2 )
+  	  <div class="btn_consumer">
+		#if( $StringUtils.equals("$!{type}", "artist") )
+			<a class="btn_comm btn_recom" href="http://op.admin.music.daum.net/ar_artistdetails/$!{artist.artistId}/edit" target="_blank"><em class="num_recom" title="아티스트 운영">admin</em></a>
+		#else
+			#if( $StringUtils.isNotEmpty("$!{command.song_id}") )
+				<a class="btn_comm btn_recom" href="http://op.admin.music.daum.net/so_songs/$!{command.song_id}/edit" target="_blank"><em class="num_recom" title="곡 운영">admin</em></a>
+			#else
+				<a class="btn_comm btn_recom" href="http://op.admin.music.daum.net/al_albums/$!{album.albumId}/edit" target="_blank"><em class="num_recom" title="앨범 운영">admin</em></a>
+			#end
+		#end
+      </div>
+	#end
+#end
+
+## 아티스트 상세 뮤직 바 스페셜
+#macro(printArtistDetailHighlightBarSpecial $musicSpecial $moreBtn)
+	<div class="other_info music_bar">
+    	<h4 class="tit_detail tit_musicbar CT_ZONE_DETAIL_BARSPECIAL">뮤직 BAR SPECIAL</h4>
+    	<a class="thumb_link" href="/musicbar/musicbar/detail?board_id=${musicSpecial.boardId}" title="$!{musicSpecial.title}">
+    		<img width="250" height="102" alt="$!{musicSpecial.title}" src="$ImageUtil.getImageUrl("$!{musicSpecial.imageUrl}", "250x102", "PHOTO")">
+    		<span class="line_thumb"></span>
+    	</a>
+    	<strong class="tit"><a href="/musicbar/musicbar/detail?board_id=${musicSpecial.boardId}" title="$!{musicSpecial.title}">#strCut("$!{musicSpecial.title}", 30)</a></strong>
+    	<p class="desc">
+    		<a href="/musicbar/musicbar/detail?board_id=${musicSpecial.boardId}">
+    		#strCut("#stripHTML($!{musicSpecial.summary})", 65)
+    		</a>
+    		#if($StringUtils.isNotBlank("$!{musicSpecial.regdttm}"))
+    		<span class="txt_bar"> | </span><span class="txt_day">$!{CheckDate.makeReleaseDate($!{musicSpecial.regdttm})} </span>
+    		#end
+    	</p>
+    	#if(!$StringUtils.equals("$!{moreBtn}", "rolling"))<a class="btn_comm btn_more" href="/musicbar/musicbar/detail?board_id=${musicSpecial.boardId}">더보기</a>#end
+	</div>
+#end
+
+#macro(printArtistDetailHighlightRecentBarSpecial $recentBoardList)
+	#foreach($recentBoard in $recentBoardList)
+	<div class="other_info music_bar bar_recom CT_ZONE_DETAIL_RECOMBAR" style="display:none;">
+    	<div class="recent_list">
+    		<h4 class="tit_detail tit_musicbar_recom">뮤직 BAR 추천</h4>
+        	<a class="thumb_link" href="/musicbar/musicbar/detail?board_id=${recentBoard.boardId}" title="$!{recentBoard.title}">
+        		<img width="250" height="102" alt="$!{recentBoard.title}" src="$ImageUtil.getImageUrl("$!{recentBoard.imageUrl}", "250x102", "PHOTO")">
+        		<span class="line_thumb"></span>
+        	</a>
+        	<strong class="tit"><a href="/musicbar/musicbar/detail?board_id=${recentBoard.boardId}" title="$!{recentBoard.title}">#strCut("$!{recentBoard.title}", 30)</a></strong>
+        	<p class="desc">
+        		<a href="/musicbar/musicbar/detail?board_id=${recentBoard.boardId}">
+        		#strCut("#stripHTML($!{recentBoard.summary})", 65)
+        		</a>
+        		#if($StringUtils.isNotBlank("$!{recentBoard.regdttm}"))
+    			#if($StringUtils.isNotBlank("#stripHTML($!{recentBoard.summary})"))
+        		<span class="txt_bar"> | </span>
+    			#end<span class="txt_day">$!{CheckDate.makeReleaseDate($!{recentBoard.regdttm})} </span>
+        		#end
+        	</p>
+        	<a class="btn_comm btn_more" href="/musicbar/musicbar/detail?board_id=${recentBoard.boardId}">더보기</a>
+    	</div>
+	</div>
+	#end
+	<script type="text/javascript">
+		(function(){
+            var list = daum.$$(".bar_recom");
+            var randIndex = Math.floor(Math.random()*list.length);
+            daum.Element.show(list[randIndex]);
+        })();
+	</script>
+#end
+
+
+## 아티스트 상세 뮤직 바 스페셜
+#macro(printArtistDetailMusicBarSpecial $musicSpecialList)
+	<div class="tit_cont">
+		<h4 class="tit_detail tit_musicbar">뮤직 BAR 스페셜</h4>
+	</div>
+	<ul class="thumb_list list_issue">
+        #foreach($board in $musicSpecialList)
+		<li>
+    		## 이미지가 없을때 no-image로 가느냐 비워두느냐
+			#if($StringUtils.isNotBlank("$!{board.imageUrl}"))
+			<a class="thumb_link" href="/musicbar/musicbar/detail?menu_id=$!{board.menuId}&board_id=$!{board.boardId}">
+				<img width="135" height="85" alt="$!{board.title}" src="$ImageUtil.getImageUrl("$!{board.imageUrl}", "135x85", "PHOTO")">		
+				<span class="line_thumb"></span>
+			</a>
+			#end
+			<div class="cont">
+				<strong class="tit">
+					<a href="/musicbar/musicbar/detail?menu_id=$!{board.menuId}&board_id=$!{board.boardId}" title="$!{board.title}">#if($StringUtils.isNotBlank("$!{board.subTitle}"))<span class="fc_etc">[$board.subTitle]</span>#end#strCut("$!{board.title}", 70)</a>
+				</strong>
+				<p class="info_desc">
+					<a href="/musicbar/musicbar/detail?menu_id=$!{board.menuId}&board_id=$!{board.boardId}" title="요약">#strCut("#stripHTML($!{board.summary})", 200)</a>				
+				</p>
+			</div>
+		</li>
+		#end
+	</ul>
+#end
+
+## 아티스트 상세 뉴스
+#macro(printArtistDetailNews $newsList)
+	<div class="tit_cont">
+		<h4 class="tit_detail tit_news">뉴스</h4>
+	</div>
+	<ul class="thumb_list list_issue">
+        #foreach($news in $newsList)
+		#if($foreach.index == 2)#break;#end
+		#*if($StringUtils.equals("$!{news.outlinkYn}", "Y"))
+			#set($href = $news.outlinkUrl)
+			#set($target = "_blank")
+		#else
+			#set($href = $news.docUrl)
+			#set($target = "")
+		#end*#
+		#if($StringUtils.isNotBlank("$!{news.docUrl}"))
+			#set($href = $news.docUrl)
+			#set($target = "_blank")
+		#else
+			#set($href = $news.outlinkUrl)
+			#set($target = "_blank")
+		#end
+		<li#if($StringUtils.isNotBlank("$!{news.thumbnailUrl}")) class="type_txt"#end>
+			##if($StringUtils.isNotBlank("$!{news.thumbnailUrl}"))
+			#if(false) ## 썸네일 사이즈가 안맞아 뺌
+			<a class="thumb_link" href="$href" target="$target">
+				<img width="135" height="85" alt="$!{news.title}" src="$ImageUtil.getImageUrl("$!{news.thumbnailUrl}", "135x85", "PHOTO")">
+				<span class="line_thumb"></span>
+			</a>
+			#end
+			<div class="cont">
+				<strong class="tit">
+					<a#if($StringUtils.equals("$!{news.outlinkYn}", "Y")) class="ico_comm"#end href="$href" target="$target">$!{news.title}</a></span>
+				</strong>
+				<p class="info_desc">
+					<a href="$href" target="$target">$!{news.summary}</a>				
+				</p>
+				<p class="txt_etc">
+					$!{news.source}<span class="txt_bar"> | </span>$!{CheckDate.makeReleaseDate($!{news.pubdt})}
+				</p>
+			</div>
+		</li>
+		#end
+	</ul>
+	<span class="arr_comm link_more"><a target="_blank" href="http://search.daum.net/search?nil_profile=vsearch&nil_src=media&w=news&q=$!{artist.name}">뉴스 더보기</a></span>
+#end
+
+## 아티스트 상세 뮤직게시판
+#macro(printArtistDetailMusicBoard)
+	<div class="tit_cont">
+			<h4 class="tit_detail">뮤직게시판</h4>
+	</div>
+	<ul class="txt_list">
+		#foreach($article in $boardList)
+    	<li>
+			<a href="#getter('GAIA_DOMAIN', '')/gaia/do/musicbar/read?bbsId=M004&articleId=$!{article.articleId}">#strCut("$!{article.subject}", 50)</a>
+		</li>
+		#end
+	</ul>
+	##<span class="btn_comm btn_more"><a href="#">더보기</a></span>
+	<a class="btn_comm btn_more" href="#getter('GAIA_DOMAIN', '')/gaia/do/musicbar/list?bbsId=M004&searchKey=meta&searchValue=2:$!{artist.artistId}">더보기</a>
+	
+#end
+
+## 아티스트 상세 QNA
+#macro(printArtistDetailQna $qnaList $artistName)
+	<div class="tit_cont">
+		<h4 class="tit_detail">QnA</h4>
+	</div>
+	<ul class="txt_list">
+		#foreach($article in $qnaList)
+		<li>
+			<a class="tit" href="http://k.daum.net/qna/view.html?qid=$!{article.articleId}" target="_blank">#strCut("$!{article.subject}", 42)</a>
+			<span class="txt_answer">답변 <em class="ff_tah">$!{article.commentCount}</em></span>
+		</li>
+        #end
+	</ul>
+	<a class="btn_comm btn_more" href="http://search.daum.net/search?w=knowledge&nil_search=btn&q=$!{artistName}" target="_blank">더보기</a>
+	##<a class="btn_comm btn_more" href="http://k.daum.net/qna/search.html?w=&from=&nil_profile=vsearch&nil_src=knowledge&q=$!{artistName}" target="_blank">더보기</a>
+#end
+
+
+##  아티스트 상세 포토 리스트 헤더
+#macro(printArtistPhotoListHeader $artist $obj_type $pageHandler $dir)
+#set( $url = "/$dir/photo/list?artist_id=$!{artist.artistId}&album_id=$!{command.album_id}&page_no=1" )
+
+	<div class="tit_cont">
+		<strong class="tit_detail tit_photo">포토</strong>
+		<span class="txt_count">(<em>$!{pageHandler.totalCnt} 개</em>)</span>
+	</div>
+	
+	#set( $URI = "#getter('URI', '')" )
+	#if($StringUtils.isNotBlank("$!{artist.artistId}"))#set($artistId = $!{artist.artistId})#elseif(!$CollectionUtils.isEmpty($!{album.keyArtistList}))#set($artistId = $!{album.keyArtistList[0].artistId})#end
+	#if($StringUtils.isNotBlank("$!{album.albumId}"))#set($albumId = $!{album.albumId})#end
+	#set($hasArtistInfo = true)#set($dir = "artist")
+	#if($URI.indexOf('/artist/main') == -1 && $URI.indexOf('/song/list') == -1 && $URI.indexOf('/album/list') == -1)
+	#set($hasArtistInfo = false)#set($dir = "album")
+		##if((!$CollectionUtils.isEmpty($album.keyArtistList) && $StringUtils.equals("$!{album.keyArtistList.size()}", "1") && !$StringUtils.equals("$!{album.keyArtistList[0].artistId}", "0")) || ($CollectionUtils.isEmpty($album.keyArtistList) && $StringUtils.isNotBlank("$!{artist.artistId}")))
+		#if($StringUtils.isNotBlank("$!{artist.artistId}") && (($CollectionUtils.isEmpty($!{album.keyArtistList}) || (!$CollectionUtils.isEmpty($!{album.keyArtistList}) && $!{album.keyArtistList.size()} == 1 && !$StringUtils.equals("$!{album.keyArtistList[0].artistId}", "0")))))
+			#set($hasArtistInfo = true)#set($dir = "artist")
+		#elseif($URI.indexOf('/artist/photo/detail') != -1) ## 아티스트 포토의 경우만 예외 (뮤직비디오는 앨범을 따라 가지만 포토는 아티스트를 따라가야만 한다.) 
+			#set($hasArtistInfo = true)#set($dir = "artist")
+		#end
+	#end
+
+	#if($hasArtistInfo)
+	<div class="sort_option f_r">
+		##<em class="link_option">
+		<a href="$!url" #if($StringUtils.isBlank("$!{obj_type}"))class="link_option"#end)>전체</a><span class="txt_bar">|</span><a href="$!{url}&obj_type=AR"#if( $StringUtils.equals("$!{obj_type}", "AR")) class="link_option"#end >아티스트</a><span class="txt_bar">|</span><a href="$!{url}&obj_type=AL"#if( $StringUtils.equals("$!{obj_type}", "AL")) class="link_option"#end>앨범아트</a>
+	</div>
+	#end
+#end	
+
+## 아티스트 상세 포토 리스트
+#macro(printArtistDetailPhotoList $artist $photoList $obj_type $pageHandler $dir)
+#set( $onepageCount = 6)	
+#set( $str_obj_type = "")
+#set( $url = "/$dir/photo/detail?artist_id=$!{command.artist_id}&album_id=$!{command.album_id}$!{str_obj_type}&obj_type=$!{obj_type}")	
+#if( $StringUtils.isNotBlank("$!{obj_type}") )
+	#set( $str_obj_type = "&obj_type=" + $!{obj_type} )
+#end	
+    <ul class="thumb_list list_photo">
+    	#foreach($image in $photoList)
+    	<li>
+			#printPhotoThumb( $image 2 $url )
+    		#*
+			<a class="thumb_link" href="$!{url}&image_id=$!{image.imageId}">
+    			<img width="130" height="130" alt="이미지정보" src="$ImageUtil.getImageUrl("$!{image.filePath}", $ImageUtil.PHOTO_130_130)">
+    			<span class="line_thumb"></span>
+    		</a>
+			*#
+    	</li>
+    	#end
+    </ul>
+#end		
+
+#macro(printPhotoDetailFooter $album)
+		
+			<div class="artist_album">
+				#printAlbumThumb( $album 1 "" "")
+				#*<a class="album_type1" href="#" title="Hollywood Tonight 앨범 상세정보">
+					<img width="42" height="42" alt="이미지 정보" src="http://cfile90.uf.daum.net/S93x70/142DB23A4DA3E6B2201C13">
+					<span class="bg_album3"></span>
+				</a>*#
+				<span class="info">
+					<strong class="tit_song">
+						<a href="#">Hollywood Tonight</a>
+					</strong>
+					<span class="txt_source"> 
+						<a class="tit_artist" href="#">Michael Jackson</a><span class="txt_bar"> | </span>2011.01.11
+					</span>
+				</span>
+			</div>
+			<ul class="list_song">
+				<li>
+					<a class="ico_comm ico_listen" href="#">You Are Not Alone</a>
+				</li>
+				<li>
+					<a class="ico_comm ico_listen" href="#">You Are Not Alone</a>
+				</li>
+			</ul>			
+ 
+#end
+
+#macro(printPhotoDetailSNS $_id)
+	## 포토가 앨범인지 아티스트인지 구분해서 파라미터 셋팅해주세요~
+	## 아티스트일때 prefix : [포토] 아티스트명, thumb : 아티스트 대표 이미지, link : http://music.daum.net/artist/artist.do?artistId=992
+	## 앨범일때 prefix : [앨범아트] 아티스트명 - [앨범구분(싱글, EP, 집수)] 앨범명, thumb : 앨범아트, link : http://music.daum.net/album/album.do?albumId=560376
+	
+	#set($link = "")
+	#set($prefix = ${artist.name})
+	## id값만 추가하면 됨
+	#printSnsButton($_id "snsButton2" $!link $prefix "artist")
+#*
+<span class="btn_sns">
+	<input class="btn_comm btn_yozm" type="button" value="요즘" title="요즘으로 보내기">
+	<input class="btn_comm btn_twitter" type="button" value="트위터" title="트위터로 보내기">
+	<input class="btn_comm btn_cyworld" type="button" value="싸이월드" title="싸이월드로 보내기">
+	<input class="btn_comm btn_more" type="button" value="SNS 더보기" title="SNS 더보기">
+</span>	
+*#
+#end	
+
+#macro(printPhotoViewer $_photoList $_orderNo $_onePageCnt $_id)
+	
+	#if(!$CollectionUtils.isEmpty($_photoList))
+	<div id="photoViewer" class="photo_viewer">
+		<div class="view_head">
+			<ul class="list_view">
+				#foreach($image in $_photoList)
+				<li id="naviThumb$!{foreach.index}"> ## 앨범 선택시 li에 on클래스 추가  #if ($i == 2)class="on"#end
+					<a class="thumb_link" href="$image.imageId">
+						<img width="95" height="95" alt="이미지정보" src="$ImageUtil.getImageUrl("$!{image.filePath}", "95x95", "PHOTO")">
+						<span class="line_thumb"></span>
+						#*#if ($i == 2)
+						<span class="img_selet">							
+							<span class="arr_comm"></span>
+						</span>	
+						#end*#				
+					</a>
+				</li>
+				#end
+			</ul>
+        	<a class="btn_detail btnPrevPage" title="이전"  href="http://music.daum.net/artist/photo/detail?artist_id=$!{artist.artistId}&page_no=$prevNo">이전</a>
+           	<a class="btn_detail btnNextPage" title="다음"  href="http://music.daum.net/artist/photo/detail?artist_id=$!{artist.artistId}&page_no=$nextNo">다음</a>
+		</div>
+		<div class="view_body">
+			<div class="thumb">
+				##set($number = ($_orderNo - 1) % $!{_onePageCnt})
+				##<img  alt="이미지정보" src="$!{photoList.get($number).filePath}">
+			</div>
+			<div class="btn_consumer">
+				<span class="btn_detail btn_photo_view">
+					<span class="screen_out btn_ori">원본보기</span><em class="size ori_size">550 X 550</em>
+				</span>
+##				#printPhotoDetailSNS($_id)
+			</div>
+		</div>		
+		<div class="view_foot"></div>
+		##printPhotoDetailFooter()
+	</div>	
+	#else
+	<div class="no_listinfo">
+		<p class="fc_txt">저장된 포토가 없습니다.</p>
+	</div>		
+	#end	
+#end	
+
+#macro(printAlbumListCate $url $albumType $artistId $orderType)
+	#if($StringUtils.equals("$!{orderType}", "01") || $StringUtils.isBlank("$!{orderType}"))<em class="link_option">최신순</em>#else<a href="$_url?artist_id=$!{artistId}&amp;album_type=$!{albumType}&amp;order_type=01">최신순</a>#end<span class="txt_bar">|</span>
+    #if($StringUtils.equals("$!{orderType}", "02"))<em class="link_option">인기순</em>#else<a href="$_url?artist_id=$!{artistId}&amp;album_type=$!{albumType}&amp;order_type=02">인기순</a>#end<span class="txt_bar">|</span>
+    #if($StringUtils.equals("$!{orderType}", "03"))<em class="link_option">제목순</em>#else<a href="$_url?artist_id=$!{artistId}&amp;album_type=$!{albumType}&amp;order_type=03">제목순</a>#end ##<span class="txt_bar">|</span>
+##    #if($StringUtils.equals("$!{orderType}", "04"))<em class="link_option">추천앨범</em>#else<a href="$_url?artist_id=$!{artistId}&amp;album_type=$!{albumType}&amp;order_type=04">추천앨범</a>#end
+#end
+
+#macro(printDetailEventBanner $motTempleteList) 
+	#foreach($motTemplete in $motTempleteList)
+	#set( $url = $!{motTemplete.linkUrl} )
+	<a href="$!{motTemplete.linkUrl}" style="display:none;"#if( $url.indexOf("http://music.daum.net") == -1 ) target="_blank"#end>
+		<img width="698" height="85" alt="이벤트 배너광고" src="$ImageUtil.getImageUrl("$!{motTemplete.imageUrl}", "698x85", "PHOTO", "C")">
+	</a>
+	#end
+	## 랜덤으로 돌아가도록 해 놓았음
+	<script type="text/javascript">
+	(function(){
+        var list = daum.$$(".wrap_event a");
+        var randIndex = Math.floor(Math.random()*list.length);
+        daum.Element.show(list[randIndex]);
+    })();
+	</script>
+#end
+
+#macro(printDetailAwardBtn $id $type $value $value2 $AODLinkId)
+    #if( $StringUtils.equals( "$!{type}", "AL" ) )
+    <a href="/album/main?album_id=$!{id}&artist_id=$!{value}" title="$!{prize.objTitle}"onclick="daum.Music.albumDetail('$!{id}','$!{value}');return false;"><span class="ico_comm ico_album">앨범 보기</span>#strCut("$!{prize.objTitle}", 30)</a>
+    #elseif( $StringUtils.equals( "$!{type}", "SO" ) )
+		#if($StringUtils.isNotBlank("$!{AODLinkId}") && !$StringUtils.equals("$!{AODLinkId}", "0"))
+		<a href="javascript:;" title="$!{prize.objTitle}" onclick="daum.Music.AodPlayer.add(this,$!{id});return false;"><span class="ico_comm ico_listen">듣기</span>#strCut("$!{prize.objTitle}", 30)</a>
+		#else
+		<span class="ico_comm ico_listen listen_off">듣기</span>#strCut("$!{prize.objTitle}", 30)</span>
+		#end
+    #elseif( $StringUtils.equals( "$!{type}", "MV" ) )
+    <a href="/artist/vclip/detail?artist_id=$!{value}&amp;vclip_id=$!{id}" title="$!{prize.objTitle}"#if(!$!{id}||$StringUtils.equals("$!{value}","0"))#else onclick="daum.Music.videoDetail('$!{id}', '$!{value}');return false;"#end><span class="ico_comm ico_video">뮤직비디오 보기</span>#strCut("$!{prize.objTitle}", 30)</a>
+    #end			
+#end
+		
+		
+#macro(printArtistDetailHighlightRelatedContent $movieList)
+	#set($relatedContentMap = {
+		"M" : {
+			"title" : "관련영화",
+			"className" : "movie",
+			"imgWidth" : "70"
+		},
+		"T" : {
+			"title" : "관련TV",
+			"className" : "tv",
+			"imgWidth" : "70"
+		},
+		"P" : {
+			"title" : "관련공연",
+			"className" : "play",
+			"imgWidth" : "84"
+		}
+	})	
+		
+	#foreach($movie in $movieList)
+	<div class="other_info cont_program" #if($foreach.index != 0)style="display:none;"#end>
+		<div class="of_$relatedContentMap.get($!{movie.movieType}).className">
+			<h4 class="tit_detail tit_$relatedContentMap.get($!{movie.movieType}).className">$relatedContentMap.get($!{movie.movieType}).title</h4>
+			<div class="wrap_cont">
+				##if($StringUtils.isNotBlank("$!{movie.filePath}"))
+				<a class="thumb_link" href="$!{movie.detailUrl}" title="$!{movie.title}" target="_blank">
+					#set($width = $relatedContentMap.get($!{movie.movieType}).imgWidth)
+					<img width="$!{width}" height="102" alt="$!{movie.title}" src="$ImageUtil.getImageUrl("$!{movie.filePath}", "$!{width}x102", "PHOTO")">
+					<span class="line_thumb"></span>
+				</a>
+				##end
+				<div class="wrap_subject">
+					<strong class="tit"><a href="$!{movie.detailUrl}" title="$!{movie.title}" target="_blank">#strCut("$!{movie.title}", 18)</a></strong>
+					#if($StringUtils.equals("$!{movie.movieType}", "M") || $StringUtils.equals("$!{movie.movieType}", "P"))
+						#if($StringUtils.isNotBlank("$!{movie.subtitle}"))<p class="fc_etc">#strCut("$!{movie.subtitle}", 18)</p>#end
+					#end
+					<span class="wrap_grade">
+						#set($score1 = $!{movie.score} * 10)
+						#set($score1_1 = $MathTool.toInteger($score1))
+						#set($score1_2 = $MathTool.toDouble($score1_1) / 10.0)
+						<span class="bar_graph">
+							<span style="width:${score1_1}%;" class="ico_comm grade_star">평점 $!{score1_1}%</span>
+						</span>
+						
+						<em class="txt_grade">$!{score1_2}</em>
+					</span>
+					<div class="wrap_btns">
+						#if($StringUtils.isNotBlank("$!{movie.detailUrl}"))<a class="btn_detail btn_detsee" href="$!{movie.detailUrl}" title="상세보기" target="_blank">상세보기</a>#end
+						#if($StringUtils.equals("$!{movie.movieType}", "M") || $StringUtils.equals("$!{movie.movieType}", "P"))
+							#if($StringUtils.isNotBlank("$!{movie.ticketUrl}"))<a class="btn_detail btn_ticket" href="$!{movie.ticketUrl}" title="예매하기" target="_blank">예매하기</a>#end
+						#end	
+						#if($StringUtils.equals("$!{movie.movieType}", "M") || $StringUtils.equals("$!{movie.movieType}", "T"))
+							#if($StringUtils.isNotBlank("$!{movie.downloadUrl}"))<a class="btn_detail btn_download" href="$!{movie.downloadUrl}" title="다운로드" target="_blank">다운로드</a>#end
+							#end						
+					</div>				
+				</div>
+			</div>
+			<div class="cont_info">
+				
+				#if($StringUtils.equals("$!{movie.movieType}", "M") || $StringUtils.equals("$!{movie.movieType}", "T"))
+				<dl class="list_info">
+					<dt class="tit_detail tit_summary">요약</dt>
+					<dd>
+    					#set($hasBar = false)
+						#if($StringUtils.isNotBlank("$!{movie.channel}"))
+							#set($hasBar = true)
+							#strCut("$!{movie.channel}", 15)
+						#end
+						
+						#if(!$CollectionUtils.isEmpty($movie.genreList))
+    						#if($hasBar)<span class="txt_bar"> | </span>#end
+							#set($hasBar = false)
+    						#foreach($genre in $movie.genreList)
+    							#set($hasBar = true)#strCut("$!{genre}", 15)#if($velocityHasNext), #end
+							#end
+						#end
+						
+						#if($StringUtils.isNotBlank("$!{movie.product_country}"))
+    						#if($hasBar)<span class="txt_bar"> | </span>#end
+    						#strCut("$!{movie.product_country}", 15)
+						#end
+					</dd>
+				</dl>
+				#end
+				
+			#if($StringUtils.equals("$!{movie.movieType}", "M"))
+				<dl class="list_info">
+					<dt class="tit_detail tit_director">감독</dt>
+					<dd>#strCut("$!{movie.director}", 25)</dd>
+				</dl>
+			#end
+			
+			#if($StringUtils.equals("$!{movie.movieType}", "P") || $StringUtils.equals("$!{movie.movieType}", "T"))
+				#if(($StringUtils.isNotBlank("$!{movie.broadcast_date}") && !$StringUtils.equals("$!{movie.broadcast_date}", " ~ ") && $!{movie.broadcast_date.indexOf("00")} == -1) || $StringUtils.isNotBlank("$!{movie.status}"))
+				<dl class="list_info">
+					<dt class="tit_detail tit_time">기간</dt>
+					<dd>
+						#set($timeBar = false)
+						#if($StringUtils.isNotBlank("$!{movie.broadcast_date}") && !$StringUtils.equals("$!{movie.broadcast_date}", " ~ "))$!{movie.broadcast_date}#set($timeBar = true)#end
+						#if($StringUtils.isNotBlank("$!{movie.status}"))#if($timeBar)<span class="txt_bar"> | </span>#end$!{movie.status}#end
+					</dd>
+				</dl>
+				#end
+			#end
+				
+			#if($StringUtils.equals("$!{movie.movieType}", "P"))
+				<dl class="list_info">
+					<dt class="tit_detail tit_place">장소</dt>
+					<dd>#strCut("$!{movie.place}", 25)</dd>
+				</dl>
+			#end
+				
+				#if(!$CollectionUtils.isEmpty($movie.actList))
+				<dl class="list_info">
+					<dt class="tit_detail tit_actor">출연</dt>
+					<dd>
+						<p class="f_l">
+    						#set($actorListString = "")
+							#foreach($actor in $movie.actList)
+								#if($foreach.index != 0)#set($actorListString = $actorListString + ", ")#end
+								#set($actorListString = $actorListString + "$!{actor}")
+							#end
+							#strCut("$!{actorListString}", 26)
+						</p>
+						<a class="btn_comm btn_more" href="$!{movie.actListUrl}" target="_blank">더보기</a>
+					</dd>
+				</dl>
+				#end
+			</div>
+		</div>
+		#if(!$StringUtils.equals("$!{moreBtn}", "rolling"))<a class="btn_comm btn_more" href="$!{movie.detailUrl}" target="_blank">더보기</a>#end
+	</div>
+	#end
+#end
+		
+		

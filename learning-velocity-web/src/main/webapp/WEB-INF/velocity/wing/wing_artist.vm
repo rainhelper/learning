@@ -1,0 +1,20 @@
+#parse("/velocity/wing/piece/wingAd.vm")
+#parse("/mot/wing/noticebox.html")##공지박스
+#parse("/velocity/wing/piece/relativeArtist.vm" )
+#parse("/mot/wing/recentmusicbar.html")##뮤직바최신
+#parse("/mot/wing/bestmusicbar.html")##뮤직바인기
+#parse("/mot/wing/realtimechart.html")##실시간차트
+##parse("/mot/wing/djrecommend.html")##dj추천음악
+#parse("/mot/wing/hotvclip.html")##hot영상
+##parse("/mot/wing/eventbanner.html")##배너
+##parse("/velocity/wing/piece/wingReport.vm")##제보/신고
+<script type="text/javascript">
+if(!daum.$("mright_noticebox")){
+	var fst = daum.${Escape.d}C("mRight","fst_able")[0]
+	daum.addClassName(fst,"fst");
+}
+domReady( function(){
+var lastc = daum.Music.getLastTagChild("mRight","div");
+if(lastc){daum.addClassName(lastc,"wrap_lst");}
+});
+</script>

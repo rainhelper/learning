@@ -1,0 +1,213 @@
+<div class="wrap_cont section_favorite">
+	<h3 class="tit_mymusic tit_interest">관심 음악</h3>
+	<div class="wrap_tab">
+		<ul class="tab_mycont tab_interest">
+			<li><a href="/my/favorite/album/list" class="tab_album">관심 앨범</a></li>
+			<li class="on"><a href="/my/favorite/artist/list" class="tab_artist">관심 아티스트</a></li>
+			<li><a href="/my/favorite/vclip/list" class="tab_seemv">관심 뮤비</a></li>
+			<li><a href="/my/favorite/musicbar/list" class="tab_txt">관심 글</a></li>
+		</ul>					
+	</div>
+	<div class="music_chart wrap_desc">
+		<div class="wrap_tool_btn">			
+			<div class="sort_option f_r">
+				#if($StringUtils.equals("$!{command.getOrdering()}","RECENT_DESC")||$StringUtils.isBlank("$!{command.getOrdering()}"))#set($classNameDate = "link_option")#end
+				#if($StringUtils.equals("$!{command.getOrdering()}","RELEASE_DESC"))#set($classNameRelease = "link_option")#end
+				#if($StringUtils.equals("$!{command.getOrdering()}","ALPHANUMERIC_ASC"))#set($classNameTitle = "link_option")#end
+				<a class="$!{classNameDate}" href="/my/favorite/artist/list?ordering=1">저장순</a><span class="txt_bar">|</span>
+				<a class="$!{classNameRelease}" href="/my/favorite/artist/list?ordering=2">발매순</a><span class="txt_bar">|</span>
+				<a class="$!{classNameTitle}" href="/my/favorite/artist/list?ordering=3">제목순</a>
+			</div>
+			<div class="tool_btn f_l">
+				#printDeleteBtn("AR") ## 삭제 버튼
+			</div>
+			<em class="txt_quantity f_l">총 <strong id="myCount" class="fc_blue">#if($!{myCount}) #toCurrency($myCount) #else 0 #end</strong> 명</em>
+		</div>
+		#if(!$CollectionUtils.isEmpty($myList))
+		<div class="wrap_artist">
+			<div class="bg_thead">
+				<input type="checkbox" class="all_chk" id="allCheck">
+				<label class="screen_out" for="allCheck">전체선택</label>			
+			</div>
+			<ul id="trackContainer" class="list_artist">
+			#foreach($item in $myList)						
+				<li id="track$!{item.artist.artistId}" class="listli">
+					<div class="inp_check"><input type="checkbox" name="trackCheckbox" value="$!{item.artist.artistId}"></div>				
+					<strong class="screen_out">아티스트명&amp;대표곡</strong>
+					<div class="artist_thumb">
+						#set($item.artist.mainImage = {})
+						#set($item.artist.mainImage.imageId = $item.mainImage.imageId)
+						#set($item.artist.mainImage.filePath  = $item.mainImage.filePath )
+						#printArtistThumb($item.artist 2)
+						<div class="info">
+							#printArtistName($item "fw_b" 20 true)
+							#foreach($song in $item.popularSongList)
+								#if($foreach.index < 3 )
+								<span class="song_listen">#printSongName( $song "ico_comm ico_listen" 20 true false false)</span>
+								#end
+							#end
+						</div>
+					</div>
+					<div class="artist_album">
+						<div class="cont_tit">
+							<strong class="screen_out">최근발매앨범</strong>
+							#if($StringUtils.isNotBlank("$!{item.relativeEvent.eventId}"))
+								<a class="ico_comm ico_event" href="$!{item.relativeEvent.linkUrl}" title="이벤트">이벤트</a>								
+							#end
+							#set($diffDate = $Number.toNumber($CheckDate.diffOfDate($!{item.album.releaseDt})))
+							#if($MathTool.toNumber($diffDate) < 8 ) 
+								<a class="ico_comm ico_new" href="$Config.getProperty('SERVICE_DOMAIN').getValue()/album/main?album_id=$!{item.album.albumId}" onclick="daum.Music.albumDetail($!{item.album.albumId}, '');return false;" title="NEW">NEW</a>
+							#end
+						</div>
+						<div class="info_album">
+						#if( !$StringUtils.equals("$!{item.album.albumId}", "0") )
+							#printAlbumThumb( $!{item.album} 2 "" "" )
+							<div class="info">
+								#printAlbumName( $item.album "fc_etc" 20 2 true )
+								<em class="txt_date">$!{CheckDate.makeReleaseDate($!{item.album.releaseDt})}</em>
+								<em class="screen_out">타이틀곡</em>
+								<span class="song_listen">
+									#foreach($masterSong in $item.album.masterSongList)
+										#if($foreach.index < 1 )
+										#printSongName($!{masterSong} "ico_comm ico_listen" 14 true false false)
+										#end
+									#end
+								</span>
+							</div>
+						#end
+						</div>
+					</div>				
+				</li>
+			#end
+			</ul>
+		</div>
+		<div class="btm_mymusic">
+			<div class="wrap_tool_btn f_l">
+				<div class="tool_btn">
+					#printDeleteBtn("AR") ## 삭제 버튼
+				</div>
+			</div>
+			##page
+			#printPaging($pagingUrl $command.page_no $pageHandler "f_l" 10)
+		</div>
+		#else
+		<div class="wrap_artist">
+		<div class="bg_thead">
+			<input id="allCheck" class="all_chk" type="checkbox">
+			<label class="screen_out" for="allCheck">전체선택</label>
+		</div>
+		<div class="wrap_nodata"><strong>관심 아티스트가 없습니다</strong></div>
+		<div class="wrap_tool_btn">
+			<div class="tool_btn">
+				#printDeleteBtn("AR") ## 삭제 버튼
+			</div>
+		</div></div>
+		#end
+		<script type="text/javascript">	
+		//new daum.Music.DragnSelect(document,"trackContainer",{liclassName:"listli",containment:"trackContainer"});
+		var controller = new daum.Music.ListPrototype();
+		controller.initialize({over:false, MySection:true});
+//		daum.Music.List.init({over:false});
+		</script>
+	</div>
+</div>
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+관심아티스트 갯수: #if($!{myCount}) $myCount #else 0 #end <br/>
+현재오더링 :  #if($!{command.getOrdering()}) $command.getOrdering() #end (디폴트 :최신순) <br/><br/>
+
+<strong>리스트</strong>
+#if($!{myList})
+	#foreach($item in $myList)
+		
+		아티스트ID : $item.artist.artistId <br/>
+	        이름 : $item.artist.name <br/> 
+		이미지Id: $item.mainImage.imageId <br/>
+		이미지주소: $item.mainImage.filePath <br/>
+		
+		<br/><인기챠트3곡><br/>
+		#foreach($song in $item.popularSongList)
+			(송 ID : $song.songId) 노래제목 : $song.title <br/>
+			링크 : #if($!{song.AODLinkId}) $song.AODLinkId #end <br/>
+		----------------<br/>
+		#end
+		
+		<br/><최근앨범+ 관련이벤트><br/>
+		타입명 : $item.album.typeName 
+		볼륨: $item.album.volume <br/>
+		앨범Id : $item.album.albumId <br/>
+		앨범명 : $item.album.title <br/>
+		발매일 : $item.album.releaseDt <br/>
+		앨범듣기여부 : $item.album.playYn<br/>
+		앨범이미지주소 : $item.album.mainImage.filePath <br/>
+		
+		<br/><마스터송><br/>
+		#foreach($masterSong in $item.album.masterSongList)
+			(송 ID : $masterSong.songId) 노래제목 : $masterSong.title <br/>
+			링크 : #if($!{masterSong.AODLinkId}) $masterSong.AODLinkId #end <br/>
+			성인곡여부 : $masterSong.adultYn <br/>
+		----------------<br/>
+		#end
+
+		
+		이벤트 Id(이벤트없을경우null) : $item.relativeEvent.eventId <br/>
+		이벤트링크 : $item.relativeEvent.linkUrl <br/><br/>
+
+	#end
+#end
+<br/>
+<br/>
+
+
+<b>왼쪽레프트정보</b><br/>
+다음이름: $left.cpDaumName <br/>
+전화번호 $left.cpNumber <br/>
+유저아뒤 : $left.userId <br/>
+음악감상잔여일 $left.aodLeftDay <br/>
+mp3잔여곡 : $left.Mp3LeftCount <br>
+
+<br>
+MY 뮤직<br/> 
+플레이리스트 $left.myPlayCount <br/>
+
+#foreach($item in $left.myPlayList)<br/>
+	ㅡ순서: $item.playListId || 이름: $item.playListName ($item.totalPlayCnt) || 디폴트: $item.gubunCd
+#end <br/>
+
+<br/>
+즐겨 듣는 음악 <br/>
+최근 들은 음악 <br/>
+관심음악 : $left.favoriteCount <br/>
+관심음악제일마지막에 저장된 탭 : $left.lastSavedObjType <br/>
+구매음악 : $left.ownCount <br/>
+		
+MY관리 <br/>
+이용권현황 $left.ticketOwnCount <br/>
+내알림  $left.announceCount <br/>
+내설정 <br/>
+
+공지사항 <br/><br/>
+#foreach($item in $left.recentNoticeList)<br/>
+	#if($foreach.index < 4)
+		$item.get("SUBJECT") ||  $item.get("URL") <br />
+	#end
+#end <br />	
+<br>
+
+현재페이지 : $command.getPage_no() <br/>
+#end
+
+<div id="FTMessage">
+-----------------------------------------
+FT 체크 (화이링)
+-----------------------------------------
+<br/>- 기본 ordering은 최신순입니다. 
+<br/>- delete시에는 item_type에 AR를 넣어주세요.(구분자는/로 제일 마지막은 붙이지말아주세요^^) ex)delete.do?item_type=AR&delete_list=12345/67899 
+<br/>- 전체 delete시에는  delete.do?delete_list=ALL 이렇게 보내주심 됩니다.
+<br/>- 성인곡 여부가 필요한지는 모르겠찌만^^ 
+-----------------------------------------
+개발 체크 (화이링)
+-----------------------------------------
+<br>- <strike>아티스트명 형식통일? <- 혜진님께 말씀드려서 배열이 하나일때도 매크로를 만들어주시기로 하셨답니다. 감사합니다. </strike>
+
+</div>			

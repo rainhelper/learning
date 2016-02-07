@@ -1,0 +1,19 @@
+<artist>
+##뮤직비디오
+	<artistDetailId>$!{command.artist_id}</artistDetailId>
+	<movieCount>$!{vclipCount}</movieCount>
+	<movieList>
+#if($!{vclipList.size()} != 0 )
+	#foreach($vclip in $vclipList)
+		<video>
+			<id>${vclip.vclipId}</id>
+			<image><![CDATA[$!{vclip.mainImage.filePath}]]></image>
+			<title><![CDATA[$!{vclip.title}]]></title>
+			<songId>$!{vclip.song.songId}</songId>
+			<playtime>$!{vclip.playTime}</playtime>
+			<releaseDate>$!{vclip.regDateTime}</releaseDate>
+		</video>
+	#end
+#end
+	</movieList>
+</artist>

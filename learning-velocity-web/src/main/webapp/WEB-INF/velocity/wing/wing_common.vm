@@ -1,0 +1,5 @@
+#parse("/velocity/wing/piece/wingAd.vm")
+#parse("/mot/wing/noticebox.html")##공지박스
+#parse("/mot/wing/recentmusicbar.html")##뮤직바최신
+#parse("/mot/wing/bestmusicbar.html")##뮤직바인기
+#parse("/mot/wing/realtimechart.html")##실시간차트

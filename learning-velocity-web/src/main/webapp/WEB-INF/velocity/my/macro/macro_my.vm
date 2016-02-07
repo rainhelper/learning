@@ -1,0 +1,498 @@
+#macro(printTopTicketOwnCount $cnt)
+#if($cnt > 0)#if($cnt > 1) 외 $MathTool.sub(${ticketOwnCount},1)건#end#end#end
+
+#macro(downloadRemainderCount $aodCount, $count)#set($tot = $MathTool.add($aodCount,$count))<a href="/my/own_ticket/ticket/list" class="fc_blue">#if($!{tot} > 0)$!{tot}#{else}0#end</a>곡#end
+
+#macro(printBgmUseRadio $useYN)
+<div class="wrap_check">
+	<input id="bgmUseY" name="use_yn" value="Y" #if("$!{useYN}" == "Y") checked #end class="inp_radio" type="radio">
+	<label class="txt_label" for="bgmUseY">배경음악 사용함</label>
+	<input id="bgmUseN" name="use_yn" value="N" #if("$!{useYN}" == "N") checked #end class="inp_radio" type="radio">
+	<label class="txt_label" for="bgmUseN">배경음악 사용안함</label>
+</div>	
+#end
+
+#macro(printAnnounceDeleteBtn $className $disable)
+	printDeleteBtn으로 변경했습니다.
+#*
+<div class="$className">
+	<input class="btn_comm btn_del_all" type="button" title="전체삭제" value="전체삭제" onclick="daum.Music.My.Announce.deleteAll();return false;" $disable>
+	<input class="btn_comm btn_del_select" type="button" title="선택삭제" value="선택삭제" onclick="daum.Music.My.Announce.deleteSelectedRow();return false;" $disable>
+</div>
+*#
+#end
+
+## type : AN(알림), - 관심 음악  AL(앨범), AR(아티스트), MV(뮤직비디오) - , -최근들은 음악   album(앨범),mv(뮤직비디오)
+#macro(printDeleteBtn $type)
+	<a class="btn_comm btn_alldel"  title="전체삭제" href="javascript:;" onclick="daum.Music.My.Del.delAll('$!{type}');">전체삭제</a>
+	<a class="btn_comm btn_setdel mg_r0" title="선택삭제" href="javascript:;" onclick="daum.Music.My.Del.delSelect(this,'$!{type}');">선택삭제</a>
+#end
+
+#macro(calcRecommendGenreSize $list)
+#if($list)	
+#set($mod = $list.size()%5)
+#set($cnt = $MathTool.floor($MathTool.div($list.size(),5)))
+#if( $mod > 0)#set($cnt=$MathTool.add($cnt,1))#end
+#set( $w = $MathTool.mul($cnt,725) )width:$!{w}px#end#end
+
+## #macro(printDepositoryMenu $type)
+##	<ul class="tab_cont tab_own">
+##		<li class="own_menu1#if($StringUtils.equals("$!{type}", "mp3")) on#end">
+##			<a href="/my/depository/mp3/list">MP3</a>
+##		</li>
+#*		<li class="own_menu2#if($StringUtils.equals("$!{type}", "bgm")) on#end">
+			<a href="/my/depository/bgm/list">BGM</a>
+		</li>
+		#
+		<li class="own_menu3#if($StringUtils.equals("$!{type}", "phone")) on#end">
+			<a href="/my/depository/mobile/list">폰뮤직</a>
+		</li>
+		#
+		<li class="own_menu3#if($StringUtils.equals("$!{type}", "gift")) on#end">
+			<a href="/my/depository/gift/list">선물한 음악</a>
+		</li>
+		<li class="own_menu4#if($StringUtils.equals("$!{type}", "manage")) on#end">
+			<a href="/my/depository/bgm_status/list?target_service=CAFE">배경음악 관리</a>
+		</li>
+*#
+##	</ul>
+## #end
+
+#macro(printDepositorySearch $cmd $purchaseCount $type)
+<input type="hidden" value="" id="search_type_id">
+<input type="hidden" id="search_type_artist" value="$!{cmd.search_type}">
+<ul class="category_cont">
+	<li class="fst#if($StringUtils.isBlank("$!{cmd.search_type}")) on#end">
+		<a class="cate1" href="/my/depository/$!{type}/list">전체</a>
+	</li>
+	#if( !$StringUtils.equals("$!{purchaseCount}", "0"))
+	<li#if($StringUtils.isNotBlank("$!{cmd.search_type}")) class="on"#end>
+		<a class="cate2" href="/my/depository/${type}/list?search_type=artist">아티스트별</a>
+	</li>#end
+</ul>
+<div id="wrapSearch" class="wrap_search">
+	<form name="mySearch" onsubmit="return daum.Music.MyDepository.search(this);">
+		<fieldset>
+			<legend class="screen_out">내부검색폼</legend>
+				<div class="wrap_cate">
+					## custom select
+					
+					<select id="search_type" class="bg_search box_search" name="">
+    					<option value="1" #if($StringUtils.isNotEmpty("$!{cmd.search_name}"))selected#end>아티스트명</option>
+    					<option value="2" #if($StringUtils.isNotEmpty("$!{cmd.search_title}"))selected#end>곡명</option>
+    				</select>
+				</div>
+				<div class="bg_search box_search">
+					<input class="inp_search" id="q2" type="text" autocomplete="off" value="$!cmd.search_name$!cmd.search_title" onkeyup="daum.Music.MyDepository.keyup(event);return false;">
+				</div>
+				<a class="bg_search btn_search" onclick="daum.Music.MyDepository.search(this);return false;" value="검색">검색</a>
+		</fieldset>
+	</form>
+<script type="text/javascript">
+daum.addEvent( daum.$("wrapSearch"), 'click', function(){
+    var sug2 = daum.suggest.Service.add(
+    	"q2",
+    	"wrapSearch",
+    	"http://suggest.music.daum.net",
+    	"/music_arti2_cfsuggest",
+    	"/suggestProxy.html" ).
+    setLimit( [10,0] ).
+    setEncodeKeyword( "utf_in_out" ).
+    setBeforeSubmitFunc( daum.Music.MyDepository.search ).
+    setForm( document.mySearch );
+});	
+
+## custom select 추가
+new daum.Music.CustomSelect("search_type", {
+	selectedCustomOptionAttributes: {
+		"class": "txt_cate"
+	},
+	customOptionContainerAttributes: {
+		"class": "list_cate"
+	} 
+});
+</script>
+</div>
+#end	
+
+#macro(printDepositoryList $type $mySonglist $totMyCount $typeStr $cmd)
+<div class="wrap_tool_btn">
+	<div class="tool_btn f_l">
+	#if($StringUtils.equals("$!{type}", "bgm")||$StringUtils.equals("$!{type}", "gift")) 
+	    #printListButton("mysong_$!{type}", "listen", "", "", "") 
+	#else
+	    #printListButton("mysong", "listen", "", "", "") ##true : aodCheck여부
+	    #if($StringUtils.equals("$!{type}","mp3"))#printListButton("down", "", "", "listen", "")#end
+    #end
+	</div>
+	<em class="txt_quantity f_l">총 <strong class="fc_blue">#if($!{totMyCount})#toCurrency($!{totMyCount})#{else}0#end</strong> 곡</em>
+	#if( $StringUtils.equals("$!{type}","mp3") || $StringUtils.equals("$!{type}","bgm"))
+	#set( $searchParam = "" )
+	#if($StringUtils.isNotBlank("$!{cmd.search_type}"))
+		#set( $searchParam = $searchParam + "&search_type=$!{cmd.search_type}" )
+	#end
+	#if($StringUtils.isNotBlank("$!{cmd.search_id}"))
+		#set( $searchParam = $searchParam + "&search_id=$!{cmd.search_id}" )
+	#end
+	#if($StringUtils.isNotBlank("$!{cmd.search_char}"))
+		#set( $searchParam = $searchParam + "&search_char=$!{cmd.search_char}" )
+	#end
+	#if($StringUtils.isNotBlank("$!{cmd.search_name}"))
+		#set( $searchParam = $searchParam + "&search_name=$!{cmd.search_name}" )
+	#end
+	#if($StringUtils.isNotBlank("$!{cmd.search_title}"))
+		#set( $searchParam = $searchParam + "&search_title=$!{cmd.search_title}" )
+	#end
+	<div class="sort_option f_r">
+		#if($StringUtils.equals("$!{cmd.ordering}","ALPHANUMERIC_ASC"))
+			<a href="/my/depository/$!{type}/list?ordering=1$!{searchParam}" onclick="daum.Music.MyDepository.search(this, 1);return false;">구매순</a><span class="txt_bar">|</span><em class="link_option">제목순</em><span class="txt_bar">|</span><a href="/my/depository/$!{type}/list?ordering=2$!{searchParam}" onclick="daum.Music.MyDepository.search(this,2);return false;">발매순</a>
+		#elseif($StringUtils.equals("$!{cmd.ordering}","RELEASE_DESC"))
+			<a href="/my/depository/$!{type}/list?ordering=1$!{searchParam}" onclick="daum.Music.MyDepository.search(this, 1);return false;">구매순</a><span class="txt_bar">|</span><a href="/my/depository/$!{type}/list?ordering=3$!{searchParam}" onclick="daum.Music.MyDepository.search(this,3);return false;">제목순</a><span class="txt_bar">|</span><em class="link_option">발매순</em>
+		#else
+			<em class="link_option">구매순</em><span class="txt_bar">|</span><a href="/my/depository/$!{type}/list?ordering=3$!{searchParam}" onclick="daum.Music.MyDepository.search(this,3);return false;">제목순</a><span class="txt_bar">|</span><a href="/my/depository/$!{type}/list?ordering=2$!{searchParam}" onclick="daum.Music.MyDepository.search(this,2);return false;">발매순</a>
+		#end
+	</div>
+	#end
+	<input type="hidden" id="ordering" value="#if($StringUtils.equals("$!{cmd.ordering}","ALPHANUMERIC_ASC"))3#elseif($StringUtils.equals("$!{cmd.ordering}","RELEASE_DESC"))2#{else}1#end">
+</div>
+<div class="bg_thead">
+	##if( !$StringUtils.equals("$!{type}", "phone"))
+	<input type="checkbox" id="allCheck" class="all_chk">
+	<label for="allCheck" class="screen_out">전체선택</label>
+	##end
+</div>
+#if(!!$mySonglist && $mySonglist.size()>0 )
+<ul id="trackContainer" class="list_music">
+	#printListItems( "$!{type}_li" $mySonglist "" false) 	
+</ul>
+#else
+<div class="wrap_nodata">
+	#if($!{typeStr}=="MP3")
+		#if( $type == "gift")
+			<strong>$!{typeStr}가 없습니다</strong>
+		#else
+			<strong>구매한 $!{typeStr}가 없습니다</strong>
+		#end
+	#else
+		#if( $type == "gift")
+            <strong>$!{typeStr}이 없습니다</strong>
+		#else
+            <strong>구매한 $!{typeStr}이 없습니다</strong>
+		#end
+	#end
+</div>	
+#end	
+<div class="wrap_tool_btn">
+	<div class="tool_btn">
+	#if($StringUtils.equals("$!{type}", "bgm")||$StringUtils.equals("$!{type}", "gift")) 
+	    #printListButtonFoot("mysong_$!{type}", "listen", "", "", "") 
+	#else
+	    #printListButtonFoot("mysong", "listen", "", "", "") ##true : aodCheck여부
+	    #if($StringUtils.equals("$!{type}","mp3"))#printListButtonFoot("down", "", "", "listen","")#end
+    #end
+	</div>
+</div>
+#printSNSList( $mySonglist )
+<script type="text/javascript">
+var controller = new daum.Music.ListPrototype();
+controller.initialize({tag:'li', isDuplicate:false, MySection:true, shiftSelect:true});
+</script>
+#end	
+ 
+#macro(printDepositoryArtistSuggest $type $myArtistList $cmd)
+<div class="wrap_list_artist">
+	
+	<div class="wrap_tab tab_artist">
+		<ul class="tab_mycont">
+			<li><a class="tab_all" href="#" tag="L0">전체</a></li>
+			<li><a class="tab_ga" href="#" tag="ㄱ">ㄱ</a></li>
+			<li><a class="tab_na" href="#" tag="ㄴ">ㄴ</a></li>
+			<li><a class="tab_da" href="#" tag="ㄷ">ㄷ</a></li>
+			<li><a class="tab_ra" href="#" tag="ㄹ">ㄹ</a></li>
+			<li><a class="tab_ma" href="#" tag="ㅁ">ㅁ</a></li>
+			<li><a class="tab_ba" href="#" tag="ㅂ">ㅂ</a></li>
+			<li><a class="tab_sa" href="#" tag="ㅅ">ㅅ</a></li>
+			<li><a class="tab_aa" href="#" tag="ㅇ">ㅇ</a></li>
+			<li><a class="tab_ja" href="#" tag="ㅈ">ㅈ</a></li>
+			<li><a class="tab_cha" href="#" tag="ㅊ">ㅊ</a></li>
+			<li><a class="tab_ka" href="#" tag="ㅋ">ㅋ</a></li>
+			<li><a class="tab_ta" href="#" tag="ㅌ">ㅌ</a></li>
+			<li><a class="tab_pa" href="#" tag="ㅍ">ㅍ</a></li>
+			<li><a class="tab_ha" href="#" tag="ㅎ">ㅎ</a></li>
+			<li><a class="tab_atoc" href="#" tag="A">A~C</a></li>
+			<li><a class="tab_dtof" href="#" tag="D">D~F</a></li>
+			<li><a class="tab_gtoi" href="#" tag="G">G~I</a></li>
+			<li><a class="tab_jtol" href="#" tag="J">J~L</a></li>
+			<li><a class="tab_mtoo" href="#" tag="M">M~O</a></li>
+			<li><a class="tab_ptor" href="#" tag="P">P~R</a></li>
+			<li><a class="tab_stou" href="#" tag="S">S~U</a></li>
+			<li><a class="tab_vtox" href="#" tag="V">V~X</a></li>
+			<li><a class="tab_ytoz" href="#" tag="Y">Y~Z</a></li>
+			<li><a class="tab_num" href="#" tag="num">0~9</a></li>
+			<li><a class="tab_etc" href="#" tag="etc">기타</a></li>
+		</ul>
+	</div>
+	<div class="scroll">
+		<ul class="list_keyword">
+			#foreach ($item in $myArtistList)
+			<li id="artist_$!{item.artist.artistId}" #if($StringUtils.equals("$!{cmd.search_id}","$!{item.artist.artistId}")) class="on"#end >
+				<a href="#" onclick='daum.Music.MyDepository.artistSearch("$!{type}", "$!{cmd.search_type}", "$!{cmd.search_char}","$!{item.artist.artistId}");return false;'><span>#strCut($!{item.artist.name},24)($!{item.ownCount})</span></a>###artist_$!{item.artist.artistId}
+			</li>
+			#end
+		</ul>
+	</div>
+</div>
+#end		
+
+#macro(printOwnTicketTab $type)	
+	<div class="wrap_tab tab_coupon">
+		<ul class="tab_mycont">
+			<li #if($StringUtils.equals("$!{type}", "ticket"))class="on"#end>
+				<a class="tab_mycoupon" href="/my/own_ticket/ticket/list">보유 이용권</a>
+			</li>
+			<li #if($StringUtils.equals("$!{type}", "gift"))class="on"#end>
+				<a class="tab_giftcoupon" href="/my/own_ticket/gift/list">선물한 이용권</a>
+			</li>
+			<li #if($StringUtils.equals("$!{type}", "periodic"))class="on"#end>
+				<a class="tab_paycancel" href="/my/own_ticket/periodic/list">자동결제 해지</a>
+			</li>
+		</ul>
+	</div>
+#end		
+
+#macro(printTicketStatus $isStatus)
+#if($isStatus == "USE")<em class="ico_comm ico_use">사용중</em>
+#elseif($isStatus == "WAIT")<em class="ico_comm ico_useend">대기중</em>
+#elseif($isStatus == "UNUSE")<em class="ico_comm ico_usebefore">미사용</em>
+#elseif($isStatus == "DONE")<em class="ico_comm ico_useend">사용완료</em>
+#elseif($isStatus == "CANCEL")<em class="ico_comm ico_useend">취소/환불</em>#end
+#end
+
+#* 이용권 종류 (이용권 상태에 따라 다름)*#
+#macro(printTicketTitle $ticket)
+#set($ticketTitle = $!{ticket.order.item.title})
+#if($ticket.order.isFreePay())#if($ticket.order.item.periodic)#set($ticketTitle = "[무료체험] $ticketTitle")#else#set($ticketTitle = "[무료체험] $ticketTitle")#end
+#elseif($ticket.order.isCouponRegularPay()) #set($ticketTitle = "[자동결제] $ticketTitle")#end
+#if($!{ticket.ticketUseStatus} == "USE")<span class="b">$!{ticketTitle}</span>
+#else $!{ticketTitle} #end
+#end
+
+
+#*
+이용권 만료 정보
+*#
+#macro(printRemainderInfo $ticket $user $isAodUse)
+#if($!{ticket.ticketUseStatus} == "CANCEL")사용 불가능
+#***##if($!{ticket.modDttm}) <span class="fc_etc">(#DateFormatYYMMDD(${ticket.modDttm}) 취소)</span>#end##
+#else##
+#***##set ($itemCode = $!{ticket.order.item.itemType.code})
+#***##set ($ownerId = ${ticket.owner.userId})
+#***##if("$itemCode" == "AP") ## AOD
+#***##***##if($isAodUse)
+#***##***##***##if($StringUtils.equals("$!{ticket.ticketUseStatus}","UNUSE") && $!{ticket.startDate}) 이용권 사용대기중 <span class="fc_etc">(#DateFormatYYMMDD($!{ticket.startDate})부터 사용 가능)</span> #end
+#***##***##***##set ($clickEvent = "alert('현재 사용중인 음악감상 이용권 기간 만료 후 사용 가능합니다.');")
+#***##***##***##set ($imgClass = "btUseTicket_dis")
+#***##***##else
+#***##***##***##set ($clickEvent = "if(confirm('선택하신 이용권을 오늘부터 사용하시겠습니까?')){ linkTicketUse('$!{ticket.id}','$!{command.status}') }")
+#***##***##***##set ($imgClass = "btUseTicket")
+#***##***##end
+#***##***##if($ticket.isStart() == false)
+#***##***##***##if("$!{ownerId}" == "$!{user.userId}" && !$!{ticket.startDate})<input type="button" class="typeBtn $!{imgClass}" title="이용권 사용하기" value="이용권 사용하기" onclick="$!{clickEvent}">#end
+#***##***##else
+#***##***##***##if($!{ticket.remainDate} == 0 && $!{ticket.getRemainDatetime()} > 0) #set($_remainDate = 1) #else #set ($_remainDate = $ticket.remainDate) #end
+#***##***##***##if($_remainDate > 0)${_remainDate}일간 듣기 가능 #if($!{ticket.endDate})<span class="fc_etc">(~#DateFormatYYMMDD($!{ticket.endDate}))</span>#end#else 이용권 사용완료 #if($!{ticket.endDate})<span class="fc_etc">(~#DateFormatYYMMDD($!{ticket.endDate}))</span>#end#end
+#***##***##end
+#***##elseif("$itemCode" == "AM") ## AOD+MP3
+#***##***##if($isAodUse)
+#***##***##***##if($StringUtils.equals("$!{ticket.ticketUseStatus}","UNUSE") && $!{ticket.startDate}) 이용권 사용대기중 <span class="fc_etc">(#DateFormatYYMMDD($!{ticket.startDate})부터 사용 가능)</span> #end
+#***##***##***##set ($clickEvent = "alert('현재 사용중인 음악감상 이용권 기간 만료 후 사용 가능합니다.');")
+#***##***##***##set ($imgClass = "btUseTicket_dis")
+#***##***##else
+#***##***##***##set ($clickEvent = "if(confirm('선택하신 이용권을 오늘부터 사용하시겠습니까?')){ linkTicketUse('$!{ticket.id}','$!{command.status}') }")
+#***##***##***##set ($imgClass = "btUseTicket")
+#***##***##end
+#***##***##if($ticket.isStart() == false)
+#***##***##***##if("$!{ownerId}" == "$!{user.userId}" && !$!{ticket.startDate})<input type="button" class="typeBtn $!{imgClass}" title="이용권 사용하기" value="이용권 사용하기" onclick="$!{clickEvent}">#end
+##elseif(!$!{ticket.endDate})제한없음
+#***##***##else
+#***##***##***##if($!{ticket.remainDate} == 0 && $!{ticket.getRemainDatetime()} > 0) #set($_remainDate = 1) #else #set ($_remainDate = $ticket.remainDate) #end 
+#***##***##***##if($_remainDate > 0)${_remainDate}일간 듣기, #end
+#***##***##***##if($ticket.order.item.isPeriodic() && ($_remainDate <= 0 ||  $!{ticket.remainder} <= 0))$!{ticket.remainDateTime}이용권 사용완료 #if($!{ticket.endDate}) <span class="fc_etc">(~#DateFormatYYMMDD($!{ticket.endDate}))</span>#end#else$!{ticket.remainder}곡 다운로드 가능 #if($!{ticket.endDate}) <span class="fc_etc">(~#DateFormatYYMMDD($!{ticket.endDate}))</span>#end#end
+#***##***##end
+#***##elseif("$itemCode" == "MP") ## MP3
+#***##***##***##set ($clickEvent = "if(confirm('선택하신 이용권을 오늘부터 사용하시겠습니까?')){ linkTicketUse('$!{ticket.id}','$!{command.status}') }")
+#***##***##***##set ($imgClass = "btUseTicket")
+#***##***##if(${ticket.remainder} <= 0)이용권 사용완료 #if($!{ticket.endDate})<span class="fc_etc">(~#DateFormatYYMMDD($!{ticket.endDate}))</span>#end
+#***##***##else${ticket.remainder}곡 다운로드 가능 <span class="fc_etc">(기간제한 없음)</span> #if($ticket.startDate)<span class="fc_etc">(#DateFormatYYMMDD(${ticket.startDate})~)</span> #end#end
+#***##elseif("$itemCode" == "MC") ## MP3기간제
+#***##***##set ($clickEvent = "if(confirm('선택하신 이용권을 오늘부터 사용하시겠습니까?')){ linkTicketUse('$!{ticket.id}','$!{command.status}') }")
+#***##***##set ($imgClass = "btUseTicket")
+#***##***##if($ticket.isStart() == false)
+#***##***##***##if("$!{ownerId}" == "$!{user.userId}" && !$!{ticket.startDate})<input type="button" class="typeBtn $!{imgClass}" title="이용권 사용하기" value="이용권 사용하기" onclick="$!{clickEvent}">
+#***##***##***##else 이용권 사용대기중 <span class="fc_etc">(#DateFormatYYMMDD(${ticket.startDate})부터 사용 가능)</span>
+#***##***##***##end
+#***##***##else
+#***##***##***##if(${ticket.remainder} <= 0)이용권 사용완료 #if($!{ticket.endDate})<span class="fc_etc">(~#DateFormatYYMMDD($!{ticket.endDate}))</span>#end
+#***##***##***##else
+#***##***##***##if($!{ticket.remainDate} == 0 && $!{ticket.remainDateTime} > 0) #set($_remainDate = 1) #else #set ($_remainDate = $ticket.remainDate) #end
+#***##***##***##if($_remainDate > 0)${ticket.remainder}곡 다운로드 가능 #if($!{ticket.endDate})<span class="fc_etc">(~#DateFormatYYMMDD(${ticket.endDate}))</span>#end#else 이용권 사용완료 #if($!{ticket.endDate})<span class="fc_etc">(~#DateFormatYYMMDD($!{ticket.endDate}))</span>#end#end
+#***##***##***##end
+#***##***##end
+#***##elseif("$itemCode" == "BT") ## BGM
+#***##***##set ($clickEvent = "if(confirm('선택하신 이용권을 오늘부터 사용하시겠습니까?')){ linkTicketUse('$!{ticket.id}','$!{command.status}') }")
+#***##***##set ($imgClass = "btUseTicket")
+#***##***##if(${ticket.remainder} <= 0)이용권 사용완료
+#***##***##else${ticket.remainder}곡 이용 가능 <span class="fc_etc">(기간제한 없음)</span> #if($!{ticket.startDate})<span class="fc_etc">(#DateFormatYYMMDD(${ticket.startDate}) ~ )</span> #end#end
+#***##elseif("$itemCode" == "BC") ## BGM기간제
+#***##***##set ($clickEvent = "if(confirm('선택하신 이용권을 오늘부터 사용하시겠습니까?')){ linkTicketUse('$!{ticket.id}','$!{command.status}') }")
+#***##***##set ($imgClass = "btUseTicket")
+#***##***##if($ticket.isStart() == false)
+#***##***##***##if("$!{ownerId}" == "$!{user.userId}")<input type="button" class="typeBtn $!{imgClass}" title="이용권 사용하기" value="이용권 사용하기" onclick="$!{clickEvent}">#end
+#***##***##else
+#***##***##***##if(${ticket.remainder} <= 0)이용권 사용완료 #if($!{ticket.endDate})<span class="fc_etc">(~#DateFormatYYMMDD($!{ticket.endDate}))</span>#end
+#***##***##***##else
+#***##***##***##if($!{ticket.remainDate} == 0 && $!{ticket.remainDateTime} > 0) #set($_remainDate = 1) #else #set ($_remainDate = $ticket.remainDate) #end
+#***##***##***##if($_remainDate > 0)$!{ticket.remainder}곡 이용 가능 #if($!{ticket.endDate}) <span class="fc_etc">(~#DateFormatYYMMDD($!{ticket.endDate}))</span>#end#else 이용권 사용완료 #if($!{ticket.endDate})<span class="fc_etc">(~#DateFormatYYMMDD($!{ticket.endDate}))</span>#end#end
+#***##***##***##end
+#***##***##end
+#***##end
+#end
+#end
+
+
+#*
+이용권 만료 정보
+*#
+#macro(printRemainderInfoForApp $ticket $user $isAodUse)
+#***##set ($itemCode = $!{ticket.order.item.itemType.code})
+#***##set ($ownerId = ${ticket.owner.userId})
+#***##if("$itemCode" == "AP") ## AOD
+#***##***##if($ticket.isStart() == true)
+#***##***##***##if($!{ticket.remainDate} == 0 && $!{ticket.getRemainDatetime()} > 0) #set($_remainDate = 1) #else #set ($_remainDate = $ticket.remainDate) #end
+#***##***##***##if($_remainDate > 0)<span class="txt_num">D-${_remainDate}</span> #if($!{ticket.endDate})<span class="txt_date"><span class="screen_out">기간</span>~#DateFormatYYMMDDForApp($!{ticket.endDate})</span>#end#end
+#***##***##end
+#***##elseif("$itemCode" == "AM") ## AOD+MP3
+#***##***##if($ticket.isStart() == true)
+#***##***##***##if($!{ticket.remainDate} == 0 && $!{ticket.getRemainDatetime()} > 0) #set($_remainDate = 1) #else #set ($_remainDate = $ticket.remainDate) #end 
+#***##***##***##if($_remainDate > 0)<span class="txt_num">D-${_remainDate}</span> #end
+#***##***##***##if($!{ticket.endDate})<span class="txt_date"><span class="screen_out">기간</span>~#DateFormatYYMMDDForApp($!{ticket.endDate})</span>#end
+#***##***##end
+#***##elseif("$itemCode" == "MP") ## MP3
+#***##***##if(${ticket.remainder} <= 0)
+#***##***##else #if($ticket.startDate)<span class="txt_date"><span class="screen_out">기간</span>#DateFormatYYMMDDForApp($!{ticket.startDate})~</span> #end#end
+#***##elseif("$itemCode" == "MC") ## MP3기간제
+#***##***##if($ticket.isStart() == true)
+#***##***##***##if(${ticket.remainder} <= 0)
+#***##***##***##else
+#***##***##***##if($!{ticket.remainDate} == 0 && $!{ticket.remainDateTime} > 0) #set($_remainDate = 1) #else #set ($_remainDate = $ticket.remainDate) #end
+#***##***##***##if($_remainDate > 0)<span class="txt_num">D-${_remainDate}</span> #if($!{ticket.endDate})<span class="txt_date"><span class="screen_out">기간</span>~#DateFormatYYMMDDForApp($!{ticket.endDate})</span>#end#end
+#***##***##***##end
+#***##***##end
+#***##elseif("$itemCode" == "BT") ## BGM
+#***##***##if(${ticket.remainder} <= 0)
+#***##***##else #if($!{ticket.startDate})<span class="txt_date"><span class="screen_out">기간</span>#DateFormatYYMMDDForApp($!{ticket.startDate})~</span> #end#end
+#***##elseif("$itemCode" == "BC") ## BGM기간제
+#***##***##if($ticket.isStart() == true)
+#***##***##***##if(${ticket.remainder} <= 0)
+#***##***##***##else
+#***##***##***##if($!{ticket.remainDate} == 0 && $!{ticket.remainDateTime} > 0) #set($_remainDate = 1) #else #set ($_remainDate = $ticket.remainDate) #end
+#***##***##***##if($_remainDate > 0)<span class="txt_num">D-${_remainDate}</span> #if($!{ticket.endDate})<span class="txt_date"><span class="screen_out">기간</span>~#DateFormatYYMMDDForApp($!{ticket.endDate})</span>#end#end
+#***##***##***##end
+#***##***##end
+#***##end
+#end
+
+
+#*
+선물한 이용권 만료 정보
+*#
+#macro(printGiftRemainderInfo $ticket)
+#if($!{ticket.ticketUseStatus} == "CANCEL")사용 불가능
+#***##if($!{ticket.modDttm}) <span class="txt_to">(#DateFormatYYMMDD(${ticket.modDttm}) 취소)</span>#end##
+#else##
+#***##set ($itemCode = $!{ticket.order.item.itemType.code})
+#***##set ($ownerId = ${ticket.owner.userId})
+#***##if("$itemCode" == "AP") ## AOD
+#***##***##***##if($!{ticket.remainDate} == 0 && $!{ticket.getRemainDatetime()} > 0) #set($_remainDate = 1) #else #set ($_remainDate = $ticket.remainDate) #end
+#***##***##***##if($_remainDate > 0) 이용권 사용중 #else 이용권 사용완료#end
+#***##elseif("$itemCode" == "AM") ## AOD+MP3
+#***##***##***##if($!{ticket.remainDate} == 0 && $!{ticket.getRemainDatetime()} > 0) #set($_remainDate = 1) #else #set ($_remainDate = $ticket.remainDate) #end 
+#***##***##***##if($_remainDate <= 0 ||  $!{ticket.remainder} <= 0) 이용권 사용완료 #else 이용권 사용중#end
+#***##elseif("$itemCode" == "MP") ## MP3
+#***##***##***##if(${ticket.remainder} <= 0)이용권 사용완료
+#***##***##***##else 이용권 사용중#end
+#***##elseif("$itemCode" == "MC") ## MP3기간제
+#***##***##***##if(${ticket.remainder} <= 0)이용권 사용완료
+#***##***##***##else
+#***##***##***##if($!{ticket.remainDate} == 0 && $!{ticket.remainDateTime} > 0) #set($_remainDate = 1) #else #set ($_remainDate = $ticket.remainDate) #end
+#***##***##***##if($_remainDate > 0)이용권 사용중 #else 이용권 사용완료#end
+#***##***##***##end
+#***##elseif("$itemCode" == "BT") ## BGM
+#***##***##if(${ticket.remainder} <= 0)이용권 사용완료
+#***##***##else 이용권 사용중#end
+#***##elseif("$itemCode" == "BC") ## BGM기간제
+#***##***##***##if(${ticket.remainder} <= 0)이용권 사용완료
+#***##***##***##else
+#***##***##***##if($!{ticket.remainDate} == 0 && $!{ticket.remainDateTime} > 0) #set($_remainDate = 1) #else #set ($_remainDate = $ticket.remainDate) #end
+#***##***##***##if($_remainDate > 0)이용권 사용중#else 이용권 사용완료#end
+#***##***##***##end
+#***##end
+#end
+#end
+
+#*
+이용권 사용하기
+*#
+#macro(printRemainderInfoUse $ticket)
+#***##set ($itemCode = $!{ticket.order.item.itemType.code})##
+#***##set ($_remainDate = $!{ticket.remainDate})##
+#***##if("$!itemCode" == "AP")##
+#***##***##***#${_remainDate}일간 듣기 가능 #if($!{ticket.endDate})<span class='fc_etc'>(~#DateFormatYYMMDD($!{ticket.endDate}))</span>#end##
+#***##elseif("$itemCode" == "AM")##
+#***##***##***#${_remainDate}일간 듣기, $!{ticket.remainder}곡 다운로드 가능 <span class='fc_etc'>(~#DateFormatYYMMDD($!{ticket.endDate}))</span>##
+#***##elseif("$itemCode" == "MP")##
+#***##***#${ticket.remainder}곡 다운로드 가능 <span class='fc_etc'>(기간제한 없음)</span> #if($ticket.startDate)<span class='fc_etc'>(#DateFormatYYMMDD(${ticket.startDate})~)</span>#end##
+#***##elseif("$itemCode" == "MC")##
+#***##***##***#${ticket.remainder}곡 다운로드 가능 #if($!{ticket.endDate})<span class='fc_etc'>(~#DateFormatYYMMDD(${ticket.endDate}))</span>#end##
+#***##elseif("$itemCode" == "BT")##
+#***##***#${ticket.remainder}곡 이용 가능 <span class='fc_etc'>(기간제한 없음)</span> #if($!{ticket.startDate})<span class='fc_etc'>(#DateFormatYYMMDD(${ticket.startDate}) ~ )</span> #end##
+#***##elseif("$itemCode" == "BC")##
+#***##***##***#$!{ticket.remainder}곡 이용 가능 #if($!{ticket.endDate}) <span class='fc_etc'>(~#DateFormatYYMMDD($!{ticket.endDate}))</span>#end##
+#***##end##
+#end
+
+#macro(printInterestedGenre $type)
+	#set($referer = $type)
+	<div class="section_interest $!Escape.url($!{referer})" #if($StringUtils.equals("top", $type))style="display:none;"#end>
+		<div class="wrap_title">
+			<h3 class="tit_mymusic tit_interest">#if($StringUtils.equals("top", $type))관심장르 추천신보#{else}관심장르 설정#end</h3>
+			<span class="txt_interest">
+					<span class="txt_bar"> | </span>
+					좋아하는 장르를 설정하시면 해당 장르 신보를 매일 받아보실 수 있습니다.
+			</span>
+		</div>
+		
+		<form>
+			<fieldset>
+				<legend class="screen_out">관심장르 설정</legend>
+				<div class="wrap_list_genre">
+					<div class="bg_list_genre">
+						<div class="wrap_tab tab_genre">
+							<ul class="tab_mycont">
+							</ul>
+						</div>
+						<div class="sub_genre_list scroll" id="subGenreContainer">
+						</div>
+					</div>
+					<div class="wrap_btn">
+						<a class="btn_mymusic btn_submit" href="javascript:;" onclick='daum.Music.MyFavoriteGenre.submit("$!Escape.url($!{referer})");return false'>수정</a>
+						<input class="btn_mymusic btn_cancel" type="clear" value="취소"  onclick='daum.Music.MyFavoriteGenre.cancel("$!Escape.url($!{referer})");return false'>
+					</div>
+				</div>
+			</fieldset>			
+		</form>
+    <script type="text/javascript">
+   	 daum.Music.MyFavoriteGenre.init(daum.$$(".tab_mycont")[0]);
+    </script>
+	</div>
+#end

@@ -1,0 +1,71 @@
+<style type="text/css">
+/* layout, bg, head */
+body {background:url(http://i1.daumcdn.net/img-contents/administration/search/120613_musicapp/bg_musicapp.jpg) repeat}
+#daumPromotion {overflow:hidden;width:100%;background:url(http://i1.daumcdn.net/img-contents/administration/search/120613_musicapp/bg_musicapp2.jpg) repeat-x}
+#daumHead {height:0;text-indent:-9999px;font-size:0}
+#daumContent {width:100%;background:url(http://i1.daumcdn.net/img-contents/administration/search/120613_musicapp/bg_musicapp3.jpg) 50% 0 no-repeat}
+
+/* 뮤직앱 다운로드 */
+.section_musicapp {width:100%;border-bottom:solid 1px #6ab7d4}
+.section_musicapp .inner {position:relative;width:980px;height:852px;margin:0 auto;background:url(http://i1.daumcdn.net/img-contents/administration/search/120613_musicapp/section_musicapp.jpg) no-repeat}
+.section_musicapp .btn {overflow:hidden;position:absolute;display:block;width:38px;height:35px;text-indent:-9999px}
+.section_musicapp .btn_daummusic {top:83px;left:58px;width:375px;height:131px}
+.section_musicapp .btn_iphone {bottom:46px;right:67px}
+.section_musicapp .btn_android {bottom:46px;right:24px}
+.section_musicapp .btn_guide {top:20px;left:58px;width:148px;height:43px}
+.section_musicapp .qr_img {position:absolute;bottom:43px;right:121px}
+
+/* 무료쿠폰 정보, 참여방법 */
+.section_info {width:980px;height:451px;margin:0 auto;background:url(http://i1.daumcdn.net/img-contents/administration/search/120613_musicapp/section_info_120615.jpg) no-repeat;text-indent:-9999px;font-size:0}
+.section_new {width:980px;height:445px;margin:0 auto;background:url(http://i1.daumcdn.net/img-contents/administration/search/120613_musicapp/section_new_120615.jpg) no-repeat;text-indent:-9999px;font-size:0}
+
+/* footer */
+#daumFoot {margin:48px 0 20px;;text-align:center;color:#548cb0}
+#daumFoot .link_daum {color:#548cb0}
+</style>
+
+
+<div id="daumPromotion">
+	 <div id="daumHead">
+	 	<h1>Daum뮤직 모바일 시즌2</h1>
+		<strong>집에서만 노래 들을 수 없잖아? 음악과 조금 더 친해지고 싶다면, 스마트폰에 Daum뮤직앱을 다운로드해보세요!</strong>
+	 </div>
+	 <div id="daumContent">
+	 	<div class="section_musicapp">
+	 		<div class="inner">
+				<p class="screen_out">Cross Gene - Daum뮤직이 추천하는 2012 루키 아이돌! Cross Gene 독점 화보, 미공개 영상을 Daum뮤직앱에서 만나보세요!</p>
+				<strong class="screen_out">뮤직앱 다운로드</strong>
+				<em class="screen_out">QR코드를 스캔해보세요!</em>
+				<img src="http://i1.daumcdn.net/img-contents/administration/search/120613_musicapp/qr_img.gif" class="qr_img" alt="QR코드" />
+        		<a href="/" class="btn btn_daummusic" title="Daum뮤직">다음 뮤직</a>
+				<a href="http://itunes.apple.com/kr/app/id411835583" class="btn btn_iphone" target="_blank">아이폰용 뮤직앱</a>
+				<a onclick="daum.Music.goAndroidMusicInstall('newTab');return false;" href="https://play.google.com/store/apps/details?id=net.daum.entertainment.music.android" class="btn btn_android" target="_blank">안드로이드폰용 뮤직앱</a>
+				<a href="http://mobile.daum.net/web/mobileApp.daum?serviceId=music" class="btn btn_guide" target="_blank">뮤직앱 가이드 보러가기</a>
+			</div>
+		</div>
+		<div class="section_info">
+			<h2>매일 매일 선착순 1000명! Daum뮤직앱 다운받고 1개월 무료쿠폰 받자!</h2>
+			<ul>
+				<li>매일 선착순 1000명! 스마트폰 이용권 쏜다! <em>New Mobile Life를 무료로 체험해보세요.</em></li>
+				<li>MP3 40곡 무료 쿠폰 추가 증정! <em>쿠폰 받고 끝? 추가 혜택의 행운을 받으세요.</em></li>
+			</ul>
+			<h3>이벤트 참여 방법</h3>
+			<ul>
+				<li>기존 사용자는 뮤직App 업데이트를 해보세요</li>
+				<li>Daum뮤직 앱을 처음 써보신다면, 구글 플레이 스토어 혹은 앱스토어에서 Daum뮤직앱을 다운로드 받아보세요</li>
+				<li>다운로드 및 업데이트 완료 후 Daum뮤직앱 실행 후, 쿠폰 받기 버튼만 누르면 끝!</li>
+				<li>기간 : 6월 19일 – 7월 2일까지 매일 매일 선착순 1000명! (매일 00시부터 선착순 배포)</li>
+			</ul>
+		</div>
+		<div class="section_new">
+			<h2>오직 Daum뮤직 앱에서만 독점 공개!</h2>
+			<strong>크로스진을 만나보세요! <em>Cross Gene 독점 화보, 미공개 영상을 만나보세요.</em></strong>
+			<strong>저스틴 비버 / 마룬5 컴백! <em>Daum뮤직앱에서 만나보세요.</em></strong>
+		</div>
+		<hr class="hide" />
+		<div id="daumFoot">
+		<h2 class="screen_out">서비스 이용정보</h2>
+		<address class="copyright">Copyright (c) <a href="http://info.daum.net/" class="link_daum" target="_blank">Daum Communications.</a>All rights reserved.</address>
+		</div>
+	</div>
+</div>

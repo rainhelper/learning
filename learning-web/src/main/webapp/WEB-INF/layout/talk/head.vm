@@ -1,0 +1,57 @@
+#parse("/layout/mobile/service_def.vm")
+
+#uaCheck()
+#set( $URI = "#getter('URI', '')" )##
+#set( $PATH = "#getter('PATH_URI', '')" )##
+#set( $DOMAIN = $URI.split($PATH)[0] )##
+#if( $StringUtils.isEmpty("#getter('VERSION', '')"))
+    #set( $STATIC_PATH = "/" )
+#else
+    #set( $STATIC_PATH = "#getter('VERSION', '')" )
+#end
+#set( $STATIC_PATH = $STATIC_PATH.replaceAll("s1", "m1"))
+
+#set( $DEBUG = "#getter('debugmode', '')" == 2 || $StringUtils.isEmpty("#getter('VERSION', '')") )##
+##
+#if( $DEBUG )##
+    #set( $STATIC_PATH = "/" )##
+#else##
+    #set( $STATIC_PATH = "#getter('VERSION', '')" )##
+#end##
+<meta charset="utf-8">
+#parse( "/layout/talk/title.vm" )
+$!{headMetaTitle}
+#parse( "/layout/talk/opengraph.vm" )
+<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width">
+<meta name="format-detection" content="telephone=no"> <link href="http://talkmusic.kakao.com/talk/favicon_talkmusic.ico" rel="shortcut icon">
+<link rel="apple-touch-icon-precomposed" href="http://cfile80.uf.daum.net/image/273BED4255764EA02D89F5">
+<link href="$!{STATIC_PATH}css/talk.css" type="text/css" rel="stylesheet" />
+
+<script src="http://m1.daumcdn.net/svc/original/U03/cssjs/coco/coco-1.0.25.min.js"></script>
+<script type="text/javascript" src="http://s1.daumcdn.net/svc/attach/U0301/cssjs/music/20150312140007/js/min.mobile.musicbar.js" charset="utf-8"></script>
+<script type="text/javascript" src="http://s1.daumcdn.net/svc/attach/U0301/cssjs/music/20150312140007/js/m/mobile_billing.js" charset="utf-8"></script>
+
+#set( $DEBUG = "#getter('debugmode', '')" == 2 || $StringUtils.isEmpty("#getter('VERSION', '')") )
+#if( $DEBUG )
+	#set( $STATIC_PATH = "/" )
+#else
+	#set( $STATIC_PATH = "#getter('VERSION', '')" )
+#end
+<script type="text/javascript" src="$!{STATIC_PATH}js/talk.js"></script>
+<!--[if lt IE 10]>
+<script src="http://m1.daumcdn.net/svc/original/U03/cssjs/jquery/jquery-1.11.1.min.js"></script>
+<script src="http://s1.daumcdn.net/svc/original/U03/cssjs/slide/slide-1.2.13.min.js"></script>
+<![endif]-->
+<!--[if gte IE 11]><!-->
+<script src="http://m1.daumcdn.net/svc/original/U03/cssjs/jquery/jquery-2.1.1.min.js"></script>
+<script src="http://s1.daumcdn.net/svc/original/U03/cssjs/slide/slide-2.0.1.standalone.min.js"></script>
+<!--<![endif]-->
+<script src="http://m1.daumcdn.net/svc/original/U03/cssjs/jquery/plugin/jquery.cookie-1.4.0.min.js"></script>
+<script type="text/javascript">
+    var _tiq = 'undefined' !== typeof _tiq ? _tiq : [];
+    (function(d) {
+        var se = d.createElement('script'); se.type = 'text/javascript'; se.async = true;
+        se.src = location.protocol + '//m2.daumcdn.net/tiara/js/td.min.js';
+        var s = d.getElementsByTagName('head')[0]; s.appendChild(se);
+    })(document);
+</script>

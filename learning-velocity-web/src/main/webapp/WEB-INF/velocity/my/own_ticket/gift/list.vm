@@ -1,0 +1,124 @@
+## 컨텐츠 영역 my_coupon.html
+<style type="text/css">
+	.section_coupon .col_breakdown .txt_info {display:inline-block;}
+</style>	
+#set( $type = "gift")
+<div class="wrap_cont section_coupon">
+	<h3 class="tit_mymusic tit_coupon">선물한 이용권</h3>
+	#printOwnTicketTab($!{type})
+	<input type="hidden" value="$!{command.use_status}" id="curStatus" name="curStatus">
+	<div class="music_chart">
+		<div class="bg_thead wrap_gift"></div>
+		#if(!$CollectionUtils.isEmpty($dto.ticketList))
+		<h4 class="screen_out">선물한 이용권</h4>
+		<ul class="list_gift">
+				#foreach($ticket in $dto.ticketList)
+			<li>
+				<div class="cont_gift cont_kind"><strong class="screen_out">종류</strong>$!{ticket.order.item.title}</div>
+				<div class="cont_gift cont_to"><strong class="screen_out">받는 사람</strong><span class="txt_to">${ticket.owner.daumName}</span></div>
+				<div class="cont_gift cont_history"><strong class="screen_out">내역</strong>#if("$!{ticket.useCode}" == "Y")#printGiftRemainderInfo($!{ticket}) #else 미사용#end</div>
+				<div class="cont_gift cont_price"><strong class="screen_out">가격</strong>#toCurrency($!{ticket.order.item.price})원</div>
+				<div class="cont_gift cont_buy"><strong class="screen_out">구매일</strong>$!CheckDate.makeReleaseDate($!{ticket.ownDate})</div>
+			</li>
+				#end
+		</ul>
+		<div class="wrap_paging">
+			#printPaging($pagingUrl, $command.page_no, $pageHandler, "", 10)
+		</div>
+		#else
+		<div class="gift_nodata">
+			<strong>선물한 이용권이 없습니다</strong>
+		</div>
+		#end
+	</div>
+	<!-- 2014-06-25 수정 끝 -->
+</div>
+#if( $StringUtils.isNotEmpty("$!{command.order_id}") )
+<script type="text/javascript">
+domReady( function(){
+	daum.Music.MyOwnTicket.click(daum.$("$!{command.order_id}"), "$!{command.order_id}");
+});
+</script>
+#end
+
+#if($StringUtils.equals("$!{command.debugmode}","2"))
+<div id="FTMessage">
+-----------------------------------------
+FT 체크 (화이링)
+-----------------------------------------
+<br/>- 이용권화면은 매크로(VM_global_library.vm)를 씁니다. 그래서-_- 
+<br/>- 화면의 변경사항은 없지만 혹시 파라메터값이 영향을 받을까 싶어 전부다 적어놓았습니다. 필요없는경우 지우셔도됩니다^^<br/>
+-----------------------------------------
+개발 체크 (화이링)
+-----------------------------------------
+</div>
+
+#if($dto.ticketList.size() > 0)
+	이용권사용여부: $dto.isAodUse() <br/>
+--------------------------<br/>
+#foreach($ticket in $dto.ticketList)
+	티켓상태:
+	#if($StringUtils.equals("$!{ticket.ticketUseStatus}","USE") && ($DateUtil.getCurrentDateTime() < $!{ticket.ownDate}))
+		#set ($ticket.ticketUseStatus = "WAIT")
+	#end
+
+	$ticket.ticketUseStatus<br/>
+	사용여부 :   $ticket.useCode <br/>
+	아이템타입: $ticket.order.item.itemType.code <br/>
+	소유자: $ticket.owner.userId<br/>	
+	기준일자 : $ticket.modDttm <br/>
+	아이템ID :  ($ticket.itemId) 종류 : $ticket.order.item.title<br/>
+	티켓시작일 : $ticket.startDate <br/> 
+	티켓종료일: $ticket.endDate<br/>
+	쿠폰여부: $ticket.order.item.coupon<br/>
+	티켓이 정기결재인지 : $ticket.order.item.periodic <br/>
+	정기결재를 할수 있는지 여부 출력:	$ticket.getIsPayItem() <br/>
+	지불타입 : $ticket.order.paymentType<br/>
+	지불타입명 :   $ticket.order.getPaymentTypeName()<br/>
+	모바일이용권여부 : $ticket.mobileDataItemYn<br/>
+	남은 사용일수 : $ticket.remainDate <br/>
+	남은 갯수 : $ticket.remainder <br/>
+        가격 :$ticket.order.item.price<br/>
+        구매일 :$!CheckDate.makeReleaseDate($!{ticket.ownDate})<br/>
+ --------------------------<br/>	
+	#end
+#end
+
+이용권  #if($!{ticketCount}) $ticketCount #else 0 #end <br/>
+
+
+<b>왼쪽레프트정보</b><br/>
+다음이름: $left.cpDaumName <br/>
+전화번호 $left.cpNumber <br/>
+유저아뒤 : $left.userId <br/>
+음악감상잔여일 $left.aodLeftDay <br/>
+mp3잔여곡 : $left.Mp3LeftCount <br>
+
+<br>
+MY 뮤직<br/> 
+플레이리스트 $left.myPlayCount <br/>
+
+#foreach($item in $left.myPlayList)<br/>
+	ㅡ순서: $item.playListId || 이름: $item.playListName ($item.totalPlayCnt) || 디폴트: $item.gubunCd
+#end <br/>
+
+<br/>
+즐겨 듣는 음악 <br/>
+최근 들은 음악 <br/>
+관심음악 : $left.favoriteCount <br/>
+관심음악제일마지막에 저장된 탭 : $left.lastSavedObjType <br/>
+구매음악 : $left.ownCount <br/>
+		
+MY관리 <br/>
+이용권현황 $left.ticketOwnCount <br/>
+내알림  $left.announceCount <br/>
+내설정 <br/>
+
+공지사항 <br/><br/>
+#foreach($item in $left.recentNoticeList)<br/>
+	#if($foreach.index < 4)
+		$item.get("SUBJECT") ||  $item.get("URL") <br />
+	#end
+#end <br />	
+<br>
+#end

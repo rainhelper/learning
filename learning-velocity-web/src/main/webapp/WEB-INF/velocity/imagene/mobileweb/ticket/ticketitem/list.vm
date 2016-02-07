@@ -1,0 +1,73 @@
+#uaCheck()
+
+<div id="daumContent"  class="cont_buy" role="main">
+<h2 class="screen_out">이용권</h2>
+<div class="section_tit">
+	<a href="/my/own_ticket/ticket/list" class="link_sort">내 이용권 관리</a> <!-- sort_on 클래스 추가시 활성화 -->
+	<a href="/ticket/ticketitem/list" class="link_sort sort_on"><span class="txt_bar">|</span>이용권 구매</a> <!-- sort_on 클래스 추가시 활성화 -->
+</div>
+<div class="buy_ticket">
+	<h3 class="screen_out">이용권 구매</h3>
+	<ul class="list_purchase">
+		<li>
+			<a href="/my/own_ticket/ticketitem/prepurchase?itemId=APMOG0031" class="link_purchase">
+				<span class="desc_ticket">
+					<span class="time_ticket"><span class="txt_num">1</span>개월</span>
+					<span class="price_ticket"><span class="txt_num">6,900</span>원</span>
+				</span>
+				<span class="txt_ticket">구매하기</span>
+			</a>
+			<div class="cont_purchase">
+				<strong class="tit_use">스마트폰 무제한 이용권</strong>
+				<p class="desc_use">무제한 듣기 : PC+스마트폰 <br>무제한 다운로드 : 스마트폰(DRM파일)</p>
+				<span class="txt_use">해당 이용권 보유시에만 앱에서 감상 가능</span>
+			</div>
+		</li>
+		<li>
+			<a href="/my/own_ticket/ticketitem/prepurchase?itemId=AMG0015" class="link_purchase">
+				<span class="desc_ticket">
+					<span class="time_ticket"><span class="txt_num">1</span>개월</span>
+					<span class="price_ticket"><span class="txt_num">8,000</span>원</span>
+				</span>
+				<span class="txt_ticket">구매하기</span>
+			</a>
+			<div class="cont_purchase">
+				<strong class="tit_use">MP3 30곡 다운+무제한 듣기</strong>
+				<p class="desc_use">무제한 듣기 : PC+스마트폰 <br>다운로드 : 30곡</p>
+				<span class="txt_use">다운받은 MP3는 평생소장, 모든 기기 가능</span>
+			</div>
+		</li>
+		<li>
+			<a href="/my/own_ticket/ticketitem/prepurchase?itemId=MCG0012" class="link_purchase">
+				<span class="desc_ticket">
+					<span class="time_ticket"><span class="txt_num">1</span>개월</span>
+					<span class="price_ticket"><span class="txt_num">5,900</span>원</span>
+				</span>
+				<span class="txt_ticket">구매하기</span>
+			</a>
+			<div class="cont_purchase">
+				<strong class="tit_use">MP3 30곡 다운</strong>
+				<p class="desc_use">다운로드 : 30곡</p>
+				<span class="txt_use">다운받은 MP3는 평생소장, 모든 기기 가능</span>
+			</div>
+		</li>
+		<li>
+			<a href="/my/own_ticket/ticketitem/prepurchase?itemId=APG0021" class="link_purchase">
+				<span class="desc_ticket">
+					<span class="time_ticket"><span class="txt_num">1</span>개월</span>
+					<span class="price_ticket"><span class="txt_num">5,000</span>원</span>
+				</span>
+				<span class="txt_ticket">구매하기</span>
+			</a>
+			<div class="cont_purchase">
+				<strong class="tit_use">무제한 듣기</strong>
+				<p class="desc_use">무제한 듣기 : PC + 스마트폰</p>
+			</div>
+		</li>
+	</ul>
+	<p class="txt_purchase">PC에서 더 다양한 종류의 이용권을 구매할 수 있습니다.</p>
+</div>
+</div>
+
+<script type="text/javascript" src="http://issue.search.daum-img.net/jumpkeyword/API/tot_api.js" charset="euc-kr"></script>
+#parse("/velocity/mobileweb/realtimeissue.vm")

@@ -1,0 +1,137 @@
+## song (for CIA-ITEM-VIEW)
+#set ($serviceId = "music")
+#set ($sectionId = "song")
+{
+	"serviceid":"${serviceId}",
+	"sectionid":"${sectionId}",
+	"itemid" : ${song.songId},
+	"title" : "$!{EscapeUtil.escapeJsonString($!{song.title})}",
+	"synonym" : [
+    #foreach($synonym in $song.synonymList)
+    	"$!{synonym}"#if($velocityHasNext),#end
+    #end
+    ],
+	"link" : "http://music.daum.net/album/main?album_id=$!{song.album.albumId}&song_id=$!{song.songId}",
+	"point" : "",
+	"point_cnt" : "",
+	"mod_dttm" : "$!{song.modDateTime}",
+	"aod" : "$!{song.AODLinkId}",
+	"mp3" : "$!{song.MP3LinkId}",
+	"bgm" : "$!{song.BGMLinkId}",
+	"vclip" : "$!{song.vclipLinkId}",
+	"AdultYn" : "$!{song.adultYn}",
+	"LyricYn" : "$!{song.lyricsYn}",
+	"Lyrics" : "$!{EscapeUtil.escapeJsonString($!{song.lyrics.lyrics})}",
+	#if($StringUtils.isEmpty($!{song.lyrics.realTimeLyrics}))
+	"RealTimeLyrics" : "",
+	#else
+	"RealTimeLyrics" : $!{song.lyrics.realTimeLyrics},
+	#end
+    "status" : #if("$!{song.svcstatus}" == "2") "Y" #else "N" #end,
+    "track_length" : "$!{song.trackLength}",
+    "track_no" : "$!{song.trackNo}",
+	"detail" : {
+		"artist" : {
+			"title" : "아티스트",
+			"content" : [
+			#foreach($artist in $song.keyArtistList)
+				{
+					"title" : "$!{EscapeUtil.escapeJsonString($!{artist.name})}",
+					"link" : "http://music.daum.net/artist/main?artist_id=$!{artist.artistId}"
+				}#if($velocityHasNext),#end
+			#end
+			]
+		},
+		"writer" : {
+			"title" : "작사자",
+			"content" : [
+			#foreach($artist in $song.lyricArtistList)
+				{
+					"title" : "$!{EscapeUtil.escapeJsonString($!{artist.name})}",
+					"link" : "http://music.daum.net/artist/main?artist_id=$!{artist.artistId}"
+				}#if($velocityHasNext),#end
+			#end
+			]
+		},
+		"composer" : {
+			"title" : "작곡자",
+			"content" : [
+			#foreach($artist in $song.composeArtistList)
+				{
+					"title" : "$!{EscapeUtil.escapeJsonString($!{artist.name})}",
+					"link" : "http://music.daum.net/artist/main?artist_id=$!{artist.artistId}"
+				}#if($velocityHasNext),#end
+			#end
+			]
+		},
+		"arranger" : {
+			"title" : "편곡자",
+			"content" : [
+			#foreach($artist in $song.arrangementArtistList)
+				{
+					"title" : "$!{EscapeUtil.escapeJsonString($!{artist.name})}",
+					"link" : "http://music.daum.net/artist/main?artist_id=$!{artist.artistId}"
+				}#if($velocityHasNext),#end
+			#end
+			]
+		},
+		"album" : {
+			"title" : "앨범명",
+			"content" : [
+				{
+					"title" : "$!{EscapeUtil.escapeJsonString($!{song.album.title})}",
+					"link" : "http://music.daum.net/album/main?album_id=$!{song.album.albumId}",
+					"id" : "$!{song.album.albumId}"
+				}
+			]
+		},
+		"albumImage" : {
+			"title" : "앨범이미지",
+			"content" : [
+				#if($!{song.album.mainImage.filePath})
+				{
+					"title" : "$ImageUtil.getImageUrl("$!{song.album.mainImage.filePath}", "100x100", "ALBUM")"
+				}
+				#end
+			]
+		},
+		"release" : {
+			"title" : "발매",
+			"content" : [
+				#if($!{song.album.releaseDt})
+				{
+					"title" : "$!{song.album.releaseDt}"
+				}
+				#end
+			]
+		},
+		"vclip" : {
+			"title" : "뮤직비디오",
+			"content" : [
+				#if($!{song.vclip})
+				{
+					"title" : "$!{EscapeUtil.escapeJsonString($!{song.vclip.title})}",
+					"tvpotVId" : "$!{song.vclip.tvpotVId}",
+					"imageUrl" : "$!{song.vclip.mainImage.filePath}"
+				}
+				#end
+			]
+		},
+	    "genre" : {
+	    	"title" : "장르",
+			"content" : [
+			#foreach($genre in $genreList)
+				{
+					"title" : "$!{genre.genreGroupName} &gt; $!{genre.genreName}",
+					"genreGroupCode" : "$!{EscapeUtil.escapeJsonString($!{genre.genreGroupCode})}",
+					"genreGroupName" : "$!{EscapeUtil.escapeJsonString($!{genre.genreGroupName})}",
+					"genreCode" : "$!{EscapeUtil.escapeJsonString($!{genre.genreCode})}",
+					"genreName" : "$!{EscapeUtil.escapeJsonString($!{genre.genreName})}"
+				}#if($velocityHasNext),#end
+			#end
+			]
+	    }
+    },
+    "ucc" : {
+    }
+}

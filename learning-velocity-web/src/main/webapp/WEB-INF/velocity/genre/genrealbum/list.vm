@@ -1,0 +1,109 @@
+<style type="text/css">
+.wrap_nodata {border-bottom: 1px solid #EAEAEA; font-size: 14px;letter-spacing: -1px;line-height: 16px;margin-bottom: 10px; padding: 59px 0 58px;text-align: center;width: 100%;}
+</style>
+<div class="section_album">
+<h3 class="screen_out">가요 종합 앨범 목록</h3>
+	<div class="wrap_option">		
+		<div class="sort_option f_r">
+			#if($StringUtils.isNotBlank("$!{command.genre_cd}"))#set($subgenrecode = "&genre_cd=" + $command.genre_cd)#end
+			#if($StringUtils.equals("$!{command.order_type}","DATE")||$StringUtils.isBlank("$!{command.order_type}"))#set($classNameDate = "link_option")#end
+			#if($StringUtils.equals("$!{command.order_type}","POP"))#set($classNamePop = "link_option")#end
+			#if($StringUtils.equals("$!{command.order_type}","TITLE"))#set($classNameTitle = "link_option")#end
+			#if($StringUtils.equals("$!{command.recommend_yn}","Y"))#set($classNameRecom = "link_option")#set($classNameDate = "")#end
+			<a class="$!{classNameDate}" onclick="daum.Music.subgenreDetail('$!{genre.genreCode}','$!{command.genre_cd}','$!{subgenre.genreCode}','DATE');return false;" href="/genre/genrealbum/list?genre_group_cd=$!{genre.genreCode}$!{subgenrecode}&order_type=DATE">최신순</a><span class="txt_bar">|</span>
+			<a class="$!{classNamePop}" onclick="daum.Music.subgenreDetail('$!{genre.genreCode}','$!{command.genre_cd}','$!{subgenre.genreCode}','POP');return false;" href="/genre/genrealbum/list?genre_group_cd=$!{genre.genreCode}$!{subgenrecode}&order_type=POP">인기순</a><span class="txt_bar">|</span>
+			##<a class="$!{classNameTitle}" onclick="daum.Music.subgenreDetail('$!{genre.genreCode}','$!{command.genre_cd}','$!{subgenre.genreCode}','TITLE');return false;" href="/genre/genrealbum/list?genre_group_cd=$!{genre.genreCode}$!{subgenrecode}&order_type=TITLE">제목순</a><span class="txt_bar">|</span>
+			<a class="$!{classNameRecom}" onclick="daum.Music.subgenreDetail('$!{genre.genreCode}','$!{command.genre_cd}','$!{subgenre.genreCode}','Y');return false;" href="/genre/genrealbum/list?genre_group_cd=$!{genre.genreCode}$!{subgenrecode}&recommend_yn=Y">추천앨범</a>
+		</div>
+		<div class="tool_btn f_l">
+		#if($StringUtils.equals("$!{command.genre_group_cd}","KO")||$StringUtils.equals("$!{command.genre_group_cd}","PO"))
+			#if($StringUtils.isBlank("$!{command.genre_cd}"))
+				<a class="btn_comm btn_relatemovie" href="/vclip/genre?genre_cd=$command.genre_group_cd">관련뮤비</a>
+			#else
+				#if($StringUtils.equals("$!{command.genre_cd}","KO11")||$StringUtils.equals("$!{command.genre_cd}","KO10"))
+					<a class="btn_comm btn_relatemovie" href="/vclip/genre?genre_cd=$command.genre_cd">관련뮤비</a>
+				#end
+			#end
+		#end
+		#if(!$StringUtils.equals("$!{command.genre_group_cd}","KO"))
+			#if($StringUtils.isBlank("$!{command.genre_cd}"))
+				<a class="btn_comm btn_relatechart" href="/chart/chartsong/genre?genre_cd=${command.genre_group_cd}RA">관련인기차트</a>
+			#end
+		#else
+			#if($StringUtils.isBlank("$!{command.genre_cd}"))
+				<a class="btn_comm btn_relatechart" href="/chart/chartsong/genre?genre_cd=${command.genre_group_cd}RA">관련인기차트</a>
+			#else
+				#if($StringUtils.equals("$!{command.genre_cd}","KO09"))<a class="btn_comm btn_relatechart" href="/chart/chartsong/list?genre_cd=TRRA">관련인기차트</a>#end
+				#if($StringUtils.equals("$!{command.genre_cd}","KO10"))<a class="btn_comm btn_relatechart" href="/chart/chartsong/list?genre_cd=IDRA">관련인기차트</a>#end
+				#if($StringUtils.equals("$!{command.genre_cd}","KO11"))<a class="btn_comm btn_relatechart" href="/chart/chartsong/list?genre_cd=INRA">관련인기차트</a>#end
+			#end
+		#end
+		</div>
+		
+	</div>	
+	<div class="wrap_album">
+		#if(!$CollectionUtils.isEmpty($genreAlbumList)) 
+		<ul class="list_album">
+			#foreach($album in $genreAlbumList)		
+			<li>
+				#printAlbumSet( $album "" )
+			</li>
+			#end
+		</ul>
+		#else
+		<div class="wrap_nodata">
+			<strong>저장된 앨범이 없습니다</strong>
+		</div>
+		#end
+	</div>	
+    ##page
+    #printPaging($pagingUrl, $command.page_no, $pageHandler, "", 10)
+</div>
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )	
+상단의 1뎁스 장르는 하드코딩하는게 좋을듯합니다.<br/>
+관련뮤비와 관련인기차트 링크는 후에 다시 공유드리겠습니다.<br/>
+KO 가요<br/>
+PO 팝<br/>
+OS O.S.T<br/>
+JP J-Pop<br/>
+JA 재즈/블루스<br/>
+CL 클래식/뉴에이지<br/>
+WO 월드뮤직<br/>
+RE 종교음악<br/>
+ET 그외장르<br/>
+<br/><br/>
+대장르코드 : $genre.genreCode <br/>
+대장르명 : $genre.genreName <br/>
+<br/><br/>
+#foreach($subgenre in $genre.genreList)
+	장르코드 : $subgenre.genreCode <br/>
+	장르명 : $subgenre.genreName <br/>
+	추천장르 여부 : $subgenre.recommendGenreYn <br/>
+#end
+<br/><br/>
+#foreach($album in $genreAlbumList)
+	앨범딱지:$album.tagType <br/>
+	앨범아이디 : $album.albumId <br/>
+	앨범명 : $album.title <br/>
+	앨범볼륨 : $album.volume <br/>
+	앨범타입코드 : $album.typeCd <br/>
+	앨범타입명 : $album.typeName <br/>
+	앨범이미지 : $album.mainImage.filePath <br/>
+	앨범재생여부 : $album.playYn <br/>
+	발매일 : $album.releaseDt <br/>
+	추천수 : $album.recommendCount <br/>
+	타이틀곡명 : $album.masterSong.title <br/> 
+	타이틀곡아이디 : $album.masterSong.songId <br/> 
+	타이틀곡듣기여부 : $album.masterSong.AODLinkId <br/> 
+	#foreach($artist in $album.keyArtistList)
+		아티스트명 : $artist.name<br/>
+		아티스트아이디 : $artist.artistId<br/>
+		아티스트링크 : 아직 형식미정입니다.<br/>
+	#end
+	<br/><br/>
+#end
+
+#end
+
+

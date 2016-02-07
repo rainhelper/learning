@@ -1,0 +1,167 @@
+##if(!$!StringUtils.equals("$!{musicSpecialList}","[]"))
+#if(!$StringUtils.isNotBlank("$!{musicSpecialList}"))
+<script type="text/javascript">
+domReady(function(){
+	var daumWrap = daum.$("daumWrap");
+	daumWrap.className ="music_type1";
+});
+</script>
+#end
+
+<div class="wrap_tit">
+	<h3>이벤트</h3>
+	<a class="btn_comm btn_list" href="/event/freesong/list">전체목록</a>
+</div>
+<div class="wrap_img thumb_link">
+	##<img  width="100%" alt="그림 나올곳">
+	<img src="$!{album.freeEvent.filePath}" width="100%" alt="$!{album.title}">
+</div>
+<div class="box_event_info">
+	<div class="wrap_info">
+		<span class="ico_comm ico_tit">event</span>
+		<h3 class="tit">$!{album.freeEvent.eventTitle}</h3>
+		<div class="wrap_album_img">
+			#printAlbumThumb( $album 3 ""  "")
+		</div>
+		<div class="list_info artist_info">
+			<dl class="wrap_event_info">
+				<dt class="tit_info album">무료곡</dt>
+				<dd class="txt_info">
+					#set($songs = '')
+					#foreach($song in $album.songList)
+						#if( $foreach.index > 0 ) #set( $songs = $songs + "/" ) #end
+						#set( $songs = $songs + $!{song.songId} )
+					#end
+					<a href="#" class="ico_comm ico_listen" onclick="daum.Music.Event.listenFreeSong('$!{songs}');return false;">
+					#set($fstSong = $!{album.songList.get(0)})
+					#set($remainderNum = $MathTool.sub($!{album.songList.size()},1))
+					$!{fstSong.title}#if($remainderNum > 0) 외  $!{remainderNum}곡#end</a></dd>
+			</dl>
+			<dl class="wrap_event_info">
+				<dt class="tit_info album">앨범</dt>
+				<dd class="txt_info">
+					#printAlbumName($album "album_type" 40 4 true)
+				</dd>
+			</dl>
+			<dl class="wrap_event_info">
+				<dt class="tit_info album">아티스트</dt>
+				<dd class="txt_info">
+					#printArtistName( $album.keyArtistList "" 15 true )
+					##<a href="#">비욕</a>
+				</dd>
+			</dl>
+			<dl class="wrap_event_info">
+				<dt class="tit_info album">기간</dt>
+				<dd class="txt_info">
+				#printDateWithName($album.freeEvent.startDate true) ~ #printDateWithName($album.freeEvent.endDate true)
+				</dd>
+			</dl>
+			<dl class="wrap_event_info">
+				<dt class="tit_info album">무료</dt>
+				<dd class="txt_info">
+				#set($aodYnflag = $StringUtils.equals("$!{album.freeEvent.aodfreeYn.getAcronym()}","Y"))
+				#set($mp3Ynflag = $StringUtils.equals("$!{album.freeEvent.mp3freeYn.getAcronym()}","Y"))
+				#set($bgmYnflag = $StringUtils.equals("$!{album.freeEvent.bgmfreeYn.getAcronym()}","Y"))
+				#if($aodYnflag)<strong>듣기</strong>#end		
+				#if($aodYnflag && $mp3Ynflag)<span class="txt_bar"> | </span>#end
+				#if($mp3Ynflag)<strong>MP3</strong>#end
+				#if(($mp3Ynflag && $bgmYnflag)||($aodYnflag && $bgmYnflag))<span class="txt_bar"> | </span>#end
+				#if($bgmYnflag)<strong>BGM</strong>#end
+				</dd>
+			</dl>
+		</div>
+		<div class="cl_b"></div>
+	</div>
+	<div class="wrap_free">
+			<div class="wrap_tool_btn">
+				<div class="tool_btn f_l">
+					#printListButton( "song"  "listen" "" "" "")
+				</div>
+			</div>
+			<div class="bg_thead">
+				<input id="allCheck" class="all_chk" type="checkbox">
+				<label class="screen_out" for="allCheck">전체선택</label>
+			</div>
+			#if($ControlUtil.convValue($album.songList.size(), 0)!=0)  
+				<table id="trackContainer" class="tbl_music" >  
+					#printListItems( "event" $album.songList "" false)   
+				</table>
+			#else 
+				리스트가 없습니다.    
+			#end
+			<div class="wrap_tool_btn">
+				<div class="tool_btn f_l">
+					#printListButton( "song" "listen" "" "" "")
+				</div>
+			</div>
+			<a class="arr_comm btn_more" href="/album/main?album_id=$!{album.albumId}" title="앨범정보 더보기">앨범정보 더보기</a>
+			
+	</div>
+	<div class="wrap_notice">
+		<strong class="screen_out">이벤트 안내</strong>
+		<ul class="list_notice">
+			<li>이벤트 당첨시 자세한 당첨안내는 응모하신 ID의 한메일로 발송해드립니다.</li>
+			<li>공연 티켓경품은 배송되지 않고 현장에서 본인 확인 후 입장 가능하며 양도는 불가능합니다.</li>
+			<li>티켓 외의 경품은, 종료일 전에 배송받으실 주소와 전화번호로 개인정보를 꼭 수정해주세요. (재배송 불가)
+				<a href="https://user.daum.net/daumuser/moreInfo.daum" target="_blank" title="개인정보 수정하기">개인정보수정</a></li>
+		</ul>
+	</div>
+</div>
+<div><iframe id="commentFrame" width="100%" frameborder="0" scrolling="no" charset="utf-8" title="댓글 영역" src="#getter('GAIA_DOMAIN', '')/gaia/do/comment/commentList?bbsId=$!{album.bbsId}&articleId=$!{album.articleId}&templatePath=/content.htmp"></iframe>
+</div>
+#printSNSList( $album.songList )
+<script type="text/javascript">  
+	var controller = new daum.Music.ListPrototype();
+	controller.initialize();  
+</script>   
+#if ($request.getParameter("debugmode") == "2" )
+"GAIA_DOMAIN": #getter('GAIA_DOMAIN', '')	
+"eventId" : "$!{album.freeEvent.eventId}"<br>
+"eventTitle" : "$!{album.freeEvent.eventTitle}"<br>
+"startDate" : "$!{album.freeEvent.startDate}"<br>
+"endDate" : "$!{album.freeEvent.endDate}"<br>
+"image" : "$!{album.freeEvent.filePath}"<br>
+"aodfreeyn" : "$!{album.freeEvent.aodfreeYn.getAcronym()}"<br>
+"bgmfreeyn" : "$!{album.freeEvent.mp3freeYn.getAcronym()}"<br>
+"mp3freeyn" : "$!{album.freeEvent.bgmfreeYn.getAcronym()}"<br>
+"albumId" : "$!{album.albumId}"<br>
+"albumTypeName" : "$!{album.typeName}"<br />
+"albumTitle" : "$!{album.title}"<br />
+"playYn" : "$!{album.playYn}"<br />
+"albumMainImage" : "$!{album.mainImage.filePath}"<br />
+"keyArtistList"<br />
+#foreach($artist in $album.keyArtistList)
+	"name" : "$!{artist.name}"<br />
+	"artistId" : "$!{artist.artistId}"<br />
+	"image" : "$!{artist.mainImage.filePath}"<br />
+#end
+"songList"<br />
+#foreach($song in $album.songList)
+	"songId" : "$!{song.songId}"<br />
+	"title" : "$!{song.title}"<br />
+	"albumId" : "$!{song.album.albumId}"<br />
+	"AODLinkId" : "$!{song.AODLinkId}"<br />
+	"MP3LinkId" : "$!{song.MP3LinkId}"<br />
+	"BGMLinkId" : "$!{song.BGMLinkId}"<br />
+#end
+<br />
+뮤직 스페셜 데이터 :: ${musicSpecialList}<br />
+<br />
+#end
+
+<div id="FTMessage">
+-----------------------------------------
+FT 체크 (화이링)
+-----------------------------------------
+<br/>- 마크업에는 daumWrap div 클래스명이 type3 으로 되어있고 현재 개발서버 마크업에는 type2로 나옴? 페이지 로드시 3으로 바꿔서 처리해야 하나요? 
+<br/>- 댓글운영원칙 링크 는 어디로?
+<br/>-
+-----------------------------------------
+개발 체크 (화이링)
+-----------------------------------------
+<br/>-메인으로뜨는 설명 데이터값(img)값을 못찾겠어요. => ${album.freeEvent.imageUrl}
+<br/>-메인으로뜨는 설명은 그림형식만 있는건가요? => 네네
+<br/>-날짜 형식 YYYYMMDD 로 내려 주세요. => 수정했어요
+<br/>-아티스트 정보 안나와요. => 수정했습니다. ~
+<br/>-오른쪽 날개 없는 형식인 경우를 알수있게 해줄 분기값 필요해요. => ${musicSpecialList} 값이 있으면 날개 없애시면되어요 ~
+</div>

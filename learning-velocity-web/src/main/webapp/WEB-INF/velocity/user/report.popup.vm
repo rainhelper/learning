@@ -1,0 +1,121 @@
+<style type="text/css">
+	.section_artist dd a {color:#139fd0;}
+##	.layer_complete {position:absolute; z-index:1;}
+</style>
+</style>
+#if($!{command.obj_type} == 'SO' && $!{song.lyricsYn} == 'Y')
+	#set($infoType = "U")
+#else
+	#set($infoType = "A")
+#end
+<div id="popupWrap" class="popup_participate">
+	<div class="popup_head">
+		<h1 class="tit_popup tit_participate ir_pm">이 정보에 직접 참여</h1>
+	</div>
+	<div class="popup_body">
+		<div class="box_info">
+			<em class="ir_pm">지금 보시는 정보에 추가·수정이 필요한 내용을 직접 등록해보세요!</em>
+			<p class="ir_pm">등록해주신 내용은 운영자의 검수후, 서비스에 반영됩니다. 검수 과정에 따라 처리 시간이 다소 걸릴 수 있는점, 양해 부탁드립니다. 정보 반영 여부는 한메일을 통해 알려드립니다.</p>
+		</div>
+      	<div class="section_artist">
+			#if( $StringUtils.equals("$!{command.obj_type}", "AR") )
+			<form name="frmUserInfo" action="/user/report.popup?obj_type=$!Escape.url($!{command.obj_type})&artist_id=$!{artist.artistId}#if($StringUtils.isNotBlank($!Escape.url($!{command.info_type})))&info_type=E#end" method="post">
+			#elseif( $StringUtils.equals("$!{command.obj_type}", "AL") )
+			<form name="frmUserInfo" action="/user/report.popup?obj_type=$!Escape.url($!{command.obj_type})&album_id=$!{album.albumId}#if($StringUtils.isNotBlank($!Escape.url($!{command.info_type})))&info_type=E#end" method="post">
+			#else
+			<form name="frmUserInfo" action="/user/report.popup?obj_type=$!Escape.url($!{command.obj_type})&song_id=$!{song.songId}#if($StringUtils.isNotBlank($!Escape.url($!{command.info_type})))&info_type=E#end" method="post">
+			#end
+	      		<h2 class="ir_pm">아티스트 정보 수정</h2>
+	      		<fieldset>
+	      			<legend class="ir_pm">정보수정폼</legend>
+		      		<dl class="wrap_name">
+		      			<dt>#if($StringUtils.equals("$!{command.obj_type}", "AR"))아티스트명#elseif($StringUtils.equals("$!{command.obj_type}", "AL"))앨범명#elseif($StringUtils.equals("$!{command.obj_type}", "SO"))곡명#end</dt>
+		      			<dd>#if($StringUtils.equals("$!{command.obj_type}", "AR"))
+							##	#set($artistName = $artist.name.replaceAll("\'","&apos;"))
+								<a href="#javascript:;" onclick="daum.Music.ReportPopup.goDetail($!{artist.artistId}); return false;" title="아티스트 바로가기">#strCut("$!{artist.name}", 20)</a>
+							#elseif($StringUtils.equals("$!{command.obj_type}", "AL"))
+							##	#set($title = $album.title.replaceAll("\'","&apos;"))
+								<a href="javascript:;" title="#escTitle($!{album.title})" onclick="daum.Music.ReportPopup.goDetail($!{album.albumId}); return false;">#strCut("$!{album.title}", 20)</a>
+							#elseif($StringUtils.equals("$!{command.obj_type}", "SO"))
+							##	#set($songtitle = $song.title.replaceAll("\'","&apos;"))
+								<a href="javascript:;" title="$!{song.title}" onclick="daum.Music.ReportPopup.goDetail($!{song.album.albumId}, $!{song.songId}); return false;">#strCut("$!{song.title}", 20) #printFeatArtistName($song)</a>
+							#end
+						</dd>
+		      		</dl>
+		      		<div class="wrap_modify">
+		      			<div class="choice_modify">
+			      			<span class="addition">
+			      				<input type="radio" id="addition" name="choice" value="A" #if($StringUtils.equals($!{infoType}, 'A'))checked="checked"#end>
+			      				<label for="addition">내용추가</label>
+			      			</span>
+			      			<span class="modify">
+			      				<input type="radio" id="modify" name="choice" value="U" #if($StringUtils.equals($!{infoType}, 'U'))checked="checked"#end>
+			      				<label for="modify">내용수정</label>
+			      			</span>
+			      			<span class="error">
+			      				<input type="radio" id="error" name="choice" value="E" #if($StringUtils.equals($!{command.info_type}, 'E'))checked="checked"#end>
+			      				<label for="error">음원오류신고</label>
+			      			</span>
+			      		</div>
+			      		<textarea col="" row="" style="overflow:auto;" name="TextBox" >$!{song.lyrics.lyrics}</textarea>
+		      		</div>
+		      		<div class="wrap_btn">
+			      		<input class="btn_popup btn_regist" type="button" id="regist" name="regist" value="확인" onclick="daum.Music.ReportPopup.addInfo('$!Escape.url($!{command.obj_type})', '$!{artist.artistId}', '$!{album.albumId}', '$!{song.songId}', callback_data);">
+			      		<a class="btn_popup btn_cancle" id="cancle" name="cancle" href="#" onclick="window.close();return false;">닫기</a>
+		      		</div>
+		      	</fieldset>
+      		</form>
+		</div>
+	</div>
+<script type="text/javascript">
+<!--
+domReady(function(){
+	daum.Music.Util.resizePopup(daum.$("popupWrap"));
+}); 
+//-->
+var callback_data = {
+};
+var callback = function(data){
+	callback_data.imageUrl  = data[0];
+	callback_data.width  = data[6];
+	callback_data.height  = data[7];
+	if(data && data[0] && data[5]){
+		daum.$("inpFileUrl").value = data[0];
+		daum.$("inpFileName").value = data[5];
+	}
+}
+</script>
+</div>
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+<br>
+호출<br>
+아티스트 정보 참여 : http://music.daum.net/user/report.popup?obj_type=AR&artist_id=927 <br>
+앨범 정보 참여 : http://music.daum.net/user/report.popup?obj_type=AL&album_id=553959 <br>
+곡 정보 참여 : http://music.daum.net/user/report.popup?obj_type=SO&song_id=8704804 <br>
+음원오류 신고 참여 : http://music.daum.net/user/report.popup?&info_type=E <br>
+<br>
+<br>
+아티스트 일때<br>
+OBJTYPE : $!{command.obj_type} == AR <br>
+OJBID : $!{artist.artistId} <br>
+OBJNAME : $!{artist.name} <br>
+<br>
+<br>
+앨범 일때<br>
+OBJTYPE : $!{command.obj_type} == AL <br>
+OJBID : $!{album.albumId} <br>
+OBJNAME : $!{album.title} <br>
+<br>
+<br>
+곡 일때<br>
+OBJTYPE : $!{command.obj_type} == SO <br>
+$!{song}
+OJBID : $!{song.songId} <br>
+OBJNAME : $!{song.title} <br>
+가사여부 : $!{song.lyricsYn} <br>
+<br>
+<br>
+음원 오류신고 일 때 : $!{command.info_type} == E<br>
+<br>
+<br>
+#end

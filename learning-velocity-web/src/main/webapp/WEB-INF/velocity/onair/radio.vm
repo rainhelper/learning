@@ -1,0 +1,9 @@
+<a id="atag" href="#none">
+	테스트
+</a>
+	    <script type="text/javascript">
+ jQuery( "#atag" ).mouseover(function() {
+      console.log(1);
+    });
+	
+	</script>

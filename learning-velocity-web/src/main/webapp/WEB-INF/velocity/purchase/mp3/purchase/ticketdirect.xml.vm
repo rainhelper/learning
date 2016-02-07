@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+#set ($errorName = $!{exception.class.simpleName})
+#if ($errorName == "PermissionException")
+	#set ( $errorView = "해당 페이지에 접근권한이 없습니다." )
+#elseif ($errorName == "DataErrorException")
+	#set ( $errorView = "죄송합니다. 요청하신 정보에 이상이 있습니다. Daum뮤직 고객센터로 문의해 주세요." )
+#elseif ($errorName == "InvalidParameterException")
+	#set ( $errorView = "매개변수가 부족합니다. Daum뮤직 고객센터로 문의해 주세요." )
+#elseif ($errorName == "UnrecognizedPaymentTypeException")
+	#set ( $errorView = "올바르지 않은 결제수단입니다." )
+#elseif ($errorName == "PaymentFailException")
+	## BI로부터 받은 isSuccess 값이 T가 아닌 경우
+	#set ( $errorView = "결제에 실패하였습니다. 잠시후 다시 시도해주세요." )
+#### 결제 매니저 에러 ####
+#elseif ($errorName == "DaumCashPaymentException")
+	## 다음캐쉬 결제 오류
+	#set ( $errorView = "다음캐시 결제 오류 ($!{exception.originalErrorCode})" )
+#elseif ($errorName == "DirectPaymentRequestException" || $errorName == "DirectPaymentConfirmException")
+	## 직납결제 오류
+	#set ( $errorView = "직납결제 오류 ($!{exception.originalErrorCode})" )
+#elseif ($errorName == "PaymentCartAddItemException" || $errorName == "PaymentCartDeleteException")
+	## 다건결제 오류
+	#set ( $errorView = "다건결제 오류 ($!{exception.originalErrorCode})" )
+#elseif ($errorName.startsWith("AutoPayment"))
+	## 자동결제 오류
+	#set ( $errorView = "자동결제 오류 ($!{exception.originalErrorCode})" )
+#elseif ($errorName == "RefundRequestException")
+	## 환불신청 오류
+	#set ( $errorView = "환불신청 오류 ($!{exception.originalErrorCode})" )
+#elseif ($errorName == "PaymentCancelException")
+	## 결제취소 오류
+	#set ( $errorView = "결제취소 오류 ($!{exception.originalErrorCode})" )
+#elseif ($errorName == "PizzaClientException")
+	## 결제취소 오류
+	#set ( $errorView = "결제모듈 오류 ($!{exception.originalErrorCode})" )
+#elseif ($errorName == "PurchaseValidateEmptyException")
+	## 구매내역 없음
+	#set ( $errorView = "구매내역이 없습니다." )
+#elseif ($errorName == "PurchaseValidateItemTypeException")
+	## 구매 불가능한 아이템
+	#set ( $errorView = "해당 아이템은 구매가 불가능합니다." )
+#elseif ($errorName == "NotEnoughDaumCashException")
+	## 다음캐시가 부족할때
+	#set ( $errorView = "다음캐쉬가 부족합니다(부가세 10% 추가). 충전 후 다시 시도해주세요." )
+#elseif ($errorName == "PurchaseValidateDuplicationException")
+	## 중복 아이템
+	## 모든 중복된 정보를 가져온다.
+	## 선물하고자 하는 아이템을 받는 사람이 이미 보유하고 있습니다.
+	#set ( $errorView = "사용하고 있는 이용권이 있습니다." )
+#elseif ($errorName == "PurchaseValidateGiftItemException")
+	## 선물 불가능한 아이템
+	#set ( $errorView = "해당 아이템은 선물하기가 불가능합니다." )
+#elseif ($errorName == "CouponInfoException")
+    #set ( $errorView = $errorMsg )
+#elseif ($errorName == "ItemUseException")
+    #set ( $errorView = $errorMsg )
+#elseif ($errorName == "EventDirectCloseException")
+    #set ( $errorView = "고객님 죄송합니다. 해당 곡은 무료 이벤트 제공이 종료되었습니다. 다른 무료 곡을 선택해주세요." )
+#elseif ($errorName == "EventAlreadyDirectException")
+    #set ( $errorView = "이미 무료 BGM 1곡을 받으셨습니다. 무료 BGM은 추천곡 중 1곡만 받을 수 있습니다." )
+#elseif ($errorName == "PaymentMobileException")
+    #set ( $errorView = "$!{detailMsg}")
+#elseif ($errorName == "MobilePaymentFailException")
+    #set ( $errorView = "$!{detailMsg} 휴대폰으로 결제하신 금액은 자동으로 취소됩니다" )
+#else
+	#set ( $errorView = "일시적인 오류가 발생하였습니다. 잠시 후 다시 실행해주시기 바랍니다." )
+#end
+<XML>
+	<RESULT>
+		#if($exception)
+			<RESULT_CODE>N</RESULT_CODE>
+			<RESULT_MESSAGE>$!{errorView}</RESULT_MESSAGE>
+		#else
+			<RESULT_CODE>$!{resultCode}</RESULT_CODE>
+			<RESULT_MESSAGE>$!{resultMessage}</RESULT_MESSAGE>
+		#end
+	</RESULT>
+</XML>

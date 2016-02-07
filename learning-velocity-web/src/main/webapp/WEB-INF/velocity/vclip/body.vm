@@ -1,0 +1,146 @@
+#set($dateKey = $!{command.date_key})
+#set($date = $!{command.date})
+#set($pageNo = $!{command.page_no})
+#set($genreCd= $!{command.genre_cd})
+#set($link = "/vclip/chart?")
+<ul class="tab_cont tab_video">
+	<li class="video_menu1 #if($StringUtils.equals('chart', $tabType))on#end">
+		<a href="/vclip/chart?date_key=$!{dateKey}&date=$!{date}&page_no=$!{pageNo}">인기차트</a>
+	</li>
+	<li class="video_menu2 #if($StringUtils.equals('newest', $tabType))on#end">
+		<a href="/vclip/newest">최신뮤비</a>
+	</li>
+	<li class="video_menu3 #if($StringUtils.equals('KO', $!{command.genre_cd}))on#end">
+		<a href="/vclip/genre?page_no=$!{pageNo}&genre_cd=$!{genreCd}">가요</a>
+	</li>
+	<li class="video_menu4 #if($StringUtils.equals('KO', $!{command.genre_cd}))on#end">
+		<a href="/vclip/genre?page_no=$!{pageNo}&genre_cd=KO10">아이돌</a>
+	</li>
+	<li class="video_menu5 #if($StringUtils.equals('KO', $!{command.genre_cd}))on#end">
+		<a href="/vclip/genre?page_no=$!{pageNo}&genre_cd=KO11">인디</a>
+	</li>
+	<li class="video_menu6 #if($StringUtils.equals('KO', $!{command.genre_cd}))on#end">
+		<a href="/vclip/genre?page_no=$!{pageNo}&genre_cd=PO">팝</a>
+	</li>
+	<li class="video_menu7">
+		<a href="/vclip/type?obj_type=02">공연</a>
+	</li>
+	<li class="video_menu8 #if($StringUtils.equals('KO', $!{command.genre_cd}))on#end">
+		<a href="/vclip/genre?page_no=$!{pageNo}&genre_cd=ET">기타</a>
+	</li>
+</ul>
+<div class="wrap_cate">
+	<ul class="category_cont f_l">
+		<li class="fst on">
+			<a class="cate1" href="/vclip/chart?date_key=3">일간</a>
+		</li>
+		<li>
+			<a class="cate2" href="/vclip/chart?date_key=2">주간</a>
+		</li>
+		<li>
+			<a class="cate3" href="/vclip/chart?date_key=1">월간</a>
+		</li>
+	</ul>
+	#printChartDateInfo($chartType $genreCd $dateKey $date $pageNo $link)
+</div>
+
+<div class="wrap_list_mv">
+	<div id="trackContainer" class="box_list_mv">
+		<ol class="list_mv" style="position:relative;">
+		#foreach($vclip in $vclipList)
+    			<li>
+					$vclip.rank
+    				<a class="thumb_link" title="$!{vclip.title}" href="#">
+    					<img id="thumbLink$!{vclip.rank}" class="thumb_img" src="http://cfile90.uf.daum.net/image/16421910375DB19403A5C4", $ImageUtil.ARTIST_160_125)" width="172" height="128" alt="" vclipId="$vclip.vclipId">
+    					##<img src="$ImageUtil.getImageUrl("$!{vclip.mainImage.filePath}", $ImageUtil.ARTIST_160_125)" width="172" height="128" alt="">
+    					#if( $!{tabType} == 'chart' )
+    					<span class="box_no #if($foreach.index < 4)top #end">
+    						<span class="wrap_no">
+    							#if( $vclip.rank < 9 )
+    							<span class="num_video num$!{vclip.rank}"></span>
+    							#else
+    								#if( $vclip.rank > 99 )
+    									<span class="num_video num$StringUtils.mid("$vclip.rank", 0, 1)"></span>
+    									<span class="num_video num$StringUtils.mid("$vclip.rank", 1, 1)"></span>
+    									<span class="num_video num$StringUtils.mid("$vclip.rank", 2, 1)"></span>
+    								#else
+    									<span class="num_video num$StringUtils.mid("$vclip.rank", 0, 1)"></span>
+    									<span class="num_video num$StringUtils.mid("$vclip.rank", 1, 1)"></span>
+    								#end
+    							#end
+    						</span>
+    					</span>
+    					#end
+    					<span class="ico_comm ico_play"></span>
+    				</a>
+    				<div class="wrap_info">
+    					<strong class="wrap_title">
+    						#printVideoName( $!{vclip} "" 20 true )
+    					</strong>
+    					<span class="wrap_artist">
+    						#printArtistName($!{vclip.keyArtistList} "" 20 true)
+    					</span>
+    					<em class="txt_date">#Str2DateYYYYMMDD($!{vclip.regDateTime})</em>
+    					<span class="song_listen">
+    						#printVideoName( $!{vclip} "ico_comm ico_listen" 20 true )
+    					</span>
+    				</div>
+    			</li>
+			#if( $foreach.index % 4 == 3)
+    			<li class="wrap_quickview hide" id="opendirect$!{foreach.index}">
+    			</li>
+			#end
+		#end	
+		</ol>
+		#printVideoCover()
+	</div>
+</div>
+<script type="text/javascript">
+	daum.Music.Video.init({totalCount:$vclipList.size(), imgString:"thumbLink", colCount:4});
+</script>
+##date_key=1 ->월간 $CheckDate.getDiffMonth("201101", -1)
+##date_key=2 ->주간 $CheckDate.getDiffDate("20110301", -7)
+##date_key=3 ->일간 $CheckDate.getDiffDate("20110301", -1)
+##최종날짜 여부 - $maxDateYn 
+#set($weekMap = $CheckDate.getWeekNum("20110201"))
+##현재년도 : -  $weekMap.get("year"))<br/>
+##현재월 : -  $weekMap.get("month"))<br/>
+##현재주 : -  $weekMap.get("weekNum"))<br/>
+##날짜 : $command.date<br/>
+##주간날짜 예시: <br/>
+##foreach($dateInfo in $CheckDate.getWeekInfo("201103"))
+##$dateInfo.weekNum주  : $dateInfo.startDate~$dateInfo.endDate <br/>
+##end
+
+{
+	"genreCD" : "$!{genre_cd}",
+	"tabType" : "$!{tabType}",
+	"dateKey" : "$!{dateKey}",
+	"date" : "$!{date}",
+	"pageNo" : "$!{pageNo}",
+	"vclipList" : [
+		#foreach($vclip in $vclipList)
+			#if($foreach.index > 0),#end
+			{
+				"rank" : "$!{vclip.rank}",
+				"vclipId" : "$!{vclip.vclipId}",
+				"title" : "$!{vclip.title}",
+				"keyArtistList" : [
+					#foreach($artist in $vclip.keyArtistList)
+						#if($foreach.index > 0),#end
+						{
+							"name" : "$!{artist.name}",
+							"artistId" : "$!{artist.artistId}"
+						}
+					#end
+				],
+				"image" : "$!{vclip.mainImage.filePath}",
+				"regdttm" : "$!{vclip.regDateTime}"
+			}
+		#end
+	]
+}
+
+
+##page
+#printPaging($pagingUrl, $command.page_no, $pageHandler, "", 10)

@@ -1,0 +1,14 @@
+#if("$!{callback}" != "")
+if (typeof(${callback}) == "function") ${callback} (
+#end
+{
+	"ehcache" : "$!{cacheName}",
+	"result" : {
+		"successCount" : "$successCount",
+		"failCount" : "$failCount",
+		"message" : "${Escape.javascript(${message})}"
+	}
+}
+#if("$!{callback}" != "")
+);
+#end

@@ -1,0 +1,83 @@
+<script type="text/javascript">
+try {
+    top.document.getElementById("videoSongId").value = "#escScript($!{song.songId})";
+    top.document.getElementById("videoSongName").value = "#escScript($!{song.songName})";
+/*	top.document.getElementById("bbsArticleId").value = "$!{song.bbsArticleId}"; */
+	top.document.getElementById("videoArtistName").value = "#escScript("#printKeyArtist($video.keyArtistList)")";
+	top.document.title = "♪뮤직비디오 - "+top.document.getElementById("videoSongName").value + " | Daum 뮤직";
+} catch (e){ 
+}
+</script>
+<style type='text/css'>
+	h3 {display:none;}
+</style>
+    <div class="conSongInfo">
+        <div id="mvInfo" class="clr">
+            <h3>뮤직비디오 정보</h3>
+            <div class="tit">
+            #if( $StringUtils.equals( "$!{song.songId}", "" ) ) 				
+                <span class="videoTitle icoTit" title="#escTitle($!{song.songName})">$!{song.title}</span>
+			#else
+				<a href="http://music.daum.net/album/main?album_id=$!{song.album.albumId}&song_id=$!{song.songId}" target="_blank" class="videoTitle icoTit" title="#escTitle($!{song.title})">$!{song.title}</a>
+			#end
+			</div>          
+        </div>     
+    </div>
+
+    <!-- 앨범&가수 정보 -->
+    <div class="conArtistInfo">
+        <h3>앨범&가수 정보</h3>			
+        <div id="musicInfo">
+		#if( $!{song.album.albumId} ) 
+			<a href="http://music.daum.net/album/main?album_id=$!{song.album.albumId}" target="_blank" class="thumb"><img src='$ImageUtil.getImageUrl("$!{song.vclip.mainImage.filePath}", "42x42", "ALBUM")'></a>
+		#else
+            <span class="thumb"><img src='$ImageUtil.getImageUrl("$!{song.vclip.mainImage.filePath}", "42x42", "ALBUM")'></span>
+		#end
+            <ul class="inf">
+			#if( $song.keyArtistList && $song.keyArtistList.size()>0 )	
+                <li><label>아티스트</label> <span class="con ellipsis">
+                #printArtistName($!{song.keyArtistList} "" 20 false)
+				</span></li>	
+			#else
+				<li><label>아티스트</label> <span class="con noData">-</span></li>
+			#end
+            #if( $StringUtils.equals( "$!{song.album.title}", "" ) )             
+				<li><label>앨범명</label> <span class="con noData">-</span></li>
+            #else
+				<li><label>앨범명</label> <span class="con"><a href="http://music.daum.net/album/main?album_id=$!{song.album.albumId}" target="_blank" title="#escTitle( $song.album.title )">#strCut( "$!{song.album.title}" 46)</a></span></li>
+            #end
+            #if( $StringUtils.equals( "$!{song.album.releaseDt}", "" ) )             
+				<li><label>발매일</label> <span class="con noData">-</span></li>
+            #else
+				<li><label>발매일</label> <span class="con"><span>$CheckDate.makeReleaseDate( $!{song.album.releaseDt} )#if( !$StringUtils.equals("$!{song.nationName}","")) ($!{song.nationName})#end</span></span></li>
+			#end
+			#if( $StringUtils.equals( "$!{song.relateVideo}", "" ) || ( $song.relateVideo && $song.relateVideo.size() == 0 ) )   
+				<li><label>그외 뮤비</label> <span class="con noData">-</span></li>
+			#else
+                <li><label>그외 뮤비</label> <span class="con conMvList"><span class="titleLists">
+			#end
+			
+			#if( $relationVclipList && $relationVclipList.size() == 1 )
+            #set( $relateTitleCut = 40 )
+            #elseif( $relationVclipList && $relationVclipList.size() > 1 )
+            #set( $relateTitleCut = 20 )
+			#end
+			
+			 
+#foreach($releateVideo in $relationVclipList)##
+#if( $foreach.index < 2 )#if( $foreach.index > 0 ), #end#strCut( "$!{releateVideo.title}" $relateTitleCut )#end##				
+#end
+    					</span>
+    				</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+<script type="text/javascript">
+runProtectedContents();
+try {
+    top.document.getElementById("frmContent").contentWindow.setItemFocus();
+} catch(e){
+    //alert(e.toString() );    
+}
+</script>

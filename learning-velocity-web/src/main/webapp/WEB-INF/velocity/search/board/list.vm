@@ -1,0 +1,133 @@
+#set($boardList = $dto.boardResult.documentList)
+#set($boardCount = $dto.boardResult.totalResultsCount)
+#set($query = $!{command.query})
+#set($url = "/search/board/list?query=$!{query}")
+#set ($artistUrl = "&artistId=$!{command.artistId}")
+#set ($rangeUrl = "&searchRange=$!{command.searchRange}")
+#set ($nationUrl = "&nationId=$!{command.nationId}")
+#set ($genreUrl = "&genreId=$!{command.genreId}")
+#set ($releaseUrl = "&releaseYear=$!{command.releaseYear}")
+#set ($listenUrl = "&listenFilter=$!{command.listenFilter}")
+#set ($bgmUrl = "&bgmFilter=$!{command.bgmFilter}")
+#set($url = $url + $artistUrl + $rangeUrl + $nationUrl + $genreUrl + $releaseUrl + $listenUrl + $bgmUrl)
+
+<ul class="tab_cont tab_search">
+	#printSearchNaviTab()
+</ul>
+
+#parse("/velocity/search/piece/highlight.vm")
+
+#if(($!{boardCount}) && $!{boardCount} > 0)
+<div class="section_bar">
+	
+	
+	<div class="wrap_title">
+		<h3 class="tit_search tit_bar">뮤직BAR</h3>
+		<span class="txt_bar"> | </span>
+		<span class="txt_quantity">총 <strong class="fc_blue ls_0">$!{boardCount}</strong> 건</span>
+		#*
+		<div class="sort_option f_r">
+			#printSearchSortOption( $url, $!{command.sortType} )
+		</div>
+		*#
+	</div>
+	
+	<ul class="list_bar">
+		#printSearchBoardList($boardList)
+	</ul>
+	
+	#set ($url = $url + "&amp;page_no=")
+	#printPaging($url, $dto.ph.pageNo, $dto.ph, "", 10)
+</div>
+#else
+<ul class="list_search_guide">
+	<li class="ico_comm">검색어의 단어 수를 줄이거나, 보다 일반적인 단어로 검색해 보세요.</li>
+	<li class="ico_comm">두 단어 이상의 키워드로 검색 하신 경우, 정확하게 띄어쓰기를 한 후 검색해 보세요.</li>
+	<li class="ico_comm">키워드에 있는 특수문자를 뺀 후에 검색해 보세요.</li>
+</ul>
+#end
+
+
+<div id="FTMessage">
+---------------------<br/>
+FT 체크<br/>
+---------------------<br/>
+
+---------------------<br/>
+개발 체크<br/>
+---------------------<br/>
+- 이미지 정보<br/>
+- 뮤직바는 인기순등 카테 분류가 안되는듯 하네요<br/>
+</div>
+
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+	
+#set($boardList = $dto.boardResult.documentList)
+#set($boardCount = $dto.boardResult.totalResultsCount)
+#set ($url = "?query=$!{command.encodedQuery}")
+
+		<h2>본문영역</h2> 
+<!-- 게시판 -->		
+		#if(($!{boardCount}) && $!{boardCount} > 0)
+		<div class="collTitle">
+			<h3 class="fl">게시판 <span class="num">총 $!{boardCount}건</span></h3>
+			<span class="fl">&nbsp;
+			#* 
+				#if($StringUtils.equals($!{command.sortType}, "0"))
+    				<span class="nrl base">정확도</span>
+    			#else
+    				<a href="$url&sortType=0" class="stlink">정확도</a>
+    			#end
+    			#if($StringUtils.equals($!{command.sortType}, "1"))
+    				<span class="nrl vline"> | </span><span class="nrl base">최신</span>
+    			#else
+    				<span class="nrl vline"> | </span><a href="$url&sortType=1" class="stlink">최신</a>
+    			#end
+    			#if($StringUtils.equals($!{command.sortType}, "2"))
+    				<span class="nrl vline"> | </span><span class="nrl base">인기도</span>
+    			#else
+    				<span class="nrl vline"> | </span><a href="$url&sortType=2" class="stlink">인기도</a>
+    			#end
+    		*#
+			</span>
+		</div>
+		<div class="collWid collTot uccDl">
+		#foreach($board in $boardList)		
+			#set( $count = $foreach.index + 1 )
+			<dl #if($foreach.index == 0) class="fst" #end>
+		        <dt>
+					<a href="$!{board.getLink()}" onclick="return gLink(null, 'RSBY', '1', '$!{count}');">$!{board.subject}</a>
+					&nbsp;&nbsp;$ConverterUtil.formatByStar(${board.regdatetime}, "****.**.**")
+				</dt>
+				<dd>
+					#if($StringUtils.isNotEmpty("$!{board.content}")) <span class="desc">$!{board.content}</span> #end
+					#if($StringUtils.isNotEmpty("$!{board.getBbsName()}")) <span class="etc"><a href="/playzone/" class="g_tit" onclick="return gLink(null, 'RSBY', '2', '$!{count}');">뮤직게시판</a> &gt; <a href="$!{board.getBbsLink()}" class="g_tit" onclick="return gLink(null, 'RSBY', '3', '$!{count}');">$!{board.getBbsName()}</a></span> #end
+				</dd>
+			</dl>
+		#end
+		</div>			
+		<div class="collBottom"></div>
+		
+<!-- 페이징 -->	
+		#if( $StringUtils.isNotEmpty("$!{command.sortType}") ) #set ($url = $url + "&sortType=$!{command.sortType}") #end
+			#printPagingClickLog("${url}&pageNo=", $dto.ph.pageNo, $dto.ph)
+		#end
+		
+		<!--검색결과 없음 -->
+        #if($boardCount <= 0)
+    		<div class="rsltHelp">
+        		<p><span class="dot">ㆍ</span>검색어의 단어 수를 줄이거나, 보다 일반적인 단어로 검색해 보세요.</p>
+        		<p><span class="dot">ㆍ</span>두 단어 이상의 키워드로 검색 하신 경우, 정확하게 띄어쓰기를 한 후 검색해 보세요.</p>
+        		<p><span class="dot">ㆍ</span>키워드에 있는 특수문자를 뺀 후에 검색해 보세요.</p>
+        	</div>
+    	</div>
+    	#end
+		
+<!-- 제보 -->
+##		<hr/><div id="wInfoArea"><span class="tit">지금 보시는 검색 결과에 추가, 수정이 필요한 내용을 직접 등록해 주세요.</span><input type="button" class="typeBtn btnInfo fl" value="제보하기" title="제보하기"></div>
+	
+<!-- 클릭로그 -->
+<script type="text/javascript">init("BY", "$!{command.eucKrQuery}", "-1", "@@@");</script>
+
+#end

@@ -1,0 +1,15 @@
+## Tiara PC, 모바일 웹 개발 가이드
+## http://play.daumcorp.com/pages/viewpage.action?pageId=130223988
+<script type="text/javascript">
+var _tiq = 'undefined' !== typeof _tiq ? _tiq : []; // Global Variables
+/**
+ * PageView 정보 전송/기본 정보만 전송 함.
+ */
+_tiq.push(['__trackPageview']);
+ 
+(function(d) {
+    var se = d.createElement('script'); se.type = 'text/javascript'; se.async = true;
+    se.src = location.protocol + '//m1.daumcdn.net/tiara/js/td.min.js';
+    var s = d.getElementsByTagName('head')[0]; s.appendChild(se);
+})(document);
+</script>

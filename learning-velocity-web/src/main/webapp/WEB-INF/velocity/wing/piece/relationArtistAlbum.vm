@@ -1,0 +1,29 @@
+#if(!$CollectionUtils.isEmpty($relationArtistAlbumList))
+<div class="wing_recommend fst_able CT_ZONE_RELARTISTALBUM">
+	<h3 class="tit_comm tit_another">이 아티스트의 다른앨범</h3>
+	<ul class="list_album">
+		#foreach($album in $relationArtistAlbumList)
+			#if( $foreach.index < 5 )
+		<li>
+			#printAlbumThumb( $album 1 "" "" )
+			<span class="wrap_info">
+				<span class="wrap_title">
+					<strong>#printAlbumName( $album "" 19 1 true )</strong> 
+				</span>
+					#printArtistName( $album.keyArtistList "txt_artist" 12 true )
+				#if( $StringUtils.isNotBlank("$!{album.releaseDt}") )
+				<span class="txt_bar fs_11"> | </span>
+				<span class="txt_sub">$!{CheckDate.makeReleaseDate($!{album.releaseDt})}</span>
+				#end
+			</span>
+		</li>
+			#end
+		#end
+	</ul>
+	<a class="btn_comm btn_more" href="/artist/album/list?artist_id=$!{relationArtistId}">더보기</a>
+</div>
+#end
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+artist_id :: $!{relationArtistId}<br>
+#end

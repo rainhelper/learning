@@ -1,0 +1,272 @@
+#uaCheck()
+#if( $StringUtils.isEmpty("#getter('VERSION', '')"))
+	#set( $STATIC_PATH = "/" )
+#else	
+	#set( $STATIC_PATH = "#getter('VERSION', '')" )
+#end
+#set( $STATIC_PATH = $STATIC_PATH.replaceAll("s1", "m1")) 
+#if($!requestURI.indexOf("/chart/") == -1)
+<script>
+#if( (( $ua_result.os.android && $StringUtils.equals("$!{command.for_android_app}", "Y")) || $ua_result.os.ios ) && $!{command.player} )
+	//location.href = '/appHub?obj_type=SO&obj_id_list=$!{command.player}';
+    //http://music.daum.net/album/main?album_id=570838&song_id=8892157&player=8892157/34129/8891999/8795199
+	//music.mobile.mMusicPlay.playOnApp('SO', '$!{command.player}', '$!{command.album_id}');
+#end
+
+daum.Event.addEvent( window, "load", function(){
+	music.mobile.LazyImageLoader('daumContent');
+	music.mobile.enableMusicClicks('list_realtime');
+	music.mobile.enableMusicClicks('list_music');
+});
+</script>
+#end
+	
+## 비디오 재생용
+<iframe id="daumPlayer" src="http://videofarm.daum.net/controller/video/viewer/VideoForList.html?play_loc=daum_music&alert=true" width="1" height="1" frameborder="0" style="position:absolute;top:-100px;height:-100px;"></iframe>
+#if(!$StringUtils.equals("$!{isDaumMusicApp}", "true"))
+<div id="footContent" class="foot_content" data-isdaumapp="#if($isDaumMobileApp)true#{else}false#{end}"></div>
+<div id="daumFoot" role="contentinfo"><!-- 고객센터, 회원정보 (실시간이슈/아담/웹투앱 요소가 빠진 푸터) 클래스 : type_basic 추가 -->
+
+	<small class="copr_info"></small>
+	<a href="#none" class="link_daumcorp">daumkakao</a>
+	</small>
+
+</div>
+
+## 2013-05-10 ui 수정 시작
+#*
+<div id="daumTotalSearchLayer" class="wrap_schall" style="display:none">
+	<div class="d_schall">
+		<form action="http://m.search.daum.net/search" id="daumTotalSearchForm" class="inner_schall" name="daumTotalSearchForm" role="search">
+			<fieldset>
+				<legend class="screen_out">통합 검색어 입력폼</legend>
+				<div class="box_search write_on">
+                    <input type="hidden" name="nil_profile" value="section">
+                    <input type="hidden" name="rtupcate" value="">
+					<input type="search" id="query_totalsearch" class="tf_keyword" value="" name="q" title="검색어 입력" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="통합검색"><!-- 2013-05-20 title 추가 -->
+					<button id="btn_reset_totalsearch" type="button" class="btn_sch btn_reset"><span class="img_g ico_del">검색어 지우기</span></button>
+					<span class="sch_btn">
+						<button type="submit" id="btn_search_totalsearch" class="btn_sch btn_search"><span class="img_g ico_search">검색</span></button>
+					</span>
+					<span class="btn_close">
+						<button type="button" id="btn_close_totalsearch" class="inner_close">취소</button>
+					</span>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+#if($params.getValue("example") == "suggest_se")
+	<div id="daumTotalSuggestLayer"></div>
+#else
+ 통합검색 서제스트 시작
+	<div id="list_suggest" class="suggest_keyword">
+		<strong class="screen_out">제안 키워드</strong>
+		<ul class="list_sgt">
+            
+			#foreach($i in [1..5])
+			<li>
+				<a href="#none" class="link_sgt">
+					<em class="emph_keyword">오바마</em>당선
+				</a>
+				<button type="button" class="btn_add"><span class="img_g ico_add">추가</span></button>
+			</li>
+			#end
+            
+		</ul>
+	</div>
+ 통합검색 서제스트 끝
+
+ 통합검색 최근검색어 시작
+	<div id="list_latest" class="latest_keyword">
+		<strong class="tit_latest">최근검색어</strong>
+		<ul class="list_latest">
+            
+			#foreach($i in [1..5])
+			<li #if($i == 1)class="fst"#end>
+				<a href="#none" class="link_latest">
+					<span class="img_g ico_search"></span>
+					김수현
+				</a>
+			</li>
+            #end
+            
+		</ul>
+		<div class="latest_btn">
+			<span class="btn_latest btn_del">
+				<button type="button" class="inner_latest">기록삭제</button>
+			</span>
+			<span class="btn_latest">
+				<button type="button" class="inner_latest">최근검색어 숨기기</button>
+			</span>
+		</div>
+	</div>
+ 통합검색 최근검색어 끝
+#end
+</div>
+## 2013-05-10 ui 수정 끝
+*#
+
+<div id="daumMinidaum" style="display:none;"></div>
+
+<div id="daumTotalSearchLayer" class="wrap_schall hide">
+    <!-- 검색창 마크업 -->
+    <div class="d_schall">
+        <form id="daumTotalSearchForm" class="inner_schall"
+            action="http://m.search.daum.net/search"
+            method="get">
+            <fieldset>
+                <legend class="screen_out">통합 검색어 입력폼</legend>
+                <div class="box_search"> <!-- 쿼리가 있을경우 write_on 클래스 추가 -->
+                    <input type="hidden" name="w" value="tot">
+					<input type="hidden" name="nil_profile" value="section">
+					<input type="hidden" name="rtupcate" value="btn_mus">
+                    <input type="search" id="q" name="q" class="tf_keyword" placeholder="통합검색">
+                    <button id="btn_reset_totalsearch" type="button" class="btn_sch btn_reset"><span class="img_g ico_del">검색어 지우기</span></button>
+                    <!-- 검색버튼 -->
+                    <button type="submit" id="btn_search_totalsearch" class="btn_sch btn_search"><span class="img_g ico_search">검색</span></button>
+                    <!-- 취소버튼 -->
+                    <button type="button" id="btn_close_totalsearch" class="btn_close">취소</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <!-- 서제스트 적용 부분 -->
+    <div id="suggest_layer" class="suggest-layer-holder d_sgt"></div>
+</div>
+ 
+<script>
+//웹투앱 2013_02_19 이미
+var imgUrl = function (){
+    var dpi = window.devicePixelRatio || 1;
+    if (dpi >= 2) { 
+        return "http://m1.daumcdn.net/svc/image/U03/common_icon/50D43EF50671760001";
+    } else if (dpi === 1.5) {
+        return "http://m1.daumcdn.net/svc/image/U03/common_icon/50D441F90658390002";
+    } else {
+        return "http://m1.daumcdn.net/svc/image/U03/common_icon/50D444560647960001";
+    }
+}();
+
+(function (exports) {
+    "use strict";
+
+    function delegate (el, selector, type, fn) {
+
+        if (exports.assert) {
+            exports.assert(!!el, 'failed to delegate event. Element: "' + el + '", Selector: "' + selector + '", Event: "' + type + '", handler: ' + fn.toString());
+        }
+
+        exports.event.on(el, type, function(e) {
+            var currentTarget = exports.event.getTarget(e),
+                targets = exports.$$(selector, el);
+
+            targets = Array.prototype.slice.apply(targets);
+
+            while (currentTarget && currentTarget !== el) {
+                if (currentTarget.nodeType === 1 && targets.indexOf(currentTarget) > -1) {
+                    fn(e, currentTarget);
+                    break;
+                }
+                currentTarget = currentTarget.parentNode;
+            }
+        });
+    }
+
+    exports.event.delegate = delegate;
+
+})(window.daumtools = (typeof window.daumtools === 'undefined') ? {} : window.daumtools);
+
+
+</script>
+
+
+<!-- 2014-05-02 스크립트작동을 위한 임시 작업시작  --> 
+<script type="text/javascript">
+// 서제스트 최근검색어를 공유하기 위한 cross stroage 를 사용하기 위해 추가
+document.domain = "daum.net";
+
+coco.configure = {
+	totalSearch: ["daumHead", "daumWrap", "daumContent", "daumAd", "daumFoot", "searchRankArea", "innerSearchForm_bottom", "footContent", "hottrendsContainer"],
+	// 새 서제스트 모듈 사용시 예제 configure
+	suggest: {
+		serviceProfile: "suggest_mus",
+        enableLatestKeyword: true
+	},
+    navigation: {
+        type: 'layer'    },
+	// 각 서비스별 추가 검색 서제스트 사용시 예제 configure(ex: 만화속 세상 예제)
+	
+	innerSuggest: {
+		formEl: "innerSearchForm",
+	    layerEl: "innerSearchLayer",
+	    suggestNumber: 10,
+	    maxRecentQueryInSuggest: 0,
+	    serviceProfile: "suggest_mus",
+	    enableLatestKeyword : false,
+	    searchURL: "/search/list",
+		endpoint: {
+	    	    url: "http://suggest.common.daum.net/music",
+	    		query:"multiple=1&mod=json&cate=album|artist|song"
+		}
+	},
+
+	multiInnerSuggest:[
+	    {
+		    formEl: "innerSearchForm_top",
+	        layerEl: "innerSearchLayer_top",
+	        suggestNumber: 10,
+	        maxRecentQueryInSuggest: 0,
+	        serviceProfile: "suggest_mus",
+	        enableLatestKeyword : false,
+	        searchURL: "/search/list",
+	    	endpoint: {
+	    	    url: "http://suggest.common.daum.net/music",
+	    		query:"multiple=1&mod=json&cate=album|artist|song"
+		    }
+	    },
+	    {
+		    formEl: "innerSearchForm_bottom",
+	        layerEl: "innerSearchLayer_bottom",
+	        suggestNumber: 10,
+	        maxRecentQueryInSuggest: 0,
+	        serviceProfile: "suggest_mus",
+	        enableLatestKeyword : false,
+	        searchURL: "/search/list",
+	    	endpoint: {
+	    	    url: "http://suggest.common.daum.net/music",
+	    		query:"multiple=1&mod=json&cate=album|artist|song"
+		    }
+	    }	
+	],
+	footcontent: {
+		id: "footContent",
+		type: "install",
+		service: "music",
+		// for install
+		scheme: "kakaomusic://app/home ",
+		intent: "intent://app/home#Intent;scheme=kakaomusic;package=com.kakao.music;end",
+		appName: "카카오뮤직앱",
+		appImgUrl: imgUrl,
+		googleplay: "market://details?id=com.kakao.music", // 구글 플레이의 해당 앱 마켓 주소
+        appstore: "itms-apps://itunes.apple.com/app/id696690152", // 앱스토어의 해당 앱 마켓 주소
+		// for add homescreen
+		homeScreenName: "카카오뮤직",
+		homeScreenService: "kakaomusic"
+	}
+};
+
+coco.start();
+</script>
+<!-- 2014-05-02 스크립트작동을 위한 임시 작업끝  --> 
+
+<!-- CT -->
+<script id="CTConfigScript" type="text/javascript">
+	var CTConfig = {
+		targetElement: "daumWrap"   // (Required) 타겟이 될 element의 id를 넣어주세요. 보통 docDaum, daumWrap입니다.
+	};
+    window.scrollTo(0,1); // 가이드
+</script>
+
+<script src="http://s1.daumcdn.net/photo-media/static/ct/ct.js" type="text/javascript" charset="utf-8"></script>
+
+#end

@@ -1,0 +1,46 @@
+{
+"serviceid" : "music",
+"sectionid" : "song",
+"title" : "곡 ID 별 목록",
+"list" :[
+#foreach($song in $songList)
+	#if($songList.indexOf($song) != 0),#end
+	{
+	    "serviceid":"music",
+	    "sectionid":"song",
+	    "itemid" : "$!{song.songId}",
+	    "songid" : "$!{song.songId}",
+	    "title" : "$!{EscapeUtil.escapeJsonString($!{song.title})}",
+	    "synonym" : [
+	    #set($synonymList = $song.getSynonymList())
+	    #foreach($synonym in $synonymList)
+	    	#if($artistList.indexOf($synonym) != 0),#end
+	    	"$!{synonym}"
+	    #end
+	    ],
+	    "link" : "http://music.daum.net/album/main?album_id=$!{song.album.albumId}&song_id=$!{song.songId}",
+	    "image" : "$!{song.album.mainImage.filePath}",
+	    "etc" : {
+	    	"artist" : [
+	    		#set($artistList = $song.keyArtistList)
+	    		#foreach($artist in $artistList)
+	    			#if($artistList.indexOf($artist) != 0),#end
+					{
+						"artistdetailid" : "$!{artist.artistId}",
+						"artistname" : "${EscapeUtil.escapeJsonString($!{artist.name})}"
+					}
+	    		#end
+	    	],
+	    	"featartist" : "${EscapeUtil.escapeJsonString($!{song.featAllArtistWithComma})}",
+	    	"aod" : "$!{song.AODLinkId}",
+	    	"mp3" : "$!{song.MP3LinkId}",
+    		"bgm" : "$!{song.BGMLinkId}",
+	    	"adultyn" : "$!{song.adultYn}",
+	    	"tvpotvid" : "$!{song.vclip.tvpotVId}",
+	    	"albumid" : "$!{song.album.albumId}",
+	    	"albumname" : "${EscapeUtil.escapeJsonString($!{song.album.title})}"
+	    }
+	}
+#end
+]
+}

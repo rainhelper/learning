@@ -1,0 +1,47 @@
+{
+    "totalCnt" : "$!{totalCnt}",    
+	"page_no" : "$!{command.page_no}",
+	"recommendedGenreList" : [
+		#foreach($item in $$recommendedGenreList)
+			#if($foreach.index > 0),#end
+			{
+   				"tagType" : "$!{item.tagType}",
+   				"typeCd" : "$!{item.typeCd}",
+   				"typeName" : "$!{item.typeName}",
+   				"volume" : "$!{item.volume}",
+
+   				"genreCode" : "$!{item.genre.genreCode}",
+   				"albumId" : "$!{item.albumId}",
+   				"title" : "$!{item.title.replaceAll("'", "&apos;").replaceAll('"', '&quot;')}",
+   				"playYn" : "$!{item.playYn}",   				
+   				"releaseDt" : "$CheckDate.makeReleaseDate("$!{item.releaseDt}")",
+   				"filePath" : "$!{item.mainImage.filePath}",
+    			
+   				"keyArtistList": [
+	                				#foreach($artist in $item.keyArtistList)
+	                					#if($foreach.index > 0),#end
+	                					{
+	                						"artistId":"$!{artist.artistId}",
+	                						"name":"$!{artist.name.replaceAll("'", "&apos;").replaceAll('"', '&quot;')}"
+	                					} 
+	                				#end
+	                			],
+    			"songList": [
+				#set($songDataList = $item.masterSongList)
+				#if(!$item.masterSongList || $item.masterSongList.size() == 0)
+					#set($songDataList = $item.songList)
+				#end
+					
+                				#foreach($song in $songDataList)
+                					#if($foreach.index > 0),#end
+                					{
+                						"songId":"$!{song.songId}",
+                						"title":"$!{song.title.replaceAll("'", "&apos;").replaceAll('"', '&quot;')}",
+                						"AODLinkId":"$!{song.AODLinkId}"
+                					} 
+									#end
+                			]
+			}
+		#end
+	]
+}

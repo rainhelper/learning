@@ -1,0 +1,72 @@
+
+#if(($!{boardCount}) && $!{boardCount} > 0)	
+<div class="section_bar" id="boardSection">
+	<div class="wrap_title">
+		<h3 class="tit_search tit_bar">뮤직BAR</h3>
+		<span class="txt_bar"> | </span>
+		<span class="txt_quantity">총 <strong class="fc_blue ls_0"> $!{boardCount}</strong> 건</span>
+	</div>
+	
+	<ul id="searchBoardList" class="list_bar">
+		#printSearchBoardList($boardList)
+	</ul>
+	
+	###if($!{boardList.size()} >= 4)
+	#if($!{boardCount} > 4)
+	<div class="wrap_folding">
+		<a href="#boardSection" id="btnBoardListFold" class="btn_fold">접기</a>
+		<a href="javascript:;" id="btnBoardListUnFold" class="btn_unfold">펼치기</a>
+		<a href="/search/board/list?query=$!{query}" class="link_more">뮤직<span class="ls_0">BAR</span> 더보기</a>
+	</div>
+	
+	<script type="text/javascript">
+		var boardExtendView = new daum.Music.ExtendView({
+			"btnUnFoldId" : "btnBoardListUnFold",
+    		"btnFoldId" : "btnBoardListFold",
+    		"containerId" : "searchBoardList",
+			"jsonUrl" : "/search/board/list_for_unfolding.json",
+			"query" : "$!{command.encodedQuery}",
+			"type" : "board",
+			"totalCount" : "$!{boardCount}",
+			"defaultNum" : 4
+		});
+	</script>
+	#else
+	<div class="wrap_more">
+		<a href="/search/board/list?query=$!{query}" class="link_more">뮤직<span class="ls_0">BAR</span> 더보기</a>
+	</div>
+	#end
+</div>
+#end
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+
+<!-- 게시판 -->
+	#if(($!{boardCount}) && $!{boardCount} > 0)
+		<div class="collTitle"><h3>게시판 <span class="num">($!{dto.boardResult.getStartNum()}-$!{dto.boardResult.getEndNum(5)} / 총  $!{boardCount}건)</span></h3></div>
+		<div class="collWid collTot uccDl">
+		#foreach($board in $boardList)
+			#*
+			$!{board.title} - $!{board.regdttm}<br/>
+			$!{board.content}
+			*#
+			<dl #if($foreach.index == 0)class="fst"#end>
+		        <dt>
+					<a href="$!{board.getLink()}">$!{board.subject}</a>
+					&nbsp;&nbsp;$ConverterUtil.formatByStar(${board.regdatetime}, "****.**.**")
+				</dt>
+				<dd>
+					#if($StringUtils.isNotEmpty("$!{board.content}")) <span class="desc">$!{board.content}</span> #end
+					#if($StringUtils.isNotEmpty("$!{board.getBbsName()}")) <span class="etc"><a href="/playzone/" class="g_tit">뮤직게시판</a> &gt; <a href="$!{board.getBbsLink()}" class="g_tit">$!{board.getBbsName()}</a></span> #end
+				</dd>
+			</dl>
+		#end				
+		</div>
+		#if($!{boardCount} > 5)
+			<div class="moreArea"><a href="/search/board?query=$!{command.encodedQuery}">게시판  더보기</a></div>
+		#else
+			<div class="nmoreArea"></div>
+		#end
+	#end
+	
+#end	

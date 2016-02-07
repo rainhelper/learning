@@ -1,0 +1,116 @@
+#uaCheck()
+<div id="daumContent"  class="cont_buy" role="main">
+<h2 class="screen_out">MP3 구매</h2>
+
+#if("$!exception" == "")
+<div class="section_tit">
+	<h3 class="tit_buy">MP3 구매 완료</h3>
+</div>
+<div class="buy_done">
+	<strong class="tit_done">결제가 완료되었습니다.</strong>
+	#if(!$StringUtils.equals("$!{isDaumMusicApp}", "true"))
+	<p class="txt_done">Daum 뮤직앱에서 구매하신 곡을 <br>확인하실 수 있습니다.</p>
+	#else
+	<p class="txt_done">MY뮤직 > 구매음악 메뉴에서<br>구매하신 곡을 다운로드 하실 수 있습니다.</p>	
+	#end
+</div>
+<div class="buy_btns">
+	#if(!$StringUtils.equals("$!{isDaumMusicApp}", "true"))
+	<button id="goAppBtn" type="button" class="btn_buy btn_down" href="javascript:;" onclick="music.mobile.mMusicPlay.purchaseSongListOnApp(); return false;">앱에서 구매한 MP3 확인</button>
+	<a href="/top" class="btn_buy link_home">뮤직홈으로 이동</a>
+	#else
+		#if(!$StringUtils.equals("$!{isAndroid}", "true"))
+	<button id="goAppBtn" type="button" class="btn_buy btn_down" onclick="javascript:goToMyMusicIOS();">MY뮤직으로 이동하기</button>
+	<a href="javascript:;" class="btn_buy link_home" onClick="javascript:goToAppMainIOS();">뮤직홈으로 이동</a>
+		#else
+	<button id="goAppBtn" type="button" class="btn_buy btn_down" onclick="javascript:goToMyMusic();">MY뮤직으로 이동하기</button>
+	<a href="javascript:;" class="btn_buy link_home" onClick="javascript:goToAppMain();">뮤직홈으로 이동</a>
+		#end
+	#end
+
+</div>
+<div class="buy_info">
+	<strong class="screen_out">구매 곡 사용 안내</strong>
+	<ul class="list_info">
+		<li><span class="ico_info"></span><p class="txt_info">PC에서도 다운받으신 곡을 확인하실 수 있습니다. <br>(music.daum.net 접속 &gt; MY &gt; 구매음악 메뉴)</p></li>
+		#if(!$StringUtils.equals("$!{isDaumMusicApp}", "true"))
+		<li><span class="ico_info"></span><p class="txt_info">뮤직앱을 아직 설치하지 않으신 분들은 위 버튼을 <br>눌러서 앱을 설치하신 후 다운받으신 MP3를 감상해<br>보세요!</p></li>
+		#end
+	</ul>
+</div>
+</div>
+
+#if($StringUtils.equals("$!{isDaumMusicApp}", "true"))
+	#if(!$StringUtils.equals("$!{isAndroid}", "true"))
+		<script type="text/javascript">
+//		  	window.location = "ios://gotoDownloadCenter";
+		</script>
+	#else
+		<script type="text/javascript">
+		   	JSInterface.goToDownloadCenter();
+		</script>
+	#end
+#end
+
+#else
+<div class="section_tit">
+	<h3 class="tit_buy">MP3 구매 실패</h3>
+</div>
+<div class="buy_done">
+	<strong class="tit_done">결제가 실패했습니다.</strong>
+</div>
+<div class="buy_btns">
+	<button id="goAppBtn" type="button" class="btn_buy btn_down" onclick="javascript:goMp3AddPage();">이전화면으로 이동</button>
+	#if(!$StringUtils.equals("$!{isDaumMusicApp}", "true"))
+	<a href="/top" class="btn_buy link_home">뮤직홈으로 이동</a>
+	#else
+		#if(!$StringUtils.equals("$!{isAndroid}", "true"))
+	<a href="javascript:;" class="btn_buy link_home" onClick="javascript:goToAppMainIOS();">뮤직홈으로 이동</a>
+		#else
+	<a href="javascript:;" class="btn_buy link_home" onClick="javascript:goToAppMain();">뮤직홈으로 이동</a>
+		#end
+	#end
+	
+	
+</div>
+
+#if($StringUtils.equals("$!{isDaumMusicApp}", "true"))
+	#if(!$StringUtils.equals("$!{isAndroid}", "true"))
+		<script type="text/javascript">
+//		  	window.location = "ios://gotoDownloadCenter";
+		</script>
+	#else
+		<script type="text/javascript">
+		   	JSInterface.goToBack();
+		</script>
+	#end
+#end
+
+<script type="text/javascript">
+function goMp3AddPage(){
+	document.location.href="/purchase/cart/mp3add?song_id_list=$!{song_id}";
+}
+</script>
+#end
+
+#if($StringUtils.equals("$!{isDaumMusicApp}", "true"))
+<script type="text/javascript">
+	function goToAppMain(){
+	  	JSInterface.goToContentMenu();
+	}
+	
+	function goToMyMusic(){
+	  	JSInterface.goToMyMusic();
+	}
+
+	function goToAppMainIOS(){
+	  	window.location = "ios://gotoMain";
+	}
+	
+	function goToMyMusicIOS(){
+	  	window.location = "ios://gotoMyMusic";
+	}
+</script>
+#end
+
+#parse("/velocity/mobileweb/realtimeissue.vm")

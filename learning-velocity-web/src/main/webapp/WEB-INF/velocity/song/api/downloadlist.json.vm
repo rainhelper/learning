@@ -1,0 +1,12 @@
+var Songs = [
+#foreach($item in $playSongList)
+#if($playSongList.indexOf($item) != 0),#end
+#set( $artistName = "#printKeyArtist( $item.keyArtistList )" )	
+	{
+		"SongId": "${item.songId}", 
+		"SongTitle": "$item.title.replaceAll("\"","\\\"")", 
+		"ArtistName" : "$artistName.replaceAll("\"","\\\"")", 
+		"Quality" : "192"
+	}
+#end
+];

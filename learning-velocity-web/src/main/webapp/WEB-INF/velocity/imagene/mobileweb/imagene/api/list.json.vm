@@ -1,0 +1,73 @@
+#uaCheck()
+{
+	"totalCount" : $awardAlbumTotCnt,
+	"count" : $awardAlbumList.size(),
+	"albums" : 
+	[
+	#set($prevAwardDate = "")
+		#foreach($awardAlbum in $awardAlbumList)
+		#if($foreach.index == 0)
+		[
+		#elseif(!$StringUtils.equals("$!{prevAwardDate}", "$!{awardAlbum.awardDate}"))
+		],
+		[
+		#end
+    		#set($year = $StringUtils.left("$!{awardAlbum.awardDate}", 4))
+        	#set($month = $Number.integer($StringUtils.mid("$!{awardAlbum.awardDate}", 4, 6)))
+    		#set($comment = "100자평을 입력해주세요.")
+    		#foreach($commander in $awardAlbum.commanderList)
+    			#if($foreach.index == 0)#set($comment = "$!{commander.command}")#break#end
+    		#end
+    		
+    		#if($foreach.index > 0 && $StringUtils.equals("$!{prevAwardDate}", "$!{awardAlbum.awardDate}")),#end
+    		{
+    			"awardDate" : "$!{awardAlbum.awardDate}",
+    			"year" : "$!{year}",
+    			"month" : "$!{month}",
+        		"albumId" : "$!{awardAlbum.albumId}",
+        		"title" : "#strCut("$!{awardAlbum.title}", 30)",
+        		"releaseDt" : "$!{awardAlbum.releaseDt}",
+        		"playYn" : "$!{awardAlbum.playYn}",
+    			"imageUrl" : "$ImageUtil.getMobileImageUrl("$!{awardAlbum.mainImage.filePath}", "94x94", "ALBUM", "C")",
+    			"imageSize" : "#if($isWVGA)141#{else}94#end",
+    			"comment" : "#strCut("$!{comment}", 100)",
+    			"keyArtistList" : [
+            		#foreach($item in $awardAlbum.keyArtistList)
+    				#if($foreach.index > 0),#end
+    				{	
+    					"name" : "$!{item.name}",
+    					"artistId" : "$!{item.artistId}"
+    				}
+            		#end
+    			]
+    		}
+		#if(($foreach.index + 1) == $!{awardAlbumList.size()})
+		]
+		#end
+		#set($prevAwardDate = $!{awardAlbum.awardDate})
+	#end
+	]
+}
+
+
+
+#stop
+
+
+#foreach($awardAlbum in $awardAlbumList)
+	수상 년월 : "$!{awardAlbum.awardDate}" <br />
+		"albumId" : "$!{awardAlbum.albumId}" <br />
+		"title" : "$!{awardAlbum.title}" <br />
+		"releaseDt" : "$!{awardAlbum.releaseDt}" <br />
+		"playYn" : "$!{awardAlbum.playYn}" <br />
+		"image" : "$!{awardAlbum.mainImage.filePath}" <br />
+		아티스트명 : 
+		#foreach($item in $awardAlbum.keyArtistList)
+			$item.name
+		#end
+		
+		#foreach($item in $awardAlbum.commanderList)
+			$item.command
+		#end
+#end
+이달의 앨범 총수 : $awardAlbumTotCnt

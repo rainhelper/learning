@@ -1,0 +1,358 @@
+#set($tmpTicketOwnCount = $dto.ticketOwnCount - 1)
+#set($targetService = $command.getTarget_service())
+#if($targetService == "BLOG") 
+	#set ($sidx = 1)
+#else 
+	#set ($sidx = 0)
+#end
+#if( $command.getTarget_service() == "CAFE"  && $cafeInfoList.size()==0 )
+	#set( $noData = true )
+#end	
+#if( $command.getTarget_service() == "BLOG" && ( $StringUtils.isEmpty("$!{bgmStatus.blogUrl}") ))
+	#set( $noData = true )
+#end	
+#if( $command.getTarget_service() == "KIDS" && ( $StringUtils.isEmpty("$!{bgmStatus.kidsUrl}") || $StringUtils.equals("$!bgmStatus.useYN", "N")) )
+	#set( $noData = true )
+#end			
+
+<link rel="stylesheet" href="http://s1.daumcdn.net/music/css/common.css?ver=20110620" type="text/css">
+<link rel="stylesheet" href="http://s1.daumcdn.net/music/css/my.css?ver=20110516" type="text/css">
+<script type="text/javascript" src="http://s1.daumcdn.net/music/js/jigu.min.js?ver=20110627" charset="utf-8"></script>
+<script type="text/javascript" src="/js/common.js?ver=20110627" charset="utf-8"></script>
+<script type="text/javascript" src="/js/player.bit.js?ver=20110627" charset="utf-8"></script>
+<script type="text/javascript" src="http://s1.daumcdn.net/music/js/app.js?ver=20110627" charset="utf-8"></script>
+<script type="text/javascript" src="http://s1.daumcdn.net/music/js/common.js?ver=20110620" charset="utf-8"></script>
+<style type="text/css">
+	#daumIndex {display:none;}
+</style>
+<script type="text/javascript" src="/_js/my.js?ver=20110516" charset="utf-8"></script>
+<div id="Daum_doc">
+<div id="wUse">	
+	<div#if($targetService=="KIDS") id="wBGMKidsService"#else id="wBGMCafeService"#end>
+		<div id="wBGMCafe">
+		#if(!$noData)
+		<form name="inputform" onsubmit="return false;">
+			<input type="hidden" name="target_service" value="$!targetService"> 
+			#if($targetService == "CAFE")	
+    			<input type="hidden" name="group_id" value="$!{cafeGroupId}">
+    			<input type="hidden" name="node" value="$!{cafeNode}">
+			#elseif($targetService == "KIDS")
+				<input type="hidden" name="page_type" value="iframe">
+			#end
+			#if($targetService == "KIDS")
+        		<div class="clearfix titCon">
+        			<div class="fl rdo"><input type="radio" id="bgmUseY" name="use_yn" value="Y" #if("$!{bgmStatus.useYN}" == "Y") checked #end><label for="bgmUseY">배경음악 사용함</label><input type="radio" id="bgmUseN" name="use_yn" value="N" #if("$!{bgmStatus.useYN}" == "N") checked #end><label for="bgmUseN">배경음악 사용안함</label></div>
+        		</div>
+        	#else
+        		<div class="clearfix titCon">
+        			<h5 class="fl tit">배경음악 편집하기</h5>
+        			<div class="fl rdo"><input type="radio" id="bgmUseY" name="use_yn" value="Y" #if("$!{bgmStatus.useYN}" == "Y") checked #end><label for="bgmUseY">배경음악 사용함</label><input type="radio" id="bgmUseN" name="use_yn" value="N" #if("$!{bgmStatus.useYN}" == "N") checked #end><label for="bgmUseN">배경음악 사용안함</label></div>
+        		</div>
+        	#end
+			<div class="ctlCon">
+				<div class="controlBgm">
+					<div class="fl leftArea">
+						<div class="sch">
+							<select id="schType" class="fl">
+								<option value="BGM">보유곡만</option>
+								<option value="">전체곡</option>
+							</select>
+							<input type="text" class="inp fl" value="" id="songKeyword" onKeypress="if(event.keyCode==13){BGMList.goSearch();return false;}">
+							<input type="button" class="fl typeBtn btnSearchBgm" value="검색" onclick="BGMList.goSearch();return false;">
+        				</div>
+						<div class="srt clearfix">
+							<div class="fl">
+								<strong id="schTypeTit">보유곡</strong><span id="schTot"><span class="bar">|</span>총 <span id="totCnt" class="em">0</span>곡</span>
+							</div>
+							<div id="totSort" style="display:block;">
+								<div class="fr sort">
+									<a href="javascript:;" onclick="BGMList.goSort(1);" id="sort1" class="blue_d1" title="최신구매순으로 보기">최신구매순</a>
+									<span class="bar">|</span>
+									<a href="javascript:;" onclick="BGMList.goSort(2);" id="sort2" class="" title="가나다순으로 보기">가나다순</a>
+								</div>
+							</div>
+							<div id="schSort" style="display:none;">
+								<div class="fr sort"><a href="javascript:;" onclick="BGMList.goRefrash();" class="blue_d1" title="보유곡 보기">보유곡 목록</a></div>
+							</div>
+						</div>
+						<div id="listBox" class="lstBox"><!-- bgm list --></div>
+						<div id="pageBox" class="cPaging"><!-- page --></div>
+    				</div>
+					
+					<input type="button" class="typeBtn btBgmPut" value="넣기" onclick="BGMList.transfer();">
+					<input type="button" class="typeBtn btBgmGet" value="빼기" onclick="BGMList.goMove('del');">
+				
+					<div class="fr rightArea">
+						<div class="sch fs_small gray ls_m1">
+							곡명 더블클릭으로 넣기/빼기를 편하게 해보세요.
+						</div>
+						<div class="srt clearfix">
+							<div class="fl">
+								<strong>선택곡</strong><span class="bar">|</span><span id="selCnt" class="em">0</span>/<span id="maxCnt">0</span>곡
+							</div>
+						</div>
+						<div id="selectBox" class="lstBox">
+							<!-- bgm select list -->
+						</div>
+						<div class="moveArea">
+							
+							<p class="fl">
+								#if($command.targetService == "KIDS")
+									<input type="hidden" name="shuffleYN" value="N">
+								#else<input type="checkbox" name="shuffleYN" value="Y" #if("$!{bgmStatus.shuffleYN}" == "Y") checked #end id="randomPlay"> <label for="randomPlay">랜덤 플레이</label>#end
+							</p>
+							<div class="fr">
+								<input class="typeBtn btBgmMove btBgmMoveBottom" type="button" onclick="BGMList.goMove('bottom');" value="맨 아래로 이동"/>
+								<input class="typeBtn btBgmMove btBgmMoveDown" type="button" onclick="BGMList.goMove('down');" value="아래로 이동"/>
+								<input class="typeBtn btBgmMove btBgmMoveUp" type="button" onclick="BGMList.goMove('up');" value="위로 이동"/>
+								<input class="typeBtn btBgmMove btBgmMoveTop" type="button" onclick="BGMList.goMove('top');" value="맨 위로 이동"/>
+							</div>
+							</div>
+						</div>
+					</div>
+					<div id="daumAodLuncherWrap"></div>
+					<script type="text/javascript">initAodLauncher('daumAodLuncherWrap');</script>
+
+					<script type="text/javascript">
+						//domReady( function(){
+						//	daumMusic.JsPlayer.embedSWF( "flashContainer", null, daum.Music.BitPlayer.stop );
+						//});
+
+						var myBgmList = [
+        				#foreach($play in $bgmStatus.playlist)
+        					{BgmTrackId:"$!{play.bgmTrackId}",SongId:"$!{play.songId}",Title:"$!{StringCutUtil.removeCarriageReturn($!{StringCutUtil.removeTagJSON($!{play.title})})}",ArtistName:"$!{StringCutUtil.removeCarriageReturn($!{StringCutUtil.removeTagJSON($!{play.artist})})}", IsOwn:("$!play.userId" == "$!{userInfo.userId}")}#if($velocityHasNext),#end
+        				#end
+						];
+						var BGMList = new Music.BGMSetup(myBgmList, "$!{targetService}");
+					</script>
+				</div>
+				<div class="btnArea clearfix">
+					<input type="button" class="typeBtn btnSubmit" value="등록하기" onclick="BGMList.goSubmit();">
+##					<input type="button" class="typeBtn btnMusic" value="Daum뮤직 바로가기" onclick="window.open('http://music.daum.net');">
+				</div>
+			</form>
+#else	## list view 
+	#if($targetService == "CAFE")
+			<div class="serviceNone">
+				<p>카페지기나 운영자로 활동하고 계신 카페가 없습니다.</p>
+				<input type="button" class="typeBtn btnMyCafeLst" value="내 카페 목록 확인하기" onclick="window.open('http://cafe.daum.net/_c21_/mine_main?t__nil_loginbox=cafelist');">
+			</div>
+	#elseif($targetService == "KIDS")
+			<div class="serviceNone">
+				<p>개설하신 마이짱이 없습니다.</p>
+				<input type="button" class="typeBtn btnMakeKids" value="키즈짱 가기" onclick="window.open('http://my.kids.daum.net/myzzang/do/profile/joinForm');">
+			</div>
+	#else		## BLOG
+			<div class="serviceNone">
+				<p>개설하신 블로그가 없습니다.</p>
+				<input type="button" class="typeBtn btnMakeBlog" value="블로그 가기" onclick="window.open('http://blog.daum.net/_blog/_top/sub/makeBlogEnter.do');">
+			</div>
+	#end
+#end
+		</div>
+	</div>
+	#if($targetService != "KIDS")
+	<div id="wBgmRecom2">
+	<div id="wTopBgm" class="recomBox">
+		<div class="titCon">
+			<h4 class="fl">배경음악 인기순위</h4>
+			<a href="http://music.daum.net/chart/chartsong/list?genre_cd=TORA&date_key=4" target="_blank" class="fr more" title="배경음악 인기순위 더보기">더보기</a>
+		</div>
+		<ol class="lst">
+			#foreach($song in $chartSongFive)
+				#set($lyricHref = "/album/main?album_id=$!song.album.albumId&song_id=$!song.songId#viewLyrics")
+				#set($bgmHref = "/purchase/cart/bgmadd.popup?song_id_list=$!song.songId")
+				#set($id = $song.songId)
+				<li class="no$!{song.rank}">
+					<span class="fl songTxt">#printSongName( $song "" 20 true )</span>
+					<div class="fl artiTxt">
+						<div class="ellipsis" style="width:90px;">
+							<span class="artist">#printArtistName( $song.keyArtistList "" 10 true )</span>
+						</div>
+					</div>
+					#set($value = $song.lyricsYn)
+					<a class="typeBtn btSetList btListLyrics#if($value!="Y")_dis#end" #if($value != "Y")  title="가사 등록"#else title="가사 보기"#end href="$!lyricHref" target="_blank" >가</a>## 가사가 없으면 dimd만 시키고 링크는 그대로 유지
+						#set($value = $song.BGMLinkId)
+					<input type="button" class="typeBtn btSetList btListBgm#if(!$id||!$value)_dis#end" #if(!$id||!$value)disabled#end id="bgm_$!{id}" onclick="daum.Browser.popup('$!bgmHref', 765, 550);">##
+				</li>
+			#end
+		</ol>
+	</div>
+	<div id="wRecBgm" class="recomBox">
+		<div class="titCon">
+			<h4 class="fl">추천 배경음악</h4>
+			<a href="http://music.daum.net/chart/chartsong/list?date_key=4&date=2011022001&genre_cd=OSRA" target="_blank" class="fr more" title="추천 배경음악 더보기">더보기</a>
+		</div>
+		<ul class="lst">
+#foreach($song in $chartOstFive)
+				#set($lyricHref = "/album/main?album_id=$!song.album.albumId&song_id=$!song.songId#viewLyrics")
+				#set($bgmHref = "/purchase/cart/bgmadd.popup?song_id_list=$!song.songId")
+				#set($id = $song.songId)
+				<li class="no$!{song.rank}">
+					<span class="fl songTxt">#printSongName( $song "" 20 true )</span>
+					<div class="fl artiTxt">
+						<div class="ellipsis" style="width:90px;">
+							<span class="artist">#printArtistName( $song.keyArtistList "" 18 true )</span>
+						</div>
+					</div>
+					#set($value = $song.lyricsYn)
+					<a class="typeBtn btSetList btListLyrics#if($value!="Y")_dis#end" #if($value != "Y")  title="가사 등록"#else title="가사 보기"#end href="$!lyricHref" target="_blank" >가</a>## 가사가 없으면 dimd만 시키고 링크는 그대로 유지
+						#set($value = $song.BGMLinkId)
+					<input type="button" class="typeBtn btSetList btListBgm#if(!$id||!$value)_dis#end" #if(!$id||!$value)disabled#end id="bgm_$!{id}" onclick="daum.Browser.popup('$!bgmHref', 765, 550);">##
+				</li>
+#end
+		</ul>
+	</div>
+	</div>
+	#end
+</div>
+<div id="flashContainer"></div>
+	#*
+	<a href="?targetService=CAFE">[카페]</a> <a href="?targetService=BLOG">[블로그]</a> <br/>
+	#if("${command.targetService}" == "CAFE")
+		#if(${dto.bgmStatus})
+			#set($bgmStatus = $dto.bgmStatus) 
+			내카페 : 
+			<select name="groupId"> 
+			#foreach($cafeInfo in $dto.cafeInfoList) 
+				<option value="$cafeInfo.groupId" #if("$cafeInfo.groupId" == "$dto.groupId") selected #end >$cafeInfo.groupName</option> 
+			#end 
+			</select> [보기]<br/>
+			배경음악 설정 : 
+				<input type="radio" name="useYN1" value="Y" #if("$!{bgmStatus.useYN}" == "Y") checked #end > 사용함
+				<input type="radio" name="useYN1" value="N" #if("$!{bgmStatus.useYN}" == "N") checked #end > 사용안함
+			
+			플레이 리스트 설정 -----------------------------<br/>
+			랜덤 플레이 : <input type="checkbox" name="shuffleYN" value="Y"> 랜덤 플레이
+		#else
+			설정 가능한 카페가 없습니다.<br/>
+		#end
+	#elseif("${command.targetService}" == "BLOG")
+		#if(${dto.bgmStatus})
+			#set($bgmStatus = $dto.bgmStatus)
+			내 블로그 : <a href="http://blog.daum.net/${bgmStatus.blogUrl}" target="_new">[바로가기]</a><br/> 
+			배경음악 설정 : 
+				<input type="radio" name="useYN1" value="Y" #if("$!{bgmStatus.useYN}" == "Y") checked #end > 사용함
+				<input type="radio" name="useYN1" value="N" #if("$!{bgmStatus.useYN}" == "N") checked #end > 사용안함 <br/>
+			
+			플레이 리스트 설정 -----------------------------<br/>
+			#foreach($play in $bgmStatus.playlist)
+				bgmTrackId:[${play.bgmTrackId}], songId:[${play.songId}] - ${play.title} - ${play.artist} <br/> 
+			#end
+			랜덤 플레이 : <input type="checkbox" name="shuffleYN" value="Y"> 랜덤 플레이 <br/>
+			
+			[설정하기] <br/>
+			
+			http://music.daum.net/my/setup/bgmRegistration.do 으로 아래 처럼 새창띄워 서브밋해주삼.. 메소드는 post가 좋아
+			targetService=BLOG
+			bgmTrackId=A090005100036409&bgmTrackId=8049567&bgmTrackId=8053473 순서대로
+			useYN=Y
+			shuffleYN=N 
+			linkUrl=http://blog.daum.net/${bgmStatus.blogUrl}
+			
+		#else
+			설정 가능한 블로그가 없습니다.<br/>
+		#end	
+	#end
+<br/>
+	배경음악 인기순위 top 5 <br/>
+	#foreach($bgmRanking in $dto.bgmRankingList)
+		${bgmRanking.rank} - [${bgmRanking.songId}] ${bgmRanking.title} - [${bgmRanking.artistDetailId}] ${bgmRanking.artistName} #printAnchorArtist( $bgmRanking, "gray", 10 ) <br/> 
+	#end
+		
+	요즘 뜨는 노래 top 5 <br/>
+	#foreach($daumRanking in $dto.daumRankingList)
+		${daumRanking.rank} - [${daumRanking.songId}] ${daumRanking.title} - [${daumRanking.artistDetailId}] ${daumRanking.artistName} #printAnchorArtist( $bgmRanking, "gray", 10 ) <br/> 
+	#end
+		
+
+	<div class="notiBgm">
+		<h5>알림</h5>
+		<p>* 보유하신 배경음악은 기간제한 없이 <strong>Daum블로그, 카페, 플래닛</strong>에서 사용 가능합니다.</p>
+		<p>* 별은 <strong>2009년 9월 10일까지</strong> 사용 가능합니다. 9월 11일에 무료별은 자동소멸, 유료별은 일괄 <strong>Daum캐쉬</strong>로 전환됩니다.</p>
+	</div>
+
+</div>
+<div id="ftMessage">
+<font class="em">=== 값 없음 ===</font> <br>
+ - <del>보유 MP3와 보유 배경음악 값이 같은거 맞나요?</del><br>
+ - <del>보유 이용권</del><br>
+ - <del>다음캐쉬</del><br>
+ - <del>음악감상 유효기간</del><br>
+ - <del>MP3다운로드 가능곡 수</del><br>
+ - 리스트에서 [기간종료] 나오는 조건?? -> 추가했음<br>
+ - <del>페이징</del><br>
+<font class="em">=== 연결 안됨 ===</font> <br>
+ - 이용권 구매하기 <br>
+ - 앨범정보 버튼 (보유배경음악)<br> 
+ - 전체듣기, 선택듣기, MP3다운, 선물하기, 배경음악, MY앨범담기<br>
+
+<font class="em">=== 요건 개발쪽 전달메세지 ===<font> <br>
+ - --- 카페 --- <br>
+ - 샐렉트 박스 선택시 ?targetService=CAFE&groupId={groupId} 로 화면 리플러시 해주세요.<br>
+ - 그 옆에 바로가기 버튼이 빠졌는데, 클릭하면 http://cafe$!{dto.node}.daum.net/_c21_/home?grpid=$!{dto.groupId} 여기로 <br>
+ - 카페 설정 완료 서브밋 페이지는 새창을 띄우고 여기로 보내셔야 합니다. bgmTrackId는 순서대로 넘겨주세요.<br>
+ - url : /my/setup/bgmRegistration.do? <br>
+ - parameter : targetService=CAFE&groupId={groupId}&node={node}&useYN={useYN}&shuffleYN={shuffleYN}&bgmTrackId={bgmTrackId} <br>
+
+ - --- 블로그 --- <br>
+ - 바로가기 URL은 http://blog.daum.net/${bgmStatus.blogUrl} 여기로 <br>
+ - 블로그 설정 완료 서브밋 페이지는 새창을 띄우고 여기로 보내셔야 합니다. bgmTrackId는 순서대로 넘겨주세요.<br>
+ - url : /my/setup/bgmRegistration.do? <br>
+ - parameter : targetService=BLOG&useYN={useYN}&shuffleYN={shuffleYN}&bgmTrackId={bgmTrackId}
+ 
+</div>
+
+배경음악관리<br/> 
+현재보고있는부분: $command.getTarget_service() <br/><br/> 
+
+#if( $command.getTarget_service() == "CAFE")
+	카페지기/운영자로 활동하는 카페<br/>
+		#foreach($cafeInfo in $cafeInfoList)
+			 $cafeInfo.groupId || $cafeInfo.groupName || $cafeInfo.node <br/>
+		#end
+
+	화면에 보이는 카페링크 : $cafeLinkUrl || $cafeNode || 	$bgmStatus.useYN || $cafeGroupId <br/>
+		
+	#foreach($play in $bgmStatus.playlist)
+		${play.bgmTrackId} || ${play.songId} || ${play.title} || ${play.artist}<br/>
+	#end<br/>	
+#end
+
+#if( $command.getTarget_service() == "BLOG")
+	블로그URL : $bgmStatus.blogUrl || $bgmStatus.useYN <br/>
+#end
+
+	셔플 : $bgmStatus.shuffleYN <br/>	
+<br/>		
+
+배경음악 인기순위<br/> 		
+#foreach($bgmRanking in $bgmRankingList)
+	$bgmRanking.rank || $bgmRanking.songId || $bgmRanking.title  || $bgmRanking.lyricsYn || $bgmRanking.BGMLinkId ||
+	
+	#foreach($artist in $bgmRanking.keyArtistList)
+		아티스트명 : $artist.name || $artist.artistId<br/>
+	#end
+
+	#foreach($artist in $bgmRanking.featArtist)
+		피처링아티스트명 : $artist.name || $artist.artistId<br/>
+	#end 
+#end
+요즘 뜨는 노래<br/>
+#foreach($daumRanking in $daumRankingList)
+	$daumRanking.rank || $daumRanking.songId || $daumRanking.title || $daumRanking.lyricsYn || $daumRanking.BGMLinkId ||
+	
+	#foreach($artist in $daumRanking.keyArtistList)
+		아티스트명 : $artist.name || $artist.artistId<br/>
+	#end
+
+	#foreach($artist in $daumRanking.featArtist)
+		피처링아티스트명 : $artist.name || $artist.artistId<br/>
+	#end 
+#end
+================================================================ <br/>	
+		
+CAFE regist parameter : target_service=CAFE&group_id={groupId}&node={node}&use_yn={useYN}&shuffle_yn={shuffleYN}&bgmTrack_id={bgmTrackId} <br>
+BLOG parameter : target_service=BLOG&use_yn={useYN}&shuffle_yn={shuffleYN}&bgmTrack_id={bgmTrackId}
+
+*#

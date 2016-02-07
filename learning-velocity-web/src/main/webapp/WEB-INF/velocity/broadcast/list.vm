@@ -1,0 +1,302 @@
+<meta charset="utf-8" />
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" media="all" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="http://i1.service.daumcdn.net/photo-contents/music/aodplayer/js/aod.js?ver=0.001" charset="utf-8"></script>
+ 
+<style type="text/css">
+ #songview{
+  background:#dcdcdc; color:#000; 
+  position:absolute; top:10px; left:100px; text-align:center; 
+  border:2px solid #000;
+   }
+</style>
+
+
+<script type="text/javascript"> 
+//<![CDATA[ 
+    document.domain='daum.net';
+    window.onload = function() {
+        if ( daumMusic.AodLauncher ) {
+            daumMusic.AodLauncher.initAodLauncher('daumAodLuncherWrap');
+        } 
+    }; 
+//]]> 
+</script> 
+
+
+<script>
+$(function() {
+  $( "#searchDate" ).datepicker({
+    dateFormat: 'yymmdd',
+    prevText: '이전 달',
+    nextText: '다음 달',
+    monthNames: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+    monthNamesShort: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+    dayNames: ['일','월','화','수','목','금','토'],
+    dayNamesShort: ['일','월','화','수','목','금','토'],
+    dayNamesMin: ['일','월','화','수','목','금','토'],
+    showMonthAfterYear: true,
+    yearSuffix: '년',
+	currentText: '오늘 날짜',
+	setDate: new Date(2014, 01, 10),
+	onClose: function( selectedDate ) {
+		document.searchForm.submit();
+   	},
+  });
+});
+</script>
+
+<script type="text/javascript">
+	var preScheduleId = "";
+	
+	var allSongId = "";
+	
+	function updateSongList(){
+		
+		var url = "/broadcast/updatesonglist.json";
+		var param = "searchDate=#{searchDate}";
+
+		var opt = {
+			method: "POST",
+			paramString : param.replace(/#{searchDate}/g, ${searchDate}),
+			timeout : 20000,
+			onsuccess : function(res){
+				var result = res.responseText;
+				
+				alert(result);
+				
+				document.location="/broadcast/list?searchDate="+${searchDate};
+			}
+		};
+		new daum.Ajax().request(url, opt);
+	}
+	
+	function allAod(){
+		daumMusic.AodLauncher.launchPlayer(allSongId);
+	}
+	
+	function getPlayingSong(e, scheduleId, channelId, startTime, endTime){
+		var url = "/broadcast/songlist.json";
+		var param = "searchDate=#{searchDate}&scheduleId=#{scheduleId}&channelId=#{channelId}&startTime=#{startTime}&endTime=#{endTime}";
+		
+		var ev = e || window.event, target = ev.target || ev.srcElement, key;
+
+		var x = ev.clientX + (document.documentElement.scrollLeft?document.documentElement.scrollLeft:document.body.scrollLeft);
+        var y = ev.clientY + (document.documentElement.scrollTop?document.documentElement.scrollTop:document.body.scrollTop);
+		
+		closeDiv();
+		
+		var opt = {
+			method: "POST",
+			paramString : param.replace(/#{searchDate}/g, ${searchDate}).replace(/#{scheduleId}/g, scheduleId).replace(/#{channelId}/g, channelId).replace(/#{startTime}/g, startTime).replace(/#{endTime}/g, endTime),
+			onsuccess : function(res){
+				var json = daum.jsonToObject(res.responseText);
+				songList(x, y, json);
+			}
+		};
+		new daum.Ajax().request(url, opt);
+	}
+	    
+    function songList(x, y, resultMap){
+		allSongId ="";
+        var obj = document.getElementById('songview');		
+        obj.style.left = (x+30)+"px";
+        obj.style.top = (y+30)+"px";
+        obj.style.display = 'block';
+		
+		console.log(resultMap);
+		
+		
+		var programInfo = resultMap["programInfo"];
+		var songList = resultMap["songList"];
+		
+		
+		var startTime = programInfo.programStartTime.substring(0,4) +"/"+ programInfo.programStartTime.substring(4,6) +"/"+ programInfo.programStartTime.substring(6,8) 
+						+" "+ programInfo.programStartTime.substring(8,10)+"시"+" "+ programInfo.programStartTime.substring(10,12)+"분";
+		var endTime = programInfo.programEndTime.substring(0,4) +"/"+ programInfo.programEndTime.substring(4,6) +"/"+ programInfo.programEndTime.substring(6,8) 
+						+" "+ programInfo.programEndTime.substring(8,10)+"시"+" "+ programInfo.programEndTime.substring(10,12)+"분";;
+		var innerStr = "";
+		innerStr += "<a href='javascript:;' onclick='javascript:closeDiv();'>닫기</a> <br/><br/>";
+		innerStr += "<a href='javascript:;' onclick='javascript:allAod();'>전체듣기</a> <br/><br/>";
+		innerStr += "<a href='http://jsong.api.dev.daum.net/start?start_time="+programInfo.programStartTime+"00&end_time="+programInfo.programEndTime+"00&channel_ids="+programInfo.channelInfo.songChannelId+"' target='_blank'>곡데이터확인</a> <br/><br/>"
+		innerStr += programInfo.programName + "("+programInfo.channelName+"-"+programInfo.channelInfo.scheduleChannelId+"-"+programInfo.channelInfo.songChannelId+") <br/>";
+		innerStr += "방송시간:"+ startTime +"~"+ endTime;
+		innerStr += "<table border=2 align='center'>";
+		innerStr += "<tr>";
+		innerStr += "<td>순서</td>";
+		innerStr += "<td width='150px'>곡명(곡ID)</td>";
+		innerStr += "<td width='150px'>앨범명</td>";
+		innerStr += "<td width='150px'>아티스트명</td>";
+		innerStr += "<td>장르</td>";
+		innerStr += "<td>시작시간</td>";
+		innerStr += "<td>재생시간(초)</td>";
+		innerStr += "<td>최근 업데이트 시간</td>";
+		innerStr += "</tr>";
+
+		for(var i=0; i<songList.length; i++){
+			allSongId +=songList[i].songId+"/";
+			
+			var albumId = "";
+			if(songList[i].album != null){
+				albumId = songList[i].album.albumId;
+			}
+			
+			innerStr += "<tr>";
+			innerStr += "<td>";
+			innerStr += i+1;
+			innerStr += "</td>";
+			innerStr += "<td>";
+			innerStr += "<a href='javascript:;' onclick='daumMusic.AodLauncher.launchPlayer(\""+songList[i].songId+"\");'>"+songList[i].title+"("+songList[i].songId+")</a>";
+			innerStr += "</td>";
+			innerStr += "<td>";
+			if(albumId != ""){
+				innerStr += "<a href='http://music.daum.net/album/main?album_id="+songList[i].album.albumId+"' target='_blank'>";
+			}
+			innerStr += songList[i].albumName;
+			
+			if(albumId != ""){
+				innerStr += "</a>";
+			}
+			innerStr += "</td>";
+			innerStr += "<td>";
+			innerStr += songList[i].artistName;
+			innerStr += "</td>";
+			innerStr += "<td>";
+			innerStr += songList[i].genreGroup+"&gt;"+songList[i].genreName;
+			innerStr += "</td>";
+			innerStr += "<td>";
+			innerStr += songList[i].startTime;
+			innerStr += "</td>";
+			innerStr += "<td>";
+			innerStr += songList[i].playTime;
+			innerStr += "</td>";
+			innerStr += "<td>";
+			innerStr += songList[i].lastUpdate;
+			innerStr += "</td>";
+			innerStr += "</tr>";
+		}
+		innerStr += "</table>";
+		
+		innerStr += "<br/> <a href='javascript:;' onclick='javascript:closeDiv();'>닫기</a> <br/>";
+		
+		obj.innerHTML = innerStr;
+		setDivHeight();
+		setSelectedScheduleBg(programInfo.epgTvScheduleId);
+		
+		preScheduleId = programInfo.epgTvScheduleId;
+    }
+
+	function closeDiv(){
+		var obj = document.getElementById('songview');
+		obj.style.display = 'none';
+		obj.style.height  = "";
+		obj.style.width  = "";
+
+		if(preScheduleId != ""){
+    		var targetObj = document.getElementById(preScheduleId);
+    		targetObj.style.background = "#ffffff";
+		}
+	}
+	
+	function setDivHeight(){ 
+		var obj = document.getElementById('songview');
+        var objTarHeight= obj.offsetHeight;
+        var objTarWidth= obj.offsetWidth;
+		
+        obj.style.height  = objTarHeight + "px";
+        obj.style.width  = objTarWidth + "px";
+    }
+	
+	function setSelectedScheduleBg(scheduleId){
+		var obj = document.getElementById(scheduleId);
+		obj.style.background = "#dcdcdc";
+	}
+	
+</script>
+	
+<html>
+	<body>
+		</br>
+		<form name="searchForm" method="get" action="/broadcast/list">
+			<p>조회날짜: <input type="text" id="searchDate" name="searchDate" value="$searchDate"></p> 	    
+
+			</br>
+			
+			<a href="#" onclick="javascript:updateSongList();"><u>선택된 날짜 곡 전체 갱신</u></a>	
+			
+			</br>
+			</br>
+
+			
+			
+			#set( $count = 1 ) 
+			#foreach($channel in $channelList)
+				#set($checked = "")
+				#foreach($selectedChannel in $command.channelIds)
+					#if($selectedChannel == ${channel.scheduleChannelId})
+						#set($checked = "checked")
+						#break
+					#end
+        		#end
+			<input type="checkbox" name="channelIds" value="${channel.scheduleChannelId}" onclick="document.searchForm.submit();" $checked/> $channel.channelName
+			#if($count%6 == 0)
+				<br/>
+			#end
+			#set( $count = $count + 1 ) 
+			#end
+	    </form>
+		<br/>
+		#set($viewChannelList = $channelList)
+		
+		#if($selectedChannelList.size() > 0)
+			#set($viewChannelList = $selectedChannelList)
+		#end
+        <table border="2" margin="100px; 100px; 100px; 100px;">
+        	<tr>
+        		<td nowrap>시간</td>
+        		#foreach($channel in $viewChannelList)
+					<td width="200px" nowrap  align="center">${channel.channelName} <br/> (${channel.scheduleChannelId} / ${channel.songChannelId})</td>
+        		#end
+        	</tr>
+        	
+        	#foreach($time in $timeTable)
+        	<tr>
+        		<td>$time</td>
+            	#foreach($channel in $viewChannelList)
+        			<td>
+					#set($scheduleListByTime = ${scheduleMap.get($time)})
+        			#foreach($schedule in $scheduleListByTime)
+        				#set($scheduleKey = ${schedule.channelId} + ${schedule.programStartTime.substring(0,2)})
+        				#set($rowKey = ${channel.scheduleChannelId} + $time)
+        				
+        				#if($scheduleKey == $rowKey)
+							<a href = "javascript:;" onclick="javascript:getPlayingSong(event,'${schedule.epgTvScheduleId}','${channel.scheduleChannelId}', '${schedule.programStartDate}${schedule.programStartTime}', '${schedule.programEndDate}${schedule.programEndTime}');">
+								<div id = "${schedule.epgTvScheduleId}">
+									#if("$!{schedule.radioProgramId}" != "" || "$!{schedule.tvProgramId}" != "")
+										<u>
+									#end
+            					${schedule.programStartTime.substring(2,4)}
+            					$schedule.programName
+									#if("$!{schedule.radioProgramId}" != "" || "$!{schedule.tvProgramId}" != "")
+										</u>
+									#end
+								</div>
+							</a>
+        					<br/>
+        				#end
+        			#end
+        		    </td>
+            	#end
+        	</tr>
+        	#end
+        </table>
+		<div id="songview" style="display:none;"></div>
+		
+        <style type="text/css"> 
+            #daumAodLuncherWrap {position:absolute;left:-9999em;top:-9999em;} 
+        </style> 
+        <div id="daumAodLuncherWrap"></div> 
+
+	</body>
+</html>

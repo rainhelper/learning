@@ -1,0 +1,21 @@
+#if("$!{callback}" != "")
+if (typeof(${callback}) == "function") ${callback} (
+#end
+{
+	"result" : {
+		"type" : "${result.resultType}",
+		"message" : "${result.message}",
+
+		"info" : {
+			"nextPlayListId" : "#escTitle(${result.info.playListId})"
+			}			
+			
+		#*
+		"type" : "$!Escape.escapeJava(${result.resultType})",
+		"message" : "$!Escape.escapeJava(${result.message})"
+		*#
+	}
+}
+#if("$!{callback}" != "")
+);
+#end

@@ -1,0 +1,51 @@
+#set($videoCount = $dto.videoResult.totalResultsCount)
+#set($videoList = $dto.videoResult.documentList)
+<div class="frameWrap">
+    <div id="wMvList" class="conBody">
+        <div class="conTop">
+            <span class="typeSprite btSetProduct btProductTv"></span>
+#if( $!{videoCount} > 0 )			
+            <span class="cnt">총 <strong>$!{videoCount}</strong>편의 영상이 있습니다.</span>
+#else 
+            <span class="cnt">검색된 뮤직비디오가 없습니다.</span>
+#end	
+
+            
+        </div>
+        <div class="conLst clearfix">
+            <ul class="lst">
+#foreach($video in $videoList)
+            <li class="itm#if( $foreach.index == 0 ) first#end" onmouseover="mOverMvList(this);" onmouseout="mOutMvList(this);" onclick="top.addPlayListPlay( '$!{video.mv_id}' );">
+                <div class="conItm clearfix">
+                    <span class="thumb"><img class="pic" src="$ImageOldUtil.getImageUrl("$!{video.mv_thumb}", $ImageOldUtil.VIDEO_70_52)"><span class="icoSave" onmouseover="this.className='icoSaveExp'" onmouseout="this.className='icoSave'" onclick="top.addPlayList( '$!{video.mv_id}', '재생목록에 추가 되었습니다');UI.stopEvent()"><img src="http://i1.daumcdn.net/img-contents/music/2008_home/common/ico_mv_save.gif"></span></span>
+                    <ul class="inf">
+                    <li class="i1"><span class="sbj">#strCut( "$!{video.song_name}" 32 ) #if( ${feat.artistName} && $!{feat.artistName.size()} > 0 )(Feat.
+                                #foreach($feat in $video.featArtist)
+                                #if( $foreach.index > 0 ),#end##    
+                                    $!{feat.artistName})
+                                #end#end</span></li>
+                    <li class="i2"><span class="arti gray">$!{video.artist_name}</span></li>
+                    <li class="i3"><span class="playTxt">플레이수</span><span class="playCnt">#toCurrency( ${video.mv_play_num} ) </span>
+                        <span class="bar">|</span>
+                        #drawStarSmall( $video.getAvgScore() )
+                    </li>
+                    </ul>
+                </div>
+            </li>
+#end
+            </ul>
+        </div>
+
+#set ($url = "?")
+#if( $StringUtils.equals( "$!{command.query}", "" ) == false )
+    #set($url = $url + "query=#escUrl( $command.query )" )
+    #printPaging("${url}&pageNo=", $dto.ph.pageNo, $dto.ph, "", 10)
+#else
+    #printPaging("${url}pageNo=", $dto.ph.pageNo, $dto.ph, "", 10)
+#end
+
+    </div>
+</div>
+<script type="text/javascript">
+runProtectedContents();
+</script>

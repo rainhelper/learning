@@ -1,0 +1,27 @@
+{
+"totalCount" : "$totalCount",
+"list" : [
+#foreach($board in $recentBoardList)
+{
+	"boardid" : "$board.boardId",
+	"title" : $JSONUtil.valueToString($board.title),
+	"subtitle" : $JSONUtil.valueToString($board.subTitle),
+	"regdate" : "$board.formalRegdate",
+	"imageurl" : "$board.imageUrl",
+	#if($board.songList.size() == 0)
+		"songcount" : "0",
+        "firstsongtitle" : "",
+        "firstsongid" : ""
+	#else
+    	#foreach($song in $board.songList)
+          		#if ($velocityCount == 1)
+		"songcount" : "$board.songCount",
+        "firstsongtitle" : $JSONUtil.valueToString($song.title),
+        "firstsongid" : "$song.songId"
+          		#end
+         #end
+	#end
+ }
+ #if(!$foreach.isLast()),#end
+ #end
+]} 

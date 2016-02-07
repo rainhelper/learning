@@ -1,0 +1,231 @@
+
+#set($videoList = $dto.videoResult.documentList)
+#set($videoCount = $dto.videoResult.totalResultsCount)
+#set($query = $!{command.query})
+#set($url = "/search/vclip/list?query=$!{query}")
+#set ($artistUrl = "&artistId=$!{command.artistId}")
+#set ($rangeUrl = "&searchRange=$!{command.searchRange}")
+#set ($nationUrl = "&nationId=$!{command.nationId}")
+#set ($genreUrl = "&genreId=$!{command.genreId}")
+#set ($releaseUrl = "&releaseYear=$!{command.releaseYear}")
+#set ($listenUrl = "&listenFilter=$!{command.listenFilter}")
+#set ($bgmUrl = "&bgmFilter=$!{command.bgmFilter}")
+#set($url = $url + $artistUrl + $rangeUrl + $nationUrl + $genreUrl + $releaseUrl + $listenUrl + $bgmUrl)
+
+
+<ul class="tab_cont tab_search">
+	#printSearchNaviTab()
+</ul>
+
+#parse("/velocity/search/piece/highlight.vm")
+
+#if(($!{videoCount}) && $!{videoCount} > 0)
+<div class="section_mv wrap_list_mv">
+	
+	
+	<div class="wrap_title">
+		<h3 class="tit_search tit_mv">뮤직비디오</h3>
+		<span class="txt_bar"> | </span>
+		<span class="txt_quantity">총 <strong class="fc_blue ls_0">$!{videoCount}</strong> 건</span>
+		<div class="sort_option f_r">
+			#printSearchSortOption( $url, $!{command.sortType} )
+		</div>
+	</div>
+	<ul id="trackContainer" class="list_mv" style="position:relative;">
+		
+	#foreach($vclip in $videoList)
+		<li style="position:relative;">
+			#set($index = $foreach.index)
+			#printSearchVideoSet( $vclip $index )
+		</li>
+		
+		###if( $foreach.index % 5 == 4)
+		##<li class="open_direct hide opendirect" id="opendirect$!{foreach.index}">#</li>
+		###end
+	#end
+		
+		
+	#set($videoListCount = $!{videoList.size()})
+	#if($!{videoListCount} < 20)
+	#set($rest = 5 - $!{videoListCount}%5)
+	#if(!$StringUtils.equals("$rest", "5"))
+	#foreach($i in [1..$rest])
+		<li style="position:relative;"></li>
+		#set($index = $!{videoListCount} + $foreach.index)
+		
+		##if( $index % 5 == 4)
+		##<li class="open_direct opendirect hide" id="opendirect$index"></li>
+		##end
+	#end
+	#end
+	#end
+	</ul>
+	
+	#printVideoCover()
+	
+	<script type="text/javascript">
+		var VideoDataList = [];
+    	#foreach( $video in $videoList )
+    		VideoDataList.push({
+				linkType : #if(!$CollectionUtils.isEmpty($video.keyArtistList.size()) && $StringUtils.equals("$!{video.keyArtistList.size()}", "1"))"artist",#else "album",#end
+    			vclipId : "$!{video.vclipId}",
+    			songId : "$!{video.song.songId}",
+    			albumId : "$!{video.album.albumId}",
+    			artistId : "#getArtistId($!{video})",
+    			count : "$!{foreach.count}",
+    			size : "$!{$videoList.size()}"
+    		});
+			daum.Music.DTO.Control.add(
+				{ 
+					songId: "$!video.song_id", 
+					keyArtistList: [
+						#foreach($keyArtist in $video.keyArtistList)
+							{ artistId: "$!keyArtist.artistId", name: "$!keyArtist.name" }#if($velocityHasNext),#end
+						#end
+					]
+				}
+			);
+    	#end
+		daum.Music.Video.init({totalCount:$videoList.size(), imgString:"thumbLink", colCount:5, isPromotion:false, arrow:false, pageType:"chart"});
+		if(controller === undefined) {
+			var controller = new daum.Music.ListPrototype();
+		}
+//		controller.initialize({tag:'li', pageType:'chart'});
+	</script>
+	
+	## 페이징
+	#if($StringUtils.isNotBlank("$!{command.sortType}")) #set($url = $url + "&amp;sortType=$!{command.sortType}") #end
+	#set($url = $url + "&amp;page_no=")
+	#printPaging($url, $dto.ph.pageNo, $dto.ph, "", 10)
+	
+</div>
+#else
+<ul class="list_search_guide">
+	<li class="ico_comm">검색어의 단어 수를 줄이거나, 보다 일반적인 단어로 검색해 보세요.</li>
+	<li class="ico_comm">두 단어 이상의 키워드로 검색 하신 경우, 정확하게 띄어쓰기를 한 후 검색해 보세요.</li>
+	<li class="ico_comm">키워드에 있는 특수문자를 뺀 후에 검색해 보세요.</li>
+</ul>
+#end
+	
+	
+	
+	
+
+<div id="FTMessage">
+---------------------<br/>
+FT 체크<br/>
+---------------------<br/>
+
+---------------------<br/>
+개발 체크<br/>
+---------------------<br/>
+- song.listenYn 값이 없어 모두 링크 없음<br/>
+
+</div>
+
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+	
+#set($videoList = $dto.videoResult.documentList)
+#set($videoCount = $dto.videoResult.totalResultsCount)
+
+#set ($url = "?query=$!{command.encodedQuery}")	
+#if( $StringUtils.isNotEmpty("$!{command.searchRange}") ) #set ($url = $url + "&searchRange=$!{command.searchRange}") #end
+#if( $StringUtils.isNotEmpty("$!{command.genreId}") ) #set ($url = $url + "&genreId=$!{command.genreId}") #end
+#if( $StringUtils.isNotEmpty("$!{command.releaseYear}") ) #set ($url = $url + "&releaseYear=$!{command.releaseYear}") #end
+
+		<h2>본문영역</h2>
+<!-- 뮤직비디오 -->		
+		#if(($!{videoCount}) && $!{videoCount} > 0)		
+		<div class="collTitle">
+			<h3 class="fl">뮤직비디오 <span class="num">$!{videoCount}건</span></h3>
+			<span class="fl">&nbsp;
+				#if($StringUtils.equals($!{command.sortType}, "0"))
+    				<span class="nrl base">정확도</span>
+    			#else
+    				<a href="$url&sortType=0" class="stlink" onclick="return gExtraLink(this, 'SRMY', '1')">정확도</a>
+    			#end
+    			#if($StringUtils.equals($!{command.sortType}, "1"))
+    				<span class="nrl vline"> | </span><span class="nrl base">최신</span>
+    			#else
+    				<span class="nrl vline"> | </span><a href="$url&sortType=1" class="stlink" onclick="return gExtraLink(this, 'SRMY', '2')">최신</a>
+    			#end
+    			#if($StringUtils.equals($!{command.sortType}, "2"))
+    				<span class="nrl vline"> | </span><span class="nrl base">인기도</span>
+    			#else
+    				<span class="nrl vline"> | </span><a href="$url&sortType=2" class="stlink" onclick="return gExtraLink(this, 'SRMY', '3')">인기도</a>
+    			#end
+			</span>
+		</div>
+		
+		<div class="collWid collTot">	
+			#foreach($video in $videoList)
+			<div class="clearfix #if($foreach.index == 0) mThumImgListFst #else mThumImgList #end">
+				##툴팁에는 전체 타이틀 길이 적용
+				<div class="collImg"><a href="#" onclick="viewVideo('$!{video.song_id}', '$!{video.mv_id}');return gLink(null, 'SRMY', '1', '1');return false;"><img src="$ImageOldUtil.getImageUrl("$!{video.mv_thumb_url}", $ImageOldUtil.VIDEO_141_99)" width="141" height="99" class="thumb fl" alt="#getStrongText($!{video.song_name_tooltip})"></a><span class="nIcon"></span></div>
+				<div class="collCont">
+					<span class="tit3 subj3">
+						<a href="#" onclick="viewVideo('$!{video.song_id}', '$!{video.mv_id}');return gLink(null, 'SRMY', '2', '1');return false;" class="fl">$!{video.song_name}</a>	
+						#if($StringUtils.equals("$!{video.mv_adult_yn}","Y"))
+						<span class="btSetTitleIcon icoProductAdult" style="float:left;margin-right:10px;">&nbsp;</span>
+						#end
+						<!--<span class="starSmall pink titStar">
+							#set($videoPoint = $!{video.getAvgScore()} * 10)
+							<span class="pt1"><span class="pt2" style="width: $!{videoPoint}%;">네티즌별점</span></span>
+							<em>$!{video.getAvgScore()}</em>
+						</span>-->
+						<div class="titStar">#drawStarSmall($!{video.getAvgScore()})</div>
+					</span>	
+					#if($StringUtils.isNotEmpty("$!{video.artist_name}"))						
+					<dl class="collDl">
+						<dd class="tit">아티스트</dd>
+						<dd class="con">#if($StringUtils.isNotEmpty("$!{video.artist_id}") && !$StringUtils.equals("$!{video.artist_id}","0"))<a href="/artist/artist.do?artistId=$!{video.artist_id}" class="gray_d2" onclick="return gLink(null, 'SRMY', '3', '1');">$!{video.artist_name}</a>#else $!{video.artist_name}#end </dd>
+					</dl>
+					#end
+					#if($StringUtils.isNotEmpty("$!{video.album_name}"))	
+					<dl class="collDl">
+						<dd class="tit">앨범명</dd>
+						<dd class="con"><a href="/album/album.do?albumId=$!{video.album_id}" class="gray_d2" onclick="return gLink(null, 'SRMY', '4', '1');">$!{video.album_vol} $!{video.album_name}</a></dd>
+					</dl>
+					#end
+					#if($StringUtils.isNotEmpty("$!{video.release_dttm}") && !$StringUtils.equals("$!{video.release_dttm}", "00000000"))	
+					<dl class="collDl">
+						<dd class="tit">발매</dd>
+						<dd class="con">$ConverterUtil.formatByStar(${video.release_dttm}, "****.**.**")</dd>
+					</dl>
+					#end
+					#set($actorList = $video.getActorList())
+					#if($actorList.size() > 0)
+					<dl class="collDl">
+						<dd class="tit">출연</dd>
+						<dd class="con">#foreach($actor in $actorList)#if($foreach.index > 0), #end $!{actor} #end</dd>
+					</dl>	
+					#end			
+				</div>
+			</div>	
+		#end			
+		</div>				
+		<div class="collBottom"></div>
+		
+<!-- 페이징 -->	
+        #if( $StringUtils.isNotEmpty("$!{command.sortType}") ) #set ($url = $url + "&sortType=$!{command.sortType}") #end
+			#printPagingClickLog("${url}&pageNo=", $dto.ph.pageNo, $dto.ph)
+		#end
+		
+		<!--검색결과 없음 -->
+        #if($videoCount <= 0)
+    		<div class="rsltHelp">
+        		<p><span class="dot">ㆍ</span>검색어의 단어 수를 줄이거나, 보다 일반적인 단어로 검색해 보세요.</p>
+        		<p><span class="dot">ㆍ</span>두 단어 이상의 키워드로 검색 하신 경우, 정확하게 띄어쓰기를 한 후 검색해 보세요.</p>
+        		<p><span class="dot">ㆍ</span>키워드에 있는 특수문자를 뺀 후에 검색해 보세요.</p>
+        	</div>
+    	</div>
+    	#end
+		
+<!-- 제보 -->
+##		<hr/><div id="wInfoArea"><span class="tit">지금 보시는 검색 결과에 추가, 수정이 필요한 내용을 직접 등록해 주세요.</span><input type="button" class="typeBtn btnInfo fl" value="제보하기" title="제보하기"></div>
+	
+<!-- 클릭로그 -->
+<script type="text/javascript">init("MY", "$!{command.eucKrQuery}", "-1", "@@@");</script>
+
+#end

@@ -1,0 +1,100 @@
+#uaCheck()
+<div id="daumContent" class="cont_bar">
+	<h2 class="screen_out">뮤직 BAR</h2>
+	<div class="cont_navi">
+		<h3 class="tit">DJ 추천음악</h3>
+		#btnPrev()
+		<a href="/musicbar/djalbum/dj" class="bround btn_djlist">DJ 목록</a>
+	</div>
+
+	#if($StringUtils.isNotBlank("$!{dj.djId}"))
+	<div class="intro_dj">
+		<div class="wrap_info">
+			<span class="thumb">
+				<img class="thumb_img" #if($isWVGA) width="83" height="83"#else width="55" height="55" #end alt="$!{dj.nickName}" src="$ImageUtil.getMobileImageUrl("${dj.imageUrlForTab}", "55x55", "PHOTO", "S")">
+				<span class="bg_album"></span>
+			</span>
+			<div class="cont">
+				<span class="dj_name"><strong class="name">#strCut("$!{dj.nickName}", 25)</strong></span>
+				<p class="desc">
+					#strCut("$!{dj.info}", 130)
+				</p>
+			</div>
+		</div>
+	</div>
+	#end
+
+	<div class="wrap_djrecom">
+		<ul class="list_info list_djlist">
+			#foreach($album in $djAlbumList)
+			<li>
+				<div class="cont">
+					<div class="info_album">
+						<a href="/album/main?album_id=$!{album.albumId}" class="link_thumb">
+							<img class="thumb_img loading" #if($isWVGA) width="141" height="141"#else width="94" height="94" #end alt="" data-src="$ImageUtil.getMobileImageUrl("$!{album.mainImage.filePath}", "94x94", "ALBUM", "C")">
+							<span class="bg_album"></span>
+						</a>
+						<strong class="txt_info txt_album"><a href="/album/main?album_id=$!{album.albumId}" class="link_album">#strCut("$!{album.title}", 30)</a></strong>
+						<span class="txt_info txt_artist">
+							#foreach($artist in $album.keyArtistList)#if($velocityCount!=1), #end#if("$!{artist.artistId}"!="0")<a href="/artist/main?artist_id=$!{artist.artistId}" class="link_artist">$!{artist.name}</a>#else$!{artist.name}#end#end
+						</span>
+						
+						<span class="time">$CheckDate.makeReleaseDate($!{album.releaseDt})</span>
+						<a href="javascript:;" onclick="music.mobile.recommend.call('$!{album.albumId}','album')" class="bround btn_like" title="추천하기">
+							<span class="ico_music ico_like">추천</span><em class="fc_blue" id="recommend_$!{album.albumId}">$!{album.recommendCount}</em>
+						</a>
+					</div>
+					<div class="info_dj">
+						<strong class="dj_name"><a href="/musicbar/djalbum/list?dj_id=${album.recommendDj.djId}" class="link_dj">#strCut("$!{album.recommendDj.nickName}", 20)님의 추천평</a></strong>
+						<span class="txt_bar">|</span>
+						<span class="time">$CheckDate.makeReleaseDate($!{album.recommendDj.regdttm})</span>
+					</div>
+					#if($StringUtils.isNotBlank("$!{album.recommendDj.comments}"))
+					<p class="desc">
+						$!{album.recommendDj.comments}
+					</p>
+					#end
+				</div>
+			</li>
+			#end
+		</ul>
+		#mobilePaging($pagingUrl, $command.page_no, $pageHandler)
+	</div>
+	
+	#SearchForm("only_bottom")
+</div>
+
+#parse("/velocity/mobileweb/realtimeissue.vm")
+
+#stop
+
+#if($dj)
+	dj명:${dj.nickName}<br/>
+	dj이미지:<img src="${dj.imageUrl}"><img src="${dj.imageUrlForTop}"><img src="${dj.imageUrlForTab}"><img src="${dj.imageUrlForWing}"><img src="${dj.imageUrlForDetail}"><br/>
+	소개말:${dj.info}<br/>	
+#end
+#foreach($album in $djAlbumList)
+		<li>
+		<div class="section_info">
+		<h4 class="tit">#if("$!{album.volume}"!="")$!{album.volume}집 #end$!{album.title}</h4>
+		<div class="wrap_cont">
+			<div class="thumb">
+				<img #if($isWVGA) width="141" height="141"#else width="94" height="94" #end alt="이미지정보" src="$ImageUtil.getMobileImageUrl("$!{album.mainImage.filePath}", "94x94", "ALBUM", "C")">
+				<span class="outline"></span>
+			</div>
+			<div class="cont">
+				<dl class="info_data">
+					<dt class="tit_base">아티스트</dt>
+					<dd class="desc">#foreach($artist in $album.keyArtistList)#if($velocityCount!=1), #end#if("$!{artist.artistId}"!="0")<a href="/artist/main?artist_id=$!{artist.artistId}" class="txt_artist">$!{artist.name}</a>#else$!{artist.name}#end#end</dd>
+				</dl>
+				<dl class="info_data">
+					<dt class="tit_base">발매정보</dt>
+					<dd class="desc">$CheckDate.makeReleaseDate($!{album.releaseDt})</dd>
+				</dl>
+			</div>
+		</div>
+		<div>
+			$album.recommendDj.comments
+		</div>
+		</li>
+#end

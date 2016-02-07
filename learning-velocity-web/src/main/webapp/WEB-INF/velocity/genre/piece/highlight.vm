@@ -1,0 +1,130 @@
+<h2 class="screen_out">장르뮤직</h2>
+<ul id="tabgenreName" class="tab_cont tab_genre">
+	<li class="genre_menu1"><a class="tab_genreA" href="/genre/genrealbum/list?genre_group_cd=KO">가요</a></li>
+	<li class="genre_menu2"><a class="tab_genreA" href="/genre/genrealbum/list?genre_group_cd=PO">팝</a></li>
+	<li class="genre_menu3"><a class="tab_genreA" href="/genre/genrealbum/list?genre_group_cd=OS">O.S.T</a></li>
+	<li class="genre_menu4"><a class="tab_genreA" href="/genre/genrealbum/list?genre_group_cd=JP">J-Pop</a></li>
+	<li class="genre_menu5"><a class="tab_genreA" href="/genre/genrealbum/list?genre_group_cd=JA">재즈/블루스</a></li>
+	<li class="genre_menu6"><a class="tab_genreA" href="/genre/genrealbum/list?genre_group_cd=CL">클래식/뉴에이지</a></li>
+	<li class="genre_menu7"><a class="tab_genreA" href="/genre/genrealbum/list?genre_group_cd=WO">월드뮤직</a></li>
+	<li class="genre_menu8"><a class="tab_genreA" href="/genre/genrealbum/list?genre_group_cd=RE">종교음악</a></li>
+	<li class="genre_menu9"><a class="tab_genreA" href="/genre/genrealbum/list?genre_group_cd=ET">기타</a></li>
+	<li class="genre_menu10"><a class="tab_genreA" href="/genre/lablealbum/list">추천 레이블</a></li>
+</ul>
+
+#if($StringUtils.isNotBlank("$!{genre.genreCode}"))
+<div class="wrap_list_keyword">
+	<ul id="subgenreName" class="list_keyword">
+		<li >
+			<a href="/genre/genrealbum/list?genre_group_cd=$!{genre.genreCode}"><span>종합</span></a>
+		</li>
+		#set($subliCount = 0)
+		#foreach($subgenre in $genre.genreList)
+		#set($subliCount = $subliCount + 1)
+		<li code="$!{subgenre.genreCode}">		
+			#if($StringUtils.equals("$!{subgenre.recommendGenreYn}","Y"))<strong>#end
+			##<a href="/genre/genrealbum/list?genre_group_cd=$!{genre.genreCode}&genre_cd=$!{subgenre.genreCode}" onclick="daum.Music.subgenreDetail('$!{genre.genreCode}','$!{command.genre_cd}','$!{subgenre.genreCode}');return false;"></a>
+			<a href="/genre/genrealbum/list?genre_group_cd=$!{genre.genreCode}&genre_cd=$!{subgenre.genreCode}">
+				<span>$subgenre.genreName</span></a>
+			#if($StringUtils.equals("$!{subgenre.recommendGenreYn}","Y"))</strong>#end
+		</li>
+		#end
+		#if($subliCount < 7)
+		#foreach($i in [$subliCount..7])
+			<li><span class="subli_blank"></span></li>
+		#end
+		#end
+	</ul>
+	<div class="cl_b"></div>
+
+	<span class="bg_box bg_top"></span>
+	<span class="bg_box bg_btm"></span>
+</div>
+<script type="text/javascript">
+new daum.Music.Genre("tabgenreName","subgenreName", {groupGenreName:"$!Escape.url($!{genre.genreName})",subGenre:"$!Escape.url($!{command.genre_cd})"});
+</script>
+#else
+<div class="wrap_list_keyword wrap_list_label"> 	
+	<ul class="tab_label">
+		<li id="domesticTab" class="on">
+			<a class="domestic ir_pm" href="#">국내</a>
+		</li>
+		<li id="foreignTab" class="">
+			<a class="foreign ir_pm" href="#">해외</a>
+		</li>
+	</ul>
+	<ul id="domesticList" class="list_keyword" style="display:block">
+		#foreach($lable in $domesticLableList)
+		<li id="$!{lable.lableId}">
+			<a href="/genre/lablealbum/list?lable_id=$!{lable.lableId}"><span>$lable.lableName</span></a>
+		</li>
+		#end
+	</ul>
+	<ul id="foreignList" class="list_keyword" style="display:none">
+		#foreach($lable in $foreignLableList)
+		<li id="$!{lable.lableId}">
+			<a href="/genre/lablealbum/list?lable_id=$!{lable.lableId}" ><span>$lable.lableName</span></a>
+		</li>
+		#end
+	</ul>
+	<div class="cl_b"></div>
+	<span class="bg_box bg_top"></span>
+	<span class="bg_box bg_btm"></span>
+	#if($domesticLableList && $domesticLableList.size() > 19)
+		<div id="lable_add_border" class="add_border"></div>
+	#end
+</div>
+<script type="text/javascript">
+new daum.Music.Genre("tabgenreName","subgenreName",{chooselabel:"$!{chooseLable.lableId}",isGenre:false,labelTab1:"domesticTab", labelTab2:"foreignTab",list1:"domesticList",list2:"foreignList",addborder:"lable_add_border"});
+</script>
+#end
+
+
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+	
+상단의 1뎁스 장르는 하드코딩하는게 좋을듯합니다.<br/>
+관련뮤비와 관련인기차트 링크는 후에 다시 공유드리겠습니다.<br/>
+KO 가요<br/>
+PO 팝<br/>
+OS O.S.T<br/>
+JP J-Pop<br/>
+JA 재즈/블루스<br/>
+CL 클래식/뉴에이지<br/>
+WO 월드뮤직<br/>
+RE 종교음악<br/>
+ET 그외장르<br/>
+<br/><br/>
+대장르코드 : $genre.genreCode <br/>
+대장르명 : $genre.genreName <br/>
+<br/><br/>
+#foreach($subgenre in $genre.genreList)
+	장르코드 : $subgenre.genreCode <br/>
+	장르명 : $subgenre.genreName <br/>
+	추천장르 여부 : $subgenre.recommendGenreYn <br/>
+#end
+<br/><br/>
+
+국내:<br/>
+#foreach($lable in $domesticLableList)
+	레이블id : $lable.lableId <br/>
+	레이블명 : $lable.lableName <br/>
+#end
+<br/>
+해외:<br/>
+#foreach($lable in $foreignLableList)
+	레이블id : $lable.lableId <br/>
+	레이블명 : $lable.lableName <br/>
+#end
+<br/>
+선택레이블:<br/>
+레이블id: $chooseLable.lableId<br/>
+레이블명: $chooseLable.lableName<br/>
+이미지주소: $chooseLable.imageUrl<br/>
+홈페이지주소: $chooseLable.websiteUrl<br/>
+소개글: $chooseLable.info<br/>
+소개주소: $chooseLable.infoUrl<br/>
+<br/><br/>
+
+#end
+			

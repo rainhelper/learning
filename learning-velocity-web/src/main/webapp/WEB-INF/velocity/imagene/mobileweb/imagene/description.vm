@@ -1,0 +1,109 @@
+#uaCheck()
+<div id="daumContent" class="cont_selection">
+	<h2 class="screen_out">선정기준</h2>
+	#SearchForm("only_top")
+	
+	#tabImagene()
+	
+	<div class="wrap_head">
+		<h3 class="tit">선정기준</h3>
+	</div>
+	<div class="wrap_selection">
+		<div class="cont">
+			<p class="desc">
+				음악적 성취를 최우선적으로 평가하되 사회적 파급과 대중적 영향을 함께 고려하는 것을 목표로 합니다. 특히, 참신한 시도와 창의적 방식으로 대중음악의 다양성과 예술성을 성취한 작품을 적극 평가합니다. 대중적 음악 경험의 지평을 확장하는데 일조한 작품을 우선으로 하며, 상업적 성공 여부를 차별 혹은 역차별의 잣대로 사용하지 않는다는 것도 원칙으로 명문화하고 있습니다.
+			</p>
+		</div>
+	</div>
+	<div class="wrap_head">
+		<h3 class="tit">선정대상</h3>
+	</div>
+	<div class="wrap_selection">
+		<div class="cont">
+			<p class="desc" id="selectSummary">
+				이달의 앨범은 매월 첫째 날부터 마지막 날까지 한 달 간 국내에서 발매되고 국내에서 유통된 국내 아티스트의 모든 앨범을 선정대상으로 합니다. 여기서 국내 유통이란 바코드를 취득한 피지컬 음반이나 합법적인 업체에서 판매되는 디지털 음원 가운데 어느 하나의 조건이라도 충족하는 경우를 말하고...
+			</p>
+			<p class="desc" id="selectContents" style="display:none;">
+				이달의 앨범은 매월 첫째 날부터 마지막 날까지 한 달 간 국내에서 발매되고 국내에서 유통된 국내 아티스트의 모든 앨범을 선정대상으로 합니다. 여기서 국내 유통이란 바코드를 취득한 피지컬 음반이나 합법적인 업체에서 판매되는 디지털 음원 가운데 어느 하나의 조건이라도 충족하는 경우를 말하고, 앨범은 공식UK차트가 기준으로 삼고 있는 것과 마찬가지로 4곡 이상의 수록곡 혹은 25분 이상의 연주시간을 담고 있는 작품을 뜻합니다.
+				단, 히트곡모음집 등의 편집 앨범, 스플릿 앨범을 포함한 여러 가수의 컴필레이션, 기발표곡들로 구성된 리메이크 앨범과 실황음반 등은 추천 대상에서 배제합니다. 또한 곡은 형식과 내용에서 완결성을 갖춘 노래를 조건으로 하므로 인트로, 아우트로, 스킷 등의 트랙은 곡으로 간주하지 않습니다. 마찬가지로 동일한 노래의 상이한 버전(리믹스, MR, 라이브, 어쿠스틱 버전 등)도 별개의 곡으로 간주하지 않습니다.
+			</p>
+		</div>
+		<div class="box_more">
+			<a class="btn_more" href="javascript:;" onclick="music.mobile.showFullContents(this, 'selectContents', 'selectSummary')">
+				<span class="txt_more">펼치기 </span>
+				<span class="ico_music ico_more"></span>
+			</a>
+			<a class="btn_top" href="#">
+				<span class="ico_music ico_top"></span>
+				맨위로
+			</a>
+		</div>
+	</div>
+	<div class="wrap_head">
+		<h3 class="tit">음악평론가 선정단 소개</h3>
+	</div>
+	<div class="wrap_selection reviewer">
+		<div class="list_reviewer">
+    		<dl class="part" id="reviewerSummary">
+    			<dt class="name">박은석</dt>
+    			<dd class="vocation">웹진 '백비트' 편집장</dd>
+    			<dt class="name">강일권</dt>
+    			<dd class="vocation">웹진 '리드머' 편집장</dd>
+    			<dt class="name">김광현</dt>
+    			<dd class="vocation">음악지 '재즈피플' 편집장</dd>
+    			<dt class="name">김봉현</dt>
+    			<dd class="vocation">문지문화원 '사이' 기획인</dd>
+    			<dt class="name">김윤하</dt>
+    			<dd class="vocation">교통방송 프리랜서 PD</dd>
+    			<dt class="name">김작가</dt>
+    			<dd class="vocation">추계예대 영상시나리오학과 강사</dd>
+    			<dt class="name">김종윤</dt>
+    			<dd class="vocation">웹진 '스캐터브레인' 편집장</dd>
+    			<dt class="name">김학선</dt>
+    			<dd class="vocation">웹진 '보다' 편집장</dd>
+    			<dt class="name">김현준</dt>
+    			<dd class="vocation">EBS '스페이스 공감' 기획위원</dd>
+    			<dt class="name">나도원</dt>
+    			<dd class="vocation">웹진 '백비트' 편집인</dd>
+    		</dl>
+    		<dl class="all" id="reviewerContents" style="display:none;">
+    			<dt class="name">문정호</dt>
+    			<dd class="vocation">웹진 '보다' 편집인</dd>
+    			<dt class="name">배순탁</dt>
+    			<dd class="vocation">'배철수의 음악캠프' 작가</dd>
+    			<dt class="name">서성덕</dt>
+    			<dd class="vocation">웹진 '보다' 편집인</dd>
+    			<dt class="name">서정민갑</dt>
+    			<dd class="vocation">'인디 어워드' 자문위원</dd>
+    			<dt class="name">윤호준</dt>
+    			<dd class="vocation">웹진 '음악취향 Y' 편집인</dd>
+    			<dt class="name">이경준</dt>
+    			<dd class="vocation">웹진 '백비트' 편집인</dd>
+    			<dt class="name">이민희</dt>
+    			<dd class="vocation">웹진 '백비트' 편집인</dd>
+    			<dt class="name">이태훈</dt>
+    			<dd class="vocation">뮤직랜드 기획팀장</dd>
+    			<dt class="name">조일동</dt>
+    			<dd class="vocation">한양대 문화인류학과 강사</dd>
+    			<dt class="name">최민우</dt>
+    			<dd class="vocation">웹진 '웨이브' 편집장</dd>
+    			<dt class="name">최지선</dt>
+    			<dd class="vocation">웹진 '웨이브' 편집인</dd>
+    			<dt class="name">최지호</dt>
+    			<dd class="vocation">웹진 '음악취향 Y' 편집인</dd>
+    		</dl>
+		</div>
+		<div class="box_more">
+			<a class="btn_more" href="javascript:;" onclick="music.mobile.showFullContents(this, 'reviewerContents')">
+				<span class="txt_more">펼치기 </span>
+				<span class="ico_music ico_more"></span>
+			</a>
+			<a class="btn_top" href="#">
+				<span class="ico_music ico_top"></span>
+				맨위로
+			</a>
+		</div>
+	</div>	
+</div>
+	
+#parse("/velocity/mobileweb/realtimeissue.vm")

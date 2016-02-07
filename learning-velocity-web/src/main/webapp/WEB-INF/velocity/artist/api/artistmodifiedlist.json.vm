@@ -1,0 +1,33 @@
+{
+	"serviceid" : "music",
+	"sectionid" : "artist_list",
+	"title" : "아티스트  최신 목록 (수정순)",
+	"list" :[
+	#foreach($artist in $artistList)
+		{
+	    "serviceid":"music",
+	    "sectionid":"artist",
+	    "itemid" : "$!{artist.artistId}",
+	    "title" : $JSONUtil.valueToString($!{artist.name}),
+	    "synonym" : [
+	    #foreach($synonym in $artist.synonymList)
+	    	$JSONUtil.valueToString($!{synonym})#if($velocityHasNext),#end
+	    #end
+	    ],
+	    "link" : "http://music.daum.net/artist/main?artist_id=$!{artist.artistId}",
+	    "image" : "$!{artist.mainImage.filePath}",
+	    "point" : "",
+	    "point_cnt" : "",
+	    "mod_dttm" : "$!{artist.modDateTime}",
+	    "status" : #if("$!{artist.svcstatus}" == "2") "Y" #else "N" #end
+		}#if($velocityHasNext),#end
+	#end
+	]
+	,
+	"paging" : {
+		"page": $!{pageHandler.pageNo},
+		"count_per_page" : $!{pageHandler.onePageCnt},
+		"page_count" : $!{pageHandler.totalPage},
+		"count" : $!{pageHandler.totalCnt}
+	}
+}

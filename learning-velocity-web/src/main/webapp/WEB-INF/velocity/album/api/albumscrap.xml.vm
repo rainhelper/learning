@@ -1,0 +1,21 @@
+<Album>
+	<Image>
+		$!{album.mainImage.filePath}
+	</Image>
+	<AlbumId>$!{album.albumId}</AlbumId>
+	<Title>$!{album.title}</Title>
+	<ArtistId></ArtistId>
+	<ArtistDetailId>$!{artist.artistId}</ArtistDetailId>
+	<ArtistName>$!{artist.name}</ArtistName>
+	<Genre>
+		#foreach($genre in $genreList)
+			$!{genre.genreName}#if($velocityHasNext)/#end			
+		#end
+	</Genre>
+	<TitleSong>
+		<TitleSongName>$!{masterSong.title}</TitleSongName>
+		<TitleSongId>$!{masterSong.songId}</TitleSongId>
+		<AOD>$!{masterSong.AODLinkId}</AOD>
+	</TitleSong>
+	<Intro><![CDATA[$!{album.description}]]></Intro>
+</Album>

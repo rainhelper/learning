@@ -1,0 +1,268 @@
+#uaCheck()
+<div id="daumContent" class="cont_detail">
+	<h2 class="screen_out">상세</h2>
+	<div class="cont_navi">
+		<h3 class="tit">아티스트 정보</h3>
+#btnPrev()
+	</div>
+	<div class="section_info">
+		<h4 class="tit">$!artist.name</h4>
+		<div class="wrap_cont">
+			<div class="thumb">
+				<img #if($isWVGA)width="141" height="141"#else width="94" height="94"#end alt="이미지정보" src="$ImageUtil.getMobileImageUrl("$!{artist.mainImage.filePath}", "94x94", "ARTIST", "C")">
+				<span class="outline"></span>
+			</div>
+			<div class="cont">
+#if("$!artist.bandTypeName"=="")
+				<dl class="info_data">
+					<dt class="tit_base">활동정보</dt>
+					<dd class="desc"> $!artist.creditTitle1#if("$!artist.creditTitle2"!=""), #end$!artist.creditTitle2</dd>
+				</dl>
+#if($StringUtils.isNotBlank("$!{artist.birthDt}"))				
+				<dl class="info_data">
+					<dt class="tit_base">출생</dt>
+					<dd class="desc">$CheckDate.makeReleaseDate($!{artist.birthDt})</dd>
+				</dl>
+#end
+#if($artistBandList.size() > 0)
+				<dl class="info_data">
+					<dt class="tit_base">소속그룹</dt>
+					<dd class="desc">#foreach($artist in $artistBandList)<a href="/artist/main?artist_id=$!{artist.artistId}">$artist.name</a> #end</dd>
+				</dl>
+#end
+#else
+				<dl class="info_data">
+					<dt class="tit_base">활동정보</dt>
+					<dd class="desc">$!artist.bandTypeName</dd>
+				</dl>
+				<dl class="info_data">
+					<dt class="tit_base">멤버</dt>
+					<dd class="desc">
+						#foreach($member in $artistCurrnetbandMemberList)#if($velocityCount!=1), #end<a href="/artist/main?artist_id=$!{member.artistId}">$!member.name</a>#end
+					</dd>
+				</dl>
+#end
+			</div>
+		</div>
+<script type="text/javascript">//<![CDATA[
+/**
+ * sns 공유하기
+ * @param {String} 포스팅시 링크에 적용될 문장
+ */
+doc = document;
+doc.loc = music.mobile.replaceURL();
+var sourceId = 2;
+var prefix ="$!artist.name"
+var url = doc.loc;
+var imagePath = "$ImageUtil.getMobileImageUrl("$!{artist.mainImage.filePath}", "94x94", "ARTIST", "C")";
+var metaType = "DMU";
+var metaKey = "$!{artist.artistId}";
+
+var shareSNS = {
+	"prefix" : prefix,
+	"link" : url,
+	"sourceId" : sourceId,
+	"image_path" : imagePath,
+	"meta_type" : metaType,
+	"meta_key" : metaKey	
+}
+
+/* 2013-2-14 웹투앱 2차로 인해 막음
+shareSNS = function( prefix, serviceName ){
+	var sourceId = 2; // yozm sourceid
+	var urlPre = 'http://m.profile.daum.net/api/popup/Share.daum?source_id=';
+	if(serviceName === "mypeople") {
+		urlPre = "https://m.mypeople.daum.net/mypeople/mweb/share.do?source_id="; 
+	}
+	var prefix ="$!artist.name"
+	var link = doc.loc;
+	var url = urlPre + sourceId + '&link='+ encodeURIComponent( link ) + '&prefix=' + encodeURIComponent( prefix ) + '&service_name=' + encodeURIComponent( serviceName );
+	url += "&image_path=$ImageUtil.getMobileImageUrl("$!{artist.mainImage.filePath}", "94x94", "ARTIST", "C")";
+	url += "&meta_type=DMU";
+	url += "&meta_key=$!{artist.artistId}";
+	window.location.href = url;
+	return false;
+};
+*/
+//]]></script>
+		<div class="wrap_consumer">
+			<a href="javascript:;" onclick="music.mobile.recommend.call('$!{artist.artistId}','artist')" class="btn_like bround"title="추천하기">
+				<span class="ico_music ico_like">추천</span><em class="fc_blue" id="recommend_$!{artist.artistId}">$!artist.recommendCount</em>
+			</a>
+#snsLayer("f_r")
+		</div>
+		<div id="socialShareMoreViewContainer"></div>
+	</div>
+#if($albumList.size() > 0)
+	<div class="section_album">
+		<div class="wrap_head">
+			<h4 class="tit">앨범</h4>
+		</div>
+		<div class="wrap_list_album">
+		<ul class="list_album"> 
+#foreach($album in $albumList)
+			<li>
+				<a href="/album/main?album_id=$!{album.albumId}" class="wrap_thumb">
+					<span class="thumb">
+						<img #if($isWVGA)width="141" height="141"#else width="94" height="94"#end alt="이미지정보" src="$ImageUtil.getMobileImageUrl("$!{album.mainImage.filePath}", "94x94", "ALBUM", "C")">
+						<span class="bg_outline"></span>
+					</span>
+					<strong class="info">
+						<span class="tit">
+							#foreach($artist in $album.keyArtistList)#if($velocityCount!=1), #end$!{artist.name}#end
+						</span>
+						<span class="txt_info">#strCut( $album.title, 18)</span>
+					</strong>
+				</a>
+			</li>
+			
+#end
+		</ul>
+		</div>
+		<span class="link_more">
+			<a href="/artist/album/list?artist_id=$!{artist.artistId}" class="txt_info">더보기</a> <span class="ico_music ico_arr"></span>
+		</span>
+	</div>
+#end
+#if($popularSongList.size() > 0)
+	<div class="section_song">
+		<div class="wrap_head">
+			<h4 class="tit">$!{artist.name}의 인기차트</h4>
+		</div>
+		<ol class="list_info list_music">
+#foreach($song in $popularSongList)
+#playList()
+#end
+		</ol>
+		<span class="link_more">
+			<a href="/artist/popularSong/list?artist_id=$!{artist.artistId}" class="txt_info">더보기</a> <span class="ico_music ico_arr"></span>
+		</span>
+	</div>
+#end
+#if($vclipList.size() > 0)
+	<div class="section_video">
+		<div class="wrap_head">
+			<h4 class="tit">뮤직비디오</h4>
+		</div>
+		<ul class="list_info list_thumb">
+#foreach($vclip in $vclipList)
+#mVideoList()
+#end
+		</ul>
+		<span class="link_more">
+			<a href="/artist/vclip/list?artist_id=$!{artist.artistId}" class="txt_info">더보기</a> <span class="ico_music ico_arr"></span>
+		</span>
+	</div>
+#end
+	<div class="cmt_comm">
+		<iframe src="about:blank" name="commentFrame" id="commentFrame" width="1" height="50" marginwidth="0" marginheight="0" frameborder="0" scrolling="no" title="commentFrame"></iframe>
+	</div>
+<script type="text/javascript">//<![CDATA[
+	daum.Event.addEvent( window, "load", function(){
+		var commentFrame = $("commentFrame");
+		commentFrame.width = "100%";
+		commentFrame.src="#getter('GAIA_MOBILE_DOMAIN', '')/gaia/do/mobile/comment/commentList?bbsId=$!{artist.bbsId}&articleId=$!{artist.articleId}";
+	});
+//]]></script>
+#SearchForm("only_bottom")
+</div>
+#parse("/velocity/mobileweb/realtimeissue.vm")
+#*
+
+<b>아티스트 정보</b><br /> 
+이미지: $artist.mainImage.filePath <br />
+ID : $artist.artistId <br />
+이름 : $artist.name, $artist.nameOrgLang, $artist.nameKorLang, $artist.nameEngLang, $artist.realName, $artist.nickName <br />
+인물일 경우 크래딧 : $artist.creditTitle1, $artist.creditTitle2 <br />
+밴드일 경우 밴드타입: $artist.bandTypeName <br />
+<hr/>
+
+소속밴드 <br/>
+#foreach($artist in $artistBandList)
+    artist.artistId : $artist.artistId <br/>
+	artist.name : $artist.name <br/>
+	artist.bandOrderNo : $artist.bandOrderNo <br/>
+	artist.mainImage.filePath : $artist.mainImage.filePath <br/>
+#end
+<hr/>
+
+
+인물일 경우 생일 : $artist.birthDt <br/>
+<hr/>
+
+밴드일 경우 멤버<br/>
+#foreach($member in $artistCurrnetbandMemberList)
+	member.mainImage.filePath : $member.mainImage.filePath <br/>
+	member.artistId : $member.artistId<br/>
+	member.name : $member.name <br/>
+	#foreach($credit in $member.bandMemberCreditList) $credit #end <br/><br/>
+#end
+<hr/>
+
+추천 : $artist.recommendCount <br />
+<hr/>
+
+<b>앨범</b><br /> 
+#foreach($album in $albumList)
+	album.albumId : $album.albumId <br />
+	album.title : $album.title <br />
+	album.typeName : $album.typeName <br />
+	album.volume : $album.volume <br />
+	album.releaseDt : $album.releaseDt <br />
+	album.playYn : $album.playYn <br />
+	album.mainImage.filePath : $album.mainImage.filePath <br/><br/>
+	artist" <br />
+	#foreach($artist in $album.keyArtistList)
+		Id : "$!{artist.artistId}" <br />
+		name : "$!{artist.name}" <br />
+	#end
+<br />	
+#end
+<hr />
+
+
+<b>인기차트</b><br /> 
+#foreach($song in $popularSongList)
+	song.songId : $song.songId<br />
+	song.title : $song.title<br />
+	song.keyArtistList : #foreach($artist in $song.keyArtistList) $artist.artistId | $artist.name #end <br />
+	song.featArtistList : #foreach($artist in $song.featArtistList) $artist.artistId | $artist.name #end <br />
+	song.creditArtistList : #foreach($artist in $song.creditArtistList) $artist.artistId | $artist.name | $artist.creditTitle #end <br />
+	song.favorite : $song.favorite<br />
+	song.AODLinkId : $song.AODLinkId<br />
+	song.lyricsYn : $song.lyricsYn<br />
+	song.vclipLinkId : $song.vclipLinkId<br />
+	song.tvpotVId : $song.tvpotVId<br />
+	song.MP3LinkId : $song.MP3LinkId<br />
+	song.BGMLinkId : $song.BGMLinkId<br />
+	song.bellSalesStatus : $song.bellSalesStatus<br />
+	song.ringSalesStatus : $song.ringSalesStatus<br /><br/><br/>
+#end
+<hr />
+
+<b>사용자 정보</b><br />
+#if($musicUser)
+	daumId : $!{musicUser.daumId} <br />
+	adultYn : $!{musicUser.adultYn} <br />
+#elseif($user)
+	daumId : $!{user.daumId} <br />
+	adultYn : $!{user.adultYn} <br />
+#end
+
+<b>뮤직비디오</b><br />
+#foreach($vclip in $vclipList)
+	뮤직비디오유료화여부(0일 경우는 유료화아님, 1일경우가 유료화) : $authorizedPlayVideoList[$!{foreach.index}] <br/>
+	vclip.vclipId : $vclip.vclipId <br />
+	vclip.tvpotVId : $vclip.tvpotVId <br />
+	vclip.mainImage.filePath : $vclip.mainImage.filePath<br /><br />
+	아티스트 <br />
+	#foreach($artist in $vclip.keyArtistList)
+	 - 이름 : $!{artist.name} <br />
+	 - ID : $!{artist.artistId} <br />
+	#end<br />	
+#end
+<hr />
+
+댓글 ID : $artist.bbsId <br />
+<hr/>
+*#

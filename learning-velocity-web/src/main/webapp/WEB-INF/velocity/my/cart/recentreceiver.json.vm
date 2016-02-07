@@ -1,0 +1,10 @@
+[
+	#foreach($daumId in $recentReceiverList)
+		#if($recentReceiverList.indexOf($daumId) != 0),#end
+		"${daumId}"
+	#end
+	]
+#*
+$!{user}
+$!{recentReceiverList}
+*#

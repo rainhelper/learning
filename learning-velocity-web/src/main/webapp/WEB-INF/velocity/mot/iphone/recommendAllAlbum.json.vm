@@ -1,0 +1,47 @@
+{
+"list" : [
+#foreach($album in $recommendAlbumList)
+{
+			"serviceid": "music",
+	        "sectionid": "album",
+	        "itemid" : "$!{album.albumId}",
+	        "title" : "$!{EscapeUtil.escapeJsonString($!{album.title})}",
+	        "link" : "http://music.daum.net/album/main?album_id=$!{album.albumId}",
+	        "image" : "$!{album.mainImage.filePath}",
+	        "etc" : {
+	        	"artist" : {
+					"title" : "아티스트",
+					"content" : [
+					#foreach( $artist in ${album.keyArtistList} )
+						#if($album.keyArtistList.indexOf($artist) != 0),#end
+						{
+							"title" : "$!{EscapeUtil.escapeJsonString($!{artist.name})}",
+							"link" : #if("$!{artist.artistId}" == "0")""#else"http://music.daum.net/artist/main?artist_id=$!{artist.artistId}"#end
+						}
+					#end
+					]
+				},
+	        	#if($album.keyArtistList.size()>0)
+		        	"artistdetailid" : "$!{album.keyArtistList.get(0).artistId}",
+		        	"artistname" : "$!{EscapeUtil.escapeJsonString($!{album.keyArtistList.get(0).name})}",
+			    #end
+			    #if($album.masterSongList.size()>0)
+					"songid" : "$!{album.masterSongList.get(0).songId}",
+					"songname" : "$!{EscapeUtil.escapeJsonString($!{album.masterSongList.get(0).title})}",
+				#else
+					#if($album.songList.size()>0)
+						"songid" : "$!{album.songList.get(0).songId}",
+						"songname" : "$!{EscapeUtil.escapeJsonString($!{album.songList.get(0).title})}",
+					#else
+						"songid" : "",
+						"songname" : "",
+					#end
+				#end
+	        	"releaseDate" : "$!{album.releaseDt}",
+	        	"volumn" : "$!{album.volume}"
+	        	}
+}#if($velocityHasNext),#end
+#end
+]
+}
+

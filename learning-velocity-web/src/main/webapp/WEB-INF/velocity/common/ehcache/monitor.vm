@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ko">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=euc-kr">
+	<meta name="autocomplete" content="off">
+	<title>Daum Music EHCACHE</title>
+	<link rel="shortcut icon" href="http://www.daum.net/favicon.ico">
+	<meta name="description" content="">
+	<style>
+	table, td, th {
+		font-size: 9pt;
+		font-family: ProFontWindows, Courier New;
+		border: solid 1px gray;
+		border-collapse: collapse;
+	}
+
+	th {
+		background-color: #444444;
+		color: #DDE6F0;
+		font-weight: normal;
+	}
+	</style>
+
+</head>
+<body>
+
+<center><h3>EHCACHE Status</h3></center>
+
+<table cellpadding="2" cellspacing="0" style="border: solid 1px black;">
+<tr>
+<th>Name</th>
+<th>Hit Ratio</th>
+<th>Hits/Misses</th>
+<th>Elements</th>
+<th>Max Elements</th>
+<th>Status</th>
+<th>TTIdle(s)</th>
+<th>TTLive(s)</th>
+<th>Clear</th>
+</tr>
+#foreach( $cache in $cacheList )
+	#set( $hitCount = $cache.statistics.cacheHits )
+	#set( $accessCount = $cache.statistics.cacheMisses)
+	<td>$cache.name</td>
+<td>
+
+#if( $accessCount != 0 )
+	#set( $ratio = $cache.statistics.cacheHits*100/($cache.statistics.cacheHits+$cache.statistics.cacheMisses) )
+	#set( $w2 = $cache.statistics.cacheHits*60/($cache.statistics.cacheHits+$cache.statistics.cacheMisses) )
+	#if( $ratio > 80 )
+		#set( $color = "#A8FA00" )
+	#elseif( $ratio > 60 )
+		#set( $color = "#00FA52" )
+	#elseif( $ratio > 40 )
+		#set( $color = "#00AD39" )
+	#elseif( $ratio > 20 )
+		#set( $color = "#FF7D81" )
+	#else
+		#set( $color = "red" )
+	#end
+
+<div style="filter=progid:DXImageTransform.Microsoft.Gradient(GradientType=1, StartColorStr=${color}, EndColorStr=white) position: relative; width: ${w2}; background-color: ${color}; z-index: 0; color: yellow; text-align: center;">${ratio}%</div>
+#else-
+#end</td>
+<td>${cache.statistics.cacheHits}/${cache.statistics.cacheMisses}</td>
+<td>${cache.memoryStoreSize}</td>
+<td>${cache.cacheConfiguration.maxElementsInMemory}</td>
+<td>
+$cache.Status
+</td>
+<td>${cache.cacheConfiguration.timeToIdleSeconds}</td>
+<td>${cache.cacheConfiguration.timeToLiveSeconds}</td>
+<td>
+<a href="/common/ehcache/remove_all.json?cache_name=${cache.name}" target=_blank>CLEAR</a>
+</td>
+</tr>
+#end
+</table>
+<br/> <br/>
+<a href="http://ehcache.org/">http://ehcache.org/</a> <br/>
+</body>
+</html>

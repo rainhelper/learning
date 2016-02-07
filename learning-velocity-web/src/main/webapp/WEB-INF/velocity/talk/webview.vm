@@ -1,0 +1,57 @@
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            launchApp();
+        });
+
+        function launchApp() {
+            var uriPath = "musictalk";
+            var storeURL = util.userAgent().os.android ? "market://details?id=com.kakao.talk" : "itms-apps://itunes.apple.com/app/id362057947";
+            var param = "";
+            if (util.userAgent().os.android) {
+                param += "url=" + encodeURIComponent("http://talkmusic.kakao.com/talk/$!{templetType}/$!{menu}/$!{listId}");
+            } else {
+                uriPath += "/talk/$!{templetType}/$!{menu}/$!{listId}";
+            }
+            var urlScheme = getUrlScheme("kakaotalk", uriPath, param, "com.kakao.talk");
+            var intentUri = getIntentUri("kakaotalk", uriPath, param, "com.kakao.talk");
+            daumtools.web2app({
+                urlScheme: urlScheme,
+                intentURI: intentUri,
+                storeURL: storeURL,
+                appName: "",
+                onUnsupportedEnvironment: function () {
+                }
+            });
+        }
+
+        function getUrlScheme(scheme, uriPath, param, pkg) {
+            var str = scheme + "://" + uriPath;
+            if (jQuery.trim(param) != "") {
+                str += "?" + jQuery.trim(param);
+            }
+            return str;
+        }
+
+        function getIntentUri(scheme, uriPath, param, pkg) {
+            var str = "intent://" + uriPath;
+            if (jQuery.trim(param) != "") {
+                str += "?" + param;
+            }
+            str += "#Intent;scheme=" + scheme + ";package=" + pkg + ";end";
+            return str;
+        }
+    </script>
+    <main id="daumContent">
+        <article id="mArticle" style="min-height: 500px;">
+            <div class="error_info">
+                <strong class="tit_error">페이지를 이동하고 있습니다</strong>
+                <p class="desc_error">
+                    자동으로 페이지가 이동되지 않을경우<br>
+                    아래 버튼을눌러 이동해 주세요.
+                </p>
+                <div class="btn_move">
+                    <a href="javascript:launchApp();" class="link_move link_type1">페이지 이동하기</a>
+                </div>
+            </div>
+        </article>
+    </main>

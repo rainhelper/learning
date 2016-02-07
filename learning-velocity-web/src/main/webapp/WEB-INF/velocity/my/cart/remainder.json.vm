@@ -1,0 +1,13 @@
+{
+	"DaumId": "$!{user.daumId}",
+	"DaumName": "$!{user.daumName}",
+	"Mp3DownloadRemainder": ${mp3DownloadRemainder},
+	"BgmDownloadRemainder": ${bgmDownloadRemainder},
+	"DaumCashRemainder": ${daumCashRemainder}
+}
+#*
+$!{user}
+$!{mp3DownloadRemainder}
+$!{bgmDownloadRemainder}
+$!{daumCashRemainder}
+*#

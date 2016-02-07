@@ -1,0 +1,22 @@
+{
+"serviceid" : "music",
+"sectionid" : "aodticket_status",
+"title" : "이용권현황",
+#set($ticket = $!{dto.firstTicketOwnInfo})
+#set($ticketTitle = $!{ticket.order.item.title})
+#if($ticket.order.isFreePay())#if($ticket.order.item.periodic)#set($ticketTitle = "[무료체험] $ticketTitle")#else#set($ticketTitle = "[무료체험] $ticketTitle")#end
+#elseif($ticket.order.isCouponRegularPay()) #set($ticketTitle = "[자동결제] $ticketTitle")#end
+"ownTicket" : "$!{ticketTitle}",
+"ownmp3count" : "$!{dto.mp3OwnCount}",
+"ownbgmcount" : "$!{dto.bgmOwnCount}",
+#if($!{dto.isAodUse()} == "true")
+"aoduse" : "1",
+#else
+"aoduse" : "0",
+#end
+"isDownload" : "$!{ticket.mobileDataItemYn}",
+"aodstartdate" : "$CheckDate.getOriginTime($!{dto.aodStartDate})",
+"aodenddate" : "$CheckDate.getOriginTime($!{dto.aodEndDate})",
+"mp3remaincount" : "$!{dto.downloadRemainder}",
+"mp3enddate" : "$CheckDate.getOriginTime($!{dto.mp3EndDate})"
+}

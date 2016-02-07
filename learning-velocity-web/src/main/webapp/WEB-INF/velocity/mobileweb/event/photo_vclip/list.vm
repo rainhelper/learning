@@ -1,0 +1,95 @@
+#uaCheck()
+#set($event_id = $request.getParameter("event_id"))
+<div id="daumContent" class="cont_spe">
+	<h2 class="screen_out">스페셜</h2>
+	<ul class="wrap_spemenu">
+		<li class="menu1"><a href="/event/main?event_id=$!event_id " class="pround"><span class="inner">스페셜홈</span></a></li>
+		<li class="menu2 on"><a href="/event/photo_vclip/list?event_id=$!event_id " class="pround"><span class="inner">포토동영상</span></a></li>
+		<li class="menu3"><a href="/event/detail?event_id=$!event_id " class="pround"><span class="inner">상세정보</span></a></li>
+		<li class="menu4"><a href="/event/eventInfo?event_id=$!event_id " class="pround"><span class="inner">이벤트</span></a></li>
+	</ul>
+#if($vclipList.size() > 0)
+	<div class="section_video">
+		<div class="wrap_head">
+			<h3 class="tit">포토동영상</h3>
+		</div>
+		<ul class="list_video">
+#foreach($item in $vclipList)
+#set($video_id = $!{item.tvpotVId})
+#set($thumb_img = $!{ImageUtil.getMobileImageUrl("$!{item.mainImage.filePath}", "94x70", "VIDEO", "C")})
+			<li>
+				<a class="wrap_thumb">
+					<span class="thumb" id="thumb_$!{video_id}">
+						<img #if($isWVGA)width="216" height="180"#else width="144" height="120"#end src="$!{thumb_img}" alt="$!{item.title}">
+						<span class="ico_music ico_play"></span>
+						<span class="outline" onclick="music.mobile.mMoviePlay('event','$!{video_id}','$!{thumb_img}','144','120')"></span>
+					</span>
+					<strong class="info">$!{item.title}</strong>
+				</a>
+			</li>
+#end
+		</ul>
+	</div>	
+#end
+	<div class="section_photo">
+		<div class="wrap_head">
+			<h3 class="tit">포토</h3>
+		</div>
+		<ul class="list_photo" id="list_$!{event_id}">
+#foreach($item in $photoList)
+#set($tmp = $velocityCount)
+			<li>
+				<a href="/event/photo_vclip/detail?event_id=$!{item.eventId}&photo_id=$!{item.photoId}" class="wrap_thumb">
+					<span class="thumb">
+						<img #if($isWVGA)width="139" height="105"#else width="93" height="70"#end src="$ImageUtil.getMobileImageUrl("$!{item.filePath}", "144x120", "PHOTO", "C")" alt="">
+						<span class="outline"></span>
+					</span>
+				</a>
+			</li>
+#end
+		</ul>
+		<div class="box_more">
+#if($!{totalPhotoCnt} > $tmp)
+			<a href="javascript:;" onclick="music.mobile.eventPhotoList.paging('$!event_id')" id="btn_$!{event_id}" class="btn_more">
+				<span class="txt_more">더보기</span>
+				<span class="count">(<span id="num_$!{event_id}">$!{tmp}</span>/ $!{totalPhotoCnt})</span>
+				<span class="ico_music ico_more"></span>
+			</a>
+#end
+			<a href="#" class="btn_top">
+				<span class="ico_music ico_top"></span>
+				맨위로
+			</a>
+		</div>
+	</div>
+</div>
+#parse("/velocity/mobileweb/realtimeissue.vm")
+
+#*
+#foreach($item in $vclipList)
+	vclipId : $!{item.vclipId}<br/>
+	tvpotVId : $!{item.tvpotVId}<br/>
+	tvpotPreVId : $!{item.tvpotPreVId}<br/>
+	title : $!{item.title}<br/>
+	adultYn : $!{item.adultYn}<br/>
+	imageId : $!{item.mainImage.imageId}<br/>
+	filePath : $!{item.mainImage.filePath}<br/>
+	keyArtist : 
+		#foreach($artist in $item.keyArtistList)
+			artistId : $!{artist.artistId}<br/>
+			artistname : $!{artist.name}<br/>
+		#end
+#end
+
+<br/>
+totalPhotoCnt : $!{totalPhotoCnt}<br/>
+
+<br/>
+
+photoList
+#foreach($item in $photoList)
+	eventId : $!{item.eventId}<br/>
+	photoId : $!{item.photoId}<br/>
+	filePath : $!{item.filePath}<br/>
+#end
+*#

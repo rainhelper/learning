@@ -1,0 +1,124 @@
+<div>
+<style type="text/css">
+	hr {display:none;}
+</style>
+##<img src="http://i1.daumcdn.net/img-section/enter/common/loading.gif" width="32" height="32" alt="">
+	
+<script>
+var JviewerConfig = {
+	tiaraDomain : 'm.music.daum.net',
+	photoData : [
+		{ 
+			"id":"1",
+			"name":"",
+			"profile":"",
+			"image":"http://s1.daumcdn.net/img-contents/music/mobile/event/1.jpg"
+		},
+		{ 
+			"id":"2",
+			"name":"",
+			"profile":"",
+			"image":"http://s1.daumcdn.net/img-contents/music/mobile/event/2.jpg"
+		},
+		{ 
+			"id":"3",
+			"name":"캐스퍼(CASPER)",
+			"profile":"크로스진의  WILD CHIC GENE<br/>캐스퍼(CASPER)입니다.<br/>Believe me! Follow me! Check this one!<br/>여러분 많은 응원 부탁 드립니다^^<br/>",
+			"image":"http://s1.daumcdn.net/img-contents/music/mobile/event/CROSS GENE_CASPER_01.jpg"
+		},
+		{ 
+			"id":"4",
+			"name":"캐스퍼(CASPER)",
+			"profile":"크로스진의  WILD CHIC GENE<br/>캐스퍼(CASPER)입니다.<br/>Believe me! Follow me! Check this one!<br/>여러분 많은 응원 부탁 드립니다^^<br/>",
+			"image":"http://s1.daumcdn.net/img-contents/music/mobile/event/CROSS GENE_CASPER_02.jpg"
+		},
+		{ 
+			"id":"5",
+			"name":"제이지(J.G)",
+			"profile":"크로스진의 DESTINY GENE<br/>제이지(J.G)입니다.<br/>팀의 메인 보컬인 만큼 멋진 목소리로 감동을<br/>드리겠습니다.<br/>많이 사랑해 주세요^^<br/>",
+			"image":"http://s1.daumcdn.net/img-contents/music/mobile/event/CROSS GENE_JG_01.jpg"
+		},
+		{ 
+			"id":"6",
+			"name":"제이지(J.G)",
+			"profile":"크로스진의 DESTINY GENE<br/>제이지(J.G)입니다.<br/>팀의 메인 보컬인 만큼 멋진 목소리로 감동을<br/>드리겠습니다.<br/>많이 사랑해 주세요^^<br/>",
+			"image":"http://s1.daumcdn.net/img-contents/music/mobile/event/CROSS GENE_JG_02.jpg"
+		},
+		{ 
+			"id":"7",
+			"name":"상민(SANGMIN)",
+			"profile":"크로스진의 ORGANIC GENE<br/>SANGMIN(상민)입니다.<br/>여러분들과 함께 호흡할 수 있는 무대를<br/>만들겠습니다.<br/>함께 해주실거죠~?<br/>",
+			"image":"http://s1.daumcdn.net/img-contents/music/mobile/event/CROSS GENE_SANGMIN_01.jpg"
+		},
+		{ 
+			"id":"8",
+			"name":"상민(SANGMIN)",
+			"profile":"크로스진의 ORGANIC GENE<br/>SANGMIN(상민)입니다.<br/>여러분들과 함께 호흡할 수 있는 무대를<br/>만들겠습니다.<br/>함께 해주실거죠~?<br/>",
+			"image":"http://s1.daumcdn.net/img-contents/music/mobile/event/CROSS GENE_SANGMIN_02.jpg"
+		},
+		{ 
+			"id":"9",
+			"name":"신(SHIN)",		
+			"profile":"크로스진의 PRESH GENE 신(SHIN)입니다.<br/>심장을 울리는 웅장하고 강렬한 음악을<br/>준비했습니다.<br/>기대해주세요!!<br/>",
+			"image":"http://s1.daumcdn.net/img-contents/music/mobile/event/CROSS GENE_SHIN_01.jpg"
+		},
+		{ 
+			"id":"10",
+			"name":"신(SHIN)",
+			"profile":"크로스진의 PRESH GENE 신(SHIN)입니다.<br/>심장을 울리는 웅장하고 강렬한 음악을<br/>준비했습니다.<br/>기대해주세요!!<br/>",
+			"image":"http://s1.daumcdn.net/img-contents/music/mobile/event/CROSS GENE_SHIN_02.jpg"
+		},
+		{ 
+			"id":"11",
+			"name":"타쿠야(TAKUYA)",
+			"profile":"크로스진의 GORGEOUS GENE<br/>타쿠야(TAKUYA)입니다.<br/>멋진 음악과 퍼포먼스, 마음껏 즐겨주세요.<br/>화이팅!!<br/>",
+			"image":"http://s1.daumcdn.net/img-contents/music/mobile/event/CROSS GENE_TAKUYA_01.jpg"
+		},
+		{ 
+			"id":"12",
+			"name":"타쿠야(TAKUYA)",
+			"profile":"크로스진의 GORGEOUS GENE<br/>타쿠야(TAKUYA)입니다.<br/>멋진 음악과 퍼포먼스, 마음껏 즐겨주세요.<br/>화이팅!!<br/>",
+			"image":"http://s1.daumcdn.net/img-contents/music/mobile/event/CROSS GENE_TAKUYA_02.jpg"
+		},
+		{ 
+			"id":"13",
+			"name":"용석(YONGSEOK)",
+			"profile":"크로스진의 MYPACE GENE<br/>용석(YONGSEOK)입니다.<br/>세련되고 고급스러운 비트감과 들을수록 <br/>중독되는 멜로디<br/>많이 기대해주시고, 응원해주세요~^^<br/>",
+			"image":"http://s1.daumcdn.net/img-contents/music/mobile/event/CROSS GENE_YONGSEOK_01.jpg"
+		},
+		{ 
+			"id":"14",
+			"name":"용석(YONGSEOK)",
+			"profile":"크로스진의 MYPACE GENE<br/>용석(YONGSEOK)입니다.<br/>세련되고 고급스러운 비트감과 들을수록 <br/>중독되는 멜로디<br/>많이 기대해주시고, 응원해주세요~^^<br/>",
+			"image":"http://s1.daumcdn.net/img-contents/music/mobile/event/CROSS GENE_YONGSEOK_02.jpg"
+		},
+		{ 
+			"id":"15",
+			"name":"",
+			"profile":"",
+			"image":"http://s1.daumcdn.net/img-contents/music/mobile/event/IMG_0509.jpg"
+		},
+		{ 
+			"id":"16",
+			"name":"",
+			"profile":"",
+			"image":"http://s1.daumcdn.net/img-contents/music/mobile/event/IMG_0694.jpg"
+		},
+		{ 
+			"id":"17",
+			"name":"",
+			"profile":"",
+			"image":"http://s1.daumcdn.net/img-contents/music/mobile/event/IMG_1075.jpg"
+		},
+		{ 
+			"id":"18",
+			"name":"",
+			"profile":"",
+			"image":"http://s1.daumcdn.net/img-contents/music/mobile/event/IMG_1776.jpg"
+		}
+	],
+	pageNavigation : { "currentPageNo":"1", "rowCountPerPage":"20", "totalRowCount":"18", "pageCountPerGroup":"20"}
+};
+</script>
+
+<script charset='utf-8' type='text/javascript' src='http://d1.daumcdn.net/tiara/tracker/tiara.min.js'></script>

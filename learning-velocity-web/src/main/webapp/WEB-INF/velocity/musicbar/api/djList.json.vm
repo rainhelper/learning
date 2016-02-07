@@ -1,0 +1,10 @@
+{"list" : [
+#foreach($dj in $allDjList)
+#if($velocityCount > 1),#end
+{
+	"nickname" : $JSONUtil.valueToString($dj.nickName),
+	"djid" : "$dj.djId",
+	"imageurl" : "$dj.imageUrlForTab"
+ }
+ #end
+]} 

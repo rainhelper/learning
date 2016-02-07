@@ -1,0 +1,8 @@
+var obj = [
+#foreach($item in $albumList)
+	#if($genreAlbumList.indexOf($item) != 0),#end
+	{
+	K: "$!{item.title}"
+	}
+#end
+];

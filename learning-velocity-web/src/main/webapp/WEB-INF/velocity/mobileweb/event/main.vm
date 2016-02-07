@@ -1,0 +1,59 @@
+#uaCheck()
+#set($event_id = $request.getParameter("event_id"))
+<div id="daumContent" class="cont_spe">
+	<h2 class="screen_out">스페셜</h2>
+	<ul class="wrap_spemenu">
+		<li class="menu1 on"><a href="/event/main?event_id=$!event_id " class="pround"><span class="inner">스페셜홈</span></a></li>
+		<li class="menu2"><a href="/event/photo_vclip/list?event_id=$!event_id " class="pround"><span class="inner">포토동영상</span></a></li>
+		<li class="menu3"><a href="/event/detail?event_id=$!event_id " class="pround"><span class="inner">상세정보</span></a></li>
+		<li class="menu4"><a href="/event/eventInfo?event_id=$!event_id " class="pround"><span class="inner">이벤트</span></a></li>
+	</ul>
+	<div class="section_top">
+		<h3 class="screen_out">스페셜홈</h3>
+		<div class="wrap_img">
+			<a href="#"><img src="$ImageUtil.getMobileImageUrl("$!{mainImage.filePath}", "320x344", "PHOTO", "C")" alt="모바일 뮤직 이벤트" class="thumb_img"></a>
+			<span class="gradient"></span>
+		</div>
+<script type="text/javascript">//<![CDATA[
+/**
+ * sns 공유하기
+ * @param {String} 포스팅시 링크에 적용될 문장
+ */
+doc = document;
+doc.loc = doc.location.href.toString();
+var sourceId = 2;
+var prefix ="[뮤직] 이벤트"
+var link = doc.loc;
+var url = encodeURIComponent( link );
+
+var shareSNS = {
+	"prefix" : prefix,
+	"link" : url,
+	"sourceId" : sourceId
+}
+
+
+/* 2013-2-14 웹투앱 2차로 인해 막음
+shareSNS = function( prefix, serviceName ){
+	var sourceId = 2; // yozm sourceid
+	var urlPre = 'http://m.profile.daum.net/api/popup/Share.daum?source_id=';
+	if(serviceName === "mypeople") {
+		urlPre = "https://m.mypeople.daum.net/mypeople/mweb/share.do?source_id="; 
+	}
+	var prefix ="[뮤직] 이벤트"
+	var link = doc.loc;
+	var url = urlPre + sourceId + '&link='+ encodeURIComponent( link ) + '&prefix=' + encodeURIComponent( prefix ) + '&service_name=' + encodeURIComponent( serviceName );
+	window.location.href = url;
+	return false;
+};
+*/
+//]]></script>
+#snsLayer()
+	</div>
+	<div id="socialShareMoreViewContainer"></div>
+</div>
+#parse("/velocity/mobileweb/realtimeissue.vm")
+#*
+제휴이벤트메인이미지 : $mainImage.filePath <br/>
+*#
+

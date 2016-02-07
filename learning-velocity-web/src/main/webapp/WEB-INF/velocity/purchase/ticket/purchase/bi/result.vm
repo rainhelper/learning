@@ -1,0 +1,50 @@
+#set( $title = "$!{purchaseTicket.order.item.title}" )
+#set( $price = "$!{purchaseTicket.order.item.salePrice}" )
+#set( $ticketId = "$!{purchaseTicket.id}" )## 티켓 '바로 사용'시 연결되는 $ticket.id
+#set( $isPeriodoc = ${purchaseTicket.order.item.periodic} )## 자동결제 여부
+#set( $isUseTicket = ${isAodUse} )## 상품 사용중 여부 (이미 사용중인 AOD 상품권이 있는지 여부)
+#set( $ticketType = ${purchaseTicket.order.item.itemType.code} )## 이용권 아이템 코드(이용권종류, AP:AOD, MP:MP3다운로드, AM:AOD+다운로드)
+#set( $startDate = "$!{purchaseTicket.startDate}" )
+#set( $endDate = "$!{purchaseTicket.endDate}" )
+#set( $couponyn = $!{purchaseTicket.order.paymentType}) ## CP 쿠폰, !CP 일반결제
+
+<h3 class="screen_out">이용권 구매 메뉴</h3>
+
+#if("$!{purchaseTicket.promotionYn}" == "Y")
+#printPurchaseMenu("1")
+#else
+#printPurchaseMenu("2")
+#end
+
+<h3 class="screen_out">전체 이용권</h3>
+<div class="info_buy">
+	#if($exception)
+		#parse("/velocity/purchase/common/complete_error.vm")	
+	<ul class="list_link">
+		<li><a href="/" target="_blank" class="link_move">뮤직홈 가기</a><span class="txt_bar">|</span> </li>
+		<li><a href="/chart/" target="_blank" class="link_move">실시간차트 가기</a><span class="txt_bar">|</span> </li>
+		<li><a href="/my/own_ticket/ticket/list" target="_blank" class="link_move">내 이용권 가기</a></li>
+	</ul>
+	#else
+	<h4 class="tit_buy">
+		<span class="ico_box"><span class="ico_coupon ico_check"></span></span>
+		<span class="img_pass txt_buy">이용권 구매가 완료되었습니다. 구매해주셔서 고맙습니다.</span>
+	</h4>
+	#if($!{isPeriodoc}==true || "$!{purchaseTicket.order.item.itemType}" == "BGMTICKET")
+	<ul class="list_link">
+		<li><a href="/" target="_blank" class="link_move">뮤직홈 가기</a><span class="txt_bar">|</span> </li>
+		<li><a href="/chart/" target="_blank" class="link_move">실시간차트 가기</a><span class="txt_bar">|</span> </li>
+		<li><a href="/my/own_ticket/ticket/list" target="_blank" class="link_move">내 이용권 가기</a></li>
+	</ul>
+	#else
+	<div class="wrap_use">
+		<button tpye="button" class="btn_coupon btn_now" onclick='daum.Music.Ticket.Using("$!{purchaseTicket.order.orderId}");return false;'>지금바로사용하기</button>
+		<button tpye="button" class="btn_coupon btn_after" onclick='location.replace("/my/own_ticket/ticket/list");'>나중에사용하기</button>
+	</div>
+	#end
+	#end
+	
+	
+</div>
+#parse("/velocity/purchase/common/album.vm")
+		

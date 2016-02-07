@@ -1,0 +1,93 @@
+#if("$!{callback}" != "")
+if (typeof(${callback}) == "function") ${callback} (
+#end
+{
+	#if($musicUser)
+		"user" : {
+			"daumId" : "$!{musicUser.daumId}",
+		    "adultYn" : "$!{musicUser.adultYn}"
+			},
+	#elseif($user)
+		"user" : {
+			"daumId" : "$!{user.daumId}",
+		    "adultYn" : "$!{user.adultYn}"
+			},
+	#end
+"list" :[
+	#foreach($song in $chartSongList)
+		
+        #if($musicUser)
+            #set($user_daumId = $!{musicUser.daumId})
+            #set($user_adultYn = $!{musicUser.adultYn})
+        #elseif($user)
+            #set($user_daumId = $!{user.daumId})
+            #set($user_adultYn= $!{user.adultYn})
+		#end
+		
+        #if(("$!song.adultYn"=="Y") && ("$user_adultYn")!="Y")
+			#set($song_type = "adult")
+        #end
+
+
+	#if($StringUtils.isNotBlank("$!{song.rank}"))#set($rank = $!song.rank)#else#set($rank = $foreach.count)#end
+	#if($chartSongList.indexOf($song) != 0),#end
+	{
+		"rank" : "$!rank",
+##		"modrank" : "$song.modRank",
+		"songId" : "$!song.songId",
+		"title" : "$!song.title.replaceAll('"','').replaceAll("'","")",
+		"lyricsYn" : "$!song.lyricsYn",
+		"AODLinkId" : "$!song.AODLinkId",
+##		"vclipLinkId":"$!{song.vclipLinkId}",
+##		"tvpotVId":"$!{song.tvpotVId}",
+		"albumId" : "$!song.album.albumId",
+		"albumTitle" : "$!song.album.title.replaceAll('"','').replaceAll("'","")",
+##		"albumImage" : "$song.album.mainImage.filePath",
+		"albumThumbnail" : "$ImageUtil.getMobileImageUrl("$!{song.album.mainImage.filePath}", "41x41", "ALBUM", "C")",
+		"albumViewerThumbnail" : "$ImageUtil.getMobileImageUrl("$!{song.album.mainImage.filePath}", "320x320", "ALBUM", "C")",
+		"songadult" : "$!song.adultYn",
+		"songType" : "$!song_type",
+		"MP3LinkId"	: "$!song.MP3LinkId",
+##		"userId" : "$song.getEncodedUserId()",
+##		"nickName" : "$song.nickName",
+		"songArtist" : [
+    		#if($song.keyArtistList.size()>0)
+			#foreach($artist in $song.keyArtistList)
+	    		#if($song.keyArtistList.indexOf($artist) != 0),#end
+				{
+				"artistId" : "$!{artist.artistId}",
+				"name" : "$!{artist.name.replaceAll('"','').replaceAll("'","")}"
+				}
+			#end
+			#end
+    	],
+    	"featArtistList": [
+    		#if($song.featArtistList.size()>0)
+			#foreach($artist in $song.featArtistList)
+	    		#if($song.featArtistList.indexOf($artist) != 0),#end
+				{
+				"artistId" : "$!{artist.artistId}",
+				"name" : "$!{artist.name.replaceAll('"','').replaceAll("'","")}"
+				}
+			#end
+			#end
+		],
+		#if($StringUtils.equals("$!{song.authorizedPlayVideo}", "true"))
+			#set($video_id = $!{song.tvpotVId})
+			#set($movie_type = "full")
+		#else        
+            #set($video_id = $!{song.tvpotPreVId})
+            #set($movie_type = "pre")	
+		#end
+		"vid" : "$!video_id",
+		"videoThumbnail" : "$ImageUtil.getMobileImageUrl("$!{song.album.mainImage.filePath}", "94x70", "ALBUM", "C")",
+		"videoadult" : "$!song.vclip.adultYn",
+		"movieType" : "$!movie_type"
+	}
+	#end
+	]
+}
+#if("$!{callback}" != "")
+);
+#end
+

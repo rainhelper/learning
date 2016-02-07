@@ -1,0 +1,13 @@
+#parse("/velocity/sym/fund/direct.popup.vm") 
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+현재 default url : $symInfo.curDefaultUrl<br/>	
+##아티스트 이름
+$artist.name </br></br>
+$symInfo.title </br></br>
+
+##아티스트 메인이미지
+$artist.mainImage.filePath </br></br>
+
+##후원금액
+$result.supportPrice </br></br>
+#end

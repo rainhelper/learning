@@ -1,0 +1,205 @@
+<style type="text/css">
+.wrap_list_menu .list_submenu {padding-bottom:2px;}
+
+.wrap_list_menu .list_submenu li.on .wrap_box {overflow:hidden;display:block;width:185px;height:21px;padding:2px 0 0 4px;background:url(http://s1.daumcdn.net/img-contents/music/2011_home/my/bg_selectitem.gif) no-repeat;}
+.wrap_list_menu .list_submenu li.on a {font-weight:bold;color:#44B1D7} 
+.wrap_list_menu .list_submenu li.selected a {font-weight:bold;color:#44B1D7}
+
+.wrap_list_menu .list_menu li .wrap_list_submenu {margin-bottom:5px;}
+
+.wrap_list_menu .list_menu li.on .scroll2 {padding-bottom:3px;}
+.list_menu li a.on, .list_menu li span.on {font-weight:bold;}
+.list_mymanage li a.on, .list_mymanage li span.on {font-weight:bold;}
+
+.wrap_list_menu .list_submenu li .wrap_listbtn {display:none;}
+.wrap_list_menu .list_submenu li.on .wrap_listbtn {display:block;}
+ 
+
+.wrap_list_menu .list_submenu .inp_cate {float:left;width:131px;}
+.wrap_list_menu .list_submenu .wrap_modifybtn {float:left;width:47px;}
+.wrap_list_menu .list_submenu .btn_confirm {width:20px;height:27px;background-position:-374px -92px}
+.wrap_list_menu .list_submenu .btn_cancel {width:20px;height:27px;background-position:-380px -132px}
+.wrap_list_menu .list_submenu .wrap_modifybtn a, .wrap_list_menu .list_submenu .wrap_modifybtn span {float: left;height: 22px;margin-top: -2px}
+.wrap_list_menu .list_submenu .wrap_modifybtn .btn_bar {}
+</style>
+<div class="wrap_myinfo">
+	<h3 class="screen_out">내정보</h3>
+	<div class="wrap_baseinfo">
+		<h4 class="screen_out">기본정보</h4>
+##		<a class="thumb_link" href="/my/top">
+		<span class="thumb_link">
+			<img src="${ProfileFarm.getUrl55x55("$left.userId")}" alt="$!{left.cpDaumName}님 프로필사진">
+			<span class="line_thumb"></span>
+##		</a>
+		</span>
+		<span class="txt_baseinfo">
+			<span class="wrap_user">
+				<span class="fc_blue" ><strong>#strCut($!{left.cpDaumName},16)님</strong></span>
+			</span>
+##			<span class="wrap_phone">
+##				#if($StringUtils.isNotBlank("$!{left.cpNumber}"))$!{left.cpNumber}#else 폰번호 없음 #end
+##				<a class="btn_mymusic btn_changenum" href="https://user.daum.net/modifyuser/modifyuser.daum"  target="_blank">번호수정</a>
+##			</span>
+			##<a class="txt_control" href="http://profile.daum.net" target="_blank">프로필사진 변경</a>
+		</span>
+	</div>
+	<div class="wrap_mycoupon">
+		<h4 class="screen_out">이용권</h4>
+		<div class="wrap_nocoupon" #if(!$StringUtils.equals("$!{left.ticketOwnCount}","0"))style="display:none;"#end> 			
+			<em class="txt_control">현재 사용 중인 이용권이 없습니다</em>
+##			<div class="wrap_btn">
+##				<a href="/purchase/ticketitem/list" class="btn_mymusic btn_buycoupon">이용권 구매</a>
+##				<a href="#" class="btn_mymusic btn_player" onclick="daum.Music.AodPlayer.add();return false;">플레이어</a>
+##			</div>
+		</div>
+		<div class="wrap_coupon" #if($StringUtils.equals("$!{left.ticketOwnCount}","0"))style="display:none;"#end>
+			<div class="wrap_title">
+				<strong class="tit_mymusic tit_coupon">남은 갯수 : </strong>
+##				<a href="/my/own_ticket/ticket/list" class="txt_num fc_blue"> #toCurrency($!{left.ticketOwnCount})</a>
+				<span class="txt_num fc_blue">#toCurrency($!{left.ticketOwnCount})</span>
+				<span class="tit_mymusic txt_unit">개</span>
+			</div>
+			<div class="wrap_remainder">
+				음악감상 잔여일
+				<span class="txt_remainder"><span class="fc_blue">$!{left.aodLeftDay}</span>일</span>
+			</div>
+			<div class="wrap_remainder">
+				구매가능 MP3 잔여곡
+				<span class="txt_remainder"><span class="num fc_blue">$!{left.Mp3LeftCount}</span>곡</span>
+			</div>
+##			<div class="wrap_manage">
+##				<a class="txt_control" href="/my/own_ticket/ticket/list">관리</a>
+##				<span class="txt_bar "> | </span>
+##				<a class="txt_control" href="/purchase/ticketitem/list">구매</a>
+##			</div>
+		</div>
+	</div>
+</div>
+#set( $URI = "#getter('URI', '')" )
+<div class="wrap_list_menu">
+##	<a href="/my/top"><h3 class="tit_mymusic tit_music">MY 뮤직</h3></a>
+	<span class="tit_mymusic tit_music">MY 뮤직</span>
+	<ul class="list_menu">
+		<li class="on">
+			<div class="wrap_onmenu">
+				<a href="/my/playList/detail?playlist_id=1" class="ico_mymusic ico_folder#if($URI.indexOf("/my/playList")>-1 || $URI.indexOf("/my/top/")>-1) on#end">재생목록</a>
+				##<span class="txt_unit">($!{left.myPlayCount})</span>
+			</div>
+##			<a href="#" class="btn_mymusic btn_add" onclick="daum.Music.MyPlayListMenu.add();return false;">추가</a>
+			#set( $tot = $left.myPlayList.size())
+			<div class="wrap_list_submenu  #if($tot>10)scroll2#end" >
+				## 내 플레이 리스트
+				<ul class="list_submenu">
+					#foreach($item in $left.myPlayList)
+					#set( $name = $item.playListName.replaceAll('"', '&quot;')  )	
+					<li  class="#if($foreach.count==$tot)lst#end #if($StringUtils.equals("$!{command.playlist_id}","$!{item.playListId}"))selected#end" id="plist_$!{item.playListId}">		
+						<span class="wrap_box">		
+							<a title="$!StringCutUtil.removeTag($!{name})" onclick="daum.Music.Playlist.detail($!{item.playListId});return false;" 
+								href="/my/playList/detail?playlist_id=$!{item.playListId}">
+								#if($!{item.playListId}==1)#set($cutLen=30)#else#set($cutLen=13)#end
+								#strCut($StringUtils.trim($!StringCutUtil.removeTag($!{name})), $cutLen)</a>
+							<span class="txt_unit">($!{item.totalPlayCnt})</span> 	
+##							#if( $!{item.playListId} != 1)
+##							<span class="wrap_listbtn"><a onclick="daum.Music.MyPlayListMenu.modify($!{item.playListId});return false;" href="#" class="btn_mymusic btn_modify">수정</a>
+##							<span class="btn_mymusic btn_bar"> | </span>
+##							<a onclick="daum.Music.MyPlayListMenu.remove($!{item.playListId});return false;" href="#" class="btn_mymusic btn_delete">삭제</a></span>
+##							#end
+						</span>
+					</li>
+					#end
+				</ul>
+			</div>
+		</li>
+##		<li><a class="ico_mymusic ico_folder#if($URI.indexOf("/my/frequent/")>-1) on#end" href="/my/frequent/list">즐겨 듣는 음악</a></li>
+##		<li><a class="ico_mymusic ico_folder#if($URI.indexOf("/my/recent/")>-1) on#end" href="/my/recent/song/list">최근 들은 음악</a></li>
+##		<li>
+##			#if( $StringUtils.equals("$left.lastSavedObjType", "AR") ) #set( $favorite = "artist" )
+##			#elseif( $StringUtils.equals("$left.lastSavedObjType", "MV") ) #set( $favorite = "vclip" )
+##			#else #set( $favorite = "album" ) #end
+##			<a class="ico_mymusic ico_folder#if($URI.indexOf("/my/favorite")>-1) on#end" href="/my/favorite/$!{favorite}/list">관심 음악</a>
+##			<span class="txt_unit">(#toCurrency($left.favoriteCount))</span>
+##		</li>
+		<li>
+			<a class="ico_mymusic ico_folder#if($URI.indexOf("/my/depository/")>-1) on#end" href="/my/depository/mp3/list">구매 음악</a>
+			<span class="txt_unit">(#toCurrency($left.ownCount))</span>
+		</li>
+	</ul>
+</div>
+#*
+<div class="wrap_list_mymanage">
+	<a href="/my/own_ticket/ticket/list"><h3 class="tit_mymusic tit_manage">MY 관리</h3></a>
+	<ul class="list_mymanage">
+		<li>
+			<a class="ico_mymusic ico_note#if($URI.indexOf("/my/own_ticket/")>-1) on#end" href="/my/own_ticket/ticket/list">이용권 현황</a>
+			<span class="txt_unit">(#toCurrency($left.ticketOwnCount))</span>
+		</li>
+		<li>
+			<a class="ico_mymusic ico_gear#if($URI.indexOf("/my/setting/")>-1) on#end" href="/my/setting/list">내 설정</a>
+		</li>
+		<li>
+			<a class="ico_mymusic ico_coupon" href="/purchase/coupon/form">쿠폰 등록</a>
+		</li>
+	</ul>
+</div>
+<div class="wrap_list_notice">
+	<a href="#getter('GAIA_DOMAIN', '')/gaia/do/notice/list?bbsId=Notice"><h3 class="tit_mymusic tit_notice">공지사항</h3></a>
+	<ul class="list_notice">
+#foreach($item in $left.recentNoticeList)
+	#if($foreach.index < 4)
+		<li><a href="$!{item.get("URL")}" title="$!{item.get("SUBJECT")}">#strCut($!{item.get("SUBJECT")},30)</a></li>
+	#end
+#end 
+	</ul>
+</div>
+*#
+<script type="text/javascript">
+var myPlayList = [
+#foreach($item in $left.myPlayList)
+#set( $name = $!{EscapeUtil.escapeJsonString($item.playListName)}  )
+#if($foreach.index>0),#end{playlist_id:"$!{item.playListId}", playListName:"$StringUtils.trim($!StringCutUtil.removeTag($!{name}))",playCnt:$!{item.totalPlayCnt},gubunCd:"$!{item.gubunCd}"}
+#end
+]
+daum.addEvent(window, 'load', function(){
+daum.Music.MyPlayListMenu.init(myPlayList, {element:daum.$$(".wrap_list_submenu .list_submenu")[0], playlist_id:"$!{command.playlist_id}", totCount:$!{left.myPlayList.size()}});
+}); 
+
+</script>
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+
+<b>왼쪽레프트정보</b><br/>
+다음이름: $left.cpDaumName <br/>
+전화번호 $left.cpNumber <br/>
+유저아뒤 : $left.userId <br/>
+
+음악감상잔여일 $left.aodLeftDay <br/>
+구매가능 mp3잔여곡 : $left.Mp3LeftCount <br>
+
+<br>
+MY 뮤직<br/> 
+플레이리스트 $left.myPlayCount <br/>
+
+#foreach($item in $left.myPlayList)<br/>
+	ㅡ순서: $item.playListId || 이름: $item.playListName ($item.totalPlayCnt) || 디폴트: $item.gubunCd
+#end <br/>
+
+<br/>
+즐겨 듣는 음악 <br/>
+최근 들은 음악 <br/>
+관심음악 : $left.favoriteCount <br/>
+구매음악 : $left.ownCount <br/>
+		
+MY관리 <br/>
+이용권현황 $left.ticketOwnCount <br/>
+내알림  $left.announceCount <br/>
+내설정 <br/>
+
+공지사항 <br/><br/>
+#foreach($item in $left.recentNoticeList)<br/>
+	#if($foreach.index < 4)
+		$item.get("SUBJECT") ||  $item.get("URL") <br />
+	#end
+#end <br />	
+ 
+ 
+#end

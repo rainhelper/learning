@@ -1,0 +1,98 @@
+#set($artistType = $artist.artistType)
+#if($artistType == 'PS')
+	<Artist>
+		<Image><![CDATA[$!{artist.mainImage.filePath}]]></Image>
+		<ArtistId><![CDATA[]]></ArtistId>
+		<ArtistDetailId><![CDATA[$!{artist.artistId}]]></ArtistDetailId>
+		<ArtistName><![CDATA[$!{artist.name}]]></ArtistName>
+		<ActiveYear>
+			<Year><![CDATA[$artist.strActYear]]></Year>
+			#if( $!{artist.strActYear} != $!{artist.endActYear} )<Year><![CDATA[$artist.endActYear]]></Year>#end
+		</ActiveYear>
+		<NameOrgLang><![CDATA[$!{artist.nameOrgLang}]]></NameOrgLang>
+		<NameKorLang><![CDATA[$!{artist.nameKorLang}]]></NameKorLang>
+		<NameKorPron><![CDATA[]]></NameKorPron>
+		<NameChiLang><![CDATA[]]></NameChiLang>
+		<NameJapLang><![CDATA[]]></NameJapLang>
+		<RealName><![CDATA[$!{artist.realName}]]></RealName>
+		<NickName><![CDATA[$!{artist.nickName}]]></NickName>
+		<SexName><![CDATA[$!{artist.sexName}]]></SexName>
+		<CafeUrl><![CDATA[]]></CafeUrl>
+		<CafeName><![CDATA[]]></CafeName>
+		<CreditTitle1><![CDATA[$!{artist.creditTitle1}]]></CreditTitle1>
+		<NationKor><![CDATA[$!{artist.nationKor}]]></NationKor>
+		<BirthDateTime><![CDATA[$!{artist.birthDt}]]></BirthDateTime>
+		<DebutDateTime><![CDATA[$!{artist.debutDt}]]></DebutDateTime>
+		<GenreAndStyle></GenreAndStyle>
+		<MasterSong>
+			#foreach($masterSong in $popularSongList)
+				<Song>
+					<TitleSongName><![CDATA[$!{masterSong.title}]]></TitleSongName>
+					<TitleSongId><![CDATA[$!{masterSong.songId}]]></TitleSongId>
+					<AOD><![CDATA[$!{masterSong.AODLinkId}]]></AOD>
+				</Song>
+			#end
+		</MasterSong>
+		<OwnBand>
+			#foreach($ownBand in $artistBandList)
+				<Band>
+					<BandName><![CDATA[$!{ownBand.name}]]></BandName>
+					<BandId><![CDATA[$!{ownBand.artistId}]]></BandId>
+				</Band>
+			#end
+		</OwnBand>
+		<ImageList>
+			#foreach($image in $imageList)
+			<imageUrl><![CDATA[$!{image.filePath}]]></imageUrl>
+			#end
+		</ImageList>
+	</Artist>
+#else
+	<Artist>
+		<Image><![CDATA[$!{artist.mainImage.filePath}]]></Image>
+		<ArtistId><![CDATA[$!{artist.artistId}]]></ArtistId>
+		<ArtistDetailId><![CDATA[$!{artist.ArtistId}]]></ArtistDetailId>
+		<ArtistName><![CDATA[$!{artist.name}]]></ArtistName>
+		<ActiveYear>
+			<Year><![CDATA[$artist.strActYear]]></Year>
+			#if( $!{artist.strActYear} != $!{artist.endActYear} )<Year><![CDATA[$artist.endActYear]]></Year>#end
+		</ActiveYear>
+		<NameOrgLang><![CDATA[$!{artist.nameOrgLang}]]></NameOrgLang>
+		<NameKorLang><![CDATA[$!{artist.nameKorLang}]]></NameKorLang>
+		<NameKorPron><![CDATA[]]></NameKorPron>
+		<NameChiLang><![CDATA[]]></NameChiLang>
+		<NameJapLang><![CDATA[]]></NameJapLang>
+		<RealName><![CDATA[$!{artist.realName}]]></RealName>
+		<NickName><![CDATA[$!{artist.nickName}]]></NickName>
+		<CafeUrl><![CDATA[]]></CafeUrl>
+		<CafeName><![CDATA[]]></CafeName>
+		<ActiveInfo>
+			<BandTypeName><![CDATA[$!{artist.bandTypeName}]]></BandTypeName>
+			<RelateArea><![CDATA[$!{artist.nationKor}]]></RelateArea>
+			<BirthDateTime><![CDATA[$!{artist.birthDt}]]></BirthDateTime>
+			<DeathDateTime><![CDATA[$!{artist.deathDt}]]></DeathDateTime>
+		</ActiveInfo>
+		<GenreAndStyle></GenreAndStyle>
+		<MasterSong>
+			#foreach($masterSong in $popularSongList)
+				<Song>
+					<TitleSongName><![CDATA[$!{masterSong.title}]]></TitleSongName>
+					<TitleSongId><![CDATA[$!{masterSong.songId}]]></TitleSongId>
+					<AOD><![CDATA[$!{masterSong.AODLinkId}]]></AOD>
+				</Song>
+			#end
+		</MasterSong>
+		<Member>
+			#foreach($member in $bandMemberList)
+				<CreditTitle><![CDATA[$!{member.creditTitle}]]></CreditTitle>
+				<MemberName><![CDATA[$!{member.name}]]></MemberName>
+				<MemberArtistId><![CDATA[$!{member.artistId}]]></MemberArtistId>
+			#end
+		</Member>
+		<ImageList>
+			#foreach($image in $artist.imageList)
+			<imageUrl><![CDATA[$!{image.filePath}]]></imageUrl>
+			#end
+		</ImageList>
+	</Artist>
+#end

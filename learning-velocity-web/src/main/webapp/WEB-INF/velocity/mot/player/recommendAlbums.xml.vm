@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Music>
+	<Albums>
+	#foreach($album in $recommendAlbumList)
+		<Album>
+			<AlbumId>$!{album.albumId}</AlbumId>
+			<AlbumName><![CDATA[$!{album.title}]]></AlbumName>
+			<AlbumImgPath>$!{album.mainImage.filePath}</AlbumImgPath>
+			<AlbumImgHeight>$!{album.mainImage.height}</AlbumImgHeight>
+			<AlbumImgWidth>$!{album.mainImage.width}</AlbumImgWidth>
+			<AlbumDetailUrl><![CDATA[http://music.daum.net/album/main?album_id=$!{album.albumId}]]></AlbumDetailUrl>
+			<artists>
+			#if($album.keyArtistList.size()>0)
+				#foreach($artist in $album.keyArtistList)
+					<artist>
+						<ArtistId>$!{artist.artistId}</ArtistId>
+						<ArtistName><![CDATA[$!{artist.name}]]></ArtistName>
+						<ArtistDetailUrl><![CDATA[http://music.daum.net/artist/main?artist_id=$!{artist.artistId}]]></ArtistDetailUrl>
+					</artist>
+				#end
+			#end
+			</artists>
+			#if($album.masterSongList.size()>0)
+				<TitleSongId>$!{album.masterSongList.get(0).songId}</TitleSongId>
+				<TitleSongName><![CDATA[$!{album.masterSongList.get(0).title}]]></TitleSongName>
+				<TitleSongDetailUrl><![CDATA[미정]]]></TitleSongDetailUrl>
+			#else
+				#if($album.songList.size()>0)
+					<TitleSongId>$!{album.songList.get(0).songId}</TitleSongId>
+					<TitleSongName><![CDATA[$!{album.songList.get(0).title}]]></TitleSongName>
+					<TitleSongDetailUrl><![CDATA[미정]]]></TitleSongDetailUrl>
+				#else
+					<TitleSongId></TitleSongId>
+					<TitleSongName></TitleSongName>
+					<TitleSongDetailUrl></TitleSongDetailUrl>
+				#end
+			#end	
+		</Album>
+	#end	
+	</Albums>
+</Music>

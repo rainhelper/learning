@@ -1,0 +1,52 @@
+#set($date = "$!Escape.url($!{command.date})")
+{
+"serviceid" : "music",
+"sectionid" : "song_popularity",
+"title" : "곡 인기순 목록",
+"rankdate" : "$!{date}",
+"list" :[
+#foreach($song in $chartSongList)
+	#if($chartSongList.indexOf($song) != 0),#end
+	{
+    "serviceid":"music",
+    "sectionid":"song",
+    "itemid" : "$!{song.songId}",
+    "songid" : "$!{song.songId}",
+    "title" : "$!{EscapeUtil.escapeJsonString($!{song.title})}",
+    "synonym" : [
+    #foreach($synonym in $song.synonymList)
+    	#if($song.synonymList.indexOf($synonym) != 0),#end
+    	"$!{EscapeUtil.escapeJsonString($!{synonym})}"
+    #end
+    ],
+    "link" : "http://music.daum.net/album/main?album_id=$!{song.album.albumId}&song_id=$!{song.songId}",
+    "image" : "$!{song.album.mainImage.filePath}",
+    "point" : "",
+    "point_cnt" : "",
+    "etc" : {
+    	"rank" : "$!{song.rank}",
+    	"modrank" : "$!{song.modRank}",
+    	"artist" : [
+    		#if($song.keyArtistList.size()>0)
+			#foreach($artist in $song.keyArtistList)
+	    		#if($song.keyArtistList.indexOf($artist) != 0),#end
+				{
+				"artistdetailid" : "$!{artist.artistId}",
+				"artistname" : "$!{EscapeUtil.escapeJsonString($!{artist.name})}"
+				}
+			#end
+			#end
+    	],
+    	"featartist" : "$!{EscapeUtil.escapeJsonString($!{song.featAllArtistWithComma})}",
+    	"aod" : "$!{song.AODLinkId}",
+    	"mp3" : "$!{song.MP3LinkId}",
+    	"bgm" : "$!{song.BGMLinkId}",
+    	"adultyn" : "$!{song.adultYn}",
+    	"tvpotvid" : "$!{song.tvpotVId}",
+    	"albumid" : "$!{song.album.albumId}",
+    	"albumname" : "$!{EscapeUtil.escapeJsonString($!{song.album.title})}"
+    }
+	}
+#end
+]
+}

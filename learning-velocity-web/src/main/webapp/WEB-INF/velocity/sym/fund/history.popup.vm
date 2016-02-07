@@ -1,0 +1,74 @@
+<!-- popWrap -->
+<div id="popWrap" class="cont_mysupport">
+	<!-- popHead -->
+	<div id="popHead">
+		<h1 class="logoArea">
+			<strong id="logo" class="text_imgpop">Support your music MY 후원 내역</strong>
+		</h1>
+	</div>
+	<!-- //popHead -->
+	<!-- popContent -->
+	<div id="popContent">
+		<div class="wrap">
+			<div class="line_bottom tit_mysupport">
+				<strong class="text_imgpop text_mysupport">MY 후원 내역</strong>
+			</div>
+			#if(!$CollectionUtils.isEmpty($historyList))
+			<ul class="list_mysupport">
+				#foreach($item in $historyList)
+				<li class="line_bottom item_mysupport">
+					<div class="box_support">
+						<span class="txt_date">$CheckDate.makeReleaseDate("$!{item.fundDateTime}")</span>
+						<a href="/urlgateway?serviceType=SYM&sym_seq=$!{item.symFund.symSeq}" onclick="daum.Music.Sym.goSupportedArtist('$!{item.symFund.symSeq}');return false;"/>
+							#if($StringUtils.equals("$!{symInfo.curStatus}", "E"))
+							<em class="txt_support"><span class="txt_bandname">$!{symInfo.title}</span> <span class="txt_num">#toCurrency($!{item.fundPrice})</span>원 후원에 참여하셨습니다.</em>
+							#else
+							<em class="txt_support"><span class="txt_bandname">$!{item.symFund.artist.name}</span> <span class="txt_num">#toCurrency($!{item.fundPrice})</span>원 후원에 참여하셨습니다.</em>
+							#end
+						</a>
+					</div>
+				</li>
+				#end
+			</ul>
+			#else
+			<div class="line_bottom wrap_mysupport">
+				<div class="inner">
+					<em class="txt_nosupport">참여한 내역이 없습니다.</em>
+					<span class="txt_support">아티스트 후원에 참여해보세요! 아티스트의 자립을 지원하고,<br/> 후원 금액에 따른 다양한 보상을 받으실 수 있습니다.</span> 
+				</div>
+			</div>
+			#end
+			<div class="btnArea">
+				<a class="btn_pop btn_confirm" onclick="window.close();return false;" href="javascript:;">확인</a>
+			</div>
+		</div>
+	</div>
+	<!-- //popContent -->
+</div>
+<!-- //popWrap -->
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+	
+{
+    "totalCnt" : "$!{totalCount}",    
+	"hist_page_no" : "$!{command.hist_page_no}",
+	"historyList" : 
+	[
+		#foreach($item in $$historyList)
+			#if($foreach.index > 0),#end
+			{
+   				"onOff" : "$!{item.onOff}",
+   				"userName" : "$!{item.daumName}",
+				"artisId" : "$!{item.symFund.artist.artistId}",
+				"fundId" : "$!{item.fundId}",
+				"artistName" : "$!{item.symFund.artist.name}",
+   				"fundPrice" : "#toCurrency($!{item.fundPrice})",
+				"symSeq" : "$!{item.symFund.symSeq}",
+   				"message" : "$!{item.supportMessage.replaceAll('\\', '\\\\')}",
+   				"fundDate" : "$CheckDate.makeReleaseDate("$!{item.fundDateTime}")"
+			}
+		#end
+	]
+}
+
+#end

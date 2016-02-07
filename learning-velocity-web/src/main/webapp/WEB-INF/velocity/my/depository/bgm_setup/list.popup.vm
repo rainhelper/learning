@@ -1,0 +1,139 @@
+<div id="wBgmAttach">
+##if( $command.form || $StringUtils.equals("$!{command.service}","telzone")) ## 메일에서 접근했을 때에는 검색으로 넣기 탭 사용안함. form 파라미터를 메일에서 쓰고 있어서 이걸로 구분함.
+	<div class="tit">
+		<h3 class="fl">배경음악 넣기</h3>
+		<span class="fr helpEditor"><img src="http://i1.daumcdn.net/img-contents/music/2009_home/musicshop/img_editor_title.gif"> <a href="javascript:;" onclick="window.open('http://editor.daum.net/help/blog.html', 'daumeditorhelp', 'width=749,height=501,resizable=no,scrollbars=no');return false;" title="Daum Editor?"><img src="http://i1.daumcdn.net/img-contents/music/2009_home/musicshop/bt_edit_help.gif"></a></span>
+	</div>
+	#set( $attachType = "BGM" )
+##else
+#*	<div class="tit">
+		#set($isSearchTab = false)
+		<ul id="tabAttach" class="fl tabBase">
+		#if( $command.form ) #set ( $param = "&form=" + $command.form ) #else #set ( $param = "" ) #end		
+		<li><a class="tab1" href="/my/depository/bgm_setup/list.popup?service=$!{command.service}$!{param}&type=bgm" title="내 배경음악 넣기">내 배경음악 넣기</a></li>
+		#if( !$command.form && !$StringUtils.equals("$!{command.service}","telzone") )
+			#set($isSearchTab = true)
+		<li>
+			<a class="tab2" href="/my/depository/bgm_setup/list.popup?service=$!{command.service}$!{param}&type=search" title="검색으로 넣기">검색으로 넣기</a>
+			##<span class="IamNew"></span>
+		</li>
+		#end
+		</ul>
+		#if(($!{ownTotalCount} > 0 && !$StringUtils.equals("$!{command.type}","search")) || $StringUtils.equals("$!{command.type}","bgm") || $isSearchTab == false) 
+			#set( $tab = 0 )
+			#set( $attachType = "BGM" )
+		#else 
+			#set( $tab = 1 ) 
+			#set( $attachType = "SEARCH" )
+		#end
+		<script type="text/javascript"> 
+			TabStatic("tabAttach", {index:$!{tab}});
+		</script>
+		<span class="fr helpEditor"><img src="http://i1.daumcdn.net/img-contents/music/2009_home/musicshop/img_editor_title.gif"> <a href="javascript:;" onclick="window.open('http://editor.daum.net/help/blog.html', 'daumeditorhelp', 'width=749,height=501,resizable=no,scrollbars=no');return false;" title="Daum Editor?"><img src="http://i1.daumcdn.net/img-contents/music/2009_home/musicshop/bt_edit_help.gif"></a></span>
+	</div>
+*#
+##end
+	<div class="con clearfix">
+		<div class="noti">
+		#if( $StringUtils.equals("$!{attachType}","BGM") ) 
+			<p class="b">게시글에 넣을 배경음악 1곡을 클릭 후 등록해 주세요.</p>
+			<span class="msg">#if($StringUtils.equals("$!{command.service}","cafe"))카페/게시판 배경음악은 <em class="blue_d1">최대 30일</em>간 재생됩니다.#elseif($StringUtils.equals("$!{command.service}","blog"))2011.12.20 이후 구매하신 배경음악은 개별 게시글에 넣을 수 없습니다.#else &nbsp;#end</span>
+		#else
+			<p class="b">게시글에 넣을 앨범이나 곡을 검색 후 넣어 주세요.</p>
+			<span class="msg">모든 음악을 구매 없이 넣을 수 있습니다.</span>
+		#end
+		</div>
+		<div class="fl leftArea">
+			<div class="sch">
+##				<select id="schType" class="fl">
+##				#if( $StringUtils.equals("$!{attachType}","BGM") )
+##					<option value="BGM">보유곡만</option>
+##					<option value="">전체곡</option>
+##				#else
+##					<option value="ALBUM">앨범</option>
+##					<option value="SONG">곡</option>
+##				#end
+##				</select>
+				<input type="text" class="inp fl" value="" id="songKeyword" onKeypress="if(event.keyCode==13){BGMList.goSearch();}">
+				<input type="button" class="fl typeBtn btnSearchBgm" value="검색" onclick="BGMList.goSearch();">
+			</div>
+			
+			<div class="srt clearfix" id="sortBox"></div>
+			#if( $StringUtils.equals("$!{attachType}","BGM") ) 
+			<div id="listBox" class="lstBox"><!-- bgm list --></div>
+			#else
+			<ul id="listBox" class="packBox"><!-- album/song list --></ul>
+			#end
+			<div id="pageBox" class="cPaging"><!-- page --></div>
+			<div class="putMore" id="putBox"></div>
+			
+			
+			<div id="flashContainer"></div>
+			<script type="text/javascript">
+				var BGMList = new daum.Music.BGMAttach({"formSubmitUrl":"$!{command.form}","attachType":"$!{attachType}","service":"$!{command.service}","userId":"$!{user.userId}"});
+				//daumMusic.JsPlayer.embedSWF( "flashContainer" );
+			</script>
+			
+		</div>
+		<!-- 
+		<div class="fr rightArea">
+			<div id="wNewestSong">
+				<div class="titCon">
+					<h4 class="">최신 인기 뮤직</h3>
+					<a href="http://music.daum.net/ranking/total.do" target="_blank" class="more" title="최신 인기 뮤직 더보기">더보기</a>
+				</div>
+				<ol class="lst">
+				#foreach($daumRanking in $dto.daumRankingList)
+					#if($velocityCount<10)
+					<li class="icoNum num$!{daumRanking.rank}"><a href="http://music.daum.net/song/song.do?songId=$!{daumRanking.songId}" target="_blank" title="#escTitle($!{daumRanking.title})">#strCut($!{daumRanking.title}, 28)</a></li>
+					#end
+				#end
+				</ol>
+			</div>
+			<div id="wNotice">
+				<div class="titCon">
+					<h4 class="">공지사항</h3>
+					<a href="http://bbs.music.daum.net/gaia/do/music/notice/list?bbsId=Notice" target="_blank" class="more" title="공지사항 더보기">더보기</a>
+				</div>
+				<ul class="lst">
+				#foreach($notice in $dto.noticeList)
+					#if($velocityCount<4)
+					<li><a href="$!{notice.url}" target="_blank" title="#escTitle($!{notice.subject})">#strCut($!{notice.subject},28)</a></li>
+					#end
+				#end
+				</ul>
+			</div>
+		</div>
+		-->
+	</div>
+	<div class="btn clearfix">
+		<input type="button" class="fl typeBtn btnReg" value="등록하기" onclick="BGMList.goAction();">
+		<input type="button" class="fl typeBtn btnCan" value="취소" onclick="window.close();">
+	</div>
+</div>
+<script type="text/javascript">
+domReady( function(){
+    daumMusic.JsPlayer.embedSWF( "flashContainer", null, daum.Music.BitPlayer.stop );
+	document.title = "음악 첨부- Daum 뮤직 :: 언제 어디서나 Music on Daum"; 
+}); 
+</script>
+		
+		
+#if( $StringUtils.equals("$!{command.debugmode}", "2"))
+보유곡수: $ownTotalCount <br>
+
+
+
+<div id="FTMessage" class="hide">
+
+-----------------------------------------
+FT 체크 (화이링)
+-----------------------------------------
+<br/>- 가운데에 들어가는 보유배경음악 주소는, music.daum.net/my/depository/bgm_status/list.json 입니다. 
+-----------------------------------------
+개발 체크 (화이링)
+-----------------------------------------
+</div>
+#end
+	 
+ 

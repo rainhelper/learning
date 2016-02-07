@@ -1,0 +1,11 @@
+#uaCheck()
+<meta charset="utf-8">
+<title>Daum 뮤직</title>
+<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width#if($ua_result.os.android || $ua_result.browser.name == "dolfin"), target-densityDpi=medium-dpi#end" />
+#if( $StringUtils.isEmpty("#getter('VERSION', '')"))
+	#set( $STATIC_PATH = "/" )
+#else	
+	#set( $STATIC_PATH = "#getter('VERSION', '')/" )
+#end
+<link href="$!{STATIC_PATH}css/m/h.css" type="text/css" rel="stylesheet" />
+<link type="text/css" rel="stylesheet" href="$!{STATIC_PATH}css/m/appModal_h.css" />

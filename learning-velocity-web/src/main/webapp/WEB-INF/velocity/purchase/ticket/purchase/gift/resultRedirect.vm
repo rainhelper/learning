@@ -1,0 +1,4 @@
+<script type="text/javascript">
+	opener.parent.location.href = '/purchase/ticket/gift/bi/resultTicket?rtnParam=$!{rtnParam}&receiver=$!{receiverList}';
+	window.close();
+</script>

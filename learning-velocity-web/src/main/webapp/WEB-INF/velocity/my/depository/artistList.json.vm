@@ -1,0 +1,12 @@
+{
+"list" :[
+	#foreach($item in $myArtistList)
+		#if($foreach.index > 0),#end
+		{
+			"artistId" : "$!{item.artist.artistId}",
+			"artistName" : "$!{item.artist.name}",
+			"ownCount" : "$!{item.ownCount}"
+		}
+	#end
+	]
+}

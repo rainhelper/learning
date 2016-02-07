@@ -1,0 +1,21 @@
+#if( $StringUtils.contains( "#getter('PATH_URI', '')", "talk/detail"))
+    <meta property="og:title" content="$!{talkDetailContent.title} $!{talkDetailContent.subTitle}">
+    <meta property="og:description" content="$!{talkDetailContent.menuName} | #if($StringUtils.isNotBlank("$!{talkDetailContent.writer.nickName}"))$!{talkDetailContent.writer.nickName} | #end$!{CheckDate.makeReleaseDate($!{talkDetailContent.regdttm})}">
+    <meta property="og:site_name" content="talk:music">
+    #if($StringUtils.isNotBlank( "$!{talkDetailContent.imageUrl}" ))
+    <meta property="og:image" content="#if($!{talkDetailContent.cropYn} == "Y")$!{ImageUtil.getFaceDetectImageUrl("$!{talkDetailContent.imageUrl}", "C1200x630")}#else$!{ImageUtil.getMobileImageUrl("$!{talkDetailContent.imageUrl}", "1200x0", "PHOTO", "R")}#end">
+    #else
+    <meta property="og:image" content="http://contents.kakao.com/music/images/music_icon.png">
+    #end
+#elseif( $StringUtils.contains( "#getter('PATH_URI', '')", "talk/quiz/"))
+    <meta property="og:title" content="$!{talkDetailContent.title} $!{talkDetailContent.subTitle}">
+    <meta property="og:description" content="$!{talkDetailContent.menuName} | $!{talkDetailContent.title} | 기간 : $!{CheckDate.makeReleaseDate($!{quizInfo.quizStartDate})} ~ $!{CheckDate.makeReleaseDate($!{quizInfo.quizEndDate})}">
+    <meta property="og:site_name" content="talk:music">
+    #if($StringUtils.isNotBlank( "$!{talkDetailContent.imageUrl}" ))
+    <meta property="og:image" content="$!{ImageUtil.getFaceDetectImageUrl("$!{talkDetailContent.imageUrl}", "C1200x630")}">
+    #else
+    <meta property="og:image" content="http://contents.kakao.com/music/images/music_icon.png">
+    #end
+#else
+    <meta name="keywords" content="talk:music">
+#end

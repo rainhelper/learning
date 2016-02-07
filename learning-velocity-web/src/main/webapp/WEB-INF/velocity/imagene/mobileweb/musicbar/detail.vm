@@ -1,0 +1,689 @@
+#uaCheck()
+<div id="daumContent" class="cont_bar">
+	<h2 class="screen_out">뮤직 BAR 상세정보</h2>
+	<div class="section_barcont">
+		<div class="cont_navi">
+			<h3 class="tit">뮤직 Bar 스페셜</h3>
+#btnPrev()
+		</div>
+		<div class="wrap_head">
+			<span class="txt_info">#if("$!boardInfo.subTitle"!="")<em class="fc_blue">$!boardInfo.subTitle</em><span class="txt_bar">|</span>#end$CheckDate.makeReleaseDate($!{boardInfo.regdttm})#if("$!boardInfo.writer.companyName"!="")<span class="txt_bar">|</span>$!boardInfo.writer.companyName#end#if("$!boardInfo.writer.name"!="")<span class="txt_bar">|</span>$!boardInfo.writer.name#end</span>
+			<h4 class="tit">$!boardInfo.title</h4>
+		</div>
+#set($song_list="on")
+#set($songIdArr = [])
+#foreach ($board in $boardContents.boardTempleteList)
+	#if($StringUtils.equals("$board.templeteName", "BA")) ##텍스트 기본 <br> 제외 태그 삭제
+		#printMobileMusicBarTemplateBA($board)
+		#set($song_list="off")
+	#elseif($board.templeteName == "PO") ##폴
+		#printMobileMusicBarTemplatePO($board , $boardInfo)
+		#set($song_list="off")
+	#elseif($StringUtils.equals("$board.templeteName", "TB")) ##상단 타이틀 기본 X
+		#printMobileMusicBarTemplateTB($board)
+		#set($song_list="off")
+	#elseif($StringUtils.equals("$board.templeteName" , "AI")) ##통이미지
+		#printMobileMusicBarTemplateAI($board)
+		#set($song_list="off")
+	#elseif($StringUtils.equals("$board.templeteName", "IT")) ##이미지 + 텍스트 --이미지 삭제 + <br> 제외 태그 삭제
+		#printMobileMusicBarTemplateIT($board)
+		#set($song_list="off")
+	#elseif($StringUtils.equals("$board.templeteName" , "VC")) ##동영상
+		#printMobileMusicBarTemplateVC($board)
+	#elseif($StringUtils.equals("$board.templeteName" , "VL")) ##동영상뷰어리스트
+		#printMobileMusicBarTemplateVL($board)
+	#elseif($StringUtils.equals("$board.templeteName" , "SL")) ##곡리스트
+		#printMobileMusicBarTemplateSL($board)
+		#set($song_list="on")
+	#elseif($StringUtils.equals("$board.templeteName" , "AL")) ##앨범형
+		#printMobileMusicBarTemplateAL($board)
+		#set($song_list="off")
+	#elseif($StringUtils.equals("$board.templeteName" , "LP")) ##생중계플레이어
+		#printMobileMusicBarTemplateLP($board)
+		#set($song_list="off")	
+	#elseif($StringUtils.equals("$board.templeteName" , "RT")) ##관련정보탭형
+	#elseif($StringUtils.equals("$board.templeteName" , "WI")) ##작성자 정보
+	#elseif($StringUtils.equals("$board.templeteName" , "PV")) ##포토뷰어
+		#printMobileMusicBarTemplatePV($board)
+		#set($song_list="off")
+	#end
+	
+	#set($boardTitle="")
+	
+	#if($foreach.first)
+		##$ua_result.isAndroid ||
+    	#if($ua_result.os.ios)
+    	<div class="cont_wholelist" id="wrapListenByApp">
+            #if($MathTool.toNumber($ua_result.browser.major) > 3)
+			<a id="listenByApp" href="javascript:;" class="round btn_wholelist">
+            #else
+    		<a onclick="alert('사용하시는 IOS 버전에서는 지원하지 않는 기능입니다. IOS를 최신버전으로 업그레이드 해 주세요');" href="javascript:;" class="round btn_wholelist">
+			#end
+    			<span class="inner">
+    				<span class="ico_music ico_wholelist"></span>
+    				<span class="txt">소개된 곡 앱에서 전체듣기</span>
+    			</span>
+    		</a>
+    	</div>
+		#elseif(($ua_result.os.android && $StringUtils.equals("$!{command.for_android_app}", "Y")))
+		<div class="cont_wholelist" id="wrapListenByApp">
+			<a id="listenByApp" href="javascript:;" class="round btn_wholelist">
+    			<span class="inner">
+    				<span class="ico_music ico_wholelist"></span>
+    				<span class="txt">소개된 곡 앱에서 전체듣기</span>
+    			</span>
+    		</a>
+    	</div>
+        #end
+	#end
+#end
+<script type="text/javascript">
+#if($CollectionUtils.isNotEmpty($!{songIdArr}))
+daum.Event.addEvent( window, "load", function(){
+	var el = daum.$("listenByApp");
+	if(el) {
+		daum.Event.addEvent(el, "click", function() {
+			music.mobile.mMusicPlay.playOnApp('SO', '$StringUtils.join($songIdArr, "/")', '$!{albumIdForApp}');
+		});
+	}
+});
+#else
+daum.Element.hide("wrapListenByApp");
+#end
+<!--
+/**
+ * sns 공유하기
+ * @param {String} 포스팅시 링크에 적용될 문장
+ */
+doc = document;
+doc.loc = music.mobile.replaceURL();
+var sourceId = 2;
+var prefix ="$!boardInfo.title.replaceAll("\'","\\'")"
+var url = doc.loc;
+
+var shareSNS = {
+	"prefix" : prefix,
+	"link" : url,
+	"sourceId" : sourceId
+}
+
+/* 2013-2-14 웹투앱 2차로 인해 막음
+shareSNS = function( prefix, serviceName ){
+	var sourceId = 2; // yozm sourceid
+	var urlPre = 'http://m.profile.daum.net/api/popup/Share.daum?source_id=';
+	if(serviceName === "mypeople") {
+		urlPre = "https://m.mypeople.daum.net/mypeople/mweb/share.do?source_id="; 
+	}
+	var prefix ='$!boardInfo.title.replaceAll("\'","\\'")';
+	var link = doc.loc;
+	var url = urlPre + sourceId + '&link='+ encodeURIComponent( link ) + '&prefix=' + encodeURIComponent( prefix ) + '&service_name=' + encodeURIComponent( serviceName );
+	window.location.href = url;
+	return false;
+};
+*/
+//-->
+</script>
+		<div class="wrap_consumer">
+			<a href="javascript:;" onclick="music.mobile.recommendByToken.call('$!{boardInfo.boardId}','board', '${securitytoken}')" class="btn_like bround" title="추천하기">
+				<span class="ico_music ico_like">추천</span><em class="fc_blue" id="recommend_$!{boardInfo.boardId}">$!boardInfo.recommendCount</em>
+			</a>
+#snsLayer()
+			<div class="cl_b"></div>
+			<div id="socialShareMoreViewContainer">
+		</div>
+#if($relatedBoardList.size() > 0)
+		<div class="wrap_relation">
+			<strong class="tit">관련글</strong>
+			<ul class="list_relation">
+#foreach($rboard in $relatedBoardList) ##관련글
+#if($foreach.count < 5)
+				 <li><span class="ico_music"></span><a href="/musicbar/detail?board_id=$!{rboard.boardId}">$rboard.title</a></li>
+#end
+#end
+			</ul>
+		</div>
+#end
+		<div class="wrap_btn">
+			<div class="wrap_round">
+				<ul class="inner">
+#if($otherBoardList.size() > 2)
+	#set($prevLink = "/musicbar/detail?board_id=$!otherBoardList.get(2).boardId")
+	#set($nextLink = "/musicbar/detail?board_id=$!otherBoardList.get(0).boardId")
+#elseif($otherBoardList.size() == 2)
+	#set($prevLink = "/musicbar/detail?board_id=$!otherBoardList.get(1).boardId")
+	#set($nextLink = "")
+#else
+	#set($prevLink = "")
+	#set($nextLink = "")
+#end
+					<li>
+						#if($StringUtils.isNotBlank("$!{prevLink}"))
+						<a href="$prevLink" class="btn_page btn_prev"><span class="ico_music ico_prev"></span>이전글</a>
+						#else
+						<a class="btn_page btn_prev off"><span class="ico_music ico_noprev"></span>이전글	</a>
+						#end
+					</li>
+					<li>
+						#if($StringUtils.isNotBlank("$!{nextLink}"))
+						<a href="$nextLink" class="btn_page btn_next">다음글<span class="ico_music ico_next"></span></a>
+						#else
+						<a class="btn_page btn_next off">다음글<span class="ico_music ico_nonext"></span>	</a>
+						#end
+					</li>
+					<li>#if("$!boardInfo.boardType" == "SYM")
+						<a href="/musicbar/list?menu_id=$!boardInfo.menuId&board_type=SYM" class="btn_page btn_list_view">목록보기</a>
+						#else
+						<a href="/musicbar/list?menu_id=$!boardInfo.menuId" class="btn_page btn_list_view">목록보기</a>
+						#end
+					</li>
+				</ul>
+			</div>
+		</div>
+#if($event && ($StringUtils.equals("$!{event.musicEventType}","1") || $StringUtils.equals("$!{event.musicEventType}","2") || $StringUtils.equals("$!{event.musicEventType}","3") || $StringUtils.equals("$!{event.musicEventType}","5") || $StringUtils.equals("$!{event.musicEventType}",""))) ## && "$event.musicEventType"=="1"
+#set($boardArticleId = $boardInfo.articleId)
+##set($boardArticleId = "3")
+
+<script type="text/javascript" src="http://event.daum.net/javascripts/daumEvent.js"></script>
+##http://music.daum.net/mobileweb/event/main?event_id=3700
+##http://m.music.daum.net/event/main?event_id=3700
+	<div class="section_event">
+		#if($!CheckDate.getCurrentDate().compareTo($event.endDate) < 1)		
+		<h4 class="screen_out">이벤트</h4>
+		<div class="wrap_notice">
+			
+			#if($StringUtils.equals("$!{event.musicEventType}","2"))##구매자대상
+			<span class="ico_event_buypeople">MP3/BGM 구매하신분들께 드립니다.</span>
+			<strong class="tit_event">$!{event.eventTitle}</strong>
+			#elseif($StringUtils.equals("$!{autoPaymentYn}","Y"))##자동결제자대상
+			<span class="ico_event_autopayment">자동결제 이용자분들께 드립니다.</span>
+    		<strong class="tit_event">$!{event.eventTitle}</strong>
+			#else
+			<strong class="tit_event"><span class="ico_event"><span class="inner">EVENT</span></span>$!{event.eventTitle}</strong>
+			#end
+			
+			
+			
+			<dl class="info_data">
+				<dt class="tit_base">기간</dt>
+				<dd class="desc">$!{CheckDate.makeReleaseDate($!event.startDate)} ~ $!{CheckDate.makeReleaseDate($!event.endDate)}</dd>
+			</dl>
+			<dl class="info_data">
+				<dt class="tit_base">발표</dt>
+				<dd class="desc">$!{CheckDate.makeReleaseDate($!event.winningDate)}</dd>
+			</dl>
+			<dl class="info_data">
+				<dt class="tit_base">경품</dt>
+				<dd class="desc">
+				#foreach($present in $event.presentList)
+				##if($foreach.index > 0)<span class="txt_bar"> | </span>#end
+					#set( $printName = "$!{present.title}" + " $!{present.quantity}"+"명")
+					#strCut("$!{printName}", 36)<br/>
+				#end
+				</dd>
+			</dl>
+			<dl class="info_data event_guide">
+				#if($StringUtils.equals("$!{event.musicEventType}","2"))##구매자대상 
+				<dt class="tit_base">구매자 대상 이벤트 안내</dt>
+				<dd class="desc moreinfo">MP3, BGM 구매자 중에서 추첨하는 이벤트입니다.<br/>PC에서 MP3, BGM 구매 후 응모해주세요!<br/>(댓글 응모 불가)</dd>	
+				#elseif($StringUtils.equals("$!{autoPaymentYn}","Y"))##자동결제자대상
+        		<dt class="tit_base">자동결제자 대상 이벤트 안내</dt>
+				<dd class="desc moreinfo">자동결제 이용자 중에서 추첨하는 이벤트입니다.<br/>PC에서 이용권을 구매해주세요</dd>
+        		#end
+				<dt class="tit_base">이벤트 당첨 안내</dt>
+				<dd class="desc">당첨자 발표는 PC웹 Daum뮤직에서 확인해주세요. 공연 티켓경품은 배송되지 않고 현장에서 본인 확인 후 입장 가능하며 양도는 불가능합니다.</dd>
+			</dl>
+		</div>
+		#end
+		#if($StringUtils.equals("$!{event.musicEventType}","2"))##구매대상 이벤트 이고
+		<div class="cmt_comm">
+            <iframe src="about:blank" name="commentFrame" id="commentFrame" width="1" height="500" marginwidth="0" marginheight="0" frameborder="0" scrolling="no" title="commentFrame"></iframe>
+           </div>
+        <script type="text/javascript">//<![CDATA[
+        	daum.Event.addEvent( window, "load", function(){
+				var commentFrame = $("commentFrame");
+				commentFrame.width = "100%";
+				commentFrame.src="#getter('GAIA_MOBILE_DOMAIN', '')/gaia/do/mobile/comment/commentList?bbsId=$!{boardInfo.bbsId}&articleId=$!{boardInfo.articleId}";
+			});
+        //]]></script>
+		
+        #elseif($boardInfo && $StringUtils.equals("$!{event.musicEventType}","1"))
+            <input type="hidden" id="gaia_eventId" value="$event.eventId" />
+            <input type="hidden" id="gaia_eventKey" value="$event.eventKey" />
+            <input type="hidden" id="gaia_comment" name="gaia_comment" value="" />
+            #if($!CheckDate.getCurrentDate().compareTo($event.endDate) < 1)
+            		<input type="hidden" id="gaia_isUseEvent" value="" />
+			#end
+    		<div class="cmt_comm">
+                <iframe src="about:blank" name="commentFrame" id="commentFrame" width="1" height="500" marginwidth="0" marginheight="0" frameborder="0" scrolling="no" title="commentFrame"></iframe>
+               </div>
+            <script type="text/javascript">//<![CDATA[
+            	daum.Event.addEvent( window, "load", function(){
+    				var commentFrame = $("commentFrame");
+    				commentFrame.width = "100%";
+    				commentFrame.src="#getter('GAIA_MOBILE_DOMAIN', '')/gaia/do/mobile/comment/commentList?bbsId=$!{boardInfo.bbsId}&articleId=$!{boardArticleId}";
+    			});
+            //]]></script>			
+		#else
+		<div class="cmt_comm">
+			<div class="wrap_head">
+				#if($StringUtils.equals("$!{event.musicEventType}","3"))
+				<div class="wrap_tit">
+				   <strong class="tit fc_blue"><label for="id_eventcmt">문항 선택 후, 댓글을 달아주세요</label></strong>
+				</div>
+				<fieldset>
+					<legend class="event_type"><span class="fc_blue">▪</span>선택</legend>
+                    <div class="write_selectline">
+						<select name="poll" id="poll$!{foreach.index}">
+							<option value="" selected="">선택하세요.</option>
+							#foreach($poll in $event.musicPollItems)
+                    		#set( $pollName = "#strCut($!{poll}, 100)" )
+							<option value="$!{poll}">$!{pollName}</option>
+                    		#end
+                        </select>
+                    </div>
+                    <legend class="event_type"><span class="fc_blue">▪</span>댓글 <span class="fc_blue">(총 $commentTotalCount 개)</span></legend>
+                    <div class="write_cmtline">
+                        <input type="text"  name="comment" id="comment" class="inp_cmtline" value="" placeholder="댓글을 작성해주세요." onclick="music.mobile.login();" spellcheck="false">
+                        <a href="#" onclick="checkLogIn('poll');return false;" class="bround btn_submit">등록</a>
+                    </div>
+                </fieldset>
+				#elseif($StringUtils.equals("$!{event.musicEventType}","5"))
+				<div class="wrap_tit">
+				   <strong class="tit fc_blue"><label for="id_eventcmt">문항 선택 후, 댓글을 달아주세요</label></strong>
+				</div>
+				<fieldset>
+					<legend class="event_type"><span class="fc_blue">▪</span>선택</legend>
+                    <div class="write_selectline">
+						<select name="present" id="present$!{foreach.index}">
+							<option value="" selected="">선택하세요.</option>
+							#foreach($present in $!{event.presentList})
+                    		#set( $present_title = "#strCut($!{present.title}, 100)" )
+                    		<option value="present:$!{present.id}">$!{present_title}</option>
+                    		#end
+                        </select>
+                    </div>
+                    <legend class="event_type"><span class="fc_blue">▪</span>댓글 <span class="fc_blue">(총 $commentTotalCount 개)</span></legend>
+                    <div class="write_cmtline">
+                        <input type="text"  name="comment" id="comment" class="inp_cmtline" value="" placeholder="댓글을 작성해주세요." onclick="music.mobile.login();" spellcheck="false">
+                        <a href="#" onclick="checkLogIn('present');return false;" class="bround btn_submit">등록</a>
+                    </div>
+                </fieldset>	
+				#else
+				<div class="wrap_tit">
+				   <strong class="tit fc_blue"><label for="id_eventcmt">이벤트 참여 댓글 (총 $commentTotalCount 개)</label></strong>
+				</div>
+				<fieldset>
+                    <legend class="screen_hide">이벤트 참여 댓글 작성</legend>
+                    <div class="write_cmtline">
+                        <input type="text"  name="comment" id="comment" class="inp_cmtline" value="" placeholder="댓글을 작성해주세요." onclick="music.mobile.login();" spellcheck="false">
+                        <a href="#" onclick="checkLogIn();return false;" class="bround btn_submit">등록</a>
+                    </div>
+                </fieldset>
+				#end
+				<script type="text/javascript">
+    				function checkLogIn(type){
+    					if(music.mobile.login()){
+							if(type === "poll") {
+								sendMobileApplication('$event.eventId', $event.eventKey,'','/event/detail?event_id=$event.eventId','항목을 선택하시고 내용을 입력해주세요.', 'comment', 'poll');
+							} else if(type === "present") {
+								sendMobileApplication('$event.eventId', $event.eventKey,'','/event/detail?event_id=$event.eventId','경품을 선택해주시고 내용을 입력해주세요.', 'comment', ' ', 'present');
+							} else {
+    							sendMobileApplication('$event.eventId', $event.eventKey,'','/event/detail?event_id=$event.eventId','내용을 넣어주세요.', 'comment');
+							}
+						}
+    				}
+					if(daum.$("commentContent")) {
+						daum.$("commentContent").value = "";
+					}
+				</script>
+			</div>
+			<form id="" name="" method="post">
+				<fieldset>
+					<legend class="screen_hide">댓글리스트</legend>
+					<ul class="list_cmt">
+#foreach ($comment in $commentList)
+						<li>
+							<div class="content">
+							#if($StringUtils.equals("$!{event.musicEventType}","3"))
+								#if($StringUtils.isNotBlank("$!{comment.poll}"))
+								<div class="select_poll fc_blue">$!{comment.poll}</div>
+								#end
+                        	#elseif($StringUtils.equals("$!{event.musicEventType}","5"))
+								<div class="select_poll fc_blue">$!event.presentMap.get($comment.presentId)</div>
+							#end
+							$comment.comment
+							</div>
+							<div class="info">
+								$comment.daumName
+								<span class="txt_bar"> | </span>
+								<span class="ff_hel">$CheckDate.dateFormat("yy.MM.dd", "HH:mm", "yyyy-MM-dd HH:mm", "$!{comment.regDate}")</span>
+							</div>
+						</li>
+#end
+					</ul>
+				</fieldset>
+			</form>
+			#mobilePaging($pagingUrl, $command.page_no, $pageHandler)
+#*
+			<div class="box_more">
+				<a href="/event/eventInfo?event_id=$!{event.eventId}" id="" class="btn_more">
+					<span class="txt_more">댓글 더보기</span>
+					<span class="count"></span>
+					<span class="ico_music ico_more"></span>
+				</a>
+				<a href="#" class="btn_top">
+					<span class="ico_music ico_top"></span>
+					맨위로
+				</a>
+			</div>
+*#
+		</div>
+		#end
+	</div>
+#else
+			<div class="cmt_comm">
+        		<iframe src="about:blank" name="commentFrame" id="commentFrame" width="1" height="500" marginwidth="0" marginheight="0" frameborder="0" scrolling="no" title="commentFrame"></iframe>
+        	</div>
+<script type="text/javascript">//<![CDATA[
+	daum.Event.addEvent( window, "load", function(){
+		var commentFrame = $("commentFrame");
+		commentFrame.width = "100%";
+		commentFrame.src="#getter('GAIA_MOBILE_DOMAIN', '')/gaia/do/mobile/comment/commentList?bbsId=$!{boardInfo.bbsId}&articleId=$!{boardInfo.articleId}";
+	});
+//]]></script>
+			
+#end
+	</div>
+#SearchForm("only_bottom")
+</div>
+
+<script type="text/javascript">//<![CDATA[
+	daum.Event.addEvent( window, "load", function(){
+		new daum.Ajax().request('/pageview/pageView.json', {paramString:'objId=$!{boardInfo.boardId}&objType=RV', onsuccess:function(r){}.bind(this)});
+	});
+//]]></script>
+
+#parse("/velocity/mobileweb/realtimeissue.vm")
+
+
+#*
+전체 곡리스트 : $boardContents.totalSongIdList
+<hr/>
+
+게시글 제목 : $boardInfo.title <br/>
+게시글 댓글아이디 : $boardInfo.bbsId <br/><br/>
+카테고리 메뉴이미지 : $boardInfo.menuImage <br/><br/>
+<hr/>
+
+##템플릿 리스트
+#foreach ($board in $boardContents.boardTempleteList)
+	#if($board.templeteName == "BA") ##텍스트 기본
+	<b>BA</b> <br/>
+		상단 공백여부 : $board.spaceYn</br>
+		순서: $board.templeteOrder</br>
+		제목: $board.title</br>
+		내용: $board.contents</br></br>
+	#elseif($board.templeteName == "TB") ##상단 타이틀 기본 X
+	<b>TB</b> <br/>
+		상단 공백여부 : $board.spaceYn</br>
+		순서: $board.templeteOrder</br>
+		소제목: $board.subTitle</br>
+		제목: $board.title</br>
+		이미지주소: $board.imageUrl</br></br>
+	#elseif($board.templeteName == "AI") ##통이미지
+	<b>AI</b> <br/>
+		상단 공백여부 : $board.spaceYn</br>
+		순서: $board.templeteOrder</br>
+		제목: $board.title</br>
+		링크: $board.linkUrl</br>
+		이미지주소: $board.imageUrl</br></br>
+	#elseif($board.templeteName == "IT") ##이미지 + 텍스트
+	<b>IT</b> <br/>
+		상단 공백여부 : $board.spaceYn</br>
+		순서: $board.templeteOrder</br>
+		제목: $board.title</br>
+		내용: $board.contents</br>
+		링크: $board.linkUrl</br>
+		이미지위치: $board.imagePosition</br>
+		이미지주소: $board.imageUrl</br></br>
+	#elseif($board.templeteName == "VC") ##동영상
+	<b>VC</b> <br/>
+		상단 공백여부 : $board.spaceYn</br>
+		순서: $board.templeteOrder</br>
+		제목: $board.title</br>
+		비디오ID: $board.id</br>
+		티비팟vid(비디오id가 있을경우) : $board.videoInfo.tvpotVId</br>
+		동영상의 1분여부(freeYn이 Y경우는 전곡듣기임) : $board.videoInfo.freeYn</br>
+		비디오주소: $board.vclipUrl</br>
+		내용: $board.htmlContents</br></br>
+	#elseif($board.templeteName == "SL") ##곡리스트
+	<b>SL</b> <br/>
+		상단 공백여부 : $board.spaceYn</br>
+		순서: $board.templeteOrder</br>
+		곡 리스트:<br/>
+		곡 리스트제목:$board.songTitle<br/>
+		#foreach ($song in $board.songList)
+			곡아이디: $song.songId<br/>
+			곡명 : $song.title<br/>
+			앨범아이디 : $song.album.albumId<br/>
+			앨범명 : $song.album.title<br/>
+			#foreach ($artist in $song.keyArtistList)
+				아티스트아이디 : $artist.artistId<br/>
+				아티스트명 : $artist.name<br/>
+			#end
+			가사유무 : $song.lyricsYn<br/>
+			aodLinkId : $song.AODLinkId<br/>
+			bgmLinkId : $song.BGMLinkId<br/>
+			mp3LinkId : $song.MP3LinkId<br/>
+			</br>
+		#end
+		<br/>
+	#elseif($board.templeteName == "AL") ##앨범형
+	<b>AL</b> <br/>
+		상단 공백여부 : $board.spaceYn</br>
+		순서: $board.templeteOrder</br>
+		앨범 리스트:<br/>
+		앨범 리스트제목:$board.albumTitle<br/>
+		#foreach ($album in $board.albumList)
+			앨범아이디 : $album.albumId<br/>
+			앨범명 : $album.title<br/>
+			#foreach ($artist in $album.keyArtistList)
+				아티스트아이디 : $artist.artistId<br/>
+				아티스트명 : $artist.name<br/>
+			#end
+			발매일 : $album.releaseDt<br/>
+			앨범평 : $album.description<br/>
+			듣기가능 : $album.playYn<br/>
+			이미지주소 : $album.mainImage.filePath<br/>
+			대표곡 아이디 : $album.masterSong.songId<br/>
+			대표곡명 : $album.masterSong.title<br/>
+			AODLINKID : $album.masterSong.AODLinkId<br/>
+			<br/>
+		#end
+		<br/>
+	#elseif($board.templeteName == "RT") ##관련정보탭형
+	<b>RT</b> <br/>
+		상단 공백여부 : $board.spaceYn</br>
+		순서: $board.templeteOrder</br>
+		앨범 리스트:<br/>
+		앨범 리스트제목:$board.albumTitle<br/>
+		#foreach ($album in $board.albumList)
+			앨범아이디 : $album.albumId<br/>
+			앨범명 : $album.title<br/>
+			#foreach ($artist in $album.keyArtistList)
+				아티스트아이디 : $artist.artistId<br/>
+				아티스트명 : $artist.name<br/>
+			#end
+			발매일 : $album.releaseDt<br/>
+			앨범평 : $album.description<br/>
+			듣기가능 : $album.playYn<br/>
+			이미지주소 : $album.mainImage.filePath<br/>
+			대표곡 아이디 : $album.masterSong.songId<br/>
+			대표곡명 : $album.masterSong.title<br/>
+			AODLINKID : $album.masterSong.AODLinkId<br/>
+			<br/>
+		#end
+		<br/>
+		아티스트 리스트:<br/>
+		아티스트 리스트제목:$board.artistTitle<br/>
+		#foreach ($artist in $board.artistList)
+			아티스트아이디 : $artist.artistId<br/>
+			아티스트명 : $artist.name<br/>
+			아티스트이미지 : $artist.mainImage.filePath<br/>
+		#end
+		<br/>
+	#elseif($board.templeteName == "WI") ##작성자 정보
+	<b>WI</b> <br/>
+		작성자id : $board.writerInfo.djId <br/>
+		작성자명 : $board.writerInfo.name <br/>
+		작성자이미지 : $board.writerInfo.imageUrl <br/>
+		작성자정보 : $board.writerInfo.info <br/>
+		작성자직업 : $board.writerInfo.job <br/>
+		회사명 : $board.writerInfo.companyName <br/>
+		회사url : $board.writerInfo.companyUrl <br/>
+		회사정보 : $board.writerInfo.companyInfo <br/>
+		<br/>
+	#end
+#end
+<hr/>
+	
+<br/><br/>
+#foreach($rboard in $relatedBoardList) ##관련글
+	연관뮤직바id : $rboard.boardId <br/>
+	연관뮤직바제목 : $rboard.title <br/>
+	<br/>
+#end
+<hr/>
+
+앞뒤게시물 <br/>
+#foreach($board in $otherBoardList)
+	뮤직바아이디 : $board.boardId <br/>
+	글제목 : $board.title <br/>
+	카테고리 : $board.subTitle <br/>
+	추천수 : $board.recommendCount <br/>
+	댓글수 : $board.replyCount <br/>
+	등록일 : $board.regdttm <br/>
+	작성자 : $board.writer.nickName <br/>
+	링크 : http://music.daum.net/musicbar/musicbar/detail?menu_id=$command.menu_id&board_id=$board.boardId <br/><br/>
+#end
+<hr/>
+
+곡댓글 커멘트 전체 수: $boardContents.songCommentCount <br/>
+곡 베스트댓글 <br/>
+#foreach($best in $boardContents.bestCommentList)
+	곡id : $best.songId <br/>
+	곡제목 : $best.title <br/>
+	곡길이 : $best.getTrackLengthMinute() <br/>
+	앨범id : $best.album.albumId <br/>
+	앨범제목 : $best.album.title <br/>
+	commentId : $best.userRequestId <br/>
+	암호화된 userId : $best.getEncodedUserId() <br/>
+	글쓴이 : $best.nickName <br/>
+	글등록일 : $best.regdttm <br/>
+	추천수 : $best.recommendCount <br/>
+	<br/>
+#end
+<hr/>
+
+곡댓글 <br/>
+#foreach($best in $boardContents.songCommentList)
+	곡id : $best.songId <br/>
+	곡제목 : $best.title <br/>
+	곡길이 : $best.getTrackLengthMinute() <br/>
+	앨범id : $best.album.albumId <br/>
+	앨범제목 : $best.album.title <br/>
+	commentId : $best.userRequestId <br/>
+	암호화된 userId : $best.getEncodedUserId() <br/>
+	글쓴이 : $best.nickName <br/>
+	글등록일 : $best.regdttm <br/>
+	추천수 : $best.recommendCount <br/>
+	<br/>
+#end
+<hr/>
+*#
+##이벤트가 있으면 가이아 댓글 대신에 이벤트 정보와 댓글을 보여준다<br/>
+#*
+#if($event)
+	이벤트 정보 <br/>
+	eventId : $event.eventId<br/>
+	eventKey : $event.eventKey<br/>
+	eventTitle : $event.eventTitle // 이벤트제목<br/>
+	startDate : $event.startDate // 이벤트 시작일<br/>
+	endDate : $event.endDate // 이벤트 종료일<br/>
+	winningDate : $event.winningDate // 발표일자<br/>
+	description : $event.description //이벤트 설명인데 현재 경품 내역용으로 입력하고있음<br/><br/>
+	
+	#if($event.musicAlbumId)
+		앨범정보<br/>
+		대표 이미지 : $album.mainImage.filePath<br/>
+		앨범명 : $album.title<br/>
+		아티스트<br/>
+		#foreach($artist in $album.keyArtistList)
+			아티스트명 : $artist.name<br/>
+			아티스트아이디 : $artist.artistId<br/>
+		#end
+		대표곡<br/>
+		#foreach( $song in $album.masterSongList )
+			$!{song.songId} : $!{song.title}<br/>
+		#end
+	#end
+	
+	#if($event.musicEventType == "2")
+		앨범 구매이벤트인경우 곡 목록<br/>
+		#foreach( $song in $songList )
+			$!{song.songId} : $!{song.title}<br/>
+		#end
+	#end
+	<br/>
+	
+	#if($event.musicArtistId)
+		아티스트 정보<br/>
+		대표 이미지 : $artist.mainImage.filePath<br/>
+		$artist.name<br/>
+		$artist.masterSongList<br/>
+		#foreach( $song in $artist.masterSongList )
+			$!{song.songId} : $!{song.title}<br/>
+		#end
+	#end
+	
+	
+	</br>
+	==댓글입력(닫아놓음)==
+	</br>
+	<input type="text" name="comment">
+	##<button onclick="sendApplication('$event.eventId', $event.eventKey,'','http://music.daum.net/event/detail?event_id=$command.eventId','', 'comment'); return false;" >응모하기</button>
+	<button onclick="refresh();" >리로딩</button>
+	</br>
+	<p>&nbsp</p>
+	</br></br>
+	
+	==응모내용==
+	<p>&nbsp</p>
+	</br>
+	#foreach ($comment in $commentList)
+		아이디 : $comment.daumId<br/>
+		이름 : $comment.daumName<br/>
+		댓글 : $comment.comment<br/>
+		<br/>
+	#end
+	
+	#foreach($motTemplete in $motTempleteList)
+		$motTemplete
+		이미지 : $motTemplete.imageUrl <br/>
+		링크 : $motTemplete.linkUrl <br/>
+		<br/><br/>
+	#end
+	
+	## 댓글 page
+	#printPaging($pagingUrl, $command.page_no, $pageHandler)
+#end
+
+<b>사용자 정보</b><br />
+#if($musicUser)
+	daumId : $!{musicUser.daumId} <br />
+	adultYn : $!{musicUser.adultYn} <br />
+#elseif($user)
+	daumId : $!{user.daumId} <br />
+	adultYn : $!{user.adultYn} <br />
+#end
+*#

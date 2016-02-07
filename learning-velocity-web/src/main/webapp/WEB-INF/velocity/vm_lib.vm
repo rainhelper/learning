@@ -1,0 +1,2983 @@
+## escape #################################################################################################
+#macro(escTitle $str)$!Escape.html($str)#end
+#macro(escUrl $str)$!Escape.url($str)#end
+#macro(escScript $str)$!Escape.javascript($str)#end
+#macro(escScriptUrl $str)$!Escape.javascript( $!Escape.url($str) )#end
+#macro(escScriptUrlStrip $str)$!Escape.javascript( $!Escape.url( $!StringCutUtil.removeTag( $str ) ) )#end
+#macro(escScriptStrip $str)$!Escape.javascript( $!StringCutUtil.removeTag( $str ) )#end
+#macro(escTag $str)$!StringCutUtil.removeTag( $str )#end
+
+#macro(getRandomNumber $form $to)$MathTool.random($from, $to)#end
+## 날짜 스트링을 각 포멧에 맞춰서 출력 ####################################################################
+#macro(Str2DateYYYYMMDD $string)
+	CheckDate.makeReleaseDate()로 사용해주세요
+	##$!StringUtils.left($string, 4).$StringUtils.mid($string, 4, 2).$StringUtils.mid($string, 6, 2)
+#end
+#macro(Str2DateForWeek $stringStart $stringEnd )##미리듣기 퀴즈
+쓰는데 있나요
+#*#Str2DateYYYYMMDD( $stringStart )~##
+#if( !$StringUtils.equals( $StringUtils.left($stringStart, 4), $StringUtils.left($stringEnd, 4) ) )$StringUtils.left($stringEnd, 4).#end##
+#if( !$StringUril.equals( $StringUtils.mid($stringStart, 4, 2), $StringUtils.mid($stringEnd, 4, 2) ) )$StringUtils.mid($stringEnd, 4, 2).#end##
+$StringUtils.mid($stringEnd, 6, 2)*#
+#end
+
+#macro(DateFormatYYMMDD $string)#if($StringUtils.isNotEmpty("$!{string}"))$!StringUtils.mid($string, 2,2).$StringUtils.mid($string, 4, 2).$StringUtils.mid($string, 6, 2)#end#end
+#macro(DateFormatYYMMDDForApp $string)#if($StringUtils.isNotEmpty("$!{string}"))$!StringUtils.mid($string, 0,4).$StringUtils.mid($string, 4, 2).$StringUtils.mid($string, 6, 2)#end#end
+
+#macro(stripHTML $val )
+$!Display.stripTags( $!{val} )##
+##$!StringCutUtil.removeTag( $!{val} )##
+##$!val.replaceAll('<(\?|/)?(xml:(.*)/|[a-zA-Z]*[1-6]?)(\s[a-zA-Z]*=[^>]*)?(\s)*(/)?>','')
+#end
+
+## Number Format ###########################################################################################
+#macro(toCurrency $number )#if( $number )$Number.format("integer", $number )#else 0 #end#end
+
+## 글자수 자르기 ###########################################################################################
+##macro(strCut $string $bytes)$!StringCutUtil.cutStringByByte($string,$bytes)#end
+#macro(strCut $string $bytes)$StringCutUtil.cutStringRealLength($string,$bytes,"..",0)#end
+
+
+## HTML/nbsp제거한 텍스트만 갖고오기 #######################################################################
+#macro(getCleanText $string)$StringCutUtil.removeTag($string).replaceAll("<","&lt;")#end
+
+
+## URL 에서 원하는 param 의 value 값을 치환 ################################################################
+#macro( setUrlParam $url $paramName $value )
+#set( $pattern = $paramName + '=[a-zA-Z0-9]+' )
+#set( $changeValue = $paramName + '=' + $value )
+$url.replaceAll( $pattern, $changeValue )##
+#end
+
+
+## URL param 조합 ##########################################################################################
+#macro( makeUrlParamList $paramList )
+#set($idx = 0)##
+#foreach( $param in $paramList )
+#set( $value = $ListTool.get( ${param}, 1 ) )##
+#if( !$StringUtils.equals( $value, "" ) )
+#if($idx>0)&#end$ListTool.get( ${param}, 0 )=$ListTool.get( ${param}, 1 )##
+#set( $idx = $idx +1)##
+#end##
+#end##
+#end
+
+##############################################################################################################
+## PRINT PAGINATION ##########################################################################################
+## pageHandler로 구동되는 표준 페이징 처리
+## 사용법 : #printPaging("$!{domain}/search/mainSearch.do?query=${query}&pageNo=", $page, $pageHandler)
+#macro(printPaging $urlbase $page $pageHandler $className $pageLimit $specialKey $specialValue)
+#set($temp = $command.toString())
+#set($commandStr = '$!command')
+#set($base = $Link.relative($request.getAttribute('javax.servlet.forward.request_uri')))$base.setAppendParams(false)
+#set($pageNoParam = "page_no")
+#if($urlbase.indexOf("pageNo") >= 0)#set($pageNoParam = "pageNo")#end
+#foreach($key in $Params.keySet())
+	#set( $key = $key.replaceAll("artistDetailId", "artist_id").replaceAll("albumId", "album_id").replaceAll("songId", "song_id").replaceAll("vclipId", "vclip_id").replaceAll("expirecache", "null").replaceAll("issue_id", "null") )
+	#set($value = $Render.eval("${commandStr}.$key") )
+	#if("$!value" != "")
+		#if($key != "query" && $key != "search_word")
+			$base.setParam($key, $!Escape.url($value), false)
+		#else
+			$base.setParam($key, $value, false)
+		#end
+	#end
+#end
+#if($StringUtils.isNotBlank("$!{specialKey}"))$base.setParam($specialKey, $specialValue, false)#end ## command에는 없지만 paging에 param을 넘겨야 할 경우가 너무 많아서 추가
+#set ($totalCnt = $Display.alt($pageHandler.totalCnt, 0)) ## 총 페이지 수
+#set ($oneBlockCnt = $Display.alt($pageLimit, 10))
+#set ($pageHandler.oneBlockCnt = $oneBlockCnt) ## 한 블럭 당 페이지 개수
+#set ($blockPage = $pageHandler.getBlockPage($page)) ## 현재 블럭의 위치
+#set ($firstPage = 1) ## 첫페이지
+#set ($lastPage = $pageHandler.totalPage) ## 마지막 페이지
+#set ($blockNextPage = $pageHandler.getBlockNextPage($blockPage)) ## 다음 블럭의 첫 페이지
+#if($blockPage > $pageHandler.totalBlock)
+	#set($startPage = ($lastPage / $pageHandler.oneBlockCnt) * $pageHandler.oneBlockCnt + $firstPage)
+    #set($endPage = $lastPage)
+#elseif($blockPage == $pageHandler.totalBlock)
+	#set($startPage = $blockNextPage - $pageHandler.oneBlockCnt)
+	#set($endPage = $lastPage)
+#else
+	#set($startPage = $blockNextPage - $pageHandler.oneBlockCnt)
+    #set($endPage = $blockNextPage - 1)
+#end
+#set ($blockPrevPage = $MathTool.max($MathTool.sub($startPage, 1), 1)) ## 이전 블럭의 첫 페이지
+#set ($endPage = $MathTool.max($endPage, 1))
+#if ($pageHandler.totalPage > 1)
+<div class="wrap_paging $!{className}">
+	<span class="paging bg_paging">
+	#if($page > 1) ## 현재 블럭이 1이 넘으면 이전 버튼 활성화
+		<a href="$!base.param($pageNoParam, $!firstPage)" class="bg_paging btn_fst" title="첫 페이지로">$!firstPage</a>
+	#else
+		<span class="bg_paging btn_fst fst_off">$!firstPage</span>
+	#end
+	#if($blockPage > 1) ## 현재 블럭이 1이 넘으면 이전 버튼 활성화
+		<a href="$!base.param($pageNoParam, $!blockPrevPage)" class="bg_paging btn_prev" title="$!blockPrevPage 페이지로">$!blockPrevPage</a>
+	#else
+		<span class="bg_paging btn_prev prev_off">이전</span>
+	#end
+    #foreach($p in [$startPage..$endPage])
+        #if($p==$page)
+		<span class="screen_out">현재페이지</span><em>$p</em>
+        #else
+        <a href="$!base.param($pageNoParam, $p)">$p</a>
+        #end
+	#end
+    #if($blockPage < $pageHandler.totalBlock)
+		<a href="$!base.param($pageNoParam, $!blockNextPage)" class="bg_paging btn_next" title="$!blockNextPage 페이지로">$!blockNextPage</a>
+	#else
+		<span class="bg_paging btn_next next_off">$!blockNextPage</span>
+	#end
+	#if($page != $pageHandler.totalPage)
+		<a href="$!base.param($pageNoParam, $!pageHandler.totalPage)" class="bg_paging btn_lst" title="마지막 페이지로">$pageHandler.totalPage</a>
+	#else
+		<span class="bg_paging btn_lst lst_off">다음</span>
+	#end
+	</span>
+</div>
+#end
+#end
+
+## ADD Click Log ?? 쓰는지 확인하기 ########################################################################
+#macro(printPagingClickLog $urlbase $page $pageHandler)
+	쓰는데 있나요
+#end
+
+## ?? 쓰는지 확인하기 ######################################################################################
+#macro(printPagingScript $urlbase $page $pageHandler)
+	쓰는데 있나요
+#end
+
+## 앨범명 ##############################################################################################
+## $full : true 이면 앨범 구분/집 정보 노출 <- 기존 full로 받던 분기값 type 으로 세분화
+## $type :1 이면 앨범명만 노출,
+## $type :2 이면 앨범타입이 "정규" 일때  "집" 정보 노출
+## $type :3 이면 앨범타입이 "싱글/EP" 인경우 "[싱글]/[EP]" 앨범구분 노출 , "정규"일때 $type 2와 상동
+## $type :4 이면 앨범 구분/정보 모두 노출
+## $type :5 이면 sns 보내기용 형태 출력  앨범명 + 정규일때 집수 or (싱글)/(EP)
+## classname : 앨범 구분의 classname ($link = true 일때만)
+#macro( printAlbumName $album $classname $len $type $tag)		## type 4 앨범형 수정 혹시 다른 곳에서 쓰게되면 알려주세요 뮤직바 사용
+#set( $printName = "")##
+#set( $albumHead = "" )##
+#if( $len <= 0 )#set( $len = 100 )#end##
+##
+#if($MathTool.toNumber($type) > 1 )##
+#***##if($MathTool.toNumber($type) == 2 || $MathTool.toNumber($type) == 5)##
+#***##***##if( $StringUtils.equals("$!{album.typeName}","정규") )##
+#***##***##***##if( $StringUtils.isNotBlank("$!{album.volume}") )##
+#***##***##***##***##set( $albumHead = $albumHead + $!{album.volume} + "집 " )##
+#***##***##***##end##
+#***##***##end##
+#***##end##
+#***##if($MathTool.toNumber($type) == 3)##
+#***##***##if( $StringUtils.equals("$!{album.typeName}","EP")||$StringUtils.equals("$!{album.typeName}","싱글"))##
+#***##***##***##if($tag)#set( $albumHead = "<em #if($StringUtils.isNotBlank('$!{classname}'))class='$!{classname}'#end>[" + $!{album.typeName} + "]</em> " )#set($len = $len + 30)##
+#***##***##***##else#set( $albumHead = "[" + $!{album.typeName} + "] " )#end##
+#***##***##end##
+#***##***##if( $StringUtils.equals("$!{album.typeName}","정규") )##
+#***##***##***##if( $StringUtils.isNotBlank("$!{album.volume}") )##
+#***##***##***##***##set( $albumHead = $albumHead + $!{album.volume} + "집 " )##
+#***##***##***##end##
+#***##***##end##
+#***##end##
+#***##if($MathTool.toNumber($type) == 4 )##
+#***##***##if( $StringUtils.isNotBlank("$!{album.typeName}") )##
+#***##***##***##if($tag)#if( $StringUtils.equals("$!{album.typeName}","EP")||$StringUtils.equals("$!{album.typeName}","싱글") )#set( $albumHead = "<em #if($StringUtils.isNotBlank('$!{classname}'))class='$!{classname}'#end>[" + $!{album.typeName} + "]</em> " )#end#set($len = $len + 30)##
+#***##***##***##else#set( $albumHead = "[" + $!{album.typeName} + "] " ) #end##
+#***##***##end##
+#***##***##if( $StringUtils.isNotBlank("$!{album.volume}") )##
+#***##***##***##set( $albumHead = $albumHead + $!{album.volume} + "집 " )##
+#***##***##end##
+#***##end##
+#end##
+#set($titleLen = $len - ${albumHead.length()})##
+#set($title = "#strCut($!{album.title}, $titleLen)")##
+#set( $printName = "$!{albumHead}" + "$!{title}" )##
+#set( $printName = "#getCleanText($printName)" )##
+#if($tag)<a #if($type == 1)class="$!{classname}"#end href="$Config.getProperty('SERVICE_DOMAIN').getValue()/album/main?album_id=$!{album.albumId}" title="#escTitle($!{album.title})">#end$!{printName}#if($tag)</a>#end##  ##onclick="daum.Music.albumDetail($!{album.albumId},'');return false;" 
+#if($MathTool.toNumber($type) == 5)##
+#***##if( $StringUtils.equals("$!{album.typeName}","EP")||$StringUtils.equals("$!{album.typeName}","싱글"))##
+#***##***##if($tag)#set( $albumHead = "<em #if($StringUtils.isNotBlank('$!{classname}'))class='$!{classname}'#end>(" + $!{album.typeName} + ")</em> ")#set($len = $len + 30)##
+#***##***##else #set( $albumHead = "(" + $!{album.typeName} + ")" )#end##
+#***#$!{albumHead}##
+#***##end
+#end
+#end
+
+## 아티스트명 ##############################################################################################
+## tag == false :: 태그 없이 아티스트명만 반환
+## artistId == 0 :: V.A or OST 임. 링크 없음
+#macro( printArtistName $keyArtistList $className $len $tag)
+#set( $artistNameHTML = "")##'<span class="$!className">V.A</span>' )
+#if( $len == 0 )#set( $len = 100 )#end
+##set( $tag = $Display.alt($tag, false) )
+#if( !$ListTool.isList($keyArtistList) && !$ListTool.isArray($keyArtistList) )
+	#set( $keyArtistList = [ $keyArtistList.artist ] )
+#end
+## 배열로 넘어왔을 때
+#if( $keyArtistList.size() > 0 )
+	#set( $commaHTML = "<span class='comma'>,&nbsp;</span>" )
+	#foreach ( $keyArtist in $keyArtistList )
+		#set( $artistNameHTML = $artistNameHTML + "$!keyArtist.name" )
+		#if( $velocityHasNext ) ## 쉼표도 더하기
+			#set( $artistNameHTML = $artistNameHTML + ", " )
+		#end
+	#end
+	#set( $needToCut = $StringCutUtil.getStringByte("$!artistNameHTML") > $len )
+	#if( $tag )
+		#set( $artistNameHTML = "")
+		#set( $linkToArtistMain = "$Config.getProperty('SERVICE_DOMAIN').getValue()/artist/main?artist_id=" )
+		#if( $needToCut )
+			#if( $keyArtistList.size() > 1 )#set( $len = $MathTool.min($MathTool.sub($len, 8), 7) )#end
+			#set( $firstKeyArtist = $keyArtistList.get(0) )
+			#set( $name = $Display.alt("#strCut($firstKeyArtist.name, $len)", "V.A") )
+			#if(!$StringUtils.equals("$!{firstKeyArtist.artistId}", "0"))
+				#set( $a = "#escTitle($firstKeyArtist.name)" )
+				#set( $a = $a.replaceAll("'","\'") )
+				#set( $artistNameHTML = '<a class="' + $!className + '" href="' + $!{linkToArtistMain} + $!{firstKeyArtist.artistId} + '" title="' + $a + '">' + $!name + '</a>' )
+			#else
+				#set( $artistNameHTML = "<span class='$!{className}'>$!name</span>" )
+			#end
+			#if( $keyArtistList.size() > 1 )
+				#set( $artistNameHTML = $artistNameHTML + "<span class='f_l'>&nbsp;외 " + ($keyArtistList.size() - 1) + "명</span>" )
+				#set( $keyArtistListJsonStr = "")
+				#foreach( $keyArtist in $keyArtistList )
+					#set( $keyArtistName = "#escTitle($keyArtist.name)" )
+					#set( $keyArtistName = $keyArtistName.replaceAll("'","\\'") )
+					##set($keyArtistName = $keyArtist.name.replaceAll("'", "\\'"))
+					#set( $keyArtistListJsonStr = $keyArtistListJsonStr + "{ artistId: '$!keyArtist.artistId', name: '$!{keyArtistName}'}")
+					#if( $velocityHasNext )#set( $keyArtistListJsonStr = $keyArtistListJsonStr + ", ")#end
+				#end
+				#set( $artistNameHTML = $artistNameHTML + '<a href="javascript:;" onclick="daum.Music.artistMore(this, [ ' + $!keyArtistListJsonStr + ' ]);return false;" class="arr_comm ico_artist CT_ZONE_ARTISTMORE">다른 가수 보기</a>' )
+			#end
+		#else
+			#foreach( $keyArtist in $keyArtistList )
+				#if(!$StringUtils.equals("$!{keyArtist.artistId}", "0"))
+					#set( $a = "#escTitle($!keyArtist.name)" )
+					#set( $a = $a.replaceAll("'","\'") )
+					#set( $artistNameHTML = $artistNameHTML + '<a class="' + $!className + '" href="' + $!{linkToArtistMain} + $!{keyArtist.artistId} + '" title="' + $a + '">' + $!{keyArtist.name} + '</a>' )
+				#else
+					#set( $artistName = $Display.alt($!keyArtist.name, "V.A") )
+					#set( $artistNameHTML = $artistNameHTML + "<span class='$!{className}'>$!artistName</span>" )
+				#end
+				#if($velocityHasNext)#set( $artistNameHTML = $artistNameHTML + $commaHTML )#end
+			#end
+		#end
+	#else
+		#if( $needToCut )
+			#set( $artistNameHTML = "#strCut($artistNameHTML, $len)")
+			#set( $artistNameHTML = $artistNameHTML.replaceAll("(,\s?\.\.)", "..") )## 쉼표가 마지막으로 나오면서 잘린 경우 예외처리
+		#end
+	#end
+#else
+	<span class="$!className">V.A</span>
+#end
+$artistNameHTML
+#end
+
+## 아티스트 썸네일
+#macro( printArtistThumb $artist $type )
+	#if( $type == 1 ) #set( $width = 35 ) #set( $height = 35 ) #end
+	#if( $type == 2 ) #set( $width = 100 ) #set( $height = 100 ) #end
+	#if( $type == 3 ) #set( $width = 110 ) #set( $height = 110 ) #end
+	#if( $type == 4 ) #set( $width = 160 ) #set( $height = 160 ) #end
+	#if( $type == 5 ) #set( $width = 60 ) #set( $height = 60 ) #end
+	#if( $type == 6 ) #set( $width = 160 ) #set( $height = 160 ) #end
+	#if( $type != 4 )
+	##set($artistName = "#stripHTML($!{artist.name})")
+	#set( $artistName = $!{artist.name.replace('\"', '&quot;')} )
+	#set( $artistName = "#stripHTML($artistName)" )
+	<span title="#escTitle($!{artistName})" href="/artist/main?artist_id=$!{artist.artistId}" onclick="daum.Music.artistDetail($!{artist.artistId});return false;" class="thumb_link">
+	#else	## 160*160 사이즈는 포토상세로 링크
+	<a title="#escTitle($!{artistName})" href="/artist/photo/detail?artist_id=$!{artist.artistId}#if($StringUtils.equals('$!{artist.mainImage.imageId}', '0'))&amp;image_id=$!{artist.mainImage.imageId}#end" class="thumb_link">
+	#end
+	#if($type != 5)
+		#set($imgSrc = $ImageUtil.getImageUrl("$!{artist.mainImage.filePath}", "$!{width}x$!{height}", "ARTIST"))
+	#else
+		#set($imgSrc = $ImageUtil.getImageUrl("$!{artist.mainImage.filePath}", "$!{width}x$!{height}", "ARTIST", "C"))
+	#end
+		<img width="$!{width}" height="$!{height}" src="$!imgSrc" alt="">
+		<span class="line_thumb"></span>
+	</a>
+#end
+
+## 첫번째 artistId 반환 #################################################################################################
+#macro( getArtistId $dto)#if($!{dto.keyArtistList} && $!{dto.keyArtistList.size()} > 0 )$dto.keyArtistList.get(0).artistId#end#end
+###foreach($artist in $dto.keyArtistList)##
+###***##if($foreach.index < 1)$!{artist.artistId}#end
+###end##
+
+## 피처링 아티스트명 ##############################################################################################
+#macro( printFeatArtistName $dto )
+#set( $printName  = "")
+#if($!{dto.featArtistList} && $!{dto.featArtistList.size()} > 0 )##
+#***##foreach( $artist in $dto.featArtistList )##
+#***##***##if( $foreach.index > 0 ) #set( $printName = $printName + ", ") #end##
+#***##***##set( $printName = $printName + $!{artist.name} )##
+#***##end##
+#***# (Feat. $!{printName})##
+#end
+#end
+
+
+## 곡명 (Feat. 피처링 아티스트명) ####################################################################################################
+#macro( printSongName $song $classname $len $tag $isNoneSongName $unconditional)
+#set( $printName  = "")
+#set( $printName = $!{song.title} + " " + $StringUtils.trim("#printFeatArtistName($song)") )##
+#htmlSongName( $song $classname $len $tag $printName $isNoneSongName $unconditional)
+#end
+
+## 곡명 - 아티스트명 ####################################################################################################
+#macro( printSongArtistName $song $classname $len $tag )
+#set($realTag = $tag)
+#set($totalLen = $len)
+#set($rowatistName = "#printArtistName( $song.keyArtistList '' 0 false )")
+#set( $printName = "#printSongName( $song '' 0 false false false )" + " - " + "$StringUtils.trim($rowatistName)")
+#htmlSongName( $song $classname $totalLen $realTag $printName false false)
+#end
+
+## 곡명 프린트
+#macro( htmlSongName $song $classname $len $tag $printName $isNoneSongName $unconditional)
+#if( $len <= 0 )#set( $len = 100 )#end
+#if(($StringUtils.isNotBlank("$!{song.AODLinkId}") && !$StringUtils.equals("$!{song.AODLinkId}", "0")) || !!$unconditional)#set($listenAble = true)#else#set($listenAble = false)#end##
+#if($tag)##
+#***##if($listenAble)
+##	 <a href="#" #if($StringUtils.isNotBlank("$!{classname}"))class="$!{classname}"#end title="#escTitle($!{printName})" onclick="daum.Music.AodPlayer.add(this,$!{song.songId});return false;">##
+###***##strCut("$!{printName.replaceAll('<', '&lt').replaceAll('>', '&gt')}", $len)##
+	 <span class="ico_listen#if($StringUtils.isNotBlank('$!{classname}')) $!{classname}#end" title='$!{printName.replaceAll("'", '"')}'>
+#***##else##
+#***##if(!$isNoneSongName)##
+#***#<span class="ico_nolisten#if($StringUtils.isNotBlank('$!{classname}')) $!{classname}#end" title='$!{printName.replaceAll("'", '"')}'>## #if($StringUtils.isNotBlank("$!{classname}"))class="$!{classname} "#end	우선 막음 없는 것들
+#***#
+#***##end##
+#***##end##
+	#strCut("$!{printName.replaceAll('<', '&lt').replaceAll('>', '&gt')}", $len)##
+#***##if($listenAble)</span>#else#if(!$isNoneSongName)</span>#end#end##
+#if($StringUtils.equals("$!{song.adultYn}", "Y")) <span class="ico_adult" title="이 정보내용은 청소년 유해매체물로서 정보통&#13;신망 이용 촉진 및 정보보호 등에 관한 법률 및&#13;청소년보호법의 규정에 의하여 19세 미만의 &#13;청소년이 이용할 수 없습니다.">&nbsp;</span>#end##
+#else##
+#***##strCut("$!{printName.replaceAll('<', '&lt').replaceAll('>', '&gt')}", $len)##
+#end
+#end
+
+## 뮤직비디오명 ####################################################################################################
+#macro( printVideoName $vclip $classname $len $tag)
+#set($artistId = "#getArtistId($!{vclip})")
+#if( $len <= 0 )#set( $len = 100 )#end
+#if($StringUtils.equals("$!{dir}", "artist"))
+#if( $command.artist_id )
+#set($artistId = $command.artist_id)
+#else
+#set($artistId = "#getArtistId($vclip)")
+#end
+#end
+#if(!$StringUtils.equals("$!{vclip.adultYn}", "N"))#set($len = $len - 5 )#end
+#if($!{tag})
+	#if(($StringUtils.equals("$!{vclip.song.songId}", "0") && $StringUtils.equals("$!{vclip.album.albumId}", "0") && $StringUtils.equals("#getArtistId($vclip)", "")) || $StringUtils.equals("$!{vclip.vclipId}", "0"))
+	<span #if($StringUtils.isNotBlank("$!{classname}"))class="$!{classname}"#end>
+	#else
+	<a href="#" #if($StringUtils.isNotBlank("$!{classname}"))class="$!{classname}"#end title="#escTitle($!{vclip.title})" onclick="daum.Music.videoDetail('$!{vclip.vclipId}', '$!artistId');return false;">
+	#end
+#end
+#strCut("$!{vclip.title}", $len)
+#if($tag)
+	#if(($StringUtils.equals("$!{vclip.song.songId}", "0") && $StringUtils.equals("$!{vclip.album.albumId}", "0") && $StringUtils.equals("#getArtistId($vclip)", "")) || $StringUtils.equals("$!{vclip.vclipId}", "0"))
+	</span>
+	#else
+	</a>
+	#end
+#end
+#if($StringUtils.equals("$!{vclip.adultYn}", "Y"))
+	<span class="ico_adult" title="이 정보내용은 청소년 유해매체물로서 정보통&#13;신망 이용 촉진 및 정보보호 등에 관한 법률 및&#13;청소년보호법의 규정에 의하여 19세 미만의 &#13;청소년이 이용할 수 없습니다.">&nbsp;</span>
+#elseif($StringUtils.equals("$!{vclip.adultYn}", "A"))
+	<span class="ico_all" title="전체 이용 가능">&nbsp;</span>
+#elseif($StringUtils.equals("$!{vclip.adultYn}", "2"))
+	<span class="ico_12" title="12세 이상 이용 가능">&nbsp;</span>
+#elseif($StringUtils.equals("$!{vclip.adultYn}", "5"))
+	<span class="ico_15" title="15세 이상 이용 가능">&nbsp;</span>
+#end##
+#end
+
+## 앨범 썸네일 ####################################################################################################
+#macro( printAlbumThumb $album $type $value $page)
+	#set($strType = "$!{type}")
+	#if( $strType.indexOf("playlist_")>-1 )
+		#set( $type = $strType.replaceAll("playlist_","") )
+		#set($link = "/my/playList/detail?playlist_id=$!{value}")
+		#set($onclick = "daum.Music.Playlist.detail('$!{value}');return false;")
+	#elseif( $strType.indexOf("imagene_")>-1 )
+		#set( $type = $strType.replaceAll("imagene_","") )
+		#set($link = "/imagene/detail?award_id=$!{value}#$!{album.albumId}")
+	#else
+		#set($link = "$Config.getProperty('SERVICE_DOMAIN').getValue()/album/main?album_id=$!{album.albumId}")
+		##set($onclick = "daum.Music.albumDetail($!{album.albumId}, '');return false;")
+	#end
+	#if( $MathTool.toNumber($type) == 1 ) #set( $width = 42 ) #set( $height = 42 ) #end
+	#if( $MathTool.toNumber($type) == 2 ) #set( $width = 72 ) #set( $height = 72 ) #end
+	#if( $MathTool.toNumber($type) == 3 ) #set( $width = 110 ) #set( $height = 110 ) #end
+	#if( $MathTool.toNumber($type) == 4 ) #set( $width = 150 ) #set( $height = 150 ) #end
+	#if( $MathTool.toNumber($type) == 5 ) #set( $width = 200 ) #set( $height = 200 ) #end
+
+	<div class="box_album">
+		#if($link.indexOf("playlist_")>-1)
+            <span class="album_type$!{type} CT_ZONE_LIST_ALBUMTHUMB">
+				<img width="$!{width}" height="$!{height}" alt="이미지정보" src="$ImageUtil.getImageUrl("$!{album.mainImage.filePath}", "$!{width}x$!{height}", "ALBUM", "#if( $!{type} == 5 || $!{type} == 1 )S#{else}C#end")">
+    		<span class="bg_album$!{type}"></span>
+			</span>
+		#else
+    		<a href="$!{link}"#if($StringUtils.isNotBlank("$!{onclick}")) onclick="$!{onclick}"#end class="album_type$!{type} CT_ZONE_LIST_ALBUMTHUMB">
+##		<span class="album_type$!{type} CT_ZONE_LIST_ALBUMTHUMB">
+    		<img width="$!{width}" height="$!{height}" alt="이미지정보" src="$ImageUtil.getImageUrl("$!{album.mainImage.filePath}", "$!{width}x$!{height}", "ALBUM", "#if( $!{type} == 5 || $!{type} == 1 )S#{else}C#end")">
+    		<span class="bg_album$!{type}"></span>
+    		</a>
+		#end
+		#printAlbumTag( $album $type $page)
+
+		#if( $MathTool.toNumber($type) > 1 )	## type 2 다시 넣기로 함
+			#if( $StringUtils.equals("$!{album.playYn}","Y")  )
+				<a title="앨범듣기" href="#" class="#if($type>=5)ico_albumlisten#else ico_songlisten#end CT_ZONE_LIST_ALBUMLISTEN" onclick="daum.Music.AodPlayer.add(this, $!{album.albumId}, 'itemTypeAlbumId' );return false;"></a>
+			#end
+		#end
+    </div>
+#end
+
+#macro( printAlbumTag $album $type $page)
+	#if($StringUtils.equals("$!{page}", "top"))#set($tagType = $!{album.motTagType})#else#set($tagType = "$!{album.tagType}")#end
+	#if($StringUtils.equals("$!{page}", "search"))
+		#if($StringUtils.equals("$!{album.tot_recommend_month_yn}", "Y"))
+			#set($tagType = "IMAGENE")
+		#elseif($StringUtils.equals("$!{album.tot_award_yn}", "Y"))
+			#set($tagType = "PRIZE")	
+		#elseif($StringUtils.equals("$!{album.tot_recommend_dj_yn}", "Y"))	
+			#set($tagType = "RECOMMAND")
+		#end
+	#end
+	#if($StringUtils.isNotBlank("$!{tagType}") )
+##    	#if($StringUtils.equals("$!{tagType}","HOT"))#set($ico_name = "ico_hotdisc") #end
+##    	#if($StringUtils.equals("$!{tagType}","FREE"))#set($ico_name = "ico_freedisc") #end
+##    	#if($StringUtils.equals("$!{tagType}","HALF"))#set($ico_name = "ico_halfdisc") #end
+##    	#if($StringUtils.equals("$!{tagType}","RECOMMAND"))#set($ico_name = "ico_recomdisc") #end
+##    	#if($StringUtils.equals("$!{tagType}","PRIZE"))#set($ico_name = "ico_awrdisc") #end
+    	#if($StringUtils.equals("$!{tagType}","FIRST"))#set($ico_name = "ico_fstdisc") #end
+##    	#if($StringUtils.equals("$!{tagType}","COMING"))#set($ico_name = "ico_preardisc") #end
+##		#if($StringUtils.equals("$!{tagType}","IMAGENE"))#set($ico_name = "ico_monthalbum") #end
+##		#if($StringUtils.equals("$!{tagType}","YEARSALBUM"))#set($ico_name = "ico_yearalbum") #end
+	#end
+
+	#if($StringUtils.isNotBlank("$!{tagType}"))
+		#if( $MathTool.toNumber($type) == 5 )<span class="$!{ico_name}"></span>#end
+		#if( $MathTool.toNumber($type) == 4 || $MathTool.toNumber($type) == 3 )<span class="$!{ico_name}_s"></span>#end
+	#end
+#end
+
+#macro( printAlbumSet $album $type)
+	#printAlbumThumb( $album 3 "" "" )
+	#set($albumNameCount = 13)
+	<strong class="tit_album">
+		#if($StringUtils.equals("$!{type}","check"))#set($albumNameCount = 12)<input id="$!{album.albumId}" class="chk_song" type="checkbox" name="trackCheckbox" value="$!{album.albumId}">#end
+		#printAlbumName( $album "" $albumNameCount 2 true)
+	</strong>
+	<p>
+		#printArtistName( $album.keyArtistList "txt_artist" 16 true )
+	</p>
+	<em class="fc_etc">$!{CheckDate.makeReleaseDate($!{album.releaseDt})}</em>
+##	<p class="song_listen">
+##		#set($masterSong = "")
+##		#if($StringUtils.isNotBlank("$!{album.masterSongList}") && $!{album.masterSongList.size()} > 0 )
+##			#set($masterSong = $ListTool.get($!{album.masterSongList}, 0))
+##		#else## 마스터 곡이 없는 경우, 앨범 삽입곡의 첫번째 곡을 노출 해줌
+##			#if($!{album.songList.size()}>0)#set($masterSong = $ListTool.get($!{album.songList}, 0))#end
+##		#end
+##		#if ($StringUtils.isNotBlank("$!{masterSong}") )
+##		#set($songlen = 12)
+##		#if($StringUtils.equals("$!{masterSong.adultYn}", "Y"))#set($songlen = 9)#end## 19금 딱지가 붙어야 할경우 아티스트명 글자수 줄임
+##		#printSongName( $!{masterSong} "ico_comm ico_listen" $songlen true false false)
+##		#end
+##	</p>
+#end
+
+## 뮤직비디오 썸네일
+#macro( printVideoThumb $vclip $type $value $value2 $dir)
+#if( $type == 1 ) #set( $width = 172 ) #set( $height = 128 ) #end
+#if( $type == 2 ) #set( $width = 138 ) #set( $height = 103 ) #end
+#if( $type == 3 ) #set( $width = 320 ) #set( $height = 228 ) #end
+#if( $type == 4 ) #set( $width = 135 ) #set( $height = 101 ) #end
+
+## 와 진짜 이걸 어째야 쓸까	
+#if($StringUtils.equals("$!{dir}", "album") && $StringUtils.isNotBlank("$!{command.album_id}") && !$StringUtils.equals("$!{vclip.vclipId}", "0"))
+<a class="thumb_link" title="#escTitle($!{vclip.title})" href="/album/vclip/detail?album_id=$!{command.album_id}&amp;vclip_id=$!{vclip.vclipId}">
+#elseif(($StringUtils.equals("$!{vclip.song.songId}", "0") && $StringUtils.equals("$!{vclip.album.albumId}", "0") && $StringUtils.equals("#getArtistId($vclip)", "")) || $StringUtils.equals("$!{vclip.vclipId}", "0"))
+##if($vclip.vclipId == 0 || !$vclip.vclipId)
+<span class="thumb_link">
+#else
+#if($StringUtils.equals("$!{dir}", "album"))
+##<a class="thumb_link" title="$!{vclip.title}" href="/album/vclip/detail?album_id=$!{command.album_id}&artist_id=#getArtistId($!{vclip})&vclip_id=$!{vclip.vclipId}">
+#if($StringUtils.equals("$!{vclip.album.id}","0"))
+<a class="thumb_link" title="#escTitle($!{vclip.title})" href="/album/vclip/detail?vclip_id=$!{vclip.vclipId}">
+#else
+<a class="thumb_link" title="#escTitle($!{vclip.title})" href="/album/vclip/detail?album_id=$!{vclip.album.id}&amp;vclip_id=$!{vclip.vclipId}">
+#end
+#elseif($StringUtils.equals("$!{dir}", "artist"))
+## $command.artist_id가 없을 때 $vclip에서 뽑아
+#set($artistId_video = $Display.alt($command.artist_id, "#getArtistId($vclip)"))
+<a class="thumb_link" title="#escTitle($!{vclip.title})" href="/artist/vclip/detail?artist_id=$!{artistId_video}&amp;vclip_id=$!{vclip.vclipId}&amp;album_id=$!{vclip.album.albumId}">
+#else
+<a class="thumb_link" title="#escTitle($!{vclip.title})" href="/artist/vclip/detail?artist_id=#getArtistId($!{vclip})&amp;vclip_id=$!{vclip.vclipId}" onclick="daum.Music.videoDetail('$!{vclip.vclipId}', '#getArtistId($vclip)');return false;">
+#end
+#end
+##	<img class="thumb_img" src="$ImageUtil.getImageUrl("$!{vclip.mainImage.filePath}", "$!{width}x$!{height}", "VCLIP", "#if( $!{type} == 3 )C#{else}S#end")" width="$!{width}" height="$!{height}" alt="뮤직비디오" #if($value)id="thumbLink$!{value}" vclipId="$!{vclip.vclipId}" artistId="#getArtistId($vclip)" songId="$!{vclip.song.songId}" albumId="$!{vclip.album.albumId}" size="$!{value2}" count="$!{value}"#end>
+	<img class="thumb_img" src="$ImageUtil.getImageUrl("$!{vclip.mainImage.filePath}", "$!{width}x$!{height}", "VCLIP", "#if( $!{type} == 3 )C#{else}S#end")" width="$!{width}" height="$!{height}" alt="뮤직비디오" #if($StringUtils.isNotBlank("$!{value}"))id="thumbLink$!{value}" index="$!{value}"#end>
+	#if( $type == 3 )
+		<span class="frame_thumb"></span>
+	#end
+
+	#if($type == 3 || $StringUtils.equals("$!{dir}", "top"))
+	#set($tagType = $!{vclip.motTagType})
+	#if( $StringUtils.isNotBlank("$!{tagType}") )
+		#if( $StringUtils.equals("$!{tagType}","ONLY") )
+		<span class="ico_monopoly"></span>
+		#elseif( $StringUtils.equals("$!{tagType}","LIVE") )
+		<span class="ico_live"></span>
+		#elseif( $StringUtils.equals("$!{tagType}","HOT") )
+		<span class="ico_hot"></span>
+		#end
+	#end
+	#end
+
+	#if( $!{vclip.rank} != 0)
+		#printVideoRank( $!{vclip.rank} )
+	#end
+	#if( !$StringUtils.isNotBlank("$!{value}") )<span class="line_thumb"></span>#end
+
+	<span class="ico_comm ico_play"></span>
+	#if($StringUtils.equals("$!{dir}", "album") && $StringUtils.isNotBlank("$!{command.album_id}") && !$StringUtils.equals("$!{vclip.vclipId}", "0"))
+	</a>
+	#elseif(($StringUtils.equals("$!{vclip.song.songId}", "0") && $StringUtils.equals("$!{vclip.album.albumId}", "0") && $StringUtils.equals("#getArtistId($vclip)", "")) || $StringUtils.equals("$!{vclip.vclipId}", "0"))
+	##if($vclip.vclipId == 0 || !$vclip.vclipId)
+    </span>
+    #else
+    </a>
+	#end
+#end
+
+## 뮤직비디오 세트
+#macro( printVideoSet $vclip $value $type)
+	#printVideoThumb($vclip 1 $value "" "")
+	#set($vclipNameCount = 20)
+	<div class="wrap_info">
+		#if($StringUtils.equals("$!{type}","check"))#set($vclipNameCount = 18)
+		<strong class="wrap_title">
+			<input id="$!{vclip.vclipId}" value="$!{vclip.vclipId}" class="chk_song" type="checkbox" name="trackCheckbox">
+			#if($StringUtils.equals("$!{vclip.HDYn}", "Y"))
+    			<span class="screen_out">HD영상 </span>#printVideoName($vclip "f_l ico_hdvideo" 14 true)
+			#else
+            	#printVideoName($vclip "f_l" $vclipNameCount true)
+			#end
+		</strong>
+		<span class="wrap_artist">
+			#printArtistName($!{vclip.keyArtistList} "" 20 true)
+		</span>
+		#else
+			#printVideoName( $!{vclip} "fw_b wrap_title" $vclipNameCount true )
+			#printArtistName($!{vclip.keyArtistList} "wrap_artist" 20 true)
+		#end
+			<em class="txt_date">$!{CheckDate.makeReleaseDate($!{vclip.regDateTime})}</em>
+			<span class="song_listen">
+				#printSongName( $!{vclip.song} "ico_comm ico_listen" 20 true true false)
+			</span>
+	</div>
+#end
+
+## 포토 썸네일
+#macro( printPhotoThumb $image $type $url)
+	#if( $type == 1 ) #set( $width = 95 ) #set( $height = 95 ) #end
+	#if( $type == 2 ) #set( $width = 130 ) #set( $height = 130 ) #end
+	#if( $type == 3 ) #set( $width = 138 ) #set( $height = 103 ) #end
+	#if( $type == 4 ) #set( $width = 135 ) #set( $height = 101 ) #end
+	<a class="thumb_link" href="$!{url}&amp;image_id=$!{image.imageId}">
+		<img width="$!{width}" height="$!{height}" alt="이미지정보" src="$ImageUtil.getImageUrl("$!{image.filePath}", "$!{width}x$!{height}", "PHOTO")">
+		<span class="line_thumb"></span>
+	</a>
+#end
+#*
+## 리스트 상하단에 위치하는 컨트롤 버튼 ####################################################################
+#macro( printListButton $type $script)
+#if( $StringUtils.equals( "$!{type}", "song") )## 곡리스트
+<input class="btn_comm all_listen" type="button" title="전체듣기" value="전체듣기" onclick="daum.Music.List.listenAll();return false;">
+<input class="btn_comm set_listen" type="button" title="선택듣기" value="선택듣기" onclick="daum.Music.List.listenSelect(this);">
+<input class="btn_comm btn_my" type="button" title="담기" value="담기" onclick="daum.Music.List.putSelect(this);">
+<input class="btn_comm btn_export" type="button" title="보내기" value="보내기" onclick="daum.Music.List.snsSelect(this);">
+<input class="btn_comm btn_buy" type="button" title="구매" value="구매" onclick="daum.Music.List.buySelect(this);">
+#elseif( $StringUtils.equals( "$!{type}", "del") )
+## 재생목록 편집 페이지에 있는 삭제 버튼
+<input class="btn_comm btn_delete" title="삭제" value="삭제" type="button" onclick="daum.Music.List.delSelect(this);">
+#elseif( $StringUtils.equals( "$!{type}", "down") )
+<input class="btn_comm btn_down mg_r0" title="다운로드" value="다운로드" type="button">
+#end
+#end
+*#
+
+##리스트 하단 버튼 
+#macro(printListButtonFoot $type $script $count $value $value2)
+#if( $StringUtils.equals( "$!{type}", "song") || $StringUtils.equals( "$!{type}", "mysong")|| $StringUtils.equals( "$!{type}", "mysong_bgm")|| $StringUtils.equals( "$!{type}", "mysong_gift"))## 곡리스트
+	#*
+<script>
+    socialShareSetVarFoot = null;
+	daum.addEvent(window, 'load', function(){
+
+		socialShareSetVarFoot = new socialshare(document.getElementById('socialShareMoreViewContainerFoot'), {
+	        shareType: 'button',
+   			useCustomizedButton: true,
+	        link: '',
+	        prefix: '', 
+			optionalServices: {
+	            cafe: '',
+	            blog: ''
+	        }			
+	    });
+
+	   	daum.Music.Social.socialShareVarInit(socialShareSetVar, socialShareSetVarFoot);
+
+        var snsBtnFoot = document.getElementById('socialShareSnsViewFoot');
+    	
+        daumtools.event.on(snsBtnFoot, 'click', function () {
+			if(socialShareSetVarFoot.context.link != ""){
+	            socialShareSetVarFoot.toggle();
+			}
+        });
+		daumtools.event.on(document, 'click', function (e) {
+			var ev = e || window.event, target = ev.target || ev.srcElement, key;
+			
+            var snsDivLayer = daum.$$('#socialShareMoreViewContainerFoot div')[0];
+			var snsParentNode = daum.$('socialShareSnsViewFoot');
+			
+			if(target != snsParentNode){
+    			if(daum.hasClassName(snsDivLayer, 'sns_on')){
+    				daum.removeClassName(snsDivLayer, 'sns_on');
+    			}
+			}
+        });		
+	});
+</script>
+*#
+	#if( $StringUtils.isBlank("$!{count}") )
+##<a href="#" class="btn_comm all_listen CT_ZONE_LIST_LISTENALL" title="전체듣기" onclick="controller.listenAll(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value2}'});return false;">전체듣기</a>
+##<a href="#" class="btn_comm set_listen CT_ZONE_LIST_LISTEN" title="선택듣기" onclick="controller.listenSelect(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value2}'});return false;">선택듣기</a>
+##<a href="#" class="btn_comm btn_my CT_ZONE_LIST_MYPUT" title="재생목록에 담기" onclick="controller.putSelect(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value2}'});return false;">재생목록에 담기</a>
+##<a href="#" id = "socialShareSnsViewFoot" class="btn_comm btn_export CT_ZONE_LIST_SNS" title="SNS 공유" onclick="daum.Music.Social.snsSend(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value}'});return false;">SNS 공유</a><!-- 2013-12-27 수정 -->
+##<a href="#" class="btn_comm btn_buy CT_ZONE_LIST_BUY" title="구매" onclick="controller.buySelect(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value2}'});return false;">구매</a>
+	#else
+##<a href="#" class="btn_comm all_listen CT_ZONE_LIST_LISTENALL" title="전체듣기" onclick="controller.listenAll(this, {container:'trackContainer$!{count}', checkboxName:'trackCheckbox$!{count}', allCheckbox:'allCheck$!{count}'}); return false;">전체듣기</a>
+##<a href="#" class="btn_comm set_listen CT_ZONE_LIST_LISTEN" title="선택듣기" onclick="controller.listenSelect(this, {container:'trackContainer$!{count}', checkboxName:'trackCheckbox$!{count}', allCheckbox:'allCheck$!{count}'});return false;">선택듣기</a>
+##<a href="#" class="btn_comm btn_my CT_ZONE_LIST_MYPUT" title="재생목록에 담기" onclick="controller.putSelect(this, {container:'trackContainer$!{count}', checkboxName:'trackCheckbox$!{count}', allCheckbox:'allCheck$!{count}'});return false;">재생목록에 담기</a>
+##<a href="#" id = "socialShareSnsViewFoot" class="btn_comm btn_export CT_ZONE_LIST_SNS" title="SNS 공유" onclick="daum.Music.Social.snsSend(this, {container:'trackContainer$!{count}', checkboxName:'trackCheckbox$!{count}'});return false;">SNS 공유</a><!-- 2013-12-27 수정 -->
+##<a href="#" class="btn_comm btn_buy CT_ZONE_LIST_BUY" title="구매" onclick="controller.buySelect(this, {container:'trackContainer$!{count}', checkboxName:'trackCheckbox$!{count}', allCheckbox:'allCheck$!{count}'});return false;">구매</a>
+	#end
+#elseif( $StringUtils.equals( "$!{type}", "del") )
+## 재생목록 편집 페이지에 있는 삭제 버튼
+<a href="#" class="btn_comm btn_delete CT_ZONE_LIST_DELETE" title="삭제" onclick="controller.delSelect(this);return false;" TYPE='button'>삭제</a>
+#elseif( $StringUtils.equals( "$!{type}", "recentdel") )
+## MY > 최근 들은 음악  > 최근들은 노래 페이지에 있는 삭제 버튼
+<a href="#" class="btn_comm btn_delete CT_ZONE_LIST_DELETE" title="삭제" onclick="daum.Music.My.Del.delSelect(this,'song');return false;">삭제</a>
+#elseif( $StringUtils.equals( "$!{type}", "down") )
+<a href="#" class="btn_comm btn_down mg_r0 CT_ZONE_LIST_DOWNLOAD" title="다운로드" onclick="controller.down(this, {downloader:false});return false;" onmouseover="controller.down(this,{checkboxName:'trackCheckbox', check:'$!{value}',downloader:true})" type="button">다운로드</a>
+#end
+
+#if($StringUtils.equals( "$!{type}", "song") || $StringUtils.equals( "$!{type}", "down") || $StringUtils.equals( "$!{type}", "del")|| $StringUtils.equals( "$!{type}", "recentdel")|| $StringUtils.equals( "$!{type}", "mysong_bgm")|| $StringUtils.equals( "$!{type}", "mysong_gift"))
+<div id="socialShareMoreViewContainerFoot"></div>
+#end
+
+#end
+
+## 리스트 상단에 위치하는 컨트롤 버튼 ####################################################################
+#macro( printListButton $type $script $count $value $value2 $newPlayListName)
+#if( $StringUtils.equals( "$!{type}", "song") || $StringUtils.equals( "$!{type}", "mysong")|| $StringUtils.equals( "$!{type}", "mysong_bgm")|| $StringUtils.equals( "$!{type}", "mysong_gift"))## 곡리스트
+<!-- 소셜쉐어 include -->
+	#*
+<script>
+    socialShareSetVar = null;
+    socialShareSetVarFoot = null;
+	
+	daum.addEvent(window, 'load', function(){
+
+		socialShareSetVar = new socialshare( document.getElementById('socialShareMoreViewContainer'), {
+	        shareType: 'button',
+   			useCustomizedButton: true,
+	        link: '',
+	        prefix: '',
+			optionalServices: {
+	            cafe: '',
+	            blog: ''
+	        }			
+	    });
+		
+	   	daum.Music.Social.socialShareVarInit(socialShareSetVar, socialShareSetVarFoot);
+
+        var snsBtn = document.getElementById('socialShareSnsView');
+		
+        daumtools.event.on(snsBtn, 'click', function () {
+			if(socialShareSetVar.context.link != ""){
+	            socialShareSetVar.toggle();
+			}
+        });
+		
+		daumtools.event.on(document, 'click', function (e) {
+			var ev = e || window.event, target = ev.target || ev.srcElement, key;
+			
+            var snsDivLayer = daum.$$('#socialShareMoreViewContainer div')[0];
+			var snsParentNode = daum.$('socialShareSnsView');
+			
+			if(target != snsParentNode){
+    			if(daum.hasClassName(snsDivLayer, 'sns_on')){
+    				daum.removeClassName(snsDivLayer, 'sns_on');
+    			}
+			}
+        });
+	});
+</script>
+*#
+#if( $StringUtils.isBlank("$!{count}") )
+##<a href="#" class="btn_comm all_listen CT_ZONE_LIST_LISTENALL" title="전체듣기" onclick="controller.listenAll(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value2}'});return false;">전체듣기</a>
+##<a href="#" class="btn_comm set_listen CT_ZONE_LIST_LISTEN" title="선택듣기" onclick="controller.listenSelect(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value2}'});return false;">선택듣기</a>
+##<a href="#" class="btn_comm btn_my CT_ZONE_LIST_MYPUT" title="재생목록에 담기" onclick="controller.putSelect(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value2}', newPlayListName:'$!{newPlayListName}'});return false;">재생목록에 담기</a>
+##<a href="#" id = "socialShareSnsView" class="btn_comm btn_export CT_ZONE_LIST_SNS" title="SNS 공유" onclick="daum.Music.Social.snsSend(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value}'});return false;">SNS 공유</a><!-- 2013-12-27 수정 -->
+##<a href="#" class="btn_comm btn_buy CT_ZONE_LIST_BUY" title="구매" onclick="controller.buySelect(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value2}'});return false;">구매</a>
+#else
+##<a href="#" class="btn_comm all_listen CT_ZONE_LIST_LISTENALL" title="전체듣기" onclick="controller.listenAll(this, {container:'trackContainer$!{count}', checkboxName:'trackCheckbox$!{count}', allCheckbox:'allCheck$!{count}'}); return false;">전체듣기</a>
+##<a href="#" class="btn_comm set_listen CT_ZONE_LIST_LISTEN" title="선택듣기" onclick="controller.listenSelect(this, {container:'trackContainer$!{count}', checkboxName:'trackCheckbox$!{count}', allCheckbox:'allCheck$!{count}'});return false;">선택듣기</a>
+##<a href="#" class="btn_comm btn_my CT_ZONE_LIST_MYPUT" title="재생목록에 담기" onclick="controller.putSelect(this, {container:'trackContainer$!{count}', checkboxName:'trackCheckbox$!{count}', allCheckbox:'allCheck$!{count}'});return false;">재생목록에 담기</a>
+##<a href="#" id = "socialShareSnsView" class="btn_comm btn_export CT_ZONE_LIST_SNS" title="SNS 공유" onclick="daum.Music.Social.snsSend(this, {container:'trackContainer$!{count}', checkboxName:'trackCheckbox$!{count}'});return false;">SNS 공유</a><!-- 2013-12-27 수정 -->
+##<a href="#" class="btn_comm btn_buy CT_ZONE_LIST_BUY" title="구매" onclick="controller.buySelect(this, {container:'trackContainer$!{count}', checkboxName:'trackCheckbox$!{count}', allCheckbox:'allCheck$!{count}'});return false;">구매</a>
+#end
+#elseif( $StringUtils.equals( "$!{type}", "del") )
+## 재생목록 편집 페이지에 있는 삭제 버튼
+<a href="#" class="btn_comm btn_delete CT_ZONE_LIST_DELETE" title="삭제" onclick="controller.delSelect(this);return false;" TYPE='button'>삭제</a>
+#elseif( $StringUtils.equals( "$!{type}", "recentdel") )
+## MY > 최근 들은 음악  > 최근들은 노래 페이지에 있는 삭제 버튼
+<a href="#" class="btn_comm btn_delete CT_ZONE_LIST_DELETE" title="삭제" onclick="daum.Music.My.Del.delSelect(this,'song');return false;">삭제</a>
+#elseif( $StringUtils.equals( "$!{type}", "down") )
+<a href="#" class="btn_comm btn_down mg_r0 CT_ZONE_LIST_DOWNLOAD" title="다운로드" onclick="controller.down(this, {downloader:false});return false;" onmouseover="controller.down(this,{checkboxName:'trackCheckbox', check:'$!{value}',downloader:true})" type="button">다운로드</a>
+#end
+
+
+#if($StringUtils.equals( "$!{type}", "song") || $StringUtils.equals( "$!{type}", "down") || $StringUtils.equals( "$!{type}", "del")|| $StringUtils.equals( "$!{type}", "recentdel")|| $StringUtils.equals( "$!{type}", "mysong_bgm")|| $StringUtils.equals( "$!{type}", "mysong_gift"))
+	<div id="socialShareMoreViewContainer" #if($StringUtils.equals( "$!{type}", "song"))class="f_l"#end></div>
+#end
+
+#end
+
+#macro( printListButtonMusicBarAndTop $type $script $count $value $value2)
+#if( $StringUtils.equals( "$!{type}", "song") )## 곡리스트
+	#set($snsRowName = $!{count})
+	#if( $StringUtils.isBlank("$!{snsRowName}") )
+		#set($snsRowName = $value)	
+	#end
+<!-- 소셜쉐어 include -->
+<script>
+    var socialShareSetVar_$!snsRowName = null;
+	
+	daum.addEvent(window, 'load', function(){
+
+		socialShareSetVar_$snsRowName = new socialshare( document.getElementById('socialShareMoreViewContainer_$!snsRowName'), {
+	        shareType: 'button',
+   			useCustomizedButton: true,
+	        link: '',
+	        prefix: '',
+			optionalServices: {
+	            cafe: '',
+	            blog: ''
+	        }			
+	    });
+		
+		daumtools.event.on(document.getElementById('socialShareSnsView_$!{snsRowName}'), 'click', function () {
+			if(socialShareSetVar_${snsRowName}.context.link != ""){
+	            socialShareSetVar_$!{snsRowName}.toggle();
+			}
+        });
+
+		daumtools.event.on(document, 'click', function (e) {
+			var ev = e || window.event, target = ev.target || ev.srcElement, key;
+			
+            var snsDivLayer = daum.$$('#socialShareMoreViewContainer_$!snsRowName div')[0];
+			var snsParentNode = daum.$('socialShareSnsView_$!{snsRowName}');
+			
+			if(target != snsParentNode){
+    			if(daum.hasClassName(snsDivLayer, 'sns_on')){
+    				daum.removeClassName(snsDivLayer, 'sns_on');
+    			}
+			}
+        });
+		
+	});
+</script>	
+	#if( $StringUtils.isBlank("$!{count}") )
+<a href="#" class="btn_comm all_listen CT_ZONE_LIST_LISTENALL" title="전체듣기" onclick="controller.listenAll(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value2}'});return false;">전체듣기</a>
+<a href="#" class="btn_comm set_listen CT_ZONE_LIST_LISTEN" title="선택듣기" onclick="controller.listenSelect(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value2}'});return false;">선택듣기</a>
+<a href="#" class="btn_comm btn_my CT_ZONE_LIST_MYPUT" title="재생목록에 담기" onclick="controller.putSelect(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value2}'});return false;">재생목록에 담기</a>
+<a href="#" id = "socialShareSnsView_${value}" class="btn_comm btn_export CT_ZONE_LIST_SNS" title="SNS 공유" onclick="daum.Music.Social.snsSendMusicBar(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value}'}, socialShareSetVar_$snsRowName);return false;">SNS 공유</a><!-- 2013-12-27 수정 -->
+<a href="#" class="btn_comm btn_buy CT_ZONE_LIST_BUY" title="구매" onclick="controller.buySelect(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value2}'});return false;">구매</a>
+	#else
+<a href="#" class="btn_comm all_listen CT_ZONE_LIST_LISTENALL" title="전체듣기" onclick="controller.listenAll(this, {container:'trackContainer$!{count}', checkboxName:'trackCheckbox$!{count}', allCheckbox:'allCheck$!{count}'}); return false;">전체듣기</a>
+<a href="#" class="btn_comm set_listen CT_ZONE_LIST_LISTEN" title="선택듣기" onclick="controller.listenSelect(this, {container:'trackContainer$!{count}', checkboxName:'trackCheckbox$!{count}', allCheckbox:'allCheck$!{count}'});return false;">선택듣기</a>
+<a href="#" class="btn_comm btn_my CT_ZONE_LIST_MYPUT" title="재생목록에 담기" onclick="controller.putSelect(this, {container:'trackContainer$!{count}', checkboxName:'trackCheckbox$!{count}', allCheckbox:'allCheck$!{count}'});return false;">재생목록에 담기</a>
+<a href="#" id = "socialShareSnsView_${count}" class="btn_comm btn_export CT_ZONE_LIST_SNS" title="SNS 공유" onclick="daum.Music.Social.snsSendMusicBar(this, {container:'trackContainer$!{count}', checkboxName:'trackCheckbox$!{count}'}, socialShareSetVar_$snsRowName);return false;">SNS 공유</a><!-- 2013-12-27 수정 -->
+<a href="#" class="btn_comm btn_buy CT_ZONE_LIST_BUY" title="구매" onclick="controller.buySelect(this, {container:'trackContainer$!{count}', checkboxName:'trackCheckbox$!{count}', allCheckbox:'allCheck$!{count}'});return false;">구매</a>
+	#end
+#end
+<div id="socialShareMoreViewContainer_${snsRowName}"></div>
+
+#end
+
+
+## 리스트 내 아이템별 액션 버튼 ############################################################################
+## $id : songId
+## $type : 버튼 타입 ( listen, lyrics, ... )
+## $value : 버튼 활성 비활성 판단할 값이나 구분자 값( true이면 무조건 활성화 / AODLinkId, lyricsYn, vclipLinkId, ... )
+## value2 : 
+#macro( printListItemButton $id $type $value $value2 $value3 $value4 $value5 $value6 $value7 $value8 $value9 $value10)
+#if( $StringUtils.equals( "$!{type}", "listen" ) )
+#if($StringUtils.equals( "$!{value9}", "N" ) && $StringUtils.equals( "$!{value10}", "Y" ))
+    <a id="play_$!{id}" class="listen btn_song btn_play listen_song#if(!$!{value3}&& ( !$!{value} || $StringUtils.isEmpty("$!{value}") || $StringUtils.equals("$!{value}","0"))) btn_noplay#end CT_ZONE_ITEM_LISTEN" href="javascript:;" title="듣기"#if(!$!{value3} && ($StringUtils.isEmpty("$!{value}") || $StringUtils.equals("$!{value}","0"))) onfocus="this.blur();"#else onclick="controller.adultCheck();return false;"#end>듣기</a>
+#else
+<a id="play_$!{id}" class="listen btn_song btn_play listen_song#if(!$!{value3}&& ( !$!{value} || $StringUtils.isEmpty("$!{value}") || $StringUtils.equals("$!{value}","0"))) btn_noplay#end CT_ZONE_ITEM_LISTEN" href="javascript:;" title="듣기"#if(!$!{value3} && ($StringUtils.isEmpty("$!{value}") || $StringUtils.equals("$!{value}","0"))) onfocus="this.blur();"#else onclick="daum.Music.SimplePlayer.playStop($!{id});return false;"#end>듣기</a>
+##	<div id="sId_$!{song.songId}" class="audio"></div>
+#end
+#elseif($StringUtils.equals( "$!{type}", "lyrics" ))
+#if( $StringUtils.isNotEmpty("$!{value4}"))#set($value4 = $value4.replaceAll("'", "&apos;") )#end
+<a class="btn_song lyrics_song#if(!${id}||!$StringUtils.equals($!{value},"Y")) lyrics_off#end CT_ZONE_ITEM_LYRICS" href="javascript:;" title="가사 보기" onclick='controller.viewLyrics(this, $!{id}, "$!{value}", {container:"trackContainer#if($StringUtils.isNotBlank("$!{value7}"))$!{value7}#end",checkboxName:"trackCheckbox$!{value2}"#if($StringUtils.isNotBlank("$!{value5}")), count:$!{value5}#end#if($StringUtils.isNotBlank("$!{value3}")), tag:"$!{value3}"#end#if($StringUtils.isNotBlank("$!{value6}")),arrow:"$!{value6}"#end#if($StringUtils.isNotBlank("$!{value8}")), typeCd:"$!{value8}"#end#if($StringUtils.isNotEmpty("$!{value9}")), isSongComment:$!{value9}#end});return false;'>가사 보기</a>
+#elseif( $StringUtils.equals( "$!{type}", "sns_more" ) )
+##<a class="btn_song more_song #if(!$StringUtils.isNotBlank($value2))more_off#end CT_ZONE_ITEM_SNSMORE" href="javascript:;" title="더보기" #if($StringUtils.isNotBlank($value2))onclick="controller.sns(event,'$!{id}'#if( $StringUtils.isNotBlank("$!{value}") ), $!{value}#end);return false;"#end>더보기</a>
+#elseif( $StringUtils.equals( "$!{type}", "album" ) )
+<a class="btn_song album_song CT_ZONE_ITEM_ALBUM" title="앨범 보기" href="/album/main?album_id=$!{id}&amp;artist_id=$!{value}">앨범 보기</a> ##onclick="daum.Music.albumDetail('$!{id}','$!{value}');return false;"
+#elseif( $StringUtils.equals( "$!{type}", "video" ) )
+<a class="btn_song video_song#if(!$!{id}||!$!{value}||$StringUtils.equals("$!{value}","0")) video_off#end CT_ZONE_ITEM_VIDEO" href="javascript:;" title="뮤직비디오 보기"#if($StringUtils.isBlank($!{value})||$StringUtils.equals("$!{value}","0")) onfocus="this.blur();"#else onclick='controller.viewVideo(this, $!{value}, {colNum:$!{value2}, songId:$id, typeCd:"$!{value10}", container:"trackContainer$!{value5}", pageType:"$!{value3}"#if($StringUtils.isNotBlank($!{value4})),rowIndex:$!{value4}#end#if($StringUtils.isNotBlank($!{value6})), tag:"$!{value6}"#end#if($StringUtils.isNotBlank("$!{value7}")), count:$!{value7}#end#if($StringUtils.isNotBlank("$!{value8}")), arrow:$!{value8}#end#if($StringUtils.isNotEmpty("$!{value9}")), isSongComment:$!{value9}#end}); return false;'#end>뮤직비디오 보기</a>
+#elseif( $StringUtils.equals( "$!{type}", "sns" ) )
+<a href="javascript:;" id="socialShareSnsView_$!{id}_$!{value5}" class="btn_song more_song" title="SNS 공유하기">SNS 공유하기</a> <!-- 2014-01-16 수정 -->
+#elseif( $StringUtils.equals( "$!{type}", "my" ) )
+<a class="btn_song my_song#if(!$!{value3} || $StringUtils.isEmpty("$!{value3}") || $StringUtils.equals("$!{value3}","0")) my_off#end CT_ZONE_ITEM_MYPUT" href="javascript:;" title="재생목록에 담기" #if(!$!{value3} || $StringUtils.isEmpty("$!{value3}") || $StringUtils.equals("$!{value3}","0"))onfocus="this.blur();"#else onclick="controller.putMy($!{id});return false;"#end>재생목록에 담기</a>
+#elseif( $StringUtils.equals( "$!{type}", "buy" ) )
+<a class="btn_song buy_song CT_ZONE_ITEM_BUY" title="구매" href="javascript:;" onclick="controller.buySelect(this, {#if($StringUtils.isNotBlank('$!{id}'))songId:$!{id},#end checkboxName:'trackCheckbox'#if($StringUtils.isNotBlank('$value2')), allCheckbox:'allCheck$!{value2}'#end}); return false;" #if($StringUtils.isNotEmpty($!{value3}))count="$!{value3}"#end select="MINE">구매</a>
+#elseif( $StringUtils.equals( "$!{type}", "buy_one" ) )
+<a class="btn_song buy_song CT_ZONE_ITEM_BUY" title="구매" href="javascript:;" onclick="controller.buy(this, $!{id}, $!{value3}, { checkboxName:'trackCheckbox#if($StringUtils.isNotBlank('$value2'))$!{value}#end'#if($StringUtils.isNotBlank('$value2')), allCheckbox:'allCheck$!{value2}'#end, type:'buy_one' })">구매</a>
+#elseif( $StringUtils.equals( "$!{type}", "mp3" ) )
+<a class="btn_song mp3_song mp3_off CT_ZONE_ITEM_MP3" href="javascript:;" title="MP3 구매하기"#if(!$!{value} || $StringUtils.isEmpty("$!{value}") || $StringUtils.equals("$!{value}","0")) onfocus="this.blur();"#else onfocus="this.blur();"#end #if($StringUtils.equals($value2,"N"))style="display:none"#end>MP3</a>
+#elseif( $StringUtils.equals( "$!{type}", "bgm" ) )
+<a class="btn_song bgm_song#if(!$!{value} || $StringUtils.isEmpty("$!{value}") || $StringUtils.equals("$!{value}","0")) bgm_off#end CT_ZONE_ITEM_BGM" href="javascript:;" title="BGM 구매하기"#if(!$!{value} || $StringUtils.isEmpty("$!{value}") || $StringUtils.equals("$!{value}","0")) onfocus="this.blur();"#else onclick="controller.bgm(this,$!{id});return false;"#end #if($StringUtils.equals($value2,"N"))style="display:none"#end>BGM</a>
+#elseif( $StringUtils.equals( "$!{type}", "alone_bgm" ) )	## 어디서 쓰는것일까??
+<a class="btn_song mybgm_song#if(!$!{id}||!$!{value}) bgm_off#end" href="javascript:;" title="BGM 구매하기" #if(!$!{id}||!$!{value})#else onclick="controller.bgm(this,$!{id});return false;"#end>BGM</a>
+#elseif( $StringUtils.equals( "$!{type}", "recommandbgm" ) )  ## 차트추천음악 bgm
+<a class="btn_song bgm_song#if(!$!{value} || $StringUtils.isEmpty("$!{value}") || $StringUtils.equals("$!{value}","0")) bgm_off#end CT_ZONE_ITEM_BGM" href="javascript:;" title="BGM 구매하기"#if(!$!{value} || $StringUtils.isEmpty("$!{value}") || $StringUtils.equals("$!{value}","0")) onfocus="this.blur();"#else onclick="controller.recommandbgm(this,$!{id});return false;"#end #if($StringUtils.equals($value2,"N"))style="display:none"#end>BGM</a>
+#elseif( $StringUtils.equals( "$!{type}", "social" ) )
+<a class="btn_song social_song #if(!$id||!$!{value}) social_fold#end CT_ZONE_ITEM_SOCIAL" href="javascript:;" title="소셜웹" onclick="daum.Music.SocialWeb.spread(event, $!{id}, $!{value2});return false;">소셜웹</a>
+#elseif( $StringUtils.equals( "$!{type}", "download" ) )
+<a class="btn_song down_song CT_ZONE_ITEM_DOWNLOAD" title="다운로드" onmouseover="daum.Music.Downloader.add(this,'$!{id}')" href="#">다운로드</a>
+#elseif( $StringUtils.equals( "$!{type}", "rebuy" ) )
+<a class="btn_song rebuy_song CT_ZONE_ITEM_REBUY" title="재구매" #if(!$!{value} || $StringUtils.isEmpty("$!{value}") || $StringUtils.equals("$!{value}","0")) onfocus="this.blur();"#else onclick="controller.mp3(this,'$!{id}', '$!{value4}', {type:'one'});return false;"#end href="#">재구매</a>
+#elseif( $StringUtils.equals( "$!{type}", "resend" ) )
+<a class="btn_song resend_song#if(!$!{value}) resend_off#end CT_ZONE_ITEM_RESEND" title="재전송" #if($!{value})href="#" onclick='controller.resend(event,{linkId:"$!{id}", getNumber:"$!{value2}"});return false;'#end>재전송</a>
+#end
+
+#if( $StringUtils.equals( "$!{type}", "sns" ) )
+<div id="socialShareMoreViewContainer_$!{id}_$!{value5}"></div> <!-- 더보기 레이어가 들어갈 요소 --> <!-- 2014-01-16 추가 : 스크립트 추가시 인라인 스타일 제거 --> 
+<!-- 소셜쉐어 include -->
+<script>
+	var snsSendValue_$!{id}_$!{value5} = ${value};
+	daum.addEvent(window, 'load', function(){
+		var snsLink = "";
+		var snsPrefix = "";
+		var snsContId = "";
+		
+		if( daum.Music.DTO && daum.Music.DTO.Song && !! daum.Music.DTO.Song['$value2'] ){
+			var songInfo = daum.Music.DTO.Song['$value2'];
+			
+			snsLink = daum.Music.Social.getValue(songInfo, 'link');
+			snsPrefix = daum.Music.Social.getValue(songInfo, 'prefix');
+			
+			snsContId = "$!value2";
+		} else{
+			snsLink = snsSendValue_$!{id}_$!{value5}.link;
+			snsPrefix = snsSendValue_$!{id}_$!{value5}.prefix;
+			snsContId = "";
+		}
+		
+		var socialShareSetVar_$!{id}_$!{value5} = null;
+		
+		if(snsContId != ""){
+    	    socialShareSetVar_$!{id}_$!{value5} = new socialshare( document.getElementById('socialShareMoreViewContainer_$!{id}_$!{value5}'), {
+    	        shareType: 'button',
+       			useCustomizedButton: true,
+    	        link: snsLink,
+    	        prefix: snsPrefix,
+    			optionalServices: {
+    	            cafe: 'http://user.csm.daum.net/export/to/cafe.do?srv=music&sct=song&contId='+snsContId+'&embed=Y',
+    	            blog: 'http://user.csm.daum.net/export/to/blog.do?srv=music&sct=song&contId='+snsContId+'&embed=Y'
+    	        }
+    	    });
+		}else{
+    	    socialShareSetVar_$!{id}_$!{value5} = new socialshare( document.getElementById('socialShareMoreViewContainer_$!{id}_$!{value5}'), {
+    	        shareType: 'button',
+       			useCustomizedButton: true,
+    	        link: snsLink,
+    	        prefix: snsPrefix
+    	    });
+		}
+		
+		var snsBtn_$!{id}_$!{value5} = document.getElementById('socialShareSnsView_$!{id}_$!{value5}');
+		
+        daumtools.event.on(snsBtn_$!{id}_$!{value5}, 'click', function () {
+            socialShareSetVar_$!{id}_$!{value5}.toggle();
+        });
+		
+		
+		daumtools.event.on(document, 'click', function (e) {
+			var ev = e || window.event, target = ev.target || ev.srcElement, key;
+            var snsDivLayer = daum.$$('#socialShareMoreViewContainer_$!{id}_$!{value5} div')[0];
+			var snsParentNode = daum.$('socialShareSnsView_$!{id}_$!{value5}');
+			if(target != snsParentNode){
+    			if(daum.hasClassName(snsDivLayer, 'sns_on')){
+    				daum.removeClassName(snsDivLayer, 'sns_on');
+    			}
+			}
+        });
+	});
+</script>
+#end
+#end
+
+#macro(printListItemButtonOnair $id $type $value $value2 $value3 $value4 $value5 $value6 $value7)
+    #if( $StringUtils.equals( "$!{type}", "listen" ))
+    	#set($listenAble = false)
+    	#if("$value2" != "" && "$value2" != 0)
+    		#set($listenAble = true)
+    	#end
+    	#set($_tagname = 'em')
+    	#set($_action = '')
+    	#set($_className = 'listen_off')
+    	
+    	#if($listenAble)
+        	#set($_tagname = 'a')
+        	#set($_action = 'onclick="daum.Music.AodPlayer.add(this,'+$id+');return false;"')
+        	#set($_className = '')
+    	#end
+    <$_tagname class="btn_now link_listen listen $_className" href="javascript:;" title="듣기" $_action>듣기</$_tagname>
+	#elseif( $StringUtils.equals( "$!{type}", "album" ))
+		#if("$id" == "" || "$id" == "0")
+	<em class="btn_now link_album" title="앨범 보기" href="#none">앨범 보기</a>
+		#else
+	<a class="btn_now link_album" title="앨범 보기" href="/album/main?album_id=$id&artist_id=$value">앨범 보기</a>
+		#end
+	#elseif( $StringUtils.equals( "$!{type}", "my" ))
+    	#set($listenAble = false)
+    	#if("$value2" != "" && "$value2" != "0")
+    		#set($listenAble = true)
+    	#end
+    	#set($_tagname = 'em')
+    	#set($_action = '')
+    	
+    	#if($listenAble)
+        	#set($_tagname = 'a')
+        	#set($_action = 'onclick="controller.putMy('+$id+');return false;"')
+    	#end
+	<$_tagname class="btn_now link_my" href="javascript:;" title="재생목록에 담기" $_action>재생목록에 담기</$_tagname>
+	#elseif( $StringUtils.equals( "$!{type}", "mp3" ))
+    	#set($mp3Able = false)
+    	#set($_tagname = 'em')
+    	#set($_action = '')
+##		#if("$value2" != "" && "$value2" != "0")
+##    		#set($mp3Able = true)
+##			#set($_tagname = 'a')
+##    	#end
+		
+		#if($mp3Able)
+##			#set($_action = 'onclick="daum.Music.Onair.buyLayer(this);return false;"')
+		#end
+	<div class="option_btn"><$_tagname class="btn_now link_mp3" href="javascript:;" title="MP3 구매하기" $_action>MP3</$_tagname>
+		#if($mp3Able)
+##        <div class="detail_btn">
+##        	<div class="layer_buy" style="display:none;">
+##        		<ul class="list_buy">
+##        			<li><a class="link_layer buy_mp3" href="#" onclick="controller.cart('mp3','$id','');daum.Music.Onair.closeLayer(this);return false;" >MP3 구매</a></li>
+##        			<li><a class="link_layer buy_mp3gift" href="#" onclick="controller.cart('mp3_gift','$id','');daum.Music.Onair.closeLayer(this);return false;return false;">MP3 선물</a></li>
+##        		</ul>
+##        	</div>
+##        </div>
+		#end
+	</div>
+	#elseif( $StringUtils.equals( "$!{type}", "bgm" ))
+    	#set($mp3Able = false)
+    	#set($_tagname = 'em')
+    	#set($_action = '')
+		#if("$value2" != "" && "$value2" != "0")
+##    		#set($mp3Able = true)
+##			#set($_tagname = 'a')
+    	#end
+		
+		#if($mp3Able)
+			#set($_action = 'onclick="daum.Music.Onair.buyLayer(this);return false;"')
+		#end
+	<div class="option_btn"><$_tagname class="btn_now link_bgm" href="javascript:;" title="BGM 구매하기" $_action>BGM</$_tagname>
+		#if($mp3Able)
+        <div class="detail_btn">
+        	<div class="layer_buy" style="display:none;">
+        		<ul class="list_buy">
+        			<li><a class="link_layer buy_bgm" href="#" onclick="controller.cart('bgm','$id','');daum.Music.Onair.closeLayer(this);return false;" >BGM 구매</a></li>
+        			<li><a class="link_layer buy_bgmgift" href="#" onclick="controller.cart('bgm_gift','$id','');daum.Music.Onair.closeLayer(this);return false;return false;">BGM 선물</a></li>
+        		</ul>
+        	</div>
+        </div>
+		#end
+	</div>
+    #end
+#end
+
+
+#macro( printListCol $_listType $song $album $hasClass $name_index $checkboxDrag)
+#if( $StringUtils.equals("$!{_listType}", "check")) ## 체크 박스
+	<input#if($hasClass) class="disc_$!{song.discNo}"#end type="checkbox" name="trackCheckbox$!{name_index}" value="$!{song.songId}" #if($StringUtils.isNotBlank("$!{checkboxDrag}"))onclick="return false;"#end>
+#end
+#end
+
+
+## 리스트 ROW  #############################################################################################
+#macro( printListItems $listType $songList $count $sequence $userAdultYn) ## count는 전체 선택 할 때 해당 되는 리스트만 선택하게 하려고 집어 넣음 뮤직바 때문에.... // 또한 리스트에 중복되는 곡이 포함되는 페이지에서 순서로 사용
+#foreach($song in $songList)
+	#if( $StringUtils.equals( "$!{listType}", "song" ) && $StringUtils.isNotBlank("$!{album.discCount}") && $!{album.discCount} > 1 && !$StringUtils.equals("$!{command.order_type}", "02"))
+    	#if($discNo != $song.discNo)
+    	#set($discNo = $song.discNo)
+	<tr class="disc_song">
+##		<td class="col_check"><input type="checkbox" onclick="daum.Music.selectDiscTrack(this, $!{discNo})"></td>
+		<td colspan="10" class="col_disc"><strong>Disc $!{discNo}</strong></td>
+	</tr>
+		#end
+	#end
+
+	#if( $listType.indexOf("_li") > -1 )
+		#if( $foreach.index > 0 ) #set( $printName = $printName + ", ") #end##
+	<li id="track#if($!{song.song.songId})$!{song.song.songId}#if($!{sequence})_$!{foreach.count}#end#{else}$!{song.songId}#if($!{sequence})_$!{foreach.count}#end#end" class="track#if($foreach.index==0) fst #end">
+	#else
+
+	<tr tag="$!{listType}" id="track$!{song.songId}#if(!$StringUtils.equals("$!{listType}","song") && !$StringUtils.equals("$!{listType}","chart") && !$StringUtils.equals("$!{listType}","album") && !$StringUtils.equals("$!{listType}","artist_chart"))_$!{foreach.count}#end" class="track#if($StringUtils.contains("$!{listType}","board") && $StringUtils.isNotBlank("$!{board.songCommentList}") && $!{board.songCommentList.size()}>0 && $StringUtils.isNotEmpty($!{board.songCommentList.get($!{foreach.index})})) open_song#end#if($foreach.count == $songList.size()) lst#end">
+	#end
+
+	########################################################################################################
+	## 인기차트 > 실시간/일간/주간/월간 ####################################################################
+	#if( $StringUtils.equals( "$!{listType}", "chart" ) )
+		<td class="col_check">
+			#printListCol("check" $song $song.album false "")
+			##printListCol("check" $song $song.album false "" "checkboxDrag")
+		</td>
+		<td class="col_rank">
+			<div class="bg_chart">
+				#printRankNumber( $!{song.rank} )
+				<span class="hide">위</span>
+				<span class="rank_vary">
+					#printRankChanged( $!{song.modRank} )
+				</span>
+			</div>
+		</td>
+		<td class="col_album">
+			#printAlbumThumb( $!{song.album} 1 "" "" )
+		</td>
+		<td class="col_title">
+			#printSongName( $!{song} "fw_b CT_ZONE_LIST_SONG" 40 true false false)
+			#printListHotIssueIcon( $!{song} "")
+		</td>
+		<td class="col_artist">
+			#printArtistName( $!{song.keyArtistList} "CT_ZONE_LIST_ARTIST" 16 true )
+		</td>
+		<td class="col_listen">
+        	#printListItemButton( $!{song.songId} "listen" $!{song.AODLinkId} "" false "" "" "" "" "" "" "")
+        </td>
+        <td class="col_lyrics">
+        	#printListItemButton( $!{song.songId} "lyrics" $!{song.lyricsYn} $count "tr" "" $!{foreach.count} "" "" $!{song.typeCd} "" "")
+        </td>
+        <td class="col_video">
+        	#printListItemButton( $!{song.songId} "video" $!{song.vclipLinkId} 11 "chart" "" "" "" $!{foreach.count} "" "" $!{song.typeCd} )
+        </td>
+        <td class="col_my">
+        	#printListItemButton( $!{song.songId} "my" true "" $!{song.AODLinkId} "" "" "" "" "" "" "")
+        </td>
+        <td class="col_export">
+        	<div class="wrap_export_btn">
+        		#printListItemButton( $!{song.songId} "sns" true "$!song.AODLinkId" "" "" $!{foreach.count} "" "" "" "" "")
+        		#printListItemButton( $!{song.songId} "sns_more" true "$!song.AODLinkId" "" "" $!{foreach.count} "" "" "" "" "")
+        	</div>
+        </td>
+        <td class="col_buy">
+    		#printListItemButton( $!{song.songId} "mp3" $!{song.MP3LinkId} "" "" $!{song.album.albumId} "" "" "" "" "" "")
+    		#printListItemButton( $!{song.songId} "bgm" $!{song.BGMLinkId} "" "" "" "" "" "" "" "" "")
+        </td>
+
+	########################################################################################################
+	## 아티스트상세 > 앨범 곡 리스트 #######################################################################
+	#elseif( $StringUtils.equals( "$!{listType}", "album" ) || $StringUtils.equals("$!{listType}", "artist_chart") )
+		#set( $idx =  ($!{pageHandler.onePageCnt}*($MathTool.sub($!{pageHandler.pageNo},1))) + $foreach.count )
+		#if($StringUtils.equals( "$!{listType}", "album" ))
+			#set($idx = $foreach.count)
+			#if($foreach.index == 10)#break;#end
+		#end
+
+		<td class="col_check">
+			#printListCol("check" $song $!{song.album} false "")
+		</td>
+		<td class="col_rank">$!{idx}</td>
+		<td class="col_title">#printSongName( $!{song} "" 28 true false false )</td>
+		<td class="col_artist">#printArtistName( $!{song.keyArtistList} "" 18 true )</td>
+		<td class="col_popular">
+			#printPopularity( $!{song} )
+		</td>
+		<td class="col_listen">
+			#printListItemButton( $!{song.songId} "listen" $!{song.AODLinkId} "" false "" "" "" "" "" "" "" )
+		</td>
+		<td class="col_lyrics">
+    		#printListItemButton( $!{song.songId} "lyrics" $!{song.lyricsYn} "" "tr" "" $!{foreach.count} false "" $!{song.typeCd} "" "")
+		</td>
+		<td class="col_album">
+			#printListItemButton( $!{song.album.albumId} "album" "#getArtistId($!{song})" "" "" "" "" "" "" "" "" "")
+		</td>
+		<td class="col_video">
+			#printListItemButton( $!{song.songId} "video" $!{song.vclipLinkId} 11 "detail" "" "" "tr" $!{foreach.count} false ""  $!{song.typeCd})
+		</td>
+		<td class="col_my">
+			#printListItemButton( $!{song.songId} "my" true "" $!{song.AODLinkId} "" "" "" "" "" "" "")
+		</td>
+		<td class="col_buy">
+			##<div class="wrap_buy_btn">
+				#printListItemButton( $!{song.songId} "mp3" $!{song.MP3LinkId} "" "" $!{song.album.albumId} "" "" "" "" "" "")
+        		#printListItemButton( $!{song.songId} "bgm" $!{song.BGMLinkId} "" "" "" "" "" "" "" "" "")
+        		##printListItemButton( $!{song.songId} "phone" "$!{song.ringSalesStatus}" "$!{song.bellSalesStatus}" )
+			##</div>
+		</td>
+	########################################################################################################
+	## 앨범스트상세 > 앨범 곡 리스트 #######################################################################
+	#elseif( $StringUtils.equals( "$!{listType}", "song" ) )
+		#if( $StringUtils.isNotBlank("$!{album.discCount}") && $!{album.discCount} > 1 && !$StringUtils.equals("$!{command.order_type}", "02"))
+##			#set( $idx = "$!{song.discNo}-$!{song.trackNo}")
+			#set( $idx = "$!{song.trackNo}")
+		#else
+			#set( $idx = $foreach.index + 1 )
+		#end
+##		<td class="col_check">
+##			#printListCol("check" $song $!{song.album} true "")
+			##printListCol("check" $song $!{song.album} true "" "checkboxDrag")
+##		</td>
+		##<td class="col_rank">$!{idx}</td>
+		<td class="col_rank">$idx</td>
+		<td class="col_title">
+			#set($titleLen = 75)#set($titleClass = "")
+			#if( $StringUtils.equals("$!{song.masterYn}", "Y") )
+				#set($titleLen = $titleLen - 10)#set($titleClass = "song_title")
+			#end
+			#if( $StringUtils.isNotBlank("$!{song.hotIssue.issueId}") && !$StringUtils.equals("$!{song.hotIssue.issueId}", "0"))
+				#set($titleLen = $titleLen - 10)
+			#end
+			#printSongName( $!{song} $!{titleClass} $!{titleLen} true false false)
+			#printListMasterSongIcon( $!{song} )
+##			#printListHotIssueIcon( $!{song} "album")
+		</td>
+		<td class="col_artist">#printArtistName( $!{song.keyArtistList} "" 14 true )</td>
+##		<td class="col_popular">
+##			#printPopularity( $!{song} )
+##		</td>
+##		<td class="col_listen">
+##			#printListItemButton( $!{song.songId} "listen" $!{song.AODLinkId} "" false "" "" "" "" "" $!{userAdultYn} $!{song.adultYn})
+##		</td>
+		<td class="col_lyrics">
+			#printListItemButton( $!{song.songId} "lyrics" $!{song.lyricsYn} $count "tr" "" $!{foreach.count} false "" $!{song.typeCd} "" "")
+		</td>
+##		<td class="col_video">
+##			#printListItemButton( $!{song.songId} "video" $!{song.vclipLinkId} 10 "detail" "" "" "tr" $!{foreach.count} false ""   $!{song.typeCd})
+##		</td>
+##		<td class="col_my">
+##			#printListItemButton( $!{song.songId} "my" true "" $!{song.AODLinkId} "" "" "" "" "" "" "")
+##		</td>
+##		<td class="col_buy">
+			##<div class="wrap_buy_btn">
+##				#printListItemButton( $!{song.songId} "mp3" $!{song.MP3LinkId} "" "" $!{song.album.albumId} "" "" "" "" "" "")
+  ##      		#printListItemButton( $!{song.songId} "bgm" $!{song.BGMLinkId} "" "" "" "" "" "" "" "" "")
+        		##printListItemButton( $!{song.songId} "phone" "$!{song.ringSalesStatus}" "$!{song.bellSalesStatus}" )
+
+			##</div>
+##		</td>
+	#######################################################################################################
+	## 뮤직바 > 뮤직바 본문 곡 리스트 #######################################################################
+	#elseif( $StringUtils.contains( "$!{listType}", "board" ) )
+		#set( $idx = $foreach.index + 1 )
+		#set($isSongCommend = "")
+
+		#if($!{board.songCommentList} && $!{board.songCommentList.size()} > 0 )
+			#if( $board.songCommentList.get($!{foreach.index}) )
+				#set($isSongComment = true)
+			#else
+				#set($isSongComment = false)
+			#end
+		#end
+		<td class="col_check">
+			##printListCol("check" $song $!{song.album} false $!{count})&nbsp;
+			##<input type="checkbox" name="trackCheckbox$!{count}" value="$!{song.songId}" class="checking_td" albumId="$!{song.album.albumId}" onclick="return false;">
+			<input type="checkbox" name="trackCheckbox$!{count}" value="$!{song.songId}" class="checking_td" albumId="$!{song.album.albumId}">
+		</td>
+		<td class="col_rank">$!{idx}</td>
+		#if($StringUtils.contains( "$!{listType}", "fund" ))
+		<td class="col_title">#printSongName( $!{song} "" 20 true false false)</td>
+		<td class="col_artist">#printArtistName( $!{song.keyArtistList} "" 10 true )</td>
+		#else
+		<td class="col_title">#printSongName( $!{song} "" 26 true false false)</td>
+		<td class="col_artist">#printArtistName( $!{song.keyArtistList} "" 20 true )</td>
+		#end
+		<td class="col_listen">
+			#printListItemButton( $!{song.songId} "listen" $!{song.AODLinkId}  "" false "" "" "" "" "" "" "" )
+		</td>
+		<td class="col_lyrics">
+			#printListItemButton( $!{song.songId} "lyrics" $!{song.lyricsYn} $count "tr" "" $idx false $count $!{song.typeCd} $!{isSongComment} "")
+		</td>
+		<td class="col_album">
+			#printListItemButton( $!{song.album.albumId} "album" "#getArtistId($!{song})" "" "" "" "" "" "" "" "" "" )
+		</td>
+		<td class="col_video">
+		#if($StringUtils.contains( "$!{listType}", "fund" ))
+			#if(!$!{song.songId}||!$!{song.vclipLinkId}||$StringUtils.equals("$!{song.vclipLinkId}","0"))
+			<span class="btn_song video_song video_off">뮤직비디오 보기</span>
+			#else
+			<a class="btn_song video_song" href="/artist/vclip/detail?vclip_id=$!{song.vclipLinkId}&amp;song_id=$!{song.songId}" title="뮤직비디오 보기">뮤직비디오 보기</a>
+			#end
+		#else
+			#printListItemButton( $!{song.songId} "video" $!{song.vclipLinkId} 10 "detail" "" $count "tr" $!{foreach.count} false $!{isSongComment}  $!{song.typeCd})
+		#end
+		</td>
+		<td class="col_my">
+			#printListItemButton( $!{song.songId} "my" true "" $!{song.AODLinkId} "" "" "" "" "" "" "" )
+		</td>
+		<td class="col_buy">
+			##<div class="wrap_buy_btn">
+			#if( $StringUtils.contains( "$!{listType}", "fund" ) )
+				#printListItemButton( $!{song.songId} "buy_one" "" "$!{song.songId}" $!{song.album.albumId} "" "" "" "" "" "" "")
+			#else
+ 				#printListItemButton( $!{song.songId} "mp3" $!{song.MP3LinkId} "" "" $!{song.album.albumId} "" "" "" "" "" "")
+        		#printListItemButton( $!{song.songId} "bgm" $!{song.BGMLinkId} "" "" "" "" "" "" "" "" "")
+			#end
+        		##printListItemButton( $!{song.songId} "phone" "$!{song.ringSalesStatus}" "$!{song.bellSalesStatus}" )
+ 			##</div>
+		</td>
+		##printListFloor( $!{song} )
+	########################################################################################################
+	## 인기차트 > 추천음악 #################################################################################
+	#elseif( $StringUtils.equals( "$!{listType}", "recommend" ) )
+		<td class="col_check">
+			##<input type="checkbox" name="trackCheckbox" value="$!{song.songId}" packageSaleYn="$!{song.album.packageSaleYn}" albumId="$!{song.album.albumId}" title="$!{title}" artistName="$artistName" isAODLinkId="$!{song.AODLinkId}">
+			##printListCol("check" $song $!{song.album} false "" "checkboxDrag")
+			#printListCol("check" $song $!{song.album} false "")
+		</td>
+		<td class="col_rank">
+			<div class="bg_chart">
+				#printRankNumber( $!{song.rank} )
+				<span class="hide">위</span>
+			</div>
+		</td>
+		<td class="col_album">
+			#printAlbumThumb( $!{song.album} 1 "" "" )
+		</td>
+		<td class="col_title">
+			#printSongName( $!{song} "fw_b" 50 true false false)
+			#printListMusicBar( $!{song} )
+		</td>
+		<td class="col_artist">
+			#printArtistName( $!{song.keyArtistList} "" 18 true )
+		</td>
+		<td class="col_listen">
+        	#printListItemButton( $!{song.songId} "listen" $!{song.AODLinkId} "" false "" "" "" "" "" "" "" )
+        </td>
+        <td class="col_lyrics">
+			#printListItemButton( $!{song.songId} "lyrics" $!{song.lyricsYn} "" "tr" "" $!{foreach.count} false "" $!{song.typeCd} "" "")
+        </td>
+        <td class="col_video">
+        	#printListItemButton( $!{song.songId} "video" $!{song.vclipLinkId} 11 "chart" "" "" "" $!{foreach.count} false ""  $!{song.typeCd})
+        </td>
+        <td class="col_my">
+        	#printListItemButton( $!{song.songId} "my" true "" $!{song.AODLinkId} "" "" "" "" "" "" "")
+        </td>
+        <td class="col_export">
+        	<div class="wrap_export_btn">
+        		#printListItemButton( $!{song.songId} "sns" true "$!song.AODLinkId" "" "" "" "" "" "" "" "" )
+        		#printListItemButton( $!{song.songId} "sns_more" true "$!song.AODLinkId"  "" "" "" "" "" "" "" "")
+        	</div>
+        </td>
+        <td class="col_buy">
+        	##<div class="wrap_buy_btn">
+        		#printListItemButton( $!{song.songId} "mp3" $!{song.MP3LinkId} "" $!{song.album.packageSaleYn} $!{song.album.albumId} $!{title} "$!{artistName}" "" "" "" "")
+        		#printListItemButton( $!{song.songId} "bgm" $!{song.BGMLinkId} "" "" "" "" "" "" "" "" "")
+        		##printListItemButton( $!{song.songId} "phone" "$!{song.ringSalesStatus}" "$!{song.bellSalesStatus}" )
+        	##</div>
+        </td>
+
+	########################################################################################################
+	## 이벤트 상세 > 구매대상 & 무료감상 곡 리스트 #######################################################################
+	#elseif( $StringUtils.equals( "$!{listType}", "event") )
+		#set( $idx = $foreach.index + 1 )
+		<td class="col_check">
+			##<input type="checkbox" name="trackCheckbox" value="$!{song.songId}" packageSaleYn="$!{song.album.packageSaleYn}" albumId="$!{song.album.albumId}" title="$!{title}" artistName="$artistName" isAODLinkId="$!{song.AODLinkId}">
+			#printListCol("check" $song $!{song.album} false "")
+		</td>
+		<td class="col_rank">$!{idx}</td>
+		<td class="col_title">#printSongName( $!{song} "" 34 true false false)</td>
+		<td class="col_artist">#printArtistName( $!{song.keyArtistList} "" 20 true )</td>
+		<td class="col_listen">
+			#printListItemButton( $!{song.songId} "listen" $!{song.AODLinkId} "" false "" "" "" "" "" "" "" )
+		</td>
+		<td class="col_lyrics">
+			#printListItemButton( $!{song.songId} "lyrics" $!{song.lyricsYn} "" "" "" $!{foreach.count} false "" $!{song.typeCd} "" "")
+		</td>
+		<td class="col_album">
+			#printListItemButton( $!{song.album.albumId} "album" "#getArtistId($!{song})" "" "" "" "" "" "" "" "" "" )
+		</td>
+		<td class="col_video">
+			#printListItemButton( $!{song.songId} "video" $!{song.vclipLinkId} "" "" "" "" "" $!{foreach.count} false ""  $!{song.typeCd})
+		</td>
+		<td class="col_my">
+			#printListItemButton( $!{song.songId} "my" true "" $!{song.AODLinkId} "" "" "" "" "" "" "")
+		</td>
+		<td class="col_buy">
+			##<div class="wrap_buy_btn">
+				#printListItemButton( $!{song.songId} "mp3" $!{song.MP3LinkId} "" "" $!{song.album.albumId} "" "" "" "" "" "")
+        		#printListItemButton( $!{song.songId} "bgm" $!{song.BGMLinkId} "" "" "" "" "" "" "" "" "")
+        		##printListItemButton( $!{song.songId} "phone" "$!{song.ringSalesStatus}" "$!{song.bellSalesStatus}" )
+			##</div>
+		</td>
+		##printListFloor( $!{song} )
+	########################################################################################################
+	## MY> 즐겨듣는음악   #################################################################################
+	#elseif( $StringUtils.equals( "$!{listType}", "song_li" ) )
+##		<div class="col_check">
+			##<input id="chk_$!{song.songId}_$!{foreach.count}"  index="$foreach.count" class="all_chk" type="checkbox" name="trackCheckbox" value="$!{song.songId}" albumId="$!{song.album.albumId}" onclick="return false;">
+##			<input id="chk_$!{song.songId}_$!{foreach.count}"  index="$foreach.count" class="all_chk" type="checkbox" name="trackCheckbox" value="$!{song.songId}" albumId="$!{song.album.albumId}">
+##		</div>
+		<div class="col_song">
+			<strong class="screen_out">곡명</strong>
+			#printSongName( $!{song} "" 40 true false false)
+		</div>
+		<div class="col_artist">
+			<strong class="screen_out">아티스트</strong>
+			#printArtistName( $!{song.keyArtistList} "" 17 true )
+		</div>
+		<div class="col_access">
+##			#printListItemButton( $!{song.songId} "listen" $!{song.AODLinkId} "" false "" "" "" "" "" "" "" )
+			#printListItemButton( $!{song.songId} "lyrics" $!{song.lyricsYn} "" "li" "" $!{foreach.count} false "" $!{song.typeCd} "" "")
+##			#printListItemButton( $!{song.album.albumId} "album" "#getArtistId($!{song})" "" "" "" "" "" "" "" "" "" )
+##			#printListItemButton( $!{song.songId} "video" $!{song.vclipLinkId} 11 "detail" "" "" "li" $!{foreach.count} false ""  $!{song.typeCd})
+##			#printListItemButton( $!{song.songId} "my" true "" $!{song.AODLinkId} "" "" "" "" "" "" "")
+##			#printListItemButton( $!{song.songId} "mp3" $!{song.MP3LinkId} "" "" $!{song.album.albumId} "" "" "" "" "" "")
+  ##  		#printListItemButton( $!{song.songId} "bgm" $!{song.BGMLinkId} "" "" "" "" "" "" "" "" "")
+    		##printListItemButton( $!{song.songId} "phone" "$!{song.ringSalesStatus}" "$!{song.bellSalesStatus}" )
+		</div>
+	#elseif( $StringUtils.equals( "$!{listType}", "mp3_li" ) )
+		<div class="col_check">
+			##printListCol("check" $!{song.song} $!{song.album} false "" "checkboxDrag")
+			#printListCol("check" $!{song.song} $!{song.album} false "")
+		</div>
+		<div class="col_song">
+			<strong class="screen_out">곡명</strong>
+			#set($sLen=32)
+			#if($!{song.giver.daumName})#set($sLen=8)#end
+			#printSongName( $!{song.song} "" $!{sLen} true false true)
+				#if($StringUtils.isNotBlank("$!{song.giver.daumName}"))
+				<span class="fc_etc fs_11" title="$!{song.giver.daumName}님">
+					#if( $StringCutUtil.getStringByte($!{song.giver.daumName}) > 10)
+						(FROM:#strCut($!{song.giver.daumName}, 10)님)
+					#else
+						(FROM:$!{song.giver.daumName}님)
+					#end
+				</span>
+				#end
+		</div>
+		<div class="col_artist">
+			<strong class="screen_out">아티스트</strong>
+			#printArtistName( $!{song.keyArtistList} "" 15 true )
+		</div>
+		<div class="col_album">
+			#printAlbumName( $!{song.song.album} "" 16 2 true )
+		</div>
+		<div class="col_access">
+##			#printListItemButton( $!{song.song.songId} "listen" $!{song.song.AODLinkId} ""  true "" "" "" "" "" "" "")
+			#printListItemButton( $!{song.song.songId} "lyrics" $!{song.song.lyricsYn} "" "" "" "" false "" $!{song.song.typeCd} "" "")
+			#if( $StringUtils.equals( "$!{song.status}", "Y" ) )	## 구매후 1년 이내, 다운로드 가능
+    		#printListItemButton( $!{song.song.songId} "download" $!{song.song.MP3LinkId} "" "" "" "" "" "" "" "" "")
+			#else	## 구매후 1년 이후, 재구매
+			#printListItemButton( $!{song.song.songId} "rebuy" $!{song.song.MP3LinkId} "" "" $!{song.album.albumId} "" "" "" "" "" "")	
+			#end
+			#printListItemButton( $!{song.song.songId} "mp3" $!{song.song.MP3LinkId} "N" "" $!{song.album.albumId} "" "" "" "" "" "")
+			#printListItemButton( $!{song.song.songId} "bgm" $!{song.song.BGMLinkId} "N" "" "" "" "" "" "" "" "")
+		</div>
+		<div class="col_date">
+			<strong class="screen_out">구매일</strong>
+			$!CheckDate.makeReleaseDate($!{song.ownDate})
+		</div>
+	#elseif( $StringUtils.equals( "$!{listType}", "bgm_li" ) )
+		<div class="col_check">
+			##<input type="checkbox" name="trackCheckbox" value="$!{song.song.songId}" packageSaleYn="$!{song.album.packageSaleYn}" albumId="$!{song.album.albumId}" title="$!{title}" artistName="$artistName" isAODLinkId="$!{song.song.AODLinkId}">
+			##printListCol("check" $!{song.song} $!{song.album} false "" "checkboxDrag")
+			#printListCol("check" $!{song.song} $!{song.album} false "")			
+		</div>
+		<div class="col_song">
+			<strong class="screen_out">곡명</strong>
+			#set($sLen=32)
+			#if($!{song.giver.daumName})#set($sLen=12)#end
+			#printSongName( $!{song.song} "" $!{sLen} true false true)
+				#if($StringUtils.isNotBlank("$!{song.giver.daumName}"))
+				<span class="fc_etc fs_11" title="$!{song.giver.daumName}님">
+					#if( $StringCutUtil.getStringByte($!{song.giver.daumName}) > 10)
+						(FROM:#strCut($!{song.giver.daumName}, 10)님)
+					#else
+						(FROM:$!{song.giver.daumName}님)
+					#end
+				</span>
+				#end
+		</div>
+		<div class="col_artist">
+			<strong class="screen_out">아티스트</strong>
+			#printArtistName( $!{song.song.keyArtistList} "" 15 true )
+		</div>
+		<div class="col_album">
+			#printAlbumName( $!{song.song.album} "" 16 2 true )
+		</div>
+		<div class="col_access">
+			#printListItemButton( $!{song.song.songId} "listen" $!{song.song.AODLinkId} ""  true "" "" "" "" "" "" "")
+			#printListItemButton( $!{song.song.songId} "lyrics" $!{song.song.lyricsYn} "" ""  $!{song.song.title} "" false "" $!{song.song.typeCd} "" "" )
+			#printListItemButton( $!{song.song.songId} "mp3" $!{song.song.MP3LinkId} "N" "" $!{song.album.albumId} "" "" "" "" "" "")
+			#printListItemButton( $!{song.song.songId} "bgm" $!{song.song.BGMLinkId} "N" "" "" "" "" "" "" "" "")
+		</div>
+		<div class="col_date">
+			<strong class="screen_out">구매일</strong>
+			$!CheckDate.makeReleaseDate($!{song.ownDate})
+		</div>
+	#elseif( $StringUtils.equals( "$!{listType}", "gift_li" ) )
+		<div class="col_check">
+			##<input type="checkbox" name="trackCheckbox" value="$!{song.song.songId}" packageSaleYn="$!{song.album.packageSaleYn}" albumId="$!{song.album.albumId}" title="$!{title}" artistName="$artistName" isAODLinkId="$!{song.song.AODLinkId}">
+			##printListCol("check" $!{song.song} $!{song.album} false "" "checkboxDrag")
+			#printListCol("check" $!{song.song} $!{song.album} false "")			
+		</div>
+		<div class="col_song">
+			<strong class="screen_out">곡명</strong>
+			#printSongName( $!{song.song} "" 30 true false false)
+		</div>
+		<div class="col_artist">
+			<strong class="screen_out">아티스트</strong>
+			#printArtistName( $!{song.keyArtistList} "" 12 true )
+		</div>
+		<div class="col_access">
+			#printListItemButton( $!{song.song.songId} "listen" $!{song.song.AODLinkId} "" false "" "" "" "" "" "" "")
+			#printListItemButton( $!{song.song.songId} "lyrics" $!{song.song.lyricsYn} "" "" "" "" false "" $!{song.song.typeCd} "" "")
+			#printListItemButton( $!{song.song.album.albumId} "album" "#getArtistId($!{song.song})" "" "" "" "" "" "" "" "" "" )
+			#printListItemButton( $!{song.song.songId} "mp3" $!{song.song.MP3LinkId} "N" "" $!{song.album.albumId} "" "" "" "" "" "")
+			#printListItemButton( $!{song.song.songId} "bgm" $!{song.song.BGMLinkId} "N" "" "" "" "" "" "" "" "")
+		</div>
+		<div class="col_type">
+			<strong class="screen_out">종류</strong>
+			$!{song.type}
+		</div>
+		<div class="col_receipt">
+			<strong class="screen_out">받은사람</strong>
+			$!{song.owner.daumName}
+		</div>
+		<div class="col_date">
+			<strong class="screen_out">보낸날짜</strong>
+			$!CheckDate.makeReleaseDate($!{song.ownDate})
+		</div>
+	#elseif( $StringUtils.equals( "$!{listType}", "phone_li" ) )
+		<div class="col_song">
+			<strong class="screen_out">곡명</strong>
+			#printSongName( $!{song.song} "" 20 true false false )
+		</div>
+		<div class="col_artist">
+			<strong class="screen_out">아티스트</strong>
+			#printArtistName( $!{song.keyArtistList} "" 20 true )
+		</div>
+		<div class="col_type">
+			<strong class="screen_out">종류</strong>
+			벨소리
+			<span class="txt_bar"> | </span>
+			$!{song.order.item.title}
+		</div>
+		<div class="col_receipt">
+			<strong class="screen_out">수신번호</strong>
+			$StringCutUtil.getFullPhoneNum($!{song.order.getNumber})
+		</div>
+		<div class="col_date">
+			<strong class="screen_out">구매일</strong>
+			$!CheckDate.makeReleaseDate($!{song.ownDate})
+		</div>
+		<div class="col_access">
+			#printListItemButton( $!{song.song.songId} "listen" $!{song.linkId} "" false "" "" "" "" "" "" "")
+			#set($isResend = true)
+			#if( $MathTool.toNumber($CheckDate.diffOfDate($CheckDate.makeReleaseDate($!{song.ownDate}))) > 30 )
+				#set($isResend = false)
+			#end
+			#printListItemButton( $!{song.linkId} "resend" $isResend $!{song.order.getNumber} "" "" "" "" "" "" "" "")
+		</div>
+	#end
+	#if( $listType.indexOf("_li") > -1 )
+	</li>
+	#else
+	</tr>
+	#if( $StringUtils.contains("$listType", "board") )
+		#if( $!{board.songCommentList} && $!{board.songCommentList.size()} > 0 )
+			#if( $board.songCommentList.get($!{foreach.index}) )
+				<tr class="song_comment">
+					<td colspan="10">
+						<em class="ico_bar ir_pm">이 노래는?</em>
+						<p class="txt_song">#strCut("$board.songCommentList.get($!{foreach.index})", 78)</p>
+					</td>
+				</tr>
+			#end
+		#end
+	#end
+	#end
+
+	#if( $StringUtils.equals( "$!{listType}", "song" ) )
+		## 앨범용 핫이슈
+		#printListAlbumHotIssue( $!{song} )
+		## 곡정보 더보기
+		#if(!$CollectionUtils.isEmpty($!{song.relationSongList}))#set($noline = "tbl_noline")#else#set($noline = "")#end
+		#if($foreach.count == $songList.size())#set($infolst = "lst")#else#set($infolst = "")#end
+##		#printListSongInfoMore( $!{song} 10 "box_songinfo" $noline $infolst)
+		## 관련곡 정보
+##		#printListRelatedSong( $!{song.relationSongList} "$!{listType}" $!{song.songId})
+
+	#elseif( $StringUtils.equals( "$listType", "artist_chart" ) )
+		## 곡정보 더보기
+
+		#if(!$CollectionUtils.isEmpty($!{song.relationSongList}))#set($noline = "tbl_noline")#else#set($noline = "")#end
+		#printListSongInfoMore( $!{song} 11 "box_chartinfo" $noline "")
+		## 관련곡 정보
+##		#printListRelatedSong( $!{song.relationSongList} "$!{listType}" $!{song.songId})
+
+	#elseif( $StringUtils.equals( "$!{listType}", "chart" ) )
+		## 핫이슈
+		#printListHotIssue( $!{song} )
+
+	#end
+
+#end
+#end
+
+	########################################################################################################
+	## 인기차트 > 실시간/일간/주간/월간 추천음악  ###############################################################
+#macro(printRecommandSonginChart $listType $song)
+	<tr tag="$!{listType}" id="recommand$!{song.songId}" class="recommand">
+		<td colspan="2" class="col_rank col_recom">
+            <div class="bg_chart">
+				<span class="ico_comm ico_recom">추천</span>
+			</div>
+		</td>
+		<td class="col_album">
+			#printAlbumThumb( $!{song.album} 1 "" "" )
+		</td>
+		<td class="col_title">
+			#printSongName( $!{song} "fw_b CT_ZONE_LIST_SONG" 40 true false false)
+			#printListHotIssueIcon( $!{song} "")
+		</td>
+		<td class="col_artist">
+			#printArtistName( $!{song.keyArtistList} "CT_ZONE_LIST_ARTIST" 16 true )
+		</td>
+		<td class="col_listen">
+        	#printListItemButton( $!{song.songId} "listen" $!{song.AODLinkId} "" false "" "" "" "" "" "" "")
+        </td>
+        <td class="col_lyrics">
+        	#printListItemButton( $!{song.songId} "lyrics" $!{song.lyricsYn} $count "tr" "" 0 "" "" $!{song.typeCd} "" "")
+        </td>
+        <td class="col_video">
+        	#printListItemButton( $!{song.songId} "video" $!{song.vclipLinkId} 11 "chart" "" "" "" 0 "" "" $!{song.typeCd} )
+        </td>
+        <td class="col_my">
+        	#printListItemButton( $!{song.songId} "my" true "" $!{song.AODLinkId} "" "" "" "" "" "" "")
+        </td>
+        <td class="col_export">
+        	<div class="wrap_export_btn">
+        	#printListItemButton( $!{song.songId} "sns" true "$!song.AODLinkId" "" "" 0 "" "" "" "" "")
+        	#printListItemButton( $!{song.songId} "sns_more" true "$!song.AODLinkId" "" "" 0 "" "" "" "" "")
+        	</div>
+        </td>
+        <td class="col_buy">
+    		#printListItemButton( $!{song.songId} "mp3" $!{song.MP3LinkId} "" "" $!{song.album.albumId} "" "" "" "" "" "")
+    		#printListItemButton( $!{song.songId} "recommandbgm" $!{song.BGMLinkId} "" "" "" "" "" "" "" "" "")
+        </td>
+	</tr>
+#end
+
+#*
+    var l = [
+    #foreach($song in $songList)
+    #if( $!{song.song} )
+    	#set($song = $song.song)
+    #end
+    	{songId : '$!{song.songId}',albumId : '$!{song.album.albumId}',title : '#escScript($!{song.title})',artistname : '#escScript("#printArtistName( $!{song} '' 0 false )")',thumb : '$ImageUtil.getImageUrl("$!{song.album.mainImage.filePath}", "42x42", "ALBUM")'}
+    	#if(!$CollectionUtils.isEmpty($!{song.relationSongList}))
+    	 ,
+        	#foreach($relationSong in $song.relationSongList)##
+            {songId : '$!{relationSong.songId}',albumId : '$!{relationSong.album.albumId}',title : '#escScript($!{relationSong.title})',artistname : '#escScript("#printArtistName( $!{relationSong} '' 0 false )")',thumb : '$ImageUtil.getImageUrl("$!{relationSong.album.mainImage.filePath}", "42x42", "ALBUM")'}#if($velocityHasNext),#end##
+    		#end##
+    	#end#if($velocityHasNext),#end##
+    #end
+    ]
+     daum.Music.Social.setListData(l);
+    l = null;
+*#
+#macro( printSNSList $songList)
+<script type="text/javascript">
+## 리펙토링하면서 사용할거.
+//daum.addEvent(window, 'load', function(){
+domReady( function(){
+    var dtoList = {
+    #foreach( $song in $songList )
+	#if( $!{song.status} )#set($downloadStatus = $song.status)#end##
+    #if( $!{song.song} )#set($song = $song.song)#end##
+	#set($songTitle = $!{song.title.replaceAll('\"', '&quot;')})
+	
+    	"$!{song.songId}" : {title:"$!{songTitle.replaceAll('\r\n', '')}", albumId:"$!{song.album.albumId}", thumb : '$ImageUtil.getImageUrl("$!{song.album.mainImage.filePath}", "42x42", "ALBUM")', albumTitle:"$!{song.album.title.replaceAll('\"', '&quot;').replaceAll('\r\n', '')}",lyricsYn:"$!{song.lyricsYn}", packageSaleYn:"$!{song.album.packageSaleYn}", adultYn:"$!{song.adultYn}", downloadStatus:"$!{downloadStatus}",AODLinkId:"$!{song.AODLinkId}", MP3LinkId:"$!{song.MP3LinkId}", BGMLinkId:"$!{song.BGMLinkId}",vclipLinkId:"$!{song.vclipLinkId}", svcstatus:"$!{song.svcstatus}", isHoldback:"$!{song.isHoldback()}",keyArtistList : [#foreach( $artist in $song.keyArtistList ){artistId:"$!{artist.artistId}", artistName:"$!{artist.name.replaceAll('\"', '&quot;')}", name:"$!{artist.name.replaceAll('\"', '&quot;')}",thumb:"$ImageUtil.getImageUrl("$!{song.album.mainImage.filePath}", "42x42", "ALBUM")" }#if($velocityHasNext),#end#end]}
+    	#if( $song.relationSongList.size()>0)
+    	#foreach( $rsong in $song.relationSongList )##
+    	#if( $foreach.index==0),#end##
+    	"$!{rsong.songId}" : {title:"$!{rsong.title.replaceAll('\"', '&quot;')}", albumId:"$!{rsong.album.albumId}", thumb : '$ImageUtil.getImageUrl("$!{rsong.album.mainImage.filePath}", "42x42", "ALBUM")', albumTitle:"$!{rsong.album.title.replaceAll('\"', '&quot;')}",lyricsYn:"$!{rsong.lyricsYn}", packageSaleYn:"$!{rsong.album.packageSaleYn}", adultYn:"$!{rsong.adultYn}", AODLinkId:"$!{rsong.AODLinkId}", MP3LinkId:"$!{rsong.MP3LinkId}", BGMLinkId:"$!{rsong.BGMLinkId}",vclipLinkId:"$!{rsong.vclipLinkId}", svcstatus:"$!{rsong.svcstatus}", isHoldback:"$!{song.isHoldback()}",keyArtistList:[#foreach( $artist in $rsong.keyArtistList ){artistId:"$!{artist.artistId}", artistName:"$!{artist.name.replaceAll('\"', '&quot;')}", thumb:"$ImageUtil.getImageUrl("$!{rsong.album.mainImage.filePath}", "42x42", "ALBUM")" }#if($velocityHasNext),#end#end]}
+    	#if($velocityHasNext),#end
+    	#end##
+    	#end
+    	#if($velocityHasNext),#end
+    #end
+    };
+    daum.Music.DTO.setSong(dtoList);
+    dtoList = null;
+});
+</script>
+#end
+
+#macro( printSNSListTwo $songList $recommandSong)
+<script type="text/javascript">
+## 리펙토링하면서 사용할거.
+//daum.addEvent(window, 'load', function(){
+domReady( function(){
+    var dtoListTwo = {
+    #foreach( $song in $songList )
+	#if( $!{song.status} )#set($downloadStatus = $song.status)#end##
+    #if( $!{song.song} )#set($song = $song.song)#end##
+	#set($songTitle = $!{song.title.replaceAll('\"', '&quot;')})
+	
+    	"$!{song.songId}" : {title:"$!{songTitle.replaceAll('\r\n', '')}", albumId:"$!{song.album.albumId}", thumb : '$ImageUtil.getImageUrl("$!{song.album.mainImage.filePath}", "42x42", "ALBUM")', albumTitle:"$!{song.album.title.replaceAll('\"', '&quot;').replaceAll('\r\n', '')}",lyricsYn:"$!{song.lyricsYn}", packageSaleYn:"$!{song.album.packageSaleYn}", adultYn:"$!{song.adultYn}", downloadStatus:"$!{downloadStatus}",AODLinkId:"$!{song.AODLinkId}", MP3LinkId:"$!{song.MP3LinkId}", BGMLinkId:"$!{song.BGMLinkId}",vclipLinkId:"$!{song.vclipLinkId}", svcstatus:"$!{song.svcstatus}", isHoldback:"$!{song.isHoldback()}",keyArtistList : [#foreach( $artist in $song.keyArtistList ){artistId:"$!{artist.artistId}", artistName:"$!{artist.name.replaceAll('\"', '&quot;')}", name:"$!{artist.name.replaceAll('\"', '&quot;')}",thumb:"$ImageUtil.getImageUrl("$!{song.album.mainImage.filePath}", "42x42", "ALBUM")" }#if($velocityHasNext),#end#end]}
+    	#if( $song.relationSongList.size()>0)
+    	#foreach( $rsong in $song.relationSongList )##
+    	#if( $foreach.index==0),#end##
+    	"$!{rsong.songId}" : {title:"$!{rsong.title.replaceAll('\"', '&quot;')}", albumId:"$!{rsong.album.albumId}", thumb : '$ImageUtil.getImageUrl("$!{rsong.album.mainImage.filePath}", "42x42", "ALBUM")', albumTitle:"$!{rsong.album.title.replaceAll('\"', '&quot;')}",lyricsYn:"$!{rsong.lyricsYn}", packageSaleYn:"$!{rsong.album.packageSaleYn}", adultYn:"$!{rsong.adultYn}", AODLinkId:"$!{rsong.AODLinkId}", MP3LinkId:"$!{rsong.MP3LinkId}", BGMLinkId:"$!{rsong.BGMLinkId}",vclipLinkId:"$!{rsong.vclipLinkId}", svcstatus:"$!{rsong.svcstatus}", isHoldback:"$!{song.isHoldback()}",keyArtistList:[#foreach( $artist in $rsong.keyArtistList ){artistId:"$!{artist.artistId}", artistName:"$!{artist.name.replaceAll('\"', '&quot;')}", thumb:"$ImageUtil.getImageUrl("$!{rsong.album.mainImage.filePath}", "42x42", "ALBUM")" }#if($velocityHasNext),#end#end]}
+    	#if($velocityHasNext),#end
+    	#end##
+    	#end
+    	#if($velocityHasNext),#end
+    #end,
+	#if( $!{recommandSong.status} )#set($downloadStatus = $recommandSong.status)#end##
+    #if( $!{recommandSong.song} )#set($song = $recommandSong.song)#end##
+	#set($songTitle = $!{recommandSong.title.replaceAll('\"', '&quot;')})
+	
+    	"$!{recommandSong.songId}" : {title:"$!{songTitle.replaceAll('\r\n', '')}", albumId:"$!{recommandSong.album.albumId}", thumb : '$ImageUtil.getImageUrl("$!{recommandSong.album.mainImage.filePath}", "42x42", "ALBUM")', albumTitle:"$!{recommandSong.album.title.replaceAll('\"', '&quot;').replaceAll('\r\n', '')}",lyricsYn:"$!{recommandSong.lyricsYn}", packageSaleYn:"$!{recommandSong.album.packageSaleYn}", adultYn:"$!{recommandSong.adultYn}", downloadStatus:"$!{downloadStatus}",AODLinkId:"$!{recommandSong.AODLinkId}", MP3LinkId:"$!{recommandSong.MP3LinkId}", BGMLinkId:"$!{recommandSong.BGMLinkId}",vclipLinkId:"$!{recommandSong.vclipLinkId}", svcstatus:"$!{recommandSong.svcstatus}", isHoldback:"$!{recommandSong.isHoldback()}",keyArtistList : [#foreach( $artist in $recommandSong.keyArtistList ){artistId:"$!{artist.artistId}", artistName:"$!{artist.name.replaceAll('\"', '&quot;')}", name:"$!{artist.name.replaceAll('\"', '&quot;')}",thumb:"$ImageUtil.getImageUrl("$!{recommandSong.album.mainImage.filePath}", "42x42", "ALBUM")" }#if($velocityHasNext),#end#end]}
+    	#if( $recommandSong.relationSongList.size()>0)
+    	#foreach( $rsong in $recommandSong.relationSongList )##
+    	#if( $foreach.index==0),#end##
+    	"$!{rsong.songId}" : {title:"$!{rsong.title.replaceAll('\"', '&quot;')}", albumId:"$!{rsong.album.albumId}", thumb : '$ImageUtil.getImageUrl("$!{rsong.album.mainImage.filePath}", "42x42", "ALBUM")', albumTitle:"$!{rsong.album.title.replaceAll('\"', '&quot;')}",lyricsYn:"$!{rsong.lyricsYn}", packageSaleYn:"$!{rsong.album.packageSaleYn}", adultYn:"$!{rsong.adultYn}", AODLinkId:"$!{rsong.AODLinkId}", MP3LinkId:"$!{rsong.MP3LinkId}", BGMLinkId:"$!{rsong.BGMLinkId}",vclipLinkId:"$!{rsong.vclipLinkId}", svcstatus:"$!{rsong.svcstatus}", isHoldback:"$!{song.isHoldback()}",keyArtistList:[#foreach( $artist in $rsong.keyArtistList ){artistId:"$!{artist.artistId}", artistName:"$!{artist.name.replaceAll('\"', '&quot;')}", thumb:"$ImageUtil.getImageUrl("$!{rsong.album.mainImage.filePath}", "42x42", "ALBUM")" }#if($velocityHasNext),#end#end]}
+    	#if($velocityHasNext),#end
+    	#end##
+    	#end
+    };
+    daum.Music.DTO.setSong(dtoListTwo);
+    dtoListTwo = null;
+});
+</script>
+#end
+
+## 리스트 테이블 헤더 ######################################################################################
+#macro( printListHeader $type )
+#if( $StringUtils.equals( "$!{type}", "chart" ) )
+<colgroup>
+	<col class="col_check">
+	<col class="col_rank">
+	<col class="col_album">
+	<col class="col_title">
+	<col class="col_artist">
+	<col class="col_listen">
+	<col class="col_lyrics">
+	<col class="col_video">
+	<col class="col_my">
+	<col class="col_export">
+	<col class="col_buy">
+</colgroup>
+<thead class="screen_out">
+	<tr class="screen_out">
+		<th scope="col">선택</th>
+		<th scope="col">순위</th>
+		<th scope="col">앨범</th>
+		<th scope="col">곡명</th>
+		<th scope="col">아티스트</th>
+		<th scope="col">듣기</th>
+		<th scope="col">가사</th>
+		<th scope="col">뮤비</th>
+		<th scope="col">담기</th>
+		<th scope="col">보내기</th>
+		<th scope="col">구매하기</th>
+	</tr>
+</thead>
+#elseif( $StringUtils.equals( "$!{type}", "album" ) )
+<colgroup>
+	<col class="col_check">
+	<col class="col_rank">
+	<col class="col_title">
+	<col class="col_artist">
+	<col class="col_popular">
+	<col class="col_listen">
+	<col class="col_lyrice">
+	<col class="col_album">
+	<col class="col_video">
+	<col class="col_my">
+	<col class="col_buy">
+</colgroup>
+<thead class="screen_out">
+	<tr class="screen_out">
+		<th scope="col">선택</th>
+		<th scope="col">순위</th>
+		<th scope="col">곡명</th>
+		<th scope="col">아티스트</th>
+		<th scope="col">인기도</th>
+		<th scope="col">듣기</th>
+		<th scope="col">가사</th>
+		<th scope="col">앨범</th>
+		<th scope="col">뮤비</th>
+		<th scope="col">담기</th>
+		<th scope="col">구매하기</th>
+	</tr>
+</thead>
+#elseif( $StringUtils.equals( "$!{type}", "hotissue" ) )
+<colgroup>
+	<col class="col_check">
+	<col class="col_album">
+	<col class="col_title">
+	<col class="col_artist">
+	<col class="col_listen">
+	<col class="col_lyrics">
+	<col class="col_video">
+	<col class="col_my">
+	<col class="col_export">
+	<col class="col_buy">
+</colgroup>
+<thead class="screen_out">
+	<tr class="screen_out">
+		<th scope="col">선택</th>
+		<th scope="col">앨범</th>
+		<th scope="col">곡명</th>
+		<th scope="col">아티스트</th>
+		<th scope="col">듣기</th>
+		<th scope="col">가사</th>
+		<th scope="col">뮤비</th>
+		<th scope="col">담기</th>
+		<th scope="col">보내기</th>
+		<th scope="col">구매하기</th>
+	</tr>
+</thead>
+#elseif( $StringUtils.equals( "$!{type}", "search") )
+<colgroup>
+	<col class="col_check">
+	<col class="col_title">
+	<col class="col_playtime">
+	<col class="col_artist">
+	<col class="col_album">
+	<col class="col_listen">
+	<col class="col_lyrics">
+	<col class="col_video">
+	<col class="col_my">
+	<col class="col_buy">
+</colgroup>
+<thead class="screen_out">
+	<tr class="screen_out">
+		<th scope="col">선택</th>
+		<th scope="col">곡명</th>
+		<th scope="col">재생시간</th>
+		<th scope="col">아티스트</th>
+		<th scope="col">앨범</th>
+		<th scope="col">듣기</th>
+		<th scope="col">가사</th>
+		<th scope="col">뮤비</th>
+		<th scope="col">담기</th>
+		<th scope="col">구매하기</th>
+	</tr>
+</thead>
+#elseif( $StringUtils.equals( "$!{type}", "search_album") )
+<colgroup>
+	<col class="col_check">
+	<col class="col_title">
+	<col class="col_artist">
+	<col class="col_album">
+	<col class="col_listen">
+	<col class="col_lyrics">
+	<col class="col_video">
+	<col class="col_my">
+	<col class="col_buy">
+</colgroup>
+<thead class="screen_out">
+	<tr class="screen_out">
+		<th scope="col">선택</th>
+		<th scope="col">곡명</th>
+		<th scope="col">아티스트</th>
+		<th scope="col">앨범</th>
+		<th scope="col">듣기</th>
+		<th scope="col">가사</th>
+		<th scope="col">뮤비</th>
+		<th scope="col">담기</th>
+		<th scope="col">구매하기</th>
+	</tr>
+</thead>
+#elseif( $StringUtils.equals( "$!{type}", "song" ) )
+<colgroup>
+##	<col class="col_check">
+	<col class="col_rank">
+	<col class="col_title">
+	<col class="col_artist">
+##	<col class="col_popular">
+	<col class="col_listen">
+	<col class="col_lyrice">
+##	<col class="col_video">
+##	<col class="col_my">
+##	<col class="col_buy">
+</colgroup>
+<thead class="screen_out">
+	<tr class="screen_out">
+##		<th scope="col">선택</th>
+		<th scope="col">순위</th>
+		<th scope="col">곡명</th>
+		<th scope="col">아티스트</th>
+##		<th scope="col">인기도</th>
+		<th scope="col">듣기</th>
+		<th scope="col">가사</th>
+##		<th scope="col">뮤비</th>
+##		<th scope="col">담기</th>
+##		<th scope="col">구매하기</th>
+	</tr>
+</thead>
+#end
+#end
+
+## 추천음악 > 뮤직바 #######################################################################################
+#macro( printListMusicBar $song )
+#if( $!{song.musicBar.title} )
+	#set( $classname = "bar_gray" )
+	#if ($foreach.index < 3) #set( $classname = "bar_blue" ) #end
+	<span class="ico_comm $!{classname}">
+		<span class="screen_out">뮤직Bar</span>
+		<a href="/musicbar/musicbar/detail?board_id=$!{song.musicBar.boardId}" title="$!{song.musicBar.title}">#strCut("$!{song.musicBar.title}", 50)</a>
+	</span>
+#end
+#end
+
+## 앨범상세 > 타이틀 아이콘 ##############################################################################
+#macro( printListMasterSongIcon $song )
+#if( $StringUtils.equals("$!{song.masterYn}", "Y") )
+	<span class="ico_comm ico_title" title="타이틀곡">&nbsp;</span>
+#end
+#end
+
+
+## 인기차트 > 핫이슈 공감 아이콘 ###########################################################################
+#macro( printListHotIssueIcon $song $type)
+#if( $StringUtils.isNotBlank("$!{song.hotIssue.issueId}") && !$StringUtils.equals("$!{song.hotIssue.issueId}", "0"))
+	<a class="btn_comm#if($StringUtils.isNotBlank($!{type}) && $StringUtils.equals($!{type}, 'album')) btn_hot#else btn_hot#end CT_ZONE_BTN_HOTISSUE" href="#" title="핫이슈 공감" onclick="daum.Music.Chart.clickHotIssue(this, '$!{song.songId}');return false;">&nbsp;</a>
+#end
+#end
+
+## 인기차트 > 핫이슈 공감 ##################################################################################
+#macro( printListHotIssue $song )
+#if( $!{song.hotIssue.issueId} )
+<tr class="hot_issue hide hotissue" id="hotissue$!{song.songId}">
+	<td colspan="11">
+		<div class="wrap_hot CT_ZONE_HOTISSUE">
+			<em class="ico_comm ir_pm">핫이슈 공감</em>
+			##<p class="fc_etc f_l">#strCut("$!{song.hotIssue.contents}", 120)</p>
+			<span class="fc_etc f_l"><a href="/chart/issuesong/list?issue_id=$!{song.hotIssue.issueId}" title="$!{song.hotIssue.title}">#strCut("$!{song.hotIssue.title}", 120)</a></span>
+			<a class="btn_comm btn_more f_r" href="/chart/issuesong/list?issue_id=$!{song.hotIssue.issueId}">더보기</a>
+		</div>
+	</td>
+</tr>
+#end
+#end
+
+#* 인기차트 > 가사/뮤직비디오 바로보기
+############################################################################################
+#macro( printListFloor $song $tag )
+#if($StringUtils.equals("$!{tag}", "li"))
+<li class="open_direct hide" id="open_direct$!{song.songId}">
+</li>
+#else
+<tr class="open_direct hide" id="open_direct$!{song.songId}">
+	<td colspan="11">
+
+	</td>
+</tr>
+#end
+#end
+*#
+## 순위 NUMBER  ############################################################################################
+#macro( printRankNumber $rank )
+#if($!{rank} < 10)
+	<span class="wrap_rank_num"><span class="num_comm num$!{rank}#if($!{rank} < 4)_blue#end">$!{rank}</span></span>
+#elseif($!{rank} == 100)
+	<span class="wrap_rank_num"><span class="num_comm num1">1</span><span class="num_comm num0">0</span><span class="num_comm num0">0</span></span>
+#else
+	#set($d = $!{rank} / 10)
+	#set($n = $!{rank} % 10)
+	<span class="wrap_rank_num"><span class="num_comm num$d">$d</span><span class="num_comm num$n">$n</span></span>
+#end
+#end
+
+## 순위 변동값 #############################################################################################
+#macro( printRankChanged $modRank )
+#if($StringUtils.equals("$!{modRank}", "new"))
+	<span class="ico_comm rank_new">NEW</span>
+#elseif($StringUtils.contains("$!{modRank}", "-"))
+	<span class="ico_comm rank_down"><span class="screen_out">하락</span>$StringUtils.replace("$!{modRank}", "-", "")</span>
+#elseif($StringUtils.equals("$!{modRank}", "0"))
+	<span class="ico_comm rank_hold">보합</span>
+#else
+	<span class="ico_comm rank_up"><span class="screen_out">상승</span>$!{modRank}</span>
+#end
+#end
+
+## 보내기 - 버튼형
+#macro(printSnsButton $id $type $link $prefix $astype)
+
+	<!-- 2013-12-16 소셜쉐어 작업 시작 -->
+	<!-- 소셜쉐어 컴포넌트가 들어갈 요소 -->
+	#if($astype == "vclip"||$astype == "artist"||$astype == "musicbar")
+	<div id="socialShareContainer" class="sns_wrap sns_etc"></div>
+	#elseif($astype == "onair")
+	<div id="socialShareContainer" class=""></div>
+	#else	
+	<div id="socialShareContainer" class="sns_wrap"></div>
+	#end
+	<style>.no_more .sns_comm_s .share_sns_type1{width: 79px;}</style>
+	<script>
+	socialShareVarProgramInit = null;
+	
+	daum.addEvent(window, 'load', function(){
+		var prefix = '$!prefix';
+		var link = '$!link';
+
+		#if($!astype != "")
+		var astype = '$!astype'; 
+    	#else
+		var astype = 'song'; 
+    	#end
+		
+		if(prefix != ''){
+    		prefix = daum.String.replaceAll(prefix,/apos;/,"");
+    		prefix = daum.String.replaceAll(prefix,"\r\n", "");
+    		prefix = daum.String.replaceAll(prefix,"&nbsp;", "");
+    		prefix = daum.String.trim(prefix);
+			
+            prefix = prefix.replace(/\n/g, "");//행바꿈제거
+            prefix = prefix.replace(/\r/g, "");//엔터제거
+		}
+
+	    var iconEl = document.getElementById('socialShareContainer');
+	    socialShareVarProgramInit = new socialshare(iconEl, {
+	        shareType: 'icon',
+	        #if($!astype != "onair")
+			useSmallIcon: true,
+			#end
+	        link: link,
+	        prefix: prefix
+			#if($!type == "")
+			, optionalServices: {
+	            cafe: 'http://user.csm.daum.net/export/to/cafe.do?srv=music&sct='+astype+'&contId=$id&embed=Y',
+	            blog: 'http://user.csm.daum.net/export/to/blog.do?srv=music&sct='+astype+'&contId=$id&embed=Y'
+	        }			
+			#end
+	    });
+		
+	   	daum.Music.Social.socialShareVarProgramInit(socialShareVarProgramInit);
+
+		#if($!astype != "onair")
+		daumtools.event.on(document, 'click', function (e) {
+			var ev = e || window.event, target = ev.target || ev.srcElement, key;
+			
+            var snsDivLayer = daum.$$('#socialShareContainer div')[0];
+			var snsParentNode = daum.$$('#socialShareContainer div div a')[3];
+			var snsParentNode2 = daum.$$('#socialShareContainer div div em')[0];
+			
+			if(target != snsParentNode && target != snsParentNode2){
+    			if(daum.hasClassName(snsDivLayer, 'sns_on')){
+    				daum.removeClassName(snsDivLayer, 'sns_on');
+    			}
+			}
+        });
+		#end
+		
+	});
+	</script>
+#end
+
+## SNS보내기 - 팝업 버튼형
+#macro( printPopupSnsButton $purchaseSongList $id $strSonglist )
+<div class="sns_share">
+	<a title="마이피플으로 보내기" href="javascript:;" class="my" onclick="daum.Music.Social.add('$!{strSonglist}','mypeople', null, '', true);return false;">마이피플</a>
+	<a title="트위터로 보내기" href="javascript:;" class="twitter" onclick="daum.Music.Social.add('$!{strSonglist}','twitter',  null, '', true);return false;">트위터</a>
+	<a title="페이스북으로 보내기" href="javascript:;" class="facebook" onclick="daum.Music.Social.add('$!{strSonglist}','facebook',  null, '', true);return false;">페이스북</a>
+	<a title="싸이월드로 보내기" href="javascript:;" class="cyworld" onclick="daum.Music.Social.add('$!{strSonglist}','nate',  null, '', true);return false;">싸이월드</a>
+	##<a title="요즘으로 보내기" href="javascript:;" class="yozm" onclick="daum.Music.Social.add('$!{strSonglist}','yozm', null, '', true);return false;">요즘</a>
+	<a title="더보기" href="javascript:;" class="link_more" onclick="daum.Music.Layer.view({el:this, wrapper:daum.$$('.daum_popup')[0], type:'snsButton2', classname:'layer_sns_share2', arrow:null, left:-66, top:-1, action:'click', id:'$!{strSonglist}',isCallback:true});return false;">더보기</a>
+</div>
+
+#set( $song = $purchaseSongList.get(0) )
+#set( $size = $MathTool.sub($!{purchaseSongList.size()},1))
+
+<script type="text/javascript">
+
+    daum.Music.Social.setParams({
+        thumb : '$ImageUtil.getImageUrl("$!{song.album.mainImage.filePath}", "42x42", "ALBUM")',
+		#if($size ==0 )
+        link : 'http://music.daum.net/album/main?album_id=$!{song.album.albumId}&song_id=$!{song.songId}',
+		prefix : '#escScript($StringUtils.trim("#printArtistName($song.keyArtistList '' 0 false)")) - #escScript($StringUtils.trim("#printSongName( $!{song} '' 50 false false false)"))을(를) 구매하였습니다.'
+		#else
+		link : 'http://music.daum.net/album/main?album_id=$!{song.album.albumId}&song_id=$!{song.songId}&player=$!{strSonglist}',
+        prefix : '#escScript($StringUtils.trim("#printArtistName($song.keyArtistList '' 0 false)")) - #escScript($StringUtils.trim("#printSongName( $!{song} '' 50 false false false)")) 외 $!{size}곡을 구매하였습니다.'
+		#end
+    });
+</script>
+#end
+
+## 상세 > SNS 공유하기 ########################################################################################
+## 페이지 로딩후 그리면 버튼만 늦게 떠서 중간에 넣어두었습니다. 페이지 로딩 후 그리고 싶다면 socialWidjet.js에서 주석제거하면 됨
+#macro( printSnsWidget )
+	printSocial 로 바꿔주세요~
+   #* <div class="btn_sns social_widget"></div> ## 소셜 위젯 javascript로 그림
+    <script type="text/javascript">
+    daum.Music.SocialWidget.load({
+        prefix : "", //퍼가는 글의 제목. 사용자가 입력할 수 있는 최대 글자수는 50(퍼머넌트 링크 포함). 주의: 제목에 &, > 같은 기호가 있을 경우 그대로 전달해야 합니다. \&amp\; 등과 같이 변환을 해서 보내면 그대로 노출됩니다!!! - required
+        prefix_yozm : "", //yozm prefix - optional
+        prefix_twitter : "", //twitter prefix - optional
+        prefix_nate : "", //nate prefix - optional
+        prefix_facebook : "", //facebook prefix - optional
+        prefix_me2day : "", //me2day prefix - optional
+        link : "", //prefix의 링크 prefix가 있는 경우 반드시 link는 있어야 함 (일반적으로 퍼머넌트 링크) - required
+        source_id : "", //source_id 요즘과 사전에 협의가 필요 - required
+        meta_type : '', //요즘과 사전에 협의가 필요 (이 값은 반드시 image_path와 같이 보내셔야 합니다.) - optional
+        meta_key : '', //요즘과 사전에 협의가 필요  - optional
+        image_path : '', //메세지와 같이 노출될 이미지 yozm과 facebook에 적용  - optional
+        caption : '', //facebook을 위한 기능으로 보내려는 문서를 짧게 설명한 문장  - optional
+        callback : '' //callback 받으려는 javascript function name (default : 'postdone') - optional
+    });
+    </script>*#
+#end
+
+#macro( printVideoRank $rank )
+<span class="box_no #if($vclip.rank < 4)top #end">
+	<span class="wrap_no">
+		#if( $!{rank} < 10 )
+		<span class="num_video num$!{vclip.rank}"></span>
+		#else
+			#if( $!{rank} > 99 )
+				<span class="num_video num$StringUtils.mid("$!{rank}", 0, 1)"></span>
+				<span class="num_video num$StringUtils.mid("$!{rank}", 1, 1)"></span>
+				<span class="num_video num$StringUtils.mid("$!{rank}", 2, 1)"></span>
+			#else
+				<span class="num_video num$StringUtils.mid("$!{rank}", 0, 1)"></span>
+				<span class="num_video num$StringUtils.mid("$!{rank}", 1, 1)"></span>
+			#end
+		#end
+	</span>
+</span>
+#end
+## 상세 > 뮤직비디오탭 vclipt 출력 #######################################
+#macro (printVclip $vclipList $artist)
+
+#end
+
+## 상세 > 곡 리스트 이벤트&공지  #######################################
+#macro(printListEventRow $event $oneLineNotice)
+	#if($StringUtils.isNotBlank("$!{event.eventId}") || $StringUtils.isNotBlank("$!{oneLineNotice}"))
+    <tr class="notice_info">
+    	<td colspan="11" id="eventRowRoll">
+			#if($StringUtils.isNotBlank("$!{event.eventId}"))
+    		<span class="album_notice_rolling">
+    			<span class="ico_detail ico_nvent">이벤트</span>
+				##/event/detail?event_id=$!{event.eventId}
+    			<a class="tit" href="$!{event.linkUrl}" title="$!{event.eventTitle}"><strong>#strCut("$!{event.eventTitle}", 70)</strong></a>
+    		</span>
+			#end
+			#if($StringUtils.isNotBlank("$!{oneLineNotice}"))
+    		<span class="album_notice_rolling">
+    			<span class="ico_detail ico_notice">공지사항</span>
+    			<span class="tit""><strong>#strCut("$!{oneLineNotice}", 70)</strong></span>
+    		</span>
+			#end
+
+		#if($StringUtils.isNotBlank("$!{event.eventId}") && $StringUtils.isNotBlank("$!{oneLineNotice}"))
+    		<div class="cont_navi">
+    			<input id="eventRowPrevBtn" class="btn_comm btn_prev" type="button" value="이전" title="이전">
+    			<input id="eventRowNextBtn" class="btn_comm btn_next" type="button" value="다음" title="다음">
+    		</div>
+        	<script type="text/javascript">
+        	var msRoll = new daum.Music.ListRoll( "eventRowRoll", {
+        		amount : 1,
+        		duration : 0.5,
+        		prevId : "eventRowPrevBtn",
+        		nextId : "eventRowNextBtn",
+        		defaultIdx : 0,
+        		perGroup : false,
+        		loop : false,
+        		listTag : "span",
+        		listClassName : "album_notice_rolling",
+        		preonclassName : "on_prev",
+        		preoffclassName : "off_prev",
+        		nextonclassName : "on_next",
+        		nextoffclassName : "off_next",
+        		contentType : "text"
+        	});
+        	msRoll.render();
+        	</script>
+		#end
+    	</td>
+    </tr>
+	#end
+#end
+
+## 상세 > 곡리스트 ###############################################################
+#macro(printListAlbumHotIssue $song)
+	#if( $StringUtils.isNotBlank("$!{song.hotIssue.issueId}") && !$StringUtils.equals("$!{song.hotIssue.issueId}", "0"))
+	<tr class="open_direct hotissue hide" id="hotissue$!{song.songId}">
+		<td colspan="10">
+			<div class="box_info box_songinfo">
+				<p class="ico_comm ico_hotissue"><a href="/chart/issuesong/list?issue_id=$!{song.hotIssue.issueId}" title="$!{song.hotIssue.title}">#strCut("$!{song.hotIssue.title}", 100)</a><a class="btn_comm btn_more" href="/chart/issuesong/list?issue_id=$!{song.hotIssue.issueId}">더보기</a></p>
+        	</div>
+        </td>
+	</tr>
+	#end
+#end
+
+## 리스트 > 인기도 ###############################################################
+#macro (printPopularity $song)
+<span class="wrap_bar_graph">
+	#if($StringUtils.isNotBlank("$!{song.favorite}"))
+		#if($!{song.favorite} < 0)#set($index = 0)
+		#elseif($!{song.favorite} > 6)#set($index = 6)
+		#else#set($index = $!{song.favorite})
+		#end
+	#else
+		#set($index = 0)
+	#end
+	#set($favPercentage = [0, 16, 34, 50, 68, 86, 100])
+	<span class="ico_comm bar_popular" style="width:$favPercentage[$index]%;">인기도 $favPercentage[$index]%</span>
+</span>
+#end
+
+## 상세 > 썸네일 툴팁 #############################################################
+#macro (printThumbTooltipText $text $thumbUrl $className $link $onclick)
+#***#<span class="wrap_tooltip_text" style="position:relative;">#if($link)<a#if($StringUtils.isNotBlank("$!{className}")) class="$!{className}"#end href="$link" #if($thumbUrl.indexOf('noalbum') == -1)onmouseover="daum.Element.toggle(daum.Element.getNext(this));return false;" onmouseout="daum.Element.toggle(daum.Element.getNext(this));return false;"#end>$text</a>#else<span#if($StringUtils.isNotBlank("$!{className}")) class="$!{className}"#end>$text</span>#end ###if($StringUtils.isNotBlank("$!{onclick}")) onclick="$onclick"#end
+#***##***#<span class="wrap_picture" style="display:none;position:absolute;top:-55px;left:0px;">
+#***##***##***#<img class="thumb" style="display:block" width="45" height="45" alt="$text" src="$thumbUrl">
+#***##***#</span></span>#end
+
+
+## 날짜  YYYY년 M월 D일 형태로 표시  dayName true 시  요일도 함께 출력
+#macro( printDateWithName $srcDate $dayNameflag)
+	#if($StringUtils.isNotBlank("$!{srcDate}"))
+	#set($eventdays = $StringUtils.split($CheckDate.makeReleaseDate($srcDate),"."))
+	$eventdays[0]년 $eventdays[1]월 $eventdays[2]일 #if($dayNameflag)($CheckDate.getDayNameByDate($srcDate))#end
+	#end
+#end
+
+#macro( printEvent $event $album $artist $songList $boardInfo)
+#set($boardArticleId = $boardInfo.articleId)
+##set($boardArticleId = "3")
+
+#if($StringUtils.equals("$!{startPageYn}","Y")) ## 시작페이지 설정 이벤트이면 아이프레임 삽
+<!-- 홈페이지 체크,설정 용 iframe -->
+<iframe name="homePageFrame" frameborder="0" marginwidth="0" marginheight="0" width="0" height="0" noresize src="http://www.daum.net/doc/ishome.html"></iframe>
+<script>
+document.domain='daum.net'; //위에서 사용되는 iframe때문에
+</script>
+#end
+##if( $StringUtils.isNotBlank("$!{album}") || $StringUtils.isNotBlank("$!{artist}") || $StringUtils.isNotBlank("$!{songList}") ) 
+#if($!CheckDate.getCurrentDate().compareTo($event.endDate) < 1)	
+<div class="box_event_info">
+	<div class="wrap_info">
+		
+		#if($StringUtils.equals("$!{event.musicEventType}","2"))##구매대상 이벤트
+		<span class="ico_event_buypeople">MP3/BGM 구매하신분들께 드립니다.</span>
+		#elseif($StringUtils.equals("$!{autoPaymentYn}","Y"))##자동결제자대상 이벤트
+		<span class="ico_event_autopayment">자동결제 이용자분들께 드립니다.</span>	
+		#else
+		<span class="ico_comm ico_tit">event</span>
+		#end
+		
+		#if($album || $artist)
+			<h3 class="tit_event tit">
+		#else
+			<h3 class="tit_event tit event_tit_txt_type">
+		#end
+			#if( $StringUtils.isNotBlank("$!{event.musicEventTitle}") )$!{event.musicEventTitle}#else$!{event.eventTitle}#end</h3>
+		#set($infotype = "gift")
+		#if($album)
+		<div class="wrap_album_img">
+			#printAlbumThumb( $album 3 "" "" )
+		</div>
+		#end
+		#if($artist)
+			#printArtistThumb( $artist 2)
+			#set($list_infotype= "artist_info")
+		##<a class="album_type2 thumb_link" href="#">
+		##	<img width="100" height="100" alt="마이 프린세스 OST" src="http://cfile108.uf.daum.net/S110x110/154AF6334DB778140F8961">
+		##		<span class="line_thumb"></span>
+		##</a>
+		#end
+		<div class="list_info $!{list_infotype}">
+			#if($album)
+			#set($infotype = "album") ## 앨범이나 아티스트 이미지가 있다면 이벤트설명 width 를 조절하기위해 클래스명 변경
+			<dl class="wrap_event_info">
+				<dt class="tit_info album">대표곡</dt>
+				<dd class="txt_info txt_album">
+					#if($StringUtils.isNotBlank("$!{album.masterSongList}") )
+						#set($masterSong = $ListTool.get($!{album.masterSongList}, 0))
+					#printSongName( $!{masterSong} "ico_comm ico_listen" 48 true false false)
+					#end
+					##printSongName( $!{album.masterSong} "ico_comm ico_listen" 10 true )
+				</dd>
+			</dl>
+			<dl class="wrap_event_info">
+				<dt class="tit_info album">아티스트</dt>
+				<dd class="txt_info txt_album">
+					#printArtistName( $album.keyArtistList "txt_artist" 66 true )
+				</dd>
+			</dl>
+			#else
+				#if($artist)
+				#set($infotype = "album") ## 앨범이나 아티스트 이미지가 있다면 이벤트설명 width 를 조절하기위해 클래스명 변경
+				<dl class="wrap_event_info">
+					<dt class="tit_info album">대표곡</dt>
+					<dd class="txt_info txt_album">
+					#printSongName( $!{artistMainSong} "ico_comm ico_listen" 62 true false false)
+					</dd>
+				</dl>
+				<dl class="wrap_event_info">
+					<dt class="tit_info album">아티스트</dt>
+					<dd class="txt_info txt_album">
+						#set($eventartist = {})
+						#set($eventartist.artist = $artist)
+						#printArtistName( $artistList "txt_artist" 66 true )
+					</dd>
+				</dl>
+				#end
+			#end
+			<dl class="wrap_event_info">
+				<dt class="tit_info $!{infotype}">기간</dt>
+				<dd class="txt_info txt_$!{infotype}">#printDateWithName($event.startDate true) ~ #printDateWithName($event.endDate true)
+				</dd>
+			</dl>
+			<dl class="wrap_event_info">
+				<dt class="tit_info $!{infotype}">발표</dt>
+				<dd class="txt_info txt_$!{infotype}">#printDateWithName($event.winningDate true)
+				</dd>
+			</dl>
+			<dl class="wrap_event_info">
+				<dt class="tit_info $!{infotype}">경품</dt>
+				<dd class="txt_info txt_$!{infotype}">
+				#foreach($present in $event.presentList)
+				#if($foreach.index > 0)<span class="txt_bar"> | </span>#end
+					#set( $printName = "$!{present.title}" + " $!{present.quantity}"+"명")
+					$!{printName}
+				#end
+				##$!{event.description}
+				</dd>
+			</dl>
+		</div>
+		<div class="cl_b"></div>
+	</div>
+	#if($StringUtils.equals("$!{event.musicEventType}","2"))
+		<div class="wrap_free">
+			<div class="wrap_tool_btn">
+				<div class="tool_btn f_l">
+				##	#printListButton( "song", "controlBtn")
+					#printListButton( "song" "listen" "" "" "")
+				</div>
+			</div>
+			<div class="bg_thead">
+				<input id="allCheck" class="all_chk" type="checkbox">
+				<label class="screen_out" for="allCheck">전체선택</label>
+			</div>
+			#if(!$CollectionUtils.isEmpty($songList))
+				<table id="trackContainer" class="tbl_music" >
+					#printListItems( "event" $songList "" false)
+				</table>
+			#else
+				리스트가 없습니다.
+			#end
+			<div class="wrap_tool_btn">
+				<div class="tool_btn f_l">
+				##	#printListButton( "song", "controlBtn")
+					#printListButton( "song" "listen" "" "" "")
+				</div>
+			</div>
+			<a class="arr_comm btn_more" href="/album/main?album_id=$!{album.albumId}" title="앨범정보 더보기">앨범정보 더보기</a>
+			#printSNSList( $songList )
+			<script type="text/javascript">
+   				var controller = new daum.Music.ListPrototype();
+				controller.initialize({isLogin:#if($StringUtils.isNotBlank("$!{user}"))true#{else}false#end, adultYn:"$!{user.isAdult(19)}"});
+			</script>
+		</div>
+	#end
+	<div class="wrap_notice">
+		<strong class="screen_out">이벤트 안내</strong>
+		#if($StringUtils.equals("$!{event.musicEventType}","2"))##구매대상 이벤트 이고
+		<span class="title_notice ff_dot fs_11">MP3, BGM 구매자 대상 이벤트 참여 방법</span>
+		<ul class="list_autoPayment_notice">
+			<li>구매자 대상 이벤트는 당첨자 선정 시, 해당 이벤트 기간동안 MP3, BGM을 구매자 중에서 추첨하는 이벤트 입니다.</li>
+			<li class="highlight">해당 앨범 중에서 마음에 드는 곡을 선택하여 구매하신 후, 구매 완료창에서 응모가 가능합니다. (댓글 응모 불가)
+		</ul>
+		#end
+		#if($StringUtils.equals("$!{autoPaymentYn}","Y"))
+		<span class="title_notice ff_dot fs_11">자동결제자 대상 이벤트 참여 방법</span>
+		<ul class="list_autoPayment_notice">
+			<li>자동결제자 대상 이벤트는 당첨자 선정 시, 자동결제자 중에서 추첨하는 이벤트입니다.</li>
+			<li class="highlight">댓글 응모 후, 자동결제 이용권을 구매해주세요!
+				<a href="/ticketitem/" target="_blank" title="이용권 구매하기">이용권 구매하기</a></li>
+		</ul>
+		#end
+		<ul class="list_notice">
+			<li>이벤트 당첨시 자세한 당첨안내는 응모하신 ID의 한메일로 발송해드립니다.</li>
+			<li>공연 티켓경품은 배송되지 않고 현장에서 본인 확인 후 입장 가능하며 양도는 불가능합니다.</li>
+			<li>티켓 외의 경품은, 종료일 전에 배송받으실 주소와 전화번호로 개인정보를 꼭 수정해주세요. (재배송 불가)
+				<a href="https://user.daum.net/daumuser/moreInfo.daum" target="_blank" title="개인정보 수정하기">개인정보수정</a></li>
+		</ul>
+	</div>
+</div>
+#end
+##end
+
+#if($StringUtils.equals("$!{event.musicEventType}","2"))##구매대상 이벤트 이고
+#if($StringUtils.isNotBlank("$!{command.event_id}"))##이벤트 페이지 일때  가이아 댓글 붙임
+<div id="gaiaiframe"></div>
+<script type="text/javascript">
+domReady( function(){
+daum.$("gaiaiframe").innerHTML = '<iframe id="commentFrame" width="100%" frameborder="0" scrolling="no" charset="utf-8" title="댓글 영역" src="#getter('GAIA_DOMAIN', '')/gaia/do/comment/commentList?bbsId=$!{album.bbsId}&articleId=$!{album.articleId}&templatePath=/content.htmp">';
+});
+</script>
+##<div><iframe id="commentFrame" width="100%" frameborder="0" scrolling="no" charset="utf-8" title="댓글 영역" src="#getter('GAIA_DOMAIN')/gaia/do/comment/commentList?bbsId=$!{album.bbsId}&articleId=$!{album.articleId}&templatePath=/content.htmp"></div>
+#end
+#elseif($boardInfo && $StringUtils.equals("$!{event.musicEventType}","1"))
+	<input type="hidden" id="gaia_eventId" value="$event.eventId" />
+	<input type="hidden" id="gaia_eventKey" value="$event.eventKey" />
+	<input type="hidden" id="gaia_comment" name="gaia_comment" value="" />
+	#if($!CheckDate.getCurrentDate().compareTo($event.endDate) < 1)
+			<input type="hidden" id="gaia_isUseEvent" value="" />
+	#end
+	<div><iframe id="commentFrame" frameborder="0" width="100%" height="" scrolling="no" charset="utf-8" title="댓글 영역" src="#getter('GAIA_DOMAIN', '')/gaia/do/comment/commentList?bbsId=C008&articleId=$!{boardArticleId}&templatePath=/content.htmp"></iframe></div>	
+#else
+##구매자 대상 이벤트인지, 시작페이지 설정 이벤트인지에따라 textarea에 onfocus 에 이벤트검
+##구매자대상이 아니라 자동결제자 인듯 
+#set($onfocusEvent = "")
+#if($StringUtils.equals("$!{autoPaymentYn}","Y"))
+	#if($MathTool.toNumber($!{autoPaymentCount}) > 0 )
+	#else
+		##set($onfocusEvent = 'onfocus ='+"daum.Music.Event.eventPopup(this,{contents:'payment'}); readonly=readonly" )
+		##set($onclickEvent = 'onclick ='+"daum.Music.Event.eventPopup(this,{contents:'payment'});" )
+	#end
+#elseif($StringUtils.equals("$!{startPageYn}","Y"))
+	#set($onfocusEvent = 'onfocus ='+"daum.Music.Event.eventPopup(this,{contents:'startpage',musicEventType:'$!{event.musicEventType}',eventKey:'$!{event.eventKey}',eventId:'$!{event.eventId}',registBtn:false});")
+	#set($onclickEvent = 'onclick ='+"daum.Music.Event.eventPopup(this,{contents:'startpage',musicEventType:'$!{event.musicEventType}',eventKey:'$!{event.eventKey}',eventId:'$!{event.eventId}',registBtn:true});")
+#end
+<div id="sectionCommentList" class="section_cmtlist">
+	<div class="tit_cont">
+		<h4 class="tit_comm f_l">댓글</h4>
+		<span class="txt_bar f_l">|</span><span class="txt_count f_l">총 <em class="fc_blue fw_b">$!{commentTotalCount}</em> 개</span>
+	</div>
+		<div class="comment_form">
+		<form action="">
+			<fieldset>
+				<legend class="screen_out">댓글 작성폼</legend>
+				#set( $polllen = 48 ) ## 폴을 한줄에 출력하기 폴문항이 길면 글자를 자른다.
+				#if( $StringUtils.isNotBlank("$!{event.musicEventSpecial}") )
+					#if($StringUtils.isNotBlank("$!{command.event_id}"))#set( $polllen = 70 ) #end
+				#end
+#if($StringUtils.equals("$!{event.musicEventType}","5"))##폴+ 댓글+ 경품 형 이벤트
+## 로그인 전
+	#if($StringUtils.equals("${user}","()"))
+	<div class="wrap_poll">
+		#foreach($present in $!{event.presentList})
+		#set( $present_title = "#strCut($!{present.title}, $polllen)" )
+		<div class="list_poll">
+			<span class="inp_poll"><input type="radio" id="present$!{foreach.index}" onclick="daum.Music.login();return false;"value="present:$present.id" name="present"></span>
+			<span class="label_poll"><label for="present$!{foreach.index}">$present_title</label></span>
+		</div>
+		#end
+	</div>
+	<div class="cmt_write">
+		<div class="bg_cmt wrap_textarea">
+			<textarea id="commentContent"  onfocus="daum.Music.login({},'commentContent');" rows="" cols="" name="comment" onkeyup="daum.Music.updateChar(300,'commentContent','characters')" readonly="readonly"></textarea>
+		</div>
+		<input class="bg_cmt btn_regist" type="button" value="댓글등록" onclick="daum.Music.login(); return false;">
+		<script type="text/javascript">
+				daum.$("commentContent").value = "";
+		</script>
+	</div>
+	#else
+##로그인후 입력가능
+	<div class="wrap_poll">
+		#foreach($present in $!{event.presentList})
+		#set( $present_title = "#strCut($!{present.title}, $polllen)" )
+		<div class="list_poll">
+			<span class="inp_poll"><input type="radio" id="present$!{foreach.index}" value="present:$present.id" name="present"></span>
+			<span class="label_poll"><label for="present$!{foreach.index}">$present_title</label></span>
+		</div>
+		#end
+	</div>
+	<div class="cmt_write">
+		<div class="bg_cmt wrap_textarea">
+			<textarea id="commentContent" rows="" cols=""  $!{onfocusEvent}  name="comment" onkeyup="daum.Music.updateChar(300,'commentContent','characters')"></textarea>
+		</div>
+		<input class="bg_cmt btn_regist" type="button" value="댓글등록"  #if($StringUtils.isNotBlank("$!{onfocusEvent}")) $!{onclickEvent} #else onclick="sendApplication('$event.eventId', $event.eventKey,'','','경품을 선택해주시고 내용을 입력해주세요.', 'comment','','present'); return false;" #end>
+		<script type="text/javascript">
+				daum.$("commentContent").value = "";
+		</script>
+	</div>
+	#end
+#elseif($StringUtils.equals("$!{event.musicEventType}","4"))
+	## 로그인 전
+	#if($StringUtils.equals("${user}","()"))
+	<div class="wrap_poll">
+		#foreach($poll in $event.musicPollItems)
+		#set( $pollName = "#strCut($!{poll}, $polllen)" )
+		<div class="list_poll">
+			<span class="inp_poll"><input type="radio" id="poll$!{foreach.index}" onclick="daum.Music.login();return false;"value="$poll" name="poll"></span>
+			<span class="label_poll"><label for="poll$!{foreach.index}">$pollName</label></span>
+		</div>
+		#end
+	</div>
+	#else
+	## 로그인후  입력가능
+	<div class="wrap_poll">
+		#foreach($poll in $event.musicPollItems)
+		#set( $pollName = "#strCut($!{poll}, $polllen)" )
+		<div class="list_poll">
+			<span class="inp_poll"><input type="radio" id="poll$!{foreach.index}" value="$poll" name="poll"></span>
+			<span class="label_poll"><label for="poll$!{foreach.index}">$pollName</label></span>
+		</div>
+		#end
+	</div>
+	#end
+#elseif($StringUtils.equals("$!{event.musicEventType}","3"))
+## 로그인 전
+	#if($StringUtils.equals("${user}","()"))
+	<div class="wrap_poll">
+		#foreach($poll in $event.musicPollItems)
+		#set( $pollName = "#strCut($!{poll}, $polllen)" )
+		<div class="list_poll">
+			<span class="inp_poll"><input type="radio" id="poll$!{foreach.index}" onclick="daum.Music.login();return false;"value="$poll" name="poll"></span>
+			<span class="label_poll"><label for="poll$!{foreach.index}">$pollName</label></span>
+		</div>
+		#end
+	</div>
+	<div class="cmt_write">
+		<div class="bg_cmt wrap_textarea">
+			<textarea id="commentContent"  onfocus="daum.Music.login({},'commentContent');" rows="" cols="" name="comment" onkeyup="daum.Music.updateChar(300,'commentContent','characters')" readonly="readonly"></textarea>
+		</div>
+		<input class="bg_cmt btn_regist" type="button" value="댓글등록" onclick="daum.Music.login(); return false;">
+		<script type="text/javascript">
+				daum.$("commentContent").value = "";
+		</script>
+	</div>
+	#else
+	## 로그인후  입력가능
+	<div class="wrap_poll">
+		#foreach($poll in $event.musicPollItems)
+		#set( $pollName = "#strCut($!{poll}, $polllen)" )
+		<div class="list_poll">
+			<span class="inp_poll"><input type="radio" id="poll$!{foreach.index}" value="$poll" name="poll"></span>
+			<span class="label_poll"><label for="poll$!{foreach.index}">$pollName</label></span>
+		</div>
+		#end
+	</div>
+	<div class="cmt_write">
+		<div class="bg_cmt wrap_textarea">
+			<textarea id="commentContent" rows="" cols="" $!{onfocusEvent} name="comment" onkeyup="daum.Music.updateChar(300,'commentContent','characters')"></textarea>
+		</div>
+		<input class="bg_cmt btn_regist" type="button" value="댓글등록" #if($StringUtils.isNotBlank("$!{onfocusEvent}")) $!{onclickEvent} #else onclick="sendApplication('$event.eventId', $event.eventKey,'','','항목을 선택하시고 내용을 입력해주세요.', 'comment', 'poll'); return false;" #end>
+		<script type="text/javascript">
+				daum.$("commentContent").value = "";
+		</script>
+	</div>
+	#end
+#elseif($StringUtils.equals("$!{event.musicEventType}","1")|| $StringUtils.isBlank("$!{event.musicEventType}"))
+    <div class="cmt_write">
+    	## 로그인 전
+    	#if($StringUtils.equals("${user}","()"))
+    	<div class="bg_cmt wrap_textarea">
+    		<textarea id="commentContent" onfocus="daum.Music.login({},'commentContent');" rows="" cols="" name="comment" onkeyup="daum.Music.updateChar(300,'commentContent','characters')" readonly="readonly"></textarea>
+    	</div>
+    	<input class="bg_cmt btn_regist" type="button" value="댓글등록" onclick="daum.Music.login(); return false;">
+    	#else
+    	##로그인후 입력가능하도록
+    	<div class="bg_cmt wrap_textarea">
+    		<textarea id="commentContent" ${onfocusEvent} rows="" cols="" name="comment" onkeyup="daum.Music.updateChar(300,'commentContent','characters')"></textarea>
+    	</div>
+    	<input class="bg_cmt btn_regist" type="button" value="댓글등록" #if($StringUtils.isNotBlank("$!{onfocusEvent}")) $!{onclickEvent} #else onclick="sendApplication('$event.eventId', $event.eventKey,'','','내용을  입력해주세요.', 'comment'); return false;" #end>
+    	#end
+    	<script type="text/javascript">
+    			daum.$("commentContent").value = "";
+    	</script>
+    </div>
+#end
+			</fieldset>
+			<div class="txt_info">
+				<div class="f_l">
+					<em id="characters" class="fw_b">0</em> / 300byte##<span class="txt_bar">|</span><a class="fc_link" href="#">댓글 운영원칙</a>
+				</div>
+			</div>
+		</form>
+	</div>
+#if( !$CollectionUtils.isEmpty($commentList) )
+	<ul class="list_comm">
+#if($StringUtils.equals("$!{event.musicEventType}","5"))##폴+ 댓글+ 경품 형 이벤트
+	#foreach ($comment in $commentList)
+	<li>
+	<span class="select_poll">$!event.presentMap.get($comment.presentId)</span>
+	<div class="txt_poll">
+		<strong class="name">$comment.daumName</strong>
+		<p>
+		<span class="txt">$!StringCutUtil.removeTag("$!{comment.comment}")<span class="date">$CheckDate.dateFormat("yy.MM.dd", "HH:mm", "yyyy-MM-dd HH:mm:ss.S z", "$!{comment.regDate}")</span></span>
+		</p>
+	</div>
+	</li>
+	#end
+#elseif($StringUtils.equals("$!{event.musicEventType}","4"))
+
+#elseif($StringUtils.equals("$!{event.musicEventType}","3"))
+	#foreach ($comment in $commentList)
+	<li>
+	<span class="select_poll">$!{comment.poll}</span>
+	<div class="txt_poll">
+		<strong class="name">$comment.daumName</strong>
+		<p>
+		<span class="txt">$!StringCutUtil.removeTag("$!{comment.comment}")<span class="date">$CheckDate.dateFormat("yy.MM.dd", "HH:mm", "yyyy-MM-dd HH:mm:ss.S z", "$!{comment.regDate}")</span></span>
+		</p>
+	</div>
+	</li>
+	#end
+#elseif($StringUtils.equals("$!{event.musicEventType}","1") || $StringUtils.isBlank("$!{event.musicEventType}"))
+	#foreach ($comment in $commentList)
+	<li>
+	<strong class="name">$comment.daumName</strong>
+	<p>
+		<span class="txt">$!StringCutUtil.removeTag("$!{comment.comment}")<span class="date">$CheckDate.dateFormat("yy.MM.dd", "HH:mm", "yyyy-MM-dd HH:mm:ss.S z", "$!{comment.regDate}")</span></span>
+	</p>
+	</li>
+	#end
+		#end
+	</ul>
+#end
+	## 댓글 page
+	
+	#set($command = {
+		"event_id": $Params.getString("event_id"),
+		"eventId": $Params.getString("eventId"),
+		"menu_id": $Params.getString("menu_id"),
+		"menuId": $Params.getString("menuId"),
+		"board_id": $Params.getString("board_id"),
+		"boardId": $Params.getString("boardId"),
+		"page_no": $Params.getInt("page_no", 1),
+		"pageNo": $Params.getInt("pageNo", 1),
+		"sym_seq" : "$!{symInfo.symSeq}"		
+	})
+
+	#printPaging($pagingUrl, $command.page_no, $pageHandler, "", 10)
+</div>
+<script type="text/javascript">
+	(function(){
+    	var pageAnchors = daum.$$("#sectionCommentList .paging.bg_paging a");
+    	pageAnchors.each(function(item, i){
+        	item.href += "#sectionCommentList";
+    	});
+		
+		var textareaWrapEl = daum.$$('.wrap_textarea')[0] || null,
+			textareaEl = daum.$$('#commentContent')[0] || null,
+		    messageEl = document.createElement('span');
+
+		messageEl.innerHTML = '인터넷은 우리가 함께 만들어가는 소중한 공간입니다.<br/>댓글 작성 시 타인에 대한 배려와 책임을 담아주세요.';
+
+		daum.Element.setStyle(textareaWrapEl,'position:relative'); 
+		daum.Element.setStyle(messageEl,'position:absolute;top:0;left:0;margin:11px 12px;line-height:18px;color:#B2B2B2;font-size:11px;font-family:dotum,Helvetica,AppleGothic,sans-serif'); 
+
+		if(!!textareaWrapEl) {
+			textareaWrapEl.appendChild(messageEl);
+		}
+		daum.addEvent(textareaEl, 'focus', function() {
+			daum.Element.hide(messageEl);
+		});
+		daum.addEvent(messageEl, 'click', function() {
+			daum.Element.hide(messageEl);
+			textareaEl.focus();
+		});
+		
+	})();
+</script>
+#end
+#end
+
+## 뮤직비디오 썸네일 바로보기 레이어
+#macro( printVideoCover )
+<span id="wrapOpen" class="cover_on" style="display:none;">
+    <span class="wrap_open">
+    	<span class="bg_txt"></span>
+    	<span class="txt_info">
+    		<a id="icoClose" class="ico_comm" href="javascript:;" title="뮤직비디오 바로보기">바로보기</a>
+    		<span id="TextBar" class="txt_bar"> | </span>
+    		<a id="viewDetail" title="뮤직비디오 상세보기" href="javascript:;">상세보기</a>
+    	</span>
+    </span>
+</span>
+<span id="wrapClose" class="cover_on" style="display:none;">
+    <span class="wrap_close">
+    	<span class="bg_txt"></span>
+    	<span class="txt_info">
+    		<a class="ico_comm ico_close" href="javascript:;" title="뮤직비디오 바로보기 닫기" onclick="daum.Music.Video.closeVideo(''); return false;">바로보기 닫기</a>
+    	</span>
+    </span>
+</span>
+#end
+
+## 곡정보 자세히
+#macro(printListSongInfoMore $song $colspan $class $noline $lst)
+	#set($hasClassicTitleInfo = false)
+	#foreach($genre in $genreList)
+    	#if( $StringUtils.equals("$!{genre.genreGroupCode}", "CL") && ($StringUtils.isNotBlank("$!{song.info}") || $StringUtils.isNotBlank("$!{song.titleKorLang}") || $StringUtils.isNotBlank("$!{song.titleEngLang}") ) )
+			#set($hasClassicTitleInfo = true)
+		#end
+	#end
+	#if( !$CollectionUtils.isEmpty($song.creditArtistList) || $StringUtils.isNotBlank("$!{song.info}") || $hasClassicTitleInfo )
+	<tr id="songdetail$!{song.songId}" class="more_info open_direct info_detail songdetail $!{noline} $!{lst}" > ## style="display:none;"
+		<td colspan="$colspan">
+#***##***#<div class="box_info $class">##
+#***##***##if($hasClassicTitleInfo)
+#***##***##***##if($StringUtils.isNotBlank("$!{song.info}"))<p class="ico_comm ico_movie info_txt">$!{song.info}</p>##
+#***##***##***##elseif($StringUtils.isNotBlank("$!{song.titleKorLang}"))<p class="ico_comm ico_movie info_txt">$!{song.titleKorLang}</p>##
+#***##***##***##elseif($StringUtils.isNotBlank("$!{song.titleEngLang}"))<p class="ico_comm ico_movie info_txt">$!{song.titleEngLang}</p>##
+#***##***##***##end##
+#***##***##else
+#***##***##***##if($StringUtils.isNotBlank("$!{song.info}"))<p class="ico_comm ico_movie info_txt">$!{song.info}</p>#end##
+#***##***##end
+#***##***##***##set($prevCreditCd = "")##
+#***##***##***##foreach($artist in $song.creditArtistList)##
+#***##***##***##***##if( $foreach.index != 0 && !$StringUtils.equals("$!{prevCreditCd}", "$!{artist.creditCd}") )</span></p>#end
+#***##***##***##***##if( !$StringUtils.equals("$!{prevCreditCd}", "$!{artist.creditCd}") )<p class="wrap_info"><em class="tit_info">#strCut("$!{artist.creditTitle}", 10)</em><span class="txt_desc">#end##
+#***##***##***##***##if( $StringUtils.equals("$!{prevCreditCd}", "$!{artist.creditCd}") ), #end##
+#***##***##***##***##if($StringUtils.isNotBlank("$!{artist.artistId}") && !$StringUtils.equals("$!{artist.artistId}", "0"))##
+#***##***##***##***##***#<a href="/artist/main?artist_id=$!{artist.artistId}">$!{artist.name}</a>##
+#***##***##***##***##else##
+#***##***##***##***##***#<span>$!{artist.name}</span>##
+#***##***##***##***##end##
+#***##***##***##***##set($prevCreditCd = $!{artist.creditCd})##
+#***##***##***##end##
+#***##***##***##if($song.creditArtistList.size() > 0)##
+#***##***##***#</span></p>##
+#***##***##***##end##
+#***##***#</div>##
+		</td>
+	</tr>
+	#end
+#end
+
+## 관련곡 정보
+#macro(printListRelatedSong $relatedSongList $type $id)
+	#set($totalCount = $relatedSongList.size())
+	#foreach($relatedSong in $relatedSongList)
+		<tr tag="$type" id="track$!{relatedSong.songId}#if(!$StringUtils.equals("$!{type}","song") && !$StringUtils.equals("$!{type}","artist_chart"))_$!{foreach.count}#end" class="track info_detail song_remix#if($StringUtils.equals("$foreach.count", "$totalCount")) tbl_remixlst#else tbl_noline#end $id">
+		#if( $StringUtils.equals("$!{type}", "song") )
+ ##   		<td class="col_check">
+ ##   			<input type="checkbox" name="trackCheckbox" value="$!{relatedSong.songId}" albumId="$!{relatedSong.album.albumId}" >
+ ##   		</td>
+    		<td class="col_title" colspan="2">
+				<em class="txt_remix">$!{relatedSong.typeName}</em>
+    			#set($titleLen = 30)#set($titleClass = "")
+    			#if( $StringUtils.equals("$!{relatedSong.masterYn}", "Y") )
+    				#set($titleLen = $titleLen - 10)#set($titleClass = "song_title")
+    			#end
+    			#if( $StringUtils.isNotBlank("$!{relatedSong.hotIssue.issueId}") && !$StringUtils.equals("$!{relatedSong.hotIssue.issueId}", "0"))
+    				#set($titleLen = $titleLen - 10)
+    			#end
+    			#printSongName( $!{relatedSong} $!{titleClass} $!{titleLen} true false false)
+    			#printListMasterSongIcon( $!{relatedSong} )
+    			#printListHotIssueIcon( $!{relatedSong} "album")
+    		</td>
+    		<td class="col_artist">#printArtistName( $!{relatedSong.keyArtistList} "" 13 true )</td>
+##    		<td class="col_popular">
+##    			#printPopularity( $!{relatedSong} )
+##    		</td>
+    		<td class="col_listen">
+    			#printListItemButton( $!{relatedSong.songId} "listen" $!{relatedSong.AODLinkId}  "" false "" "" "" "" "" "" "" )
+    		</td>
+    		<td class="col_lyrics">
+    			#printListItemButton( $!{relatedSong.songId} "lyrics" $!{relatedSong.lyricsYn} 0 "tr"  "" $!{foreach.count} false "" $!{relatedSong.typeCd} "" "")
+    		</td>
+##    		<td class="col_video">
+##    			#printListItemButton( $!{relatedSong.songId} "video" $!{relatedSong.vclipLinkId} 10 "detail" "" "" "tr" $!{foreach.count} false ""   $!{relatedSong.typeCd})
+##    		</td>
+##    		<td class="col_my">
+##    			#printListItemButton( $!{relatedSong.songId} "my" true "" $!{relatedSong.AODLinkId} "" "" "" "" "" "" "")
+##    		</td>
+##    		<td class="col_buy">
+##    			<div class="wrap_buy_btn">
+##    				#printListItemButton( $!{relatedSong.songId} "mp3" $!{relatedSong.MP3LinkId} "" "" $!{relatedSong.album.albumId} "" "" "" "" "" "")
+##            		#printListItemButton( $!{relatedSong.songId} "bgm" $!{relatedSong.BGMLinkId} "" "" "" "" "" "" "" "" "")
+##            		##printListItemButton( $!{song.songId} "phone" "$!{song.ringSalesStatus}" "$!{song.bellSalesStatus}" )
+##    			</div>
+##    		</td>
+		#elseif( $StringUtils.equals("$!{type}", "artist_chart") )
+    		<td class="col_check">
+    			<input type="checkbox" name="trackCheckbox" value="$!{relatedSong.songId}" albumId="$!{relatedSong.album.albumId}" >
+    		</td>
+			<td class="col_title" colspan="2">
+				<em class="txt_remix">$!{relatedSong.typeName}</em>
+				#printSongName( $!{relatedSong} "" 25 true false false)
+    		</td>
+    		<td class="col_artist">#printArtistName( $!{relatedSong.keyArtistList} "" 20 true )</td>
+    		<td class="col_popular">
+    			#printPopularity( $!{relatedSong} )
+    		</td>
+    		<td class="col_listen">
+    			#printListItemButton( $!{relatedSong.songId} "listen" $!{relatedSong.AODLinkId}  "" "" "" "" "" "" "" "" "" )
+    		</td>
+    		<td class="col_lyrics">
+        		#printListItemButton( $!{relatedSong.songId} "lyrics" $!{relatedSong.lyricsYn} "" "tr" "" $!{foreach.count} false "" $!{relatedSong.typeCd} "" "")
+    		</td>
+    		<td class="col_album">
+    			#printListItemButton( $!{relatedSong.album.albumId} "album" "#getArtistId($!{relatedSong})" "" "" "" "" "" "" "" "" "" )
+    		</td>
+    		<td class="col_video">
+    			#printListItemButton( $!{relatedSong.songId} "video" $!{relatedSong.vclipLinkId} 11 "detail" "" "" "tr" $!{foreach.count} false ""  $!{relatedSong.typeCd})
+    		</td>
+    		<td class="col_my">
+    			#printListItemButton( $!{relatedSong.songId} "my" true "" $!{relatedSong.AODLinkId} "" "" "" "" "" "" "")
+    		</td>
+    		<td class="col_buy">
+    			##<div class="wrap_buy_btn">
+    				#printListItemButton( $!{relatedSong.songId} "mp3" $!{relatedSong.MP3LinkId} "" "" $!{relatedSong.album.albumId} "" "" "" "" "" "")
+            		#printListItemButton( $!{relatedSong.songId} "bgm" $!{relatedSong.BGMLinkId} "" "" "" "" "" "" "" "" "")
+            		##printListItemButton( $!{song.songId} "phone" "$!{song.ringSalesStatus}" "$!{song.bellSalesStatus}" )
+    			##</div>
+    		</td>
+		#end
+		</tr>
+	#end
+#end
+
+
+#macro(getHeadTitle $titleMap $path)
+	#set($keyArr = $path.replaceAll("^\/", "").split("/"))
+	#set($title = "")
+
+	#foreach($key in $keyArr)
+		#if($titleMap.containsKey($key))
+			##if($titleMap.get($key).children)
+			#if( $StringUtils.isNotEmpty("$!{titleMap.get($key).title}") )
+			#set($title = $titleMap.get($key).title)
+			#end
+			#set($titleMap = $titleMap.get($key))
+			##end
+		#else
+			#break
+		#end
+	#end
+#end
+
+#macro(userAgentCheck)
+#set($ua_string = $request.getHeader("User-Agent"))
+#parse("/velocity/common/ua_check_core.vm")
+#end
+
+## newLine제거
+#macro(getSongTitle $song)#if($song.title)$!{song.title.replaceAll("(\r\n|\n)", "")}#end#end
+
+		
+
+## 방금그곡 리스트 상단에 위치하는 컨트롤 버튼 ####################################################################
+#macro( printListButtonOnairTop $type $script $count $value $value2 $newPlayListName)
+#if( $StringUtils.equals( "$!{type}", "song"))## 곡리스트
+<!-- 소셜쉐어 include -->
+<script>
+    socialShareSetVar = null;
+    socialShareSetVarFoot = null;
+	
+	daum.addEvent(window, 'load', function(){
+
+		socialShareSetVar = new socialshare( document.getElementById('socialShareMoreViewContainer'), {
+	        shareType: 'button',
+   			useCustomizedButton: true,
+	        link: '',
+	        prefix: '',
+			optionalServices: {
+	            cafe: '',
+	            blog: ''
+	        }			
+	    });
+		
+	   	daum.Music.Social.socialShareVarInit(socialShareSetVar, socialShareSetVarFoot);
+
+        var snsBtn = document.getElementById('socialShareSnsView');
+		
+        daumtools.event.on(snsBtn, 'click', function () {
+			if(socialShareSetVar.context.link != ""){
+	            socialShareSetVar.toggle();
+			}
+        });
+		
+		daumtools.event.on(document, 'click', function (e) {
+			var ev = e || window.event, target = ev.target || ev.srcElement, key;
+			
+            var snsDivLayer = daum.$$('#socialShareMoreViewContainer div')[0];
+			var snsParentNode = daum.$('socialShareSnsView');
+			
+			if(target != snsParentNode){
+    			if(daum.hasClassName(snsDivLayer, 'sns_on')){
+    				daum.removeClassName(snsDivLayer, 'sns_on');
+    			}
+			}
+        });
+	});
+</script>	
+
+<a href="#" class="btn_now link_all CT_ZONE_LIST_LISTENALL" title="전체듣기" onclick="controller.listenAll(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value2}'});return false;">전체듣기</a>
+<a href="#" class="btn_now link_set CT_ZONE_LIST_LISTEN" title="선택듣기" onclick="controller.listenSelect(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value2}'});return false;">선택듣기</a>
+<a href="#" class="btn_now link_my CT_ZONE_LIST_MYPUT" title="재생목록에 담기" onclick="controller.putSelect(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value2}', newPlayListName:'$!{newPlayListName}'});return false;">재생목록에 담기</a>
+<a href="#" id = "socialShareSnsView" class="btn_now link_sns CT_ZONE_LIST_SNS" title="SNS 공유" onclick="daum.Music.Social.snsSend(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value}'});return false;">SNS 공유</a><!-- 2013-12-27 수정 -->
+<div class="detail_btn">
+	<a href="javascript:;" class="btn_now link_buy CT_ZONE_LIST_BUY" title="구매" onclick="daum.Music.Onair.buySelectLayer(this);return false;">구매</a>
+	<div class="layer_buy" style="display:none;">
+		<ul class="list_buy">
+			<li><a href="javascript:;" class="link_layer buy_mp3" title="MP3 구매" onclick="controller.cartSelect('mp3');return false;">MP3 구매</a></li>
+			<li><a href="javascript:;" class="link_layer buy_mp3gift" title="MP3 선물"  onclick="controller.cartSelect('mp3_gift');return false;">MP3 선물</a></li>
+			<li><a href="javascript:;" class="link_layer buy_bgm" title="BGM 구매"  onclick="controller.cartSelect('bgm');return false;">BGM 구매</a></li>
+			<li><a href="javascript:;" class="link_layer buy_bgmgift" title="BGM 선물"  onclick="controller.cartSelect('bgm_gift');return false;">BGM 선물</a></li>
+		</ul>
+	</div>
+</div>
+#end
+
+
+#if($StringUtils.equals( "$!{type}", "song") )
+	<div id="socialShareMoreViewContainer"></div>
+#end
+
+#end
+
+
+
+
+##리스트 하단 버튼 
+#macro(printListButtonOnairFoot $type $script $count $value $value2)
+#if( $StringUtils.equals( "$!{type}", "song"))## 곡리스트
+<script>
+    socialShareSetVarFoot = null;
+	daum.addEvent(window, 'load', function(){
+
+		socialShareSetVarFoot = new socialshare(document.getElementById('socialShareMoreViewContainerFoot'), {
+	        shareType: 'button',
+   			useCustomizedButton: true,
+	        link: '',
+	        prefix: '', 
+			optionalServices: {
+	            cafe: '',
+	            blog: ''
+	        }			
+	    });
+
+	   	daum.Music.Social.socialShareVarInit(socialShareSetVar, socialShareSetVarFoot);
+
+        var snsBtnFoot = document.getElementById('socialShareSnsViewFoot');
+    	
+        daumtools.event.on(snsBtnFoot, 'click', function () {
+			if(socialShareSetVarFoot.context.link != ""){
+	            socialShareSetVarFoot.toggle();
+			}
+        });
+		daumtools.event.on(document, 'click', function (e) {
+			var ev = e || window.event, target = ev.target || ev.srcElement, key;
+			
+            var snsDivLayer = daum.$$('#socialShareMoreViewContainerFoot div')[0];
+			var snsParentNode = daum.$('socialShareSnsViewFoot');
+			
+			if(target != snsParentNode){
+    			if(daum.hasClassName(snsDivLayer, 'sns_on')){
+    				daum.removeClassName(snsDivLayer, 'sns_on');
+    			}
+			}
+        });		
+	});
+</script>
+
+<a href="#" class="btn_now link_all CT_ZONE_LIST_LISTENALL" title="전체듣기" onclick="controller.listenAll(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value2}'});return false;">전체듣기</a>
+<a href="#" class="btn_now link_set CT_ZONE_LIST_LISTEN" title="선택듣기" onclick="controller.listenSelect(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value2}'});return false;">선택듣기</a>
+<a href="#" class="btn_now link_my CT_ZONE_LIST_MYPUT" title="재생목록에 담기" onclick="controller.putSelect(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value2}', newPlayListName:'$!{newPlayListName}'});return false;">재생목록에 담기</a>
+<a href="#" id = "socialShareSnsViewFoot" class="btn_now link_sns CT_ZONE_LIST_SNS" title="SNS 공유" onclick="daum.Music.Social.snsSend(this, {container:'trackContainer$!{value}', checkboxName:'trackCheckbox$!{value}'});return false;">SNS 공유</a><!-- 2013-12-27 수정 -->
+<div class="detail_btn">
+	<a href="javascript:;" class="btn_now link_buy CT_ZONE_LIST_BUY" title="구매" onclick="daum.Music.Onair.buySelectLayer(this);return false;">구매</a>
+	<div class="layer_buy" style="display:none;">
+		<ul class="list_buy">
+			<li><a href="javascript:;" class="link_layer buy_mp3" title="MP3 구매" onclick="controller.cartSelect('mp3');return false;">MP3 구매</a></li>
+			<li><a href="javascript:;" class="link_layer buy_mp3gift" title="MP3 선물"  onclick="controller.cartSelect('mp3_gift');return false;">MP3 선물</a></li>
+			<li><a href="javascript:;" class="link_layer buy_bgm" title="BGM 구매"  onclick="controller.cartSelect('bgm');return false;">BGM 구매</a></li>
+			<li><a href="javascript:;" class="link_layer buy_bgmgift" title="BGM 선물"  onclick="controller.cartSelect('bgm_gift');return false;">BGM 선물</a></li>
+		</ul>
+	</div>
+</div>
+#end
+
+#if($StringUtils.equals( "$!{type}", "song") )
+	<div id="socialShareMoreViewContainerFoot"></div>
+#end
+
+#end
+
+
+
+##리스트 하단 버튼 
+#macro(printOnairProgramDetail $selectedProgram $contentType)
+<h4 class="screen_out">프로그램 정보</h4>
+<div class="now_song">
+	<div class="song_tit">
+		<strong class="tit_song">$!{selectedProgram.programMasterName}</strong>
+		<a href="#none" class="btn_now link_recomm" onclick="daum.Music.API.Recommend.send({id:'$!{selectedProgram.programId}',el:'recomNum',contents:'$!{contentType}', user:'#if($StringUtils.isNotEmpty($!{user.userId}))Y#end'});return false;"><span class="screen_out">추천수 </span>
+			<span id="recomNum">$!{selectedProgram.recommendCount}</span>
+		</a>
+
+		
+		<a href="#none" class="btn_now link_site">홈페이지</a>
+	</div>
+	<div class="song_detail">
+		<span class="detail_day"><em class="tit_detail">방송</em> $!{selectedProgram.channelName} $CheckDate.makeBroadCastTime("$!selectedProgram.broadcastTime")</span>
+		#if($StringUtils.isNotBlank("$!{selectedProgram.song.songId}") && !$StringUtils.equals("$!{selectedProgram.song.songId}","0"))
+		<span class="detail_signal"><em class="tit_detail">시그널</em> 
+			<a href="#none" class="link_detail">
+				$!{selectedProgram.song.title} 
+				- 
+				#if(${selectedProgram.song.keyArtistList.size()} > 0)
+					#foreach($artist in ${selectedProgram.song.keyArtistList})
+						${artist.name}
+					#end
+				#end	
+			</a>
+		</span>
+		#end
+	</div>
+</div>
+#end
+
+
+##프로그램 리스트 하단 페이징 마크업
+#macro(printOnairProgramListPaging $programList)
+<div id="programListPagingWrap" class="paging_now">
+	<span class="inner_paging">
+		<button type="button" class="btn_now btn_prev">이전</button>
+		<span class="paging_num" id="pagingToggle">
+		</span>
+		<button type="button" class="btn_now btn_next">다음</button>
+	</span>
+</div>	
+#end	

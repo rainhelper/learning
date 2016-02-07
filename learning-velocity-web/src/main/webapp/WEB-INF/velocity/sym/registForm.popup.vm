@@ -1,0 +1,413 @@
+
+<div id="popWrap" class="cont_registApp">
+<!-- popHead -->
+	<div id="popHead">
+		<h1 class="logoArea">
+			<strong id="logo" class="text_imgpop">Support your music 지원서</strong>
+			<strong id="applicationLogo" class="title">지원서</strong>
+		</h1>
+	</div>
+	<!-- //popHead -->
+	<!-- popContent -->
+	<div id="popContent">
+		<div class="wrap">
+			<form name="registForm" class="regist_app" method="post" action="/sym/registForm.popup" target="hiddenSubmitForm">
+				<fieldset>
+					<legend class="screen_out legend">지원서</legend>
+					
+					<input type="hidden" name="type" value="insert"/>
+                	<input type="hidden" name="sym_seq" value="$!{command.sym_seq}"/>
+					
+					<div class="form">
+						<div class="block line_bottom">
+							<label class="tit_label text_imgpop text_artist" for="artist">* 아티스트명</label>
+							<input class="input_text artist required" id="artist" name="artistName" type="text" maxlength="60" required>
+								
+							<button class="btn_pop btn_profile_photo" type="button" onclick="daum.Music.Sym.openPhotoUploaderPopup();return false;">* 프로필 사진 첨부</button>
+							<ul id="imageListWrapper" class="files_upload photos_upload"></ul>
+							
+						</div>
+						<div class="block line_bottom">
+							<strong class="block tit text_imgpop text_infomation">연락가능한 신상정보</strong>
+							<!-- p class="row row_name">
+								<label class="tit_label" for="name">* 이름</label>
+								<input class="input_text name required" id="name" name="candidateName" type="text" maxlength="60" required>
+							</p -->
+							<p class="row row_phone">
+								<label class="tit_label" for="phone">* 전화번호</label>
+								<input class="input_text phone required" id="phone" name="phone" type="text" maxlength="20" required>
+							</p>
+							<p class="row row_email">
+								<label class="tit_label" for="email">* 이메일</label>
+								<input class="input_text email required" id="email" name="email" type="text" maxlength="50" required>
+							</p>						
+						</div>
+						<div class="block line_bottom row_support">
+							<label class="tit_label text_imgpop text_support" for="support">* 지원동기</label>
+							<p class="row">
+								<label class="tit_label">(최대한 자세히 <br> 적어 주세요)</label>
+								<textarea cols="60" rows="10" class="input_textarea support required" id="support" name="applyMtv" title="지원동기" onkeyup="daum.Music.Sym.checkLength(1800, 'support');"></textarea>
+							</p>
+						</div>
+						<div class="block line_bottom">
+							<strong class="tit text_imgpop text_team">팀소개</strong>
+							<p class="row row_member_instruments">
+								<label class="tit_label" for="member_instruments">멤버(이름, 나이, 악기 포지션 등)</label>
+								<input class="input_text member_instruments" id="member" name="member" type="text" maxlength="500">
+							</p>
+							<p class="row row_member_instruments">
+								<label class="tit_label" for="member_instruments">간단한 팀 소개</label>
+								<input class="input_text member_instruments" id="intro" name="intro" type="text" maxlength="500">
+							</p>
+							<p class="row row_year_formation">
+								<label class="tit_label" for="year_formation">결성시기</label>
+								<input class="input_text year_formation" id="year_formation" name="debutDt" type="text" maxlength="30">
+							</p>
+							<p class="row row_whether_album">
+								<label class="tit_label" for="whether_album">* 음반/음원<br/>&nbsp;&nbsp;발매 여부</label>
+								<span class="wrap_radio">
+									<input type="radio" class="radio" name="albumYn" id="radioAlbumY" value="Y">
+									<label class="lbl" for="radioAlbumY">발매</label>
+								</span>
+								<span class="wrap_radio">
+									<input type="radio" class="radio" name="albumYn" id="radioAlbumN" value="N">
+									<label class="lbl" for="radioAlbumN">미발매</label>
+								</span>
+							</p>
+							
+							<p class="row row_label_affiliation">
+								<label class="tit_label" for="label_affiliation">* 레이블 소속여부</label>
+								<span class="wrap_radio">
+									<input type="radio" class="radio" name="lableYn" id="radioLableY" value="Y">
+									<label class="lbl" for="radioLableY">소속</label>
+								</span>
+								<span class="wrap_radio">
+									<input type="radio" class="radio" name="lableYn" id="radioLableN" value="N">
+									<label class="lbl" for="radioLableN">무소속</label>
+								</span>
+							</p>
+							<p class="row row_career_activites">
+								<label class="tit_label" for="career_activities">* 활동 경력</label>
+								<input class="input_text career_activities required" id="career_activities" name="activity" type="text" maxlength="2000" >
+							</p>
+							<p class="row row_record_number">
+								<label class="tit_label" for="record_number">* 녹음 가능한 곡수</label>
+								<input class="input_text record_number required" id="record_number" name="songCnt" type="text" maxlength="10">
+							</p>
+							<p class="row row_community_homepage">
+								<label class="tit_label label_community_homepage" for="community_homepage">커뮤니티/홈페이지/SNS</label>
+								<input class="input_text community_homepage" id="community_homepage" name="homepageUrl" type="text" maxlength="60">
+							</p>
+							<p class="row row_other">
+								<label class="tit_label" for="other">기타</label>
+								<input class="input_text other" id="other" name="etc" type="text" maxlength="2000">
+							</p>
+						</div>
+						<div class="block line_bottom row_selecting_music">
+							<label class="tit_label text_imgpop text_selecting_music" for="selecting_music">Support your music 선정시 이런 음반을 만들고 싶다</label>
+							<textarea cols="60" rows="10" class="input_textarea selecting_music" id="selecting_music" name="goal" title="Support your music 선정시 이런 음반을 만들고 싶다" onkeyup="daum.Music.Sym.checkLength(4000, 'selecting_music');"></textarea>
+						</div>
+						<div id="vclipWrapper" class="block line_bottom add_url">
+							<p class="top">
+								<label class="tit_label text_imgpop text_url" for="url">* 자작곡 라이브 동영상 URL (공개로 설정된 TV팟 URL)</label>
+								<a class="btn_add btn_pop" href="#" onclick="daum.Music.Sym.addVclipInputBox();return false;">추가하기</a>
+								<a class="up_tvport" href="http://tvpot.daum.net/upload/ClipUpload.do?from=gnb" target="_blank">TV팟 업로드 하러가기<span class="ico_arrow">&nbsp;</span></a>
+							</p>
+							<input id="firstVclip" class="input_text url" type="text"/>
+							
+							<p id="vclipInfo" class="wrap_introduction">
+								TV팟 URL 넣는 방법&nbsp;&nbsp;:&nbsp;&nbsp;TV팟에 올린 영상에서 TV팟 퍼가기 &gt; 주소 퍼가기 &gt; 복사하기 후 위의 입력란에 붙여넣기 <br/>
+								유투브 URL 넣는 방법 : 유투브에 동영상 업로드 후 동영상 공유 > 주소 복사 후 입력란에 붙여넣기
+							<span class="txt_youtubeurl"></span></p>
+						</div>
+						<div class="block line_bottom row_sources">
+							<label class="tit_label text_imgpop text_sources" for="sources">* 음원(데모 포함) 있을 시 첨부</label>
+							<input class="input_text sources" id="sources" name="image" type="text">
+							
+							##<button class="btn_pop btn_upload" type="button">파일올리기</button>
+							<div class="btn_pop btn_upload" id="coca_uploader"><!-- 업로더 플래시가 임베딩 될 div --></div>
+							<span class="attach_info">MP3형식, 최대 10개 첨부 가능 <br> 파일명을 정확한 곡 제목으로 기재해주세요. </span>
+							<ul id="fileListWrapper" class="files_upload"></ul>
+						</div>
+					</div>
+					<div class="precautions">
+						<strong class="text_imgpop text_precautions">주의사항</strong>
+						<ol>
+							<li>아티스트의 이미지를 잘 나타낼 수 있는 프로필 사진을 꼭 첨부해 주세요.</li>
+							<li>라이브 동영상과 음원(데모/발매 음원 모두 가능)을 반드시 첨부해 주세요. </li>
+							<li>동영상은 TV팟에 올린 후 URL을 첨부해 주세요. 비공개로 설정 시 접근이 되지않으므로 꼭 공개로 설정하셔야 합니다. </li>
+							<li>온라인 투표+오프라인 오디션 현장 투표+프로젝트 매니저 심사를 통해 최종적으로 아티스트가 선정됩니다.  </li>
+							<li>1차 후보에 선정되면 지원서 내용 일부와 음원 및 영상이 무료로 공개됩니다. </li>
+							<li>성의 없는 지원서 작성이나 빠진 항목이 있을 경우 심사 대상에서 제외됩니다.</li>
+						</ol>
+					</div>
+					<p class="allow">
+						<input class="input_check" id="checkagree" name="checkAgree" type="checkbox" value="" required>
+						<label class="text_agree" for="checkagree">주의사항을 모두 읽었고, 이에 동의합니다. (제출한 지원서는 수정할 수 없으니 주의해 주세요)</label>
+					</p>
+					
+					<div class="gathering">
+						<strong class="text_imgpop text_gathering">개인정보 수집·이용시 동의 안내</strong>
+						<p class="txtarea">
+수집·이용 목적&nbsp;&nbsp;:&nbsp;&nbsp;SYM 아티스트 선정 및 심사<br/>
+수집·이용 항목&nbsp;&nbsp;:&nbsp;&nbsp;이름, 연락처, 이메일 주소, 서비스 이용 기록<br/>
+수집·이용 기간&nbsp;&nbsp;:&nbsp;&nbsp;심사가 완료 후 즉시파기<br/>  
+<span class="blue">단, 관계법령의 규정에 의하여 보존할 필요가 있는 경우 일정기간 동안 개인정보를 보관함.</span><br/><br/>
+그 밖의 사항은 <a href="http://www.daum.net/doc/info_protection.html" target="_blank" title="개인정보취급방침 바로가기">개인정보취급방침</a>을 준수합니다.
+						</p>
+						<p class="allow">
+							<input class="input_check" id="checkagree1" name="checkAgree" type="checkbox" value="" required>
+							<label class="text_agree" for="checkagree1">위와 같이 개인정보 수집·이용에 동의합니다</label>
+						</p>
+					</div>
+					<div class="infoguidance">
+						<strong class="text_imgpop text_infoguidance">개인정보 제공에 대한 동의 안내</strong>
+						<p class="txtarea">
+제공 받는 자&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp; 민트페이퍼<br/>
+개인정보 제공 목적&nbsp;&nbsp;:&nbsp;&nbsp;SYM 아티스트 선정 및 심사<br/> 
+개인정보 제공 항목&nbsp;&nbsp;:&nbsp;&nbsp;이름, 연락처 이메일 주소<br/>
+보유 및 이용 기간&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;심사 완료 후 즉시파기<br/>
+<span class="blue">단, 관계법령의 규정에 의하여 보존할 필요가 있는 경우 일정기간 동안 개인정보를 보관함.</span><br/><br/>
+그 밖의 사항은 <a href="http://www.daum.net/doc/info_protection.html" target="_blank" title="개인정보취급방침 바로가기">개인정보취급방침</a>을 준수합니다.
+						</p>
+						<p class="allow">
+							<input class="input_check" id="checkagree2" name="checkAgree" type="checkbox" value="" required>
+							<label class="text_agree" for="checkagree2">위와 같이 개인정보 제공에 동의합니다</label>
+						</p>
+					</div>
+
+					<div class="btnArea">
+						##<button class="btn_pop btn_application" onclick="daum.Music.Sym.submitRegisterForm();return false;">지원서 제출하기</button>
+						<a class="btn_pop btn_application" onclick="daum.Music.Sym.submitRegisterForm();return false;">지원서 제출하기</a>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+	</div>
+	<!-- //popContent -->
+</div>
+
+<iframe name="hiddenSubmitForm" style="display:none;"></iframe>
+
+<script type="text/javascript" src="http://editor.daum.net/coca/swfobject.js"></script>
+<script type="text/javascript">
+    document.domain='daum.net';
+    
+	daum.Music.Sym.registerFormInit();
+	
+	// 파일 업로더
+    function getSWF(movieName){
+      	return (navigator.appName.indexOf("Microsoft") != -1)?window[movieName]:document[movieName];
+    }
+    
+    Coca = {
+    
+    	//function은 수정 금지
+    
+    	//function : upload 시작
+    	upload: function(){
+      		getSWF("coca").browse();
+    	},
+    	//function : activate 시작(현재는 모든 업로드 서버 -php, 업로드팜- 들이 바로 activation 하기 때문에 호출할 필요가 없다. 
+    	activate: function(){
+    		getSWF("coca").activate();
+    	},
+    	//function : remove 파일 삭제 key 는 attach type url을 집어 넣는다.
+    	remove: function(key){
+    		return getSWF("coca").remove(key);//return remain count
+    	},
+    	//upload enable
+    	enableCoca: function(key){
+    		return getSWF("coca").enableCoca();
+    	},
+    	//upload disable
+    	disableCoca: function(key){
+    		return getSWF("coca").disableCoca();
+    	},
+    
+    	//callback은 서비스에서 알아서 오버라이드
+    	//ctx 는 한 페이지 안에 여러 플래시 업로더 인스턴스가 있을 때 구분하기 위한 용도, ctx를 따로 주지 않는 경우 빈 문자열을 반환한다. 
+    
+    	//플래시 인스턴스에 mouse_over
+    	on_mouse_over: function(ctx)
+    	{
+    		//console.log(ctx+"_mouseover");
+    	},
+    	//플래시 인스턴스에 mouse_out
+    	on_mouse_out: function(ctx)
+    	{
+    		//console.log(ctx+"_mouseout");
+    	},
+    	//callback : 에러 발생 시 호출
+    	on_error: function(msg, ctx){
+    		//console.log(ctx+"_error:"+msg);
+    	},
+    	//callback : 파일 브라우저 창에서 취소 할 때 호출
+    	on_browse_cancel: function(hasError, ctx){
+    		//console.log(ctx+"_browse_cancel");
+    	},
+    	//callback : 파일 브라우저에서 파일 선택 후 확인 시 호출
+    	on_upload_start: function(ctx, count){
+    		//console.log(ctx+"_upload_start:"+count);
+			daum.Music.Sym.addMusicFileInfo();
+    	},
+    	//callback : 파일 업로드가 시작 될 때 호출 - 파일을 3개 선택했으면 3번 호출
+    	on_upload_open: function(name, size, type, ctx){
+    		//console.log(ctx+"_upload_open:"+name);
+    	},
+    	//callback : 전체 선택 파일의 업로드 량 변화 시 호출 - 퍼센트
+    	on_upload_progress: function(percent, ctx){
+    		//console.log(ctx+"_upload_progress:"+percent);
+    	},
+    	//callback : 파일 업로드가 끝나고, result가 오기까지 기다리기 시작
+    	on_upload_wating_complete: function(name, type, ctx){
+    		//console.log(ctx+"_upload_wating_complete:"+name);
+    	},
+    	//callback : 파일 업로드가 끝났을 때 호출 - result 는 이전 카페 php 모듈의 리턴값과 동일, 파일 3개를 올렸으면 3번 호
+    	on_upload_complete: function(result, ctx){
+    		//console.log(ctx+"_upload_complete:\n"+result);
+    		daum.Music.Sym.addMusicFile(result);
+    	},
+    	//callback : 모든 업로드가 끝났을 때 호출
+    	on_upload_finish: function(ctx){
+    		//console.log(ctx+"_upload_finish");
+    	},
+    	//callback : 파일 액티베이트가  끝났을 때 호출 - 현재 파일서버들은 자동 액티베이트 방식이기 때문에 호출되지 않는다.
+    	on_activate_complete: function(result, ctx){
+    		//console.log(ctx+"_activate_complete:\n"+result);
+    	},
+    	//callback : 파일 액티베이트가  모두 끝났을 때 호출 - 현재 파일서버들은 자동 액티베이트 방식이기 때문에 호출되지 않는다.
+    	on_activate_finish: function(ctx){
+    		//console.log(ctx+"_activate_finish");
+    	},
+    	//callback : 설정해놓은 파일 사이즈보다  큰 파일을 선택했을 경우
+    	on_over_filesize: function(filename, maxsize, ctx){
+    		//console.log(ctx+"_oversize:"+filename+","+maxsize);
+    	},
+    	//callback : 설정해놓은 파일 개수보다  많이  파일을 선택했을 경우
+    	on_over_filecount: function(overcount, maxcount, ctx){
+    		//console.log(ctx+"_overcount:"+overcount+","+maxcount);
+    	},
+    	//callback : 설정해놓은 전체 파일 사이즈 파일를 넘게 선택했을 경우
+    	on_over_filequota: function(overquota, maxquota, ctx){
+    		//console.log(ctx+"_overquota:"+overquota+","+maxquota);
+    	},
+    	//callback : 용량이나 개수 제한이 업로드 도중 넘을 경우 해당 파일은 SKIP, extension_quota_flag는 특정 파일에 쿼타를 줄 경우 해당 파일의 그룹명(다음 에디터에 커플링)
+    	on_upload_skip: function(name, size, type, ctx, extension_quota_flag){
+    		//console.log(ctx+"_upload_skip:"+name);
+    	},
+    	//callback : 100% progress 이후, complete 대기 중
+    	on_upload_wating_complete: function(name, extension, ctx){
+    		//console.log(ctx+"_wait_complete:"+name);
+    	},
+    	on_upload_restrict_complete: function(result, ctx){
+    		//console.log(ctx+"_restrict_complete:"+result);
+    	}
+    };
+    
+    var so = new SWFObject("http://editor.daum.net/coca_service/1.1.21/coca.swf", "coca", "66", "25", "9.0.28");//, "#484848");
+    
+    //DO NOT MODIFY!!!
+    so.addParam("quality", "high");
+    so.addParam("menu", "false");
+    so.addParam("swLiveConnect", "true");
+    so.addParam("allowScriptAccess", "always");
+    so.addParam("scale", "noscale");
+    so.addParam("salign", "LT");
+    // DON'T! DON'T! DON'T USE transparent wmode !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
+    //SERVICE PARAMS.
+    //필수 : 업로더를 사용하기 위해서는 coca_service 키를 발급 받아야 한다.(리아 기술팀 박대환)
+    //업로드 팜 사용 : service 키를 발급 받아야한다.(기반 기술팀 박대환)
+    //기존 php 서버 사용 : 기존 param 과 같게 아래 값 설정
+    
+    so.addVariable("coca_service", "MusicCoca"); 
+    so.addVariable("sid", "$!{user.userId}");
+    so.addVariable("service", "music"); 
+    so.addVariable("sname", "music");
+    so.addVariable("service_farm", "not_use");//use
+    so.addVariable("coca_skin", "http://editor.daum.net/coca/btn_file02.gif");
+    //so.addVariable("single_selection", "true");
+    //so.addVariable("coca_ctx", "instance_name");
+    //so.addVariable("single_selection", "true");
+    
+    so.write("coca_uploader");
+
+	// photo uploader
+
+	DaumPhotoEditorPastel = {
+        getFlashVars:function(){
+            return {
+                "coca_service":"MusicPep", //기존에 쓰시던 coca_service 값
+                "service":"music", //기존에 쓰시던 service 값
+                "maxDefSize":"1024", //이미지 최대 width(1024이하)
+                "defaultSign":"", //서명 기능 사용 시 기본 서명 값
+                "upload_service":"uf", //"uf", "handrive", default:"uf"
+                "handrive_import":"false", //"false", "true", default:"false"
+                
+    			//이하는 변경하지 마세요.
+                "imageAlign":"C",
+                "remote_urls":"",
+                "originalCheck":"false", //원본저장 체크 여부 ("false", "true", default:"false")
+                "originalCheckBox":"false", //원본저장 체크박스를 보여줄 것인지 아닌지 ("false", "true", default:"false")
+                "usePowerEditor":"false", //우측 하단 에디터 정렬 기능(4개 버튼)의 사용 여부 ("false", "true", default:"true")
+                "useExifMenu":"true" //Exif 메뉴 사용 여부, false시 메뉴 안보임 ("false", "true", default:"true")
+            };
+        },
+ 
+		// 사진 등록 후에 사진이 한장씩 업로드팜에 등록 될 때 call 됩니다.
+        // data (json data)에는 등록된 이미지의 URL, 이름 등 정보가 들어 있습니다.
+        attach:function(data){
+			daum.Music.Sym.addProfileImage(data);
+        }
+    };
+</script>
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+	
+<form method="post">
+	<input type="hidden" name="type" value="insert"/>
+	<input type="hidden" name="sym_seq" value="$command.sym_seq"/>
+	<input type="hidden" name="userId" value="$user.userId"/>
+아티스트명 : <input type="text" name="artistName"/><br/>
+이름 : <input type="text" name="candidateName"/><br/>
+전화번호 :<input type="text" name="phone"/><br/>
+이메일 :<input type="text" name="email"/><br/>
+지원동기 :<input type="text" name="applyMtv"/><br/>
+멤버 :<input type="text" name="member"/><br/>
+악기 :<input type="text" name="intro"/><br/>
+결성년도 :<input type="text" name="debutDt"/><br/>
+음반 발매 여부 :<input type="text" name="albumYn"/><br/>
+레이블 소속 여부 :<input type="text" name="lableYn"/><br/>
+활동 경력 :<input type="text" name="activity"/><br/>
+녹음 가능한 곡수 :<input type="text" name="songCnt"/><br/>
+커뮤니티 또는 홈페이지 주소 :<input type="text" name="homepageUrl"/><br/>
+기타 :<input type="text" name="etc"/><br/>
+이런음반 만들고 싶다 :<input type="text" name="goal"/><br/>
+동영상 :<input type="text" name="vclip"/><br/>
+음원 :<input type="text" name="image"/><br/>
+==========================<br/>
+이미지 :<input type="text" name="symImageList[0].filePath"/><br/>
+이미지 :<input type="text" name="symImageList[1].filePath"/><br/>
+이미지 :<input type="text" name="symImageList[2].filePath"/><br/>
+이미지 :<input type="text" name="symImageList[3].filePath"/><br/>
+이미지 :<input type="text" name="symImageList[4].filePath"/><br/>
+이미지 :<input type="text" name="symImageList[5].filePath"/><br/>
+==========================<br/>
+곡명 :<input type="text" name="symSongList[0].title"/><br/>
+곡주소 :<input type="text" name="symSongList[0].filePath"/><br/>
+곡명 :<input type="text" name="symSongList[1].title"/><br/>
+곡주소 :<input type="text" name="symSongList[1].filePath"/><br/>
+곡명 :<input type="text" name="symSongList[2].title"/><br/>
+곡주소 :<input type="text" name="symSongList[2].filePath"/><br/>
+==========================<br/>
+동영상명 :<input type="text" name="symVclipList[0].title"/><br/>
+동영상주소 :<input type="text" name="symVclipList[0].filePath"/><br/>
+동영상명 :<input type="text" name="symVclipList[1].title"/><br/>
+동영상주소 :<input type="text" name="symVclipList[1].filePath"/><br/>
+동영상명 :<input type="text" name="symVclipList[2].title"/><br/>
+동영상주소 :<input type="text" name="symVclipList[2].filePath"/><br/>
+==========================<br/>
+<input type="submit" name="submit" value="지원하기"/>
+</form>
+#end

@@ -1,0 +1,15 @@
+{
+"title" : "$!{title}",
+"endDate" : "$CheckDate.makeReleaseDate($!{endDate})",
+	
+	"result" : {
+		"type" : "${result.resultType}",
+		"message" : "${result.message.replaceAll('\n', '<br>')}"
+		
+		##"message" : "$str"
+		#*
+		"type" : "$!Escape.escapeJava(${result.resultType})",
+		"message" : "$!Escape.escapeJava(${result.message})"
+		*#
+	}
+}

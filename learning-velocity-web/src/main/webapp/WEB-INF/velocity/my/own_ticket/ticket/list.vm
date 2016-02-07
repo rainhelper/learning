@@ -1,0 +1,152 @@
+## 컨텐츠 영역 my_coupon.html
+<style type="text/css">
+	.section_coupon .col_breakdown .txt_info {display:inline-block;}
+</style>	
+#set( $type = "ticket")
+<div class="wrap_cont section_coupon">
+	<h3 class="tit_mymusic tit_coupon">이용권 현황</h3>
+	#printOwnTicketTab($!{type})
+	<input type="hidden" value="$!{command.use_status}" id="curStatus" name="curStatus">
+	<div class="music_chart">
+		<div class="wrap_choice">
+			<a href="/my/own_ticket/ticket/list" class="txt_all"><span class="btn_mymusic btn_radio #if($StringUtils.isBlank("$!{command.use_status}"))on#end"></span><span class="txt_option#if($StringUtils.isBlank("$!{command.use_status}")) txt_whole#end">전체</span></a>
+			<a href="/my/own_ticket/ticket/list?use_status=USE"><span class="btn_mymusic btn_radio#if($StringUtils.equals("$!{command.use_status}","USE")) on#end"></span><span class="txt_option#if($StringUtils.equals("$!{command.use_status}","USE")) txt_whole#end ">사용중</span></a>
+			<a href="/my/own_ticket/ticket/list?use_status=UNUSE"><span class="btn_mymusic btn_radio#if($StringUtils.equals("$!{command.use_status}","UNUSE")) on#end"></span><span class="txt_option#if($StringUtils.equals("$!{command.use_status}","UNUSE")) txt_whole#end">미사용</span></a>
+			<a href="/my/own_ticket/ticket/list?use_status=DONE"><span class="btn_mymusic btn_radio#if($StringUtils.equals("$!{command.use_status}","DONE")) on#end"></span><span class="txt_option#if($StringUtils.equals("$!{command.use_status}","DONE")) txt_whole#end">사용종료</span></a>
+			<a href="https://cash.daum.net/Skyline-section/settlement/manage.daum" class="btn_mymusic btn_change">결제수단변경</a>
+		</div>
+		
+		<div class="list_coupon bg_thead">
+			<table class="tbl_coupon">
+				<caption class="screen_out">보유 이용권 내역</caption>
+				<colgroup>
+					<col class="col_kind">
+					<col class="col_breakdown">
+					<col class="col_price">
+					<col class="col_buy">
+				</colgroup>
+				<thead class="screen_out">
+					<tr class="screen_out">
+						<th scope="col">종류</th>
+						<th scope="col">내역</th>
+						<th scope="col">가격 </th>
+						<th scope="col">구매일</th>
+					</tr>
+				</thead>
+				<tbody>
+				#if(!$CollectionUtils.isEmpty($dto.ticketList))
+					#foreach($ticket in $dto.ticketList)
+					<tr>
+						<td class="col_kind" id="list_$!{ticket.order.orderId}" title="$!{ticket.order.item.title}">
+                        	#if($StringUtils.equals("$!{ticket.ticketUseStatus}","USE") && ($MathTool.toNumber($Date.get('yyyyMMddHHmmss')) < $MathTool.toNumber($!{ticket.ownDate})))
+                        		#set ($ticket.ticketUseStatus = "WAIT")
+							#end
+							#printTicketStatus($!{ticket.ticketUseStatus})<span class="txt_kind" id="title_$!{ticket.order.orderId}" title="$!{ticket.order.item.title}">#strCut($!{ticket.order.item.title},42)</span></td> ###* && !$StringUtils.equals("$!{ticket.ticketUseStatus}","CANCEL")*#
+						<td class="col_breakdown">
+							#if($StringUtils.equals("$!{ticket.useCode}", "N"))#if($StringUtils.equals("$!{dto.isAodUse()}","Y"))사용중 듣기이용권 기간만료 후 사용 가능#{else}<button type="button" class="btn_mymusic btn_use" id="$!{ticket.order.orderId}" onclick='daum.Music.MyOwnTicket.click(this, "$!{ticket.order.orderId}");'>사용하기</button>#end#{else}<span class="txt_info">#printRemainderInfo( $!{ticket} $!{dto.user} $!{dto.isAodUse()})</span>#end</td>
+						<td class="#if($StringUtils.equals("$!{ticket.order.item.coupon}","true"))col_text#{else}col_price#end">#if($StringUtils.equals("$!{ticket.order.item.coupon}","true"))쿠폰#{else}<span class="txt_num">#toCurrency($!{ticket.order.item.price})</span>#end</td>
+						<td class="col_buy">$!CheckDate.makeReleaseDate($!{ticket.ownDate})</td>
+					</tr>						
+					#end
+				#else	
+					<tr class="no_listinfo">
+						<td colspan="4"><p class="fc_txt">보유 이용권이 없습니다</p></td>
+					</tr>					
+				#end
+				</tbody>
+			</table>
+		</div>
+		<div class="wrap_paging">
+			#printPaging($pagingUrl, $command.page_no, $pageHandler, "", 10)
+		</div>
+	</div>
+</div>
+#if( $StringUtils.isNotEmpty("$!{command.order_id}") )
+<script type="text/javascript">
+domReady( function(){
+	daum.Music.MyOwnTicket.click(daum.$("$!{command.order_id}"), "$!{command.order_id}");
+});
+</script>
+#end
+
+#if($StringUtils.equals("$!{command.debugmode}","2"))
+<div id="FTMessage">
+-----------------------------------------
+FT 체크 (화이링)
+-----------------------------------------
+<br/>- 이용권화면은 매크로(VM_global_library.vm)를 씁니다. 그래서-_- 
+<br/>- 화면의 변경사항은 없지만 혹시 파라메터값이 영향을 받을까 싶어 전부다 적어놓았습니다. 필요없는경우 지우셔도됩니다^^<br/>
+-----------------------------------------
+개발 체크 (화이링)
+-----------------------------------------
+</div>
+
+#if($dto.ticketList.size() > 0)
+	이용권사용여부: $dto.isAodUse() <br/>
+--------------------------<br/>
+#foreach($ticket in $dto.ticketList)
+	티켓상태:
+	#if($StringUtils.equals("$!{ticket.ticketUseStatus}","USE") && ($DateUtil.getCurrentDateTime() < $!{ticket.ownDate}))
+		#set ($ticket.ticketUseStatus = "WAIT")
+	#end
+
+	$ticket.ticketUseStatus<br/>
+	사용여부 :   $ticket.useCode <br/>
+	아이템타입: $ticket.order.item.itemType.code <br/>
+	소유자: $ticket.owner.userId<br/>	
+	기준일자 : $ticket.modDttm <br/>
+	아이템ID :  ($ticket.itemId) 종류 : $ticket.order.item.title<br/>
+	티켓시작일 : $ticket.startDate <br/> 
+	티켓종료일: $ticket.endDate<br/>
+	쿠폰여부: $ticket.order.item.coupon<br/>
+	티켓이 정기결재인지 : $ticket.order.item.periodic <br/>
+	정기결재를 할수 있는지 여부 출력:	$ticket.getIsPayItem() <br/>
+	지불타입 : $ticket.order.paymentType<br/>
+	지불타입명 :   $ticket.order.getPaymentTypeName()<br/>
+	모바일이용권여부 : $ticket.mobileDataItemYn<br/>
+	남은 사용일수 : $ticket.remainDate <br/>
+	남은 갯수 : $ticket.remainder <br/>
+        가격 :$ticket.order.item.price<br/>
+        구매일 :$!CheckDate.makeReleaseDate($!{ticket.ownDate})<br/>
+ --------------------------<br/>	
+	#end
+#end
+
+이용권  #if($!{ticketCount}) $ticketCount #else 0 #end <br/>
+
+
+<b>왼쪽레프트정보</b><br/>
+다음이름: $left.cpDaumName <br/>
+전화번호 $left.cpNumber <br/>
+유저아뒤 : $left.userId <br/>
+음악감상잔여일 $left.aodLeftDay <br/>
+mp3잔여곡 : $left.Mp3LeftCount <br>
+
+<br>
+MY 뮤직<br/> 
+플레이리스트 $left.myPlayCount <br/>
+
+#foreach($item in $left.myPlayList)<br/>
+	ㅡ순서: $item.playListId || 이름: $item.playListName ($item.totalPlayCnt) || 디폴트: $item.gubunCd
+#end <br/>
+
+<br/>
+즐겨 듣는 음악 <br/>
+최근 들은 음악 <br/>
+관심음악 : $left.favoriteCount <br/>
+관심음악제일마지막에 저장된 탭 : $left.lastSavedObjType <br/>
+구매음악 : $left.ownCount <br/>
+		
+MY관리 <br/>
+이용권현황 $left.ticketOwnCount <br/>
+내알림  $left.announceCount <br/>
+내설정 <br/>
+
+공지사항 <br/><br/>
+#foreach($item in $left.recentNoticeList)<br/>
+	#if($foreach.index < 4)
+		$item.get("SUBJECT") ||  $item.get("URL") <br />
+	#end
+#end <br />	
+<br>
+#end

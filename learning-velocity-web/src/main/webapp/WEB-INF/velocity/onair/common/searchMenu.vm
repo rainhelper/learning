@@ -1,0 +1,12 @@
+#set( $URI = "#getter('URI', '')" )##
+<ul class="tab_sort tab_channel">
+	<li #if( $URI.indexOf("/onair/search/program") > -1 )class="on"#end>
+		<a href="/onair/search/program" class="link_tab link_program" title="프로그램 검색">프로그램 검색</a>
+	</li>
+	<li #if( $URI.indexOf("/onair/search/channel") > -1 )class="on"#end>
+		<a href="/onair/search/channel" class="link_tab link_choice" title="채널선택" id="channelSel">채널 선택</a>
+	</li>
+</ul>
+	
+
+

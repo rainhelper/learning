@@ -1,0 +1,38 @@
+<div class="now_chart">
+	<h4 class="txt_now tit_chart">프로그램 선곡표 바로 가기</h4>
+	<div class="area_chart">
+		#set($premediaType = "")
+		#set($channelCount = 0)
+		#foreach($program in $programList)
+			#if($channelCount == 0)
+		<div class="wrap_program wrap_tv">		
+		<strong class="txt_now tit_tv">TV</strong>
+		<ul class="list_program list_tv">
+			#end
+			
+			#if($channelCount != 0 && $premediaType != ${program.mediaType})
+		
+		
+		</ul>
+		</div>
+		<div class="wrap_program wrap_radio">
+		<strong class="txt_now tit_radio">라디오</strong>
+		<ul class="list_program list_radio">
+			#end
+			
+			<li>
+			#set($href = "")
+			#if("$!{program.mediaType}" == "4")
+				#set($href = "/onair/radio/channel?channelId="+$!{program.channelId}+"&programId="+$!{program.programId}+"#nowMusicListWrap")
+			#elseif("$!{program.mediaType}" == "1")
+				#set($href = "/onair/tv?programId="+$!{program.programId}+"#nowMusicListWrap")
+			#end
+				<a href="$href" class="link_chart">${program.programMasterName}</a>
+			</li>
+			#set($premediaType = ${program.mediaType})
+			#set($channelCount = $channelCount +1)
+		#end
+		</ul>
+		</div>
+	</div>
+</div>

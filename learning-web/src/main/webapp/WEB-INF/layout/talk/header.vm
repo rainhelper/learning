@@ -1,0 +1,327 @@
+#if ( $!requestURI.indexOf("/detail") > -1 )
+<header id="daumHead" class="head_detail">
+    <div class="d_head head_detail" id="entry">
+        <h1 class="screen_out">talk:music</h1>
+        <a href="/talk/top" class="link_prev">
+            <span class="ico_comm">이전페이지로 이동 </span>
+        </a>
+        #if($!is_kakaotalk_webview)
+            <a href="/CloseAppView" style="position: absolute;top: 0;right: 0;z-index: 30;padding-top: 6px;">
+                <span class="ico_comm" style="width: 19px;height: 19px;margin: 10px 14px;background: url(http://cfile38.uf.daum.net/image/2127214B55644C6A34DC34); background-size: 19px 19px;">창 닫기 </span>
+            </a>
+        #end
+    </div>
+    <div class="d_head" id="nav" style="display:none; position: fixed; top:0; height:53px; width:100%; z-index: 999; max-width:640px;">
+        <h1 class="screen_out">talk:music</h1>
+        <a href="/talk/top" class="link_prev">
+            <span class="ico_comm">이전페이지로 이동 </span>
+        </a>
+        <strong class="screen_out">sns 공유하기 </strong>
+        <ul class="list_sns">
+            #if($!is_kakaotalk_webview)
+                <li>
+                    <a href="javascript:;" onclick="showShareableSns()" class="ico_comm ico_moresns">기타 공유</a>
+                </li>
+                <li style="margin-right: 10px;">
+                    <a href="/CloseAppView" style="top: 0;right: 0;z-index: 30;padding-top: 6px; height: 40px;">
+                        <span class="ico_comm" style="width: 13px;height: 13px;margin: 12px 6px;background-position: -140px -120px; ">창 닫기 </span>
+                    </a>
+                </li>
+            #else
+                <li>
+                    <a href="javascript:;" class="ico_comm ico_katalk" id="shareKakaotalk" onclick="return daum.Music.Talk.shareSns('kakaotalk');">카카오톡</a>
+                </li>
+                <li>
+                    <a href="javascript:;" class="ico_comm ico_kastory" id="shareKakaostory" onclick="return daum.Music.Talk.shareSns('kakaostory');">카카오스토리</a>
+                </li>
+                <li>
+                    <a href="javascript:;" class="ico_comm ico_facebook" id="shareFacebook" onclick="return daum.Music.Talk.shareSns('facebook');">페이스북</a>
+                </li>
+                <li>
+                    <a href="javascript:;" onclick="showShareableSns()" class="ico_comm ico_moresns">기타 공유</a>
+                </li>
+            #end
+        </ul>
+    </div>
+</header>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        if (isOldIE()) {
+            jQuery("#nav").remove();
+        } else {
+            jQuery(window).scroll(function () {
+                var scrollIndex = jQuery(window).scrollTop();
+                if (scrollIndex > 230) {
+                    setTimeout(function () {
+                        if (jQuery(window).scrollTop() > 230) {
+                            jQuery("#daumHead").addClass("detail_scroll");
+                            jQuery("#entry").hide();
+                            jQuery("#nav").show();
+                        }
+                    }, 50);
+                } else {
+                    jQuery("#daumHead").removeClass("detail_scroll");
+                    jQuery("#nav").hide();
+                    jQuery("#entry").show();
+                }
+            });
+        }
+    });
+</script>
+
+#elseif ( $!requestURI.indexOf("/pollResult") > -1  )
+<header id="daumHead" class="head_list">
+    <div class="d_head head_list">
+        <h1 class="tit_list">투표 결과 보기</h1>
+    </div>
+</header>
+#elseif ( $!requestURI.indexOf("/quiz") > -1  )
+<header id="daumHead"  class="head_list head_quiz">
+    <div class="d_head head_list head_quiz">
+        <h1 class="tit_list" id="quizTitle">퀴즈 정답 맞추고 자랑하자</h1>
+        <a href="/talk/top" class="link_home"><span class="ico_comm ico_home">메인화면으로 이동</span></a>
+        #if($!is_kakaotalk_webview)
+        <a href="/CloseAppView" style="position: absolute;top: 0;right: 0;z-index: 30;padding-top: 6px;">
+            <span class="ico_comm" style="width: 13px;height: 13px;margin: 12px 14px;background-position: -140px -120px;">창 닫기 </span>
+        </a>
+        #end
+    </div>
+</header>
+#elseif ( $!requestURI.indexOf("/viewer") > -1 )
+
+#elseif ( $!requestURI.indexOf("/webview") > -1 )
+<header id="daumHead" class="head_top">
+    <div class="d_head">
+        <h1 class="tit_musictalk">
+            <a href="/talk/top" id="daumLogo" class="link_musictalk"><span class="ico_comm ico_musictalk">talk:music</span></a>
+        </h1>
+        <a href="http://contents.kakao.com/music/1428491158377.html" target="_blank" class="link_kakao">
+            <span class="ico_comm">카카오뮤직 </span>
+        </a>
+
+        #if($!is_kakaotalk_webview)
+            <a href="#" class="link_menu" id="mene_icon" style="margin-right: 30px;">
+                <span class="ico_comm">메뉴 열기</span>
+            </a>
+            <a href="/CloseAppView" style="position: absolute;top: 0;right: 0;z-index: 30;padding-top: 6px; height: 40px;">
+                <span class="ico_comm" style="width: 13px;height: 13px;margin: 11px 14px;background-position: -140px -120px;">창 닫기 </span>
+            </a>
+        #else
+            <a href="#" class="link_menu" id="mene_icon">
+                <span class="ico_comm">메뉴 열기</span>
+            </a>
+        #end
+        <div class="info_user">
+            <ul class="list_user">
+                <li><a href="http://www.kakao.com/services/5" target="_blank" class="link_user">카카오뮤직소개</a></li>
+                #if($StringUtils.isNotBlank("$!{user.userId}"))
+                    <li><a href="/talk/logout" class="link_user">카카오뮤직 로그아웃</a></li>
+                #else
+                    <li><a href="https://accounts.kakao.com/login?continue=#getter('URI')" class="link_user">카카오뮤직 로그인</a></li>
+                #end
+            </ul>
+        </div>
+    </div>
+</header>
+#else
+<div id="nav" style="display: none; position: fixed; top:0; height:42px; width:100%; z-index: 999; max-width:640px;">
+</div>
+<header id="daumHead" class="head_top">
+    <div class="d_head">
+        <h1 class="tit_musictalk">
+            <a href="/talk/top" id="daumLogo" class="link_musictalk"><span class="ico_comm ico_musictalk">talk:music</span></a>
+        </h1>
+        <a href="http://contents.kakao.com/music/1428491158377.html" target="_blank" class="link_kakao">
+            <span class="ico_comm">카카오뮤직 </span>
+        </a>
+
+        #if($!is_kakaotalk_webview)
+            <a href="#" class="link_menu" id="mene_icon" style="margin-right: 30px;">
+                <span class="ico_comm">메뉴 열기</span>
+            </a>
+            <a href="/CloseAppView" style="position: absolute;top: 0;right: 0;z-index: 30;padding-top: 6px; height: 40px;">
+                <span class="ico_comm" style="width: 13px;height: 13px;margin: 11px 14px;background-position: -140px -120px;">창 닫기 </span>
+            </a>
+        #else
+            <a href="#" class="link_menu" id="mene_icon">
+                <span class="ico_comm">메뉴 열기</span>
+            </a>
+        #end
+        <div class="info_user">
+            <ul class="list_user">
+                <li><a href="http://www.kakao.com/services/5" target="_blank" class="link_user">카카오뮤직소개</a></li>
+                #if($StringUtils.isNotBlank("$!{user.userId}"))
+                <li><a href="/talk/logout" class="link_user">카카오뮤직 로그아웃</a></li>
+                #else
+                <li><a href="https://accounts.kakao.com/login?continue=#getter('URI')" class="link_user">카카오뮤직 로그인</a></li>
+                #end
+            </ul>
+        </div>
+    </div>
+
+    <!--START 서비스 GNB / LNB 영역 ===========================================-->
+    <nav>
+        <h2 class="screen_out">카카오뮤직 톡 메인메뉴 </h2>
+        <ul class="gnb_comm">
+            #if($talkMenuList.size() > 3)
+                <div id="gnb_comm_wrap" style="width:9999px;">
+                    <div id="gnb_comm_inner" style="position: relative;">
+                        <li #if( $!requestURI.indexOf("/top") > -1 ) class="on" #end style="width:110px;">
+                            <a href="/talk/top" class="link_menu">전체 </a>
+                        </li>
+                        #foreach( $talkMenu in $talkMenuList )
+                            <li #if( $!requestURI.indexOf("/$!{talkMenu.menuId}") > -1 ) class="on" #end style="width:110px;">
+                            <a href="/talk/$!{talkMenu.menuId}" class="link_menu">$!{talkMenu.menuName}</a>
+                            </li>
+                        #end
+                    </div>
+                </div>
+            #else
+                <li #if( $!requestURI.indexOf("/top") > -1 ) class="on" #end>
+                    <a href="/talk/top" class="link_menu">전체 </a>
+                </li>
+                #foreach( $talkMenu in $talkMenuList )
+                    <li #if( $!requestURI.indexOf("/$!{talkMenu.menuId}") > -1 ) class="on" #end>
+                    <a href="/talk/$!{talkMenu.menuId}" class="link_menu">$!{talkMenu.menuName}</a>
+                    </li>
+                #end
+            #end
+        </ul>
+    </nav>
+    <!--END 서비스 GNB / LNB 영역 =============================================-->
+
+    <script type="text/javascript">
+        var menuListSize = $!talkMenuList.size();
+        var widthDiff = 0;
+        var gnbInnerLeft = 0;
+
+        jQuery(document).ready(function () {
+            jQuery("#mene_icon").click(function() {
+                if (jQuery(".info_on").length == 0) {
+                    jQuery(".d_head").addClass("info_on");
+                } else {
+                    jQuery(".d_head").removeClass("info_on");
+                }
+            });
+
+            jQuery(window).scroll(function () {
+                var scrollIndex = jQuery(window).scrollTop();
+                if (scrollIndex > 500) {
+                    setTimeout(function () {
+                        if (jQuery(window).scrollTop() > 500) {
+                            if (jQuery("#nav").text() == "") {
+                                jQuery("#nav").html(jQuery("nav").html());
+                                jQuery("#nav").show();
+                                if (menuListSize > 3) {
+                                    addGesture();
+                                }
+                            }
+                        }
+                    }, 50);
+                } else {
+                    jQuery("#nav").html("");
+                    jQuery("#nav").hide();
+                }
+            });
+
+            //메뉴가 3개 이상일경우 슬라이드 동작함
+            if (menuListSize > 3) {
+                var currentMenuIndex = 0;
+                jQuery("#gnb_comm_inner > li").each(function(index) {
+                    if (jQuery(this).closest(".on").length > 0) {
+                        currentMenuIndex = index;
+                    }
+                });
+
+                resizeMenu(currentMenuIndex);
+                jQuery(window).resize(function() {
+                    resizeMenu(currentMenuIndex);
+                });
+
+                addGesture();
+            }
+
+        });
+
+        function addGesture() {
+            var panel = document.getElementById("gnb_comm_inner");
+            var listener = gesture.GestureListener(panel, 10);
+            listener.onGestureStart(function(session) {
+
+            });
+            listener.onGestureMove(function(session) {
+                jQuery("#gnb_comm_inner").css("left",  (gnbInnerLeft + session.delta.x) * 0.6);
+            });
+            listener.onGestureEnd(function(session) {
+
+                widthDiff = 0;
+                gnbInnerLeft = 0;
+                if (jQuery("#gnb_comm_inner").css("left") > "0px") {
+                    jQuery("#gnb_comm_inner").animate({
+                        left: "0px"
+                    }, 100);
+
+                } else {
+                    var gnbInner = getInner();
+                    var daumWrapWidth = getDaumWrapWidth();
+                    var gnbInnerWidth = getGnbInnerWidth();
+
+                    widthDiff = gnbInnerWidth - daumWrapWidth;
+                    gnbInnerLeft = Number(jQuery("#gnb_comm_inner").css("left").replace(/[^-\d\.]/g, ''));
+
+                    if (widthDiff < 0) { //left end
+                        jQuery("#gnb_comm_inner").animate({
+                            left: "0px"
+                        }, 100);
+                        gnbInnerLeft = 0;
+                    } else if (widthDiff > -gnbInnerLeft) { //center
+                        var gnbInnerLeftRev = -gnbInnerLeft;
+                        gnbInnerLeft = -(Math.round(gnbInnerLeftRev / gnbInner) * gnbInner);
+                        jQuery("#gnb_comm_inner").animate({
+                            left: gnbInnerLeft
+                        }, 100);
+                    } else { //right end
+                        jQuery("#gnb_comm_inner").animate({
+                            left: -widthDiff
+                        }, 100);
+                        gnbInnerLeft = -widthDiff;
+                    }
+
+                }
+            });
+        }
+
+        function getInner() {
+            return Number(jQuery("#gnb_comm_inner > li").eq(0).css("width").replace(/[^-\d\.]/g, ''));
+        }
+
+        function getDaumWrapWidth() {
+            return Number(jQuery("#daumWrap").css("width").replace(/[^-\d\.]/g, ''));
+        }
+
+        function getGnbInnerWidth() {
+            return Number(jQuery("#daumWrap").css("width").replace(/[^-\d\.]/g, '')) / 4.5 * (menuListSize + 1);
+        }
+
+        function resizeMenu(currentMenuIndex) {
+            var daumWrapWidth = Number(jQuery("#daumWrap").css("width").replace(/[^-\d\.]/g, ''));
+            var daumWrapWidthDiv = daumWrapWidth / 4.5;
+            jQuery("#gnb_comm_inner > li").each(function() {
+                jQuery(this).css("width", daumWrapWidthDiv);
+            });
+
+            if (menuListSize - currentMenuIndex < 3) {
+                jQuery("#gnb_comm_inner").css("left", -(getGnbInnerWidth() - getDaumWrapWidth()));
+                gnbInnerLeft = -(getGnbInnerWidth() - getDaumWrapWidth());
+            } else if (currentMenuIndex < 3) {
+                jQuery("#gnb_comm_inner").css("left", "0px");
+                gnbInnerLeft = 0;
+            } else {
+                jQuery("#gnb_comm_inner").css("left", -((currentMenuIndex - 1) * getInner()));
+                gnbInnerLeft = -((currentMenuIndex - 1) * getInner());
+            }
+        }
+
+    </script>
+</header>
+#end

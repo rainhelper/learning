@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<SongList>
+<Count>$!{songList.size()}</Count>
+<LastUpdate>$!{command.endTime}</LastUpdate>
+<ModifyFlag>Y</ModifyFlag>
+<HasSongList>#if(${songList.size()} > 0)Y#else N#end</HasSongList>
+#foreach($song in $songList)
+	<Song>
+        <ChannelTypeCd><![CDATA[#if("$!{song.channel.mediaType}" == "1") TV #else 라디오 #end]]></ChannelTypeCd>
+        <ChannelName><![CDATA[$!{song.channel.channelName}]]></ChannelName>
+        <ChannelId><![CDATA[$!{song.channel.channelId}]]></ChannelId>
+        <ChannelUrl>#if("$!{song.schedule.radioProgramId}" !="" || "$!{song.schedule.tvProgramId}" !="") <![CDATA[http://music.daum.net/onair/search/channel?channelIds=${song.channel.channelId}&mediaType=$!{song.channel.mediaType}]]>#end</ChannelUrl>
+        <ProgramMasterName><![CDATA[$!{song.schedule.programMasterName}]]></ProgramMasterName>
+        <ProgramId><![CDATA[$!{song.schedule.programId}]]></ProgramId>
+        <ProgramUrl>#if("$!{song.channel.mediaType}" == "1" && "$!{song.schedule.programId}" !="") <![CDATA[http://music.daum.net/onair/tv?programId=$!{song.schedule.programId}]]> #elseif("$!{song.channel.mediaType}" == "4" &&"$!{song.schedule.programId}" !="") <![CDATA[http://music.daum.net/onair/radio/channel?channelId=$!{song.channel.channelId}&programId=$!{song.schedule.programId}]]> #end</ProgramUrl>
+        <UpdateTime><![CDATA[${song.updateDtm}]]></UpdateTime>
+		<StartTime><![CDATA[${song.startTime}]]></StartTime>
+        <ProgramName><![CDATA[$!{song.schedule.programName}]]></ProgramName>
+        <ProgramStartDate><![CDATA[#if("$!{song.schedule.programStartTime}" != "" && $!{song.schedule.programStartTime.length()} >= 8)$!{song.schedule.programStartTime.substring(0,8)}#else $!{song.schedule.programStartTime} #end]]></ProgramStartDate>
+        <ProgramStartTime><![CDATA[#if("$!{song.schedule.programStartTime}" != "" && $!{song.schedule.programStartTime.length()} >= 12)$!{song.schedule.programStartTime.substring(8,12)}#end]]></ProgramStartTime>
+        <SongId>#if("${song.song.songId}" !="0")<![CDATA[${song.song.songId}]]>#end</SongId>
+        <SongTitle>#if("${song.song.songId}" !="0")<![CDATA[#printSongName( $!{song.song} "" 100 false)]]>#else<![CDATA[$!{song.title}]]>#end</SongTitle>
+        <SongUrl>#if("${song.song.songId}" !="0")<![CDATA[http://music.daum.net/album/main?album_id=${song.song.album.albumId}&songId=${song.song.songId}]]>#end</SongUrl>
+        <ArtistList>
+        	#if(${song.song.keyArtistList.size()} > 0)
+        		#foreach($artist in ${song.song.keyArtistList})
+        	<Artist>
+                <ArtistId><![CDATA[${artist.artistId}]]></ArtistId>
+                <ArtistName><![CDATA[${artist.name}]]></ArtistName>
+                <ArtistUrl><![CDATA[http://music.daum.net/artist/main?artist_id=${artist.artistId}]]></ArtistUrl>
+        	</Artist>	
+        		#end
+        	#else
+        	<Artist>	
+                <ArtistId/>
+                <ArtistName><![CDATA[${song.artistName}]]></ArtistName>
+                <ArtistUrl/>
+        	</Artist>	
+        	#end
+        </ArtistList>
+        <AlbumId>#if("${song.song.songId}" !="0")<![CDATA[${song.song.album.albumId}]]>#end</AlbumId>
+        <AlbumName>#if("${song.song.songId}" !="0")<![CDATA[${song.song.album.title}]]>#end</AlbumName>
+        <AlbumUrl>#if("${song.song.album.albumId}" !="0")<![CDATA[http://music.daum.net/album/main?album_id=${song.song.album.albumId}]]>#end</AlbumUrl>
+        <AlbumImage>#if("${song.song.songId}" !="0")<![CDATA[$ImageUtil.getImageUrl("$!{song.song.album.mainImage.filePath}", "${command.imageSize}x${command.imageSize}", "ALBUM", "C")]]>#end</AlbumImage>
+        <LyricsUrl>#if("${song.song.songId}" !="0")<![CDATA[http://music.daum.net/album/main?album_id=${song.song.album.albumId}&songId=${song.song.songId}]]>#end</LyricsUrl>
+        <CollenctionTime>${song.lastUpdate}</CollenctionTime>
+    </Song>
+#end
+</SongList>

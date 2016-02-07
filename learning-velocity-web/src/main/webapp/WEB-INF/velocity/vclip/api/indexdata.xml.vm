@@ -1,0 +1,91 @@
+#if ($!vclip.svcstatus == '2' && $artistList)
+<?xml version="1.0" encoding="UTF-8"?>
+<feed
+	xmlns="http://ccweb.search.daum.net:8080/cc/schema/api/video/article/0.1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://ccweb.search.daum.net:8080/cc/schema/api/video/article/0.1 http://ccweb.search.daum.net:8080/cc/schema/api/video/article/0.1/videoArticle-0.1.xsd ">
+	<videoArticle>
+		<docUrl>http://music.daum.net/$where/vclip/detail?vclip_id=$vclip.vclipId</docUrl>
+		<cpDocId>$vclip.vclipId</cpDocId>
+		<cpUrl>http://music.daum.net</cpUrl>
+		<categoryCode>0</categoryCode>
+		<vid>$vclip.tvpotVId</vid>
+		#set ($artistTitle = "")
+		#foreach ($artist in $artistList)
+			#if($velocityCount > 1)
+				#set ($artistTitle = $artistTitle + ",")
+			#end
+			#set($artistTitle = $artistTitle + $artist.name)
+		#end
+		
+		#set ($actorTitle = "")
+		#foreach ($artist in $actorList)
+			#if($velocityCount > 1)
+				#set ($actorTitle = $actorTitle + ",")
+			#end
+			#set($actorTitle = $actorTitle + $artist.name)
+		#end
+		
+		<title><![CDATA[$artistTitle - $vclip.title]]></title> 
+		<content><![CDATA[$artistTitle - $vclip.title]]></content> 
+		<playTime>$vclip.playTime</playTime>
+		<fileSize>0</fileSize>
+		<streamRate>0</streamRate>
+		<pubDate>$vclip.iso8601RegDateTime</pubDate>
+		<tag><![CDATA[$artistTitle,$actorTitle,$StringUtils.replace($vclip.title, " ", ",")#if ($synonym) ,$StringUtils.replace($synonym, "|", ",") #end
+		#if ($song.titleEngLang && $song.titleEngLang != "") , $song.titleEngLang #end
+		#if ($song.titleKorLang && $song.titleKorLang != "") , $song.titleKorLang #end
+		#if ($song.titleKorPron && $song.titleKorPron != "") , $song.titleKorPron #end
+		#if ($song.titleOrgPron && $song.titleOrgPron != "") , $song.titleOrgPron #end
+		]]></tag>
+		<adminTag></adminTag>
+		<userId>7xIDs</userId>
+		<nickName>Daum뮤직</nickName>
+		<masterImageUrl>$!vclip.mainImage.filePath</masterImageUrl>
+		#if ($!vclip.freeYn == 'Y')
+		<isFree>true</isFree>
+		#else
+		<isFree>false</isFree>  
+		#end
+		#if ($!vclip.adultYn == 'Y')
+		<isLoginRequired>true</isLoginRequired>
+		#else
+		<isLoginRequired>false</isLoginRequired>
+		#end
+		#if ($!vclip.adultYn == 'Y')
+		<isAdult>true</isAdult>
+		#else
+		<isAdult>false</isAdult>
+		#end
+		<isBrandUser>false</isBrandUser>
+		<isPowerUser>false</isPowerUser>
+		<isPreviewable>true</isPreviewable>
+		#if ($!vclip.takeYn == 'Y') 
+		<isEmbeddable>true</isEmbeddable>
+		#else 
+		<isEmbeddable>false</isEmbeddable>
+		#end
+		<isAdminRecommend>false</isAdminRecommend>
+		<counts>
+			<recommendCount>0</recommendCount>
+			<readCount>0</readCount>
+			<replyCount>0</replyCount>
+			<scrapCount>0</scrapCount>
+			<playCount>0</playCount>
+			<copyCount>0</copyCount>
+		</counts>
+		<status>Y</status>
+	</videoArticle>
+</feed>
+#else
+<?xml version="1.0" encoding="UTF-8"?>
+<feed
+	xmlns="http://ccweb.search.daum.net:8080/cc/schema/api/video/article/status/0.1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://ccweb.search.daum.net:8080/cc/schema/api/video/article/status/0.1 http://ccweb.search.daum.net:8080/cc/schema/api/video/article/status/0.1/videoArticleStatus-0.1.xsd ">
+	<videoArticleStatus>
+		<docUrl>http://music.daum.net/artist/vclip/detail?vclip_id=$vclip.vclipId</docUrl>
+		<status>D</status>
+	</videoArticleStatus>
+</feed>
+#end

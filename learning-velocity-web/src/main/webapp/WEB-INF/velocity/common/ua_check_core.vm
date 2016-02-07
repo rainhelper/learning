@@ -1,0 +1,143 @@
+#################################################################
+## User Agent Check Core
+#################################################################
+##
+## 이 파일을 parse 하기 전에 아래와 같이 $ua_string을 정의해 줍니다.
+## #set($ua_string = $request.getHeader("User-Agent"))
+## #parse("ua_check_core.vm")
+## 그리고 아래와 같은 형식으로 사용합니다.
+## #if($ua_result.isPolaris == true) ## 이렇게 boolean으로 사용
+##   폴라리스  
+## #else
+##   기본
+## #end
+##
+## * version값은 velocity 1.6이상을 사용하는 환경에서 
+##   iphone/ipod/ipad/android에서만 값이 나옵니다.
+## * isDaumMobileApp값 2010년 12월 29일부로 사용 가능합니다.
+##
+## 이 파일의 최신 버전은 http://ui.daum.net/ua_check_core.vm 입니다.
+## 버전 정보가 포함되어 있는 이 주석은 제거하지 않는 것이 좋습니다.
+## 참고문서 : http://play.daumcorp.com/x/2JfM
+##
+## 파일 소스 정보 #################################################
+## Path: ua_check_core.vm
+## Name: ua_check_core.vm
+## URL: http://source.daumcorp.com/private/htmls/trunk/ua_check/webapps/ua_check_core.vm
+## Repository Root: http://source.daumcorp.com/private/htmls
+## Repository UUID: f8bfc1a8-0708-0410-b811-d4a9d8773568
+## Revision: 9251
+## Node Kind: file
+## Last Changed Author: ezhong
+## Last Changed Rev: 9127
+## Last Changed Date: 2011-06-29 16:16:29 +0900 (Wed, 29 Jun 2011)
+## 동틀페이지 : http://ui.daum.net/dt/project/ua_check
+#################################################################
+##
+##
+#set( $ua_result = {
+"isSafari": false,
+"isIphone": false,
+"isIpod": false,
+"isIpad": false,
+"isWebkit": false,
+"isPolaris": false,
+"isOpera": false, "isOperaMini": false, "isOperaMobile": false,
+"isAndroid": false,
+"isWebviewer": false,
+"isUIWebview": false,
+"isIemobile": false,
+"isDolfin": false,
+"isDaumMobileApp": false,
+"isDaumMusicApp": false,
+"isWindowsPhone": false,
+"isXperiaX1": false,
+"version": 0,
+"model":""
+})
+##
+#set($ua=$ua_string.toLowerCase())
+#if($ua.matches(".*safari.*"))
+	#set($ua_result.isSafari=true)
+#end
+#if($ua.matches(".*ipod.*"))
+	#set($ua_result.isIpod=true)
+#end
+#if($ua.matches(".*ipad.*"))
+	#set($ua_result.isIpad=true)
+#end
+#if($ua.matches(".*iphone.*") && !$ua.matches(".*ipod.*"))
+	#set($ua_result.isIphone=true)
+#end
+#if($ua.matches(".*applewebkit.*"))
+	#set($ua_result.isWebkit=true)
+#end
+#if($ua.matches(".*android.*"))
+	#set($ua_result.isAndroid=true)
+#end
+#if($ua.matches(".*polaris.*") || $ua.matches(".*natebrowser.*"))
+	#set($ua_result.isPolaris=true)
+#end
+#if($ua.matches(".*opera.*"))
+	#set($ua_result.isOpera=true)
+#end
+#if($ua.matches(".*opera mini.*"))
+	#set($ua_result.isOperaMini=true)
+#end
+#if($ua.matches(".*opera mobi.*"))
+	#set($ua_result.isOperaMobile=true)
+#end
+#if($ua.matches(".*uzard.*") || $ua.matches(".*opera mini.*") || ($ua.matches(".*wv.*") && $ua.matches(".*lg.*")))
+	#set($ua_result.isWebviewer=true)
+#end
+#if($ua.matches(".*iemobile.*"))
+	#set($ua_result.isIemobile=true)
+#end
+#if($ua.matches(".*dolfin.*"))
+	#set($ua_result.isDolfin=true)
+#end
+#if($ua.matches(".*sonyericssonx1i.*"))
+	#set($ua_result.isXperiaX1=true)
+#end
+#if($ua.matches(".*windows phone.*"))
+	#set($ua_result.isWindowsPhone=true)
+#end
+
+#if($ua.matches(".*daummobileapp.*"))
+	#set($ua_result.isDaumMobileApp=true)
+#end
+
+#if( $!request.getHeader("cookie") )
+	#set($ua_result.isDaumMobileApp = ($!request.getHeader("cookie").toLowerCase().indexOf("daumglueapp")>-1))
+	#set($ua_result.isDaumMusicApp = ($!request.getHeader("cookie").toLowerCase().indexOf("daumglueapp=daummusic")>-1)) ## 다음뮤직앱인 경우
+	##set($ua_result.isDaumMusicApp = true) ## 다음뮤직앱인 경우
+#end
+
+#if(($ua_result.isIphone || $ua_result.isIpad || $ua_result.isIpod) && $ua_result.isWebkit && !$ua.matches(".*safari.*"))
+	#set($ua_result.isUIWebview=true)
+#end
+##
+## 아래는 브라우저에 따른 옵션값들 정의
+## [주의] 버전 값이 제대로 나오기 위해서는 반드시 velocity 1.6 이상버전을 사용하셔야 합니다.
+## (velocity-tools가 아니라 velocity입니다.)
+##
+#if(($ua_result.isIphone || $ua_result.isIpod || $ua_result.isIpad || $ua_result.isAndroid) && !$ua_result.isOpera)
+#if($ua.matches(".*like mac os x.*")) ## iOS인 경우
+#set($ua_temp_frag = $ua.split(" like mac os x").get(0))
+#set($ua_result.version=$ua_temp_frag.substring($ua_temp_frag.lastIndexOf(" ")).replace("_",".").replace(" ",""))
+#elseif($ua.matches(".* android .*")) ## Android인 경우
+#set($ua_temp_frag = $ua.split(" android ").get(1))
+#if("$!{ua_temp_frag}"!="")
+	#set($ua_result.version = "")
+	#if( $ua_temp_frag.indexOf(";") > -1 )
+		#set($ua_result.version=$ua_temp_frag.substring(0,$ua_temp_frag.indexOf(";")))
+	#end
+#end
+#if($ua.matches(".*build.*"))
+#set($ua_temp_frag=$ua_temp_frag.split(" build").get(0))
+#set($ua_result.model=$ua_temp_frag.substring($ua_temp_frag.lastIndexOf("; ")).replace("; ",""))
+#end
+#end
+#end
+
+ 

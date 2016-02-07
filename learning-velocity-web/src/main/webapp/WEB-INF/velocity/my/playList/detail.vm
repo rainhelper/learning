@@ -1,0 +1,275 @@
+<div class="wrap_cont section_playlist">
+	<h3 class="screen_out">재생목록 목록</h3>
+##	<em class="ico_mymusic ico_guide">마우스 드래그&amp;드롭으로 곡 순서를 손쉽게 바꾸실 수 있습니다</em>
+	<div class="music_chart">
+		<div id="wrapSearch" class="wrap_search">
+#*			<form name="playlistSearch" onsubmit="return daum.Music.Playlist.search(this);">
+				<fieldset>
+					<legend class="screen_out">내부검색폼</legend>
+						<div class="bg_search box_search">
+							<input class="inp_search" id="q2" type="text" autocomplete="off" onfocus="daum.Element.addClassName(this,'inp_focus');" value="">
+						</div>
+						<a class="bg_search btn_search" type="button" onclick="daum.Music.Playlist.search(this);return false;">검색</a>
+				</fieldset>
+			</form>
+*#
+<style type="text/css">
+#wrapSearch .suggestBox {top:23px;left:0px;border:1px solid #C5C5C7;}
+#wrapSearch .suggestBox .baseBox {width:225px;}
+#wrapSearch .inp_focus {background:none;}
+
+.wrap_tool_btn .tool_btn button {float:left;height:25px;margin-right:3px;}
+.wrap_listinfo .wrap_selectlist .wrap_info {width:300px;}
+</style>
+#*
+<script type="text/javascript">
+var sug2 = daum.suggest.Service.add(
+	"q2",
+	"wrapSearch",
+	"http://suggest.music.daum.net",
+	"/music_all2_cfsuggest",
+	"/suggestProxy.html" ).
+setLimit( [10,0] ).
+setEncodeKeyword( "utf_in_out" ).
+setBeforeSubmitFunc( daum.Music.Playlist.search ).
+setForm( document.playlistSearch );
+daum.addEvent(daum.$("q2"), 'click', function(){
+	daum.Music.Layer.clear();
+}); 
+domReady(function(){
+	if( daum.$("q2").value != ""){
+		daum.Element.addClassName(daum.$("q2"),'inp_focus');
+	}
+}); 
+</script>
+*#
+		</div>
+##		<div class="wrap_tool_btn">
+##			<div class="tool_btn">
+##				#printListButton("mysong" "" "" "" "")
+##				#printListButton("del" "" "" "" "")
+##			</div>
+##		</div>
+		<div class="bg_thead">
+##			<input id="allCheck" class="all_chk" type="checkbox">
+##			<label for="allCheck" class="screen_out">전체선택</label>
+		</div>
+		#if(!$CollectionUtils.isEmpty($myList))	
+			<ul id="trackContainer" class="list_music list_playlist">
+				#printListItems( "song_li" $myList "" true) 
+			</ul>
+		#else
+			<ul id="trackContainer" class="list_music list_playlist"></ul>	
+    		<div class="wrap_nodata">
+    			<strong>저장된 곡이 없습니다.</strong>
+    		</div>	
+		#end
+##		<div class="wrap_tool_btn">
+##			<div class="tool_btn">
+##				#printListButtonFoot("mysong" "" "" "" "")
+##				#printListButtonFoot("del" "" "" "" "")
+##			</div>
+##		</div>
+		#if(!$CollectionUtils.isEmpty($myList))	
+			#if( $myList.size() < 5)
+			 <div style="height:200px;"></div>
+			#end
+		#end			
+		#printSNSList( $myList )
+		<script type="text/javascript">
+		var controller = new daum.Music.ListPrototype();
+		controller.initialize({tag:'li', MySection:true});
+		var name_el = ($StringUtils.equals("$!{command.playlist_id}", "0"))? daum.$('inputPlaylistName') : daum.$('textPlaylistName');
+		
+		daum.Music.Playlist.init({id:"$!{baseInfo.playListId}", name_el:name_el});		
+		//new daum.Music.CheckBoxDrag("trackContainer");
+		//var checkboxDrag = daum.Music.selectByDrag().init("#trackContainer .track", "col_check");
+
+    	domReady(function(){
+			daum.Music.Playlist.Dnd.init();
+		}); 
+		</script>
+	
+		#*
+		li class='thisline' 
+		<div class="layer_moveitem" style="top:247px;left:140px;">
+			<em class="ico_mymusic ico_dontchg">이동 </em>
+			<span class="txt_moveitem fc_blue">Hollywood Tonight (Radio Edit)</span>
+		</div>*#
+	</div>
+</div>
+
+<div id="flashContainer"></div>
+
+<script type="text/javascript">
+    domReady( function(){
+        daumMusic.JsPlayer.embedSWF( "flashContainer", null, daum.Music.BitPlayer.stop );
+    });
+</script>
+
+#*
+<div class="wrap_cont section_playlist">
+	<h3 class="screen_out">플레이리스트 목록</h3>
+	<em class="ico_mymusic ico_guide">마우스 드래그&amp;드롭으로 곡 순서를 손쉽게 바꾸실 수 있습니다</em>
+	<div class="music_chart">
+		<div class="wrap_search">
+			<form action="">
+				<fieldset>
+					<legend class="screen_out">내부검색폼</legend>
+						<div class="bg_search box_search">
+							<input class="inp_search" type="text">
+						</div>
+						<input class="bg_search btn_search" value="검색" type="submit">
+						<div class="wrap_list_suggest" style="display:none;">
+							<ul class="list_suggest">
+							</ul>
+							<div class="wrap_foot">
+								<a href="#">서제스트란?</a>
+								<span class="txt_bar"> | </span>
+								<a href="#">기능끄기</a>
+							</div>					
+						</div>
+				</fieldset>
+			</form>
+		</div>
+		<div class="wrap_tool_btn">
+			<div class="tool_btn">
+				<input class="btn_comm all_listen" title="전체듣기" value="전체듣기" type="button">
+				<input class="btn_comm set_listen" title="선택듣기" value="선택듣기" type="button">
+				<input class="btn_comm btn_my" title="담기" value="담기" type="button">
+				<input class="btn_comm btn_export" title="보내기" value="보내기" type="button">
+				<input class="btn_comm btn_buy" title="구매" value="구매" type="button">
+				<input class="btn_comm btn_delete" title="삭제" value="삭제" type="button">
+			</div>
+		</div>
+		<div class="bg_thead">
+			<input id="allCheck" class="all_chk" type="checkbox">
+			<label for="allCheck" class="screen_out">전체선택</label>			
+		</div>
+		<div class="wrap_nodata">
+			<strong>검색 후 곡을 추가해주세요</strong>
+		</div>
+		<div class="wrap_tool_btn">
+			<div class="tool_btn">
+				<input class="btn_comm all_listen" title="전체듣기" value="전체듣기" type="button">
+				<input class="btn_comm set_listen" title="선택듣기" value="선택듣기" type="button">
+				<input class="btn_comm btn_my" title="담기" value="담기" type="button">
+				<input class="btn_comm btn_export" title="보내기" value="보내기" type="button">
+				<input class="btn_comm btn_buy" title="구매" value="구매" type="button">
+				<input class="btn_comm btn_delete" title="삭제" value="삭제" type="button">
+			</div>
+		</div>
+		<div class="layer_moveitem" style="display:none;top:247px;left:140px;">
+			<em class="ico_mymusic ico_chgorder">이동 : </em>
+			<span class="txt_moveitem fc_blue">Hollywood Tonight (Radio Edit)</span>
+		</div>
+	</div>
+</div>		
+*#
+
+				
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+	<div id="FTMessage" 
+-----------------------------------------<br/>
+FT 체크 (화이링)<br/>
+-----------------------------------------<br/>
+- 페이징없음 <br/>
+- 추가 후 오더링 되는지 확인하기 <br/>
+-----------------------------------------<br/>
+개발 체크 (화이링)<br/>
+-----------------------------------------<br/>
+- 기본플레이리스트인지 여부 <br/>
+-----------------------------------------<br/>
+기획 체크 (화이링)<br/>
+-----------------------------------------<br/>
+- 플레이리스트 추가 > 플레이리스트 이름 입력 > 취소 누르면 어디로? <br/> 
+</div>
+
+<b>현재 플레이리스트 정보</b><br/>
+기본플레이리스트구분: $baseInfo.gubunCd <br>
+앨범이미지: $baseInfo.mainImage.imageId || 이미지주소 : $baseInfo.mainImage.filePath <br>
+시퀀스 : ($baseInfo.playListId) || 이름 : $baseInfo.playListName <br/>
+총카운트 : $baseInfo.totalPlayCnt <br/>
+총재생시간 : $baseInfo.totalPlayTime <br/>
+유입경로: $baseInfo.inflowCd <br>
+최종편집일: $baseInfo.modDttm <br><br/>
+
+상단오른쪽 현재꺼를 제외한 리스트정보<br/>
+#if($!{otherLists})
+	#foreach($item in $otherLists)
+		이미지: #if($!{item.mainImage.imageId}) $item.mainImage.imageId #end ||  
+		이미지주소:  #if($!{item.mainImage.filePath}) $item.mainImage.filePath #end ||  
+		시퀀스 : ($item.playListId) || 플레이리스트이름 : $item.playListName || 플레이곡수 : $item.totalPlayCnt ||
+		최종편집일: $item.modDttm ||
+		기본플레이리스트구분 : $item.gubunCd <br/>
+	#end
+#else 
+	없음
+#end	
+<br/>
+
+<b>왼쪽레프트정보</b><br/>
+다음이름: $left.cpDaumName <br/>
+전화번호 $left.cpNumber <br/>
+유저아뒤 : $left.userId <br/>
+음악감상잔여일 $left.aodLeftDay <br/>
+mp3잔여곡 : $left.Mp3LeftCount <br>
+
+<br>
+MY 뮤직<br/> 
+플레이리스트 $left.myPlayCount <br/>
+
+#foreach($item in $left.myPlayList)<br/>
+	ㅡ순서: $item.playListId || 이름: $item.playListName ($item.totalPlayCnt) || 디폴트: $item.gubunCd
+#end <br/>
+
+<br/>
+즐겨 듣는 음악 <br/>
+최근 들은 음악 <br/>
+관심음악 : $left.favoriteCount <br/>
+관심음악제일마지막에 저장된 탭 : $left.lastSavedObjType <br/>
+구매음악 : $left.ownCount <br/>
+		
+MY관리 <br/>
+이용권현황 $left.ticketOwnCount <br/>
+내알림  $left.announceCount <br/>
+내설정 <br/>
+
+공지사항 <br/><br/>
+#foreach($item in $left.recentNoticeList)<br/>
+	#if($foreach.index < 4)
+		$item.get("SUBJECT") ||  $item.get("URL") <br />
+	#end
+#end <br />	
+<br>
+
+
+<b>플레이리스트</b><br/>
+#if($!{myList})
+	#foreach($item in $myList)
+		item.songId: $item.songId <br/>
+		item.title: $item.title <br/>
+		item.adultYn: $item.adultYn <br/>
+		item.keyArtistList :
+		#foreach($artist in $item.keyArtistList)
+			아티스트명 : $artist.name (아티스트아이디 : $artist.artistId ) <br/>
+		#end
+		item.featArtist : 
+		#foreach($artist in $item.featArtist)
+			피쳐링아티스트명 : $artist.name (피쳐링아티스트아이디 : $artist.artistId ) <br/>
+		#end
+	
+		듣기아이디(널이면 비활성화): #if($!{item.AODLinkId}) $item.AODLinkId #end <br/>
+		item.lyricsYn: $item.lyricsYn <br/>	
+		item.album.albumId : $item.album.albumId <br/>
+		뮤직비디오아이디 (널이면 비활성화) :#if($!{item.vclipLinkId}) $item.vclipLinkId #end <br/>
+		MP3아이디(널이면 비활성화) :#if($!{item.MP3LinkId}) $item.MP3LinkId #end <br/>
+		BGM아이디(널이면 비활성화) :#if($!{item.BGMLinkId}) $item.BGMLinkId #end <br/>
+		Bell판매상태(널이면 비활성화) :#if($!{item.bellSalesStatus}) $item.bellSalesStatus #end <br/>
+		ring판매상태(널이면 비활성화) :#if($!{item.ringSalesStatus}) $item.ringSalesStatus #end <br/>
+	-------------<br/>
+	#end
+#end
+#end
+	

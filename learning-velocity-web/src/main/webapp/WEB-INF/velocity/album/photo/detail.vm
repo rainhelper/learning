@@ -1,0 +1,122 @@
+<style type="text/css">
+.section_photo .view_head .list_view li .img_selet {display:none;}
+.section_photo .view_head .list_view li.on .img_selet {display:block;position:absolute;top:0;left:0;width:87px;height:87px;border:4px solid #5ab5d5;}
+.section_photo .view_head .list_view li.on .img_selet .arr_comm {position:absolute;bottom:-11px;left:39px;width:8px;height:7px;background-position:0 -320px;}
+
+.gallery_view .video_viewer .btnPrevPage, .gallery_view .photo_viewer .btnPrevPage {left:-1px;background-position:-40px -160px;}
+.gallery_view .video_viewer .naviPrev_off, .gallery_view .photo_viewer .naviPrev_off {left:-1px;background-position:-120px -160px;}
+.gallery_view .video_viewer .btnNextPage, .gallery_view .photo_viewer .btnNextPage {left:673px;background-position:0 -160px;}
+.gallery_view .video_viewer .naviNext_off, .gallery_view .photo_viewer .naviNext_off {left:673px;background-position:-80px -160px;}
+
+.section_photo .view_head .list_view li {position:relative;}
+.section_photo .thumb {display:block;position:relative;}
+.section_photo .thumb .line_thumb {position:absolute;top:0;left:0;border: 1px solid #020202;filter:alpha(opacity:20);opacity:0.2;}
+.section_photo .thumb img {display:block;}
+</style>
+##페이지 no
+#set($pageNo = $command.page_no)
+#set($nextNo = $pageNo + 1)
+#set($prevNo = $pageNo - 1)
+#set($lastPage = $MathTool.ceil( $MathTool.div($photoCount,$!onePageCnt)))
+
+<div class="gallery_view section_photo">
+<h3 class="screen_out">포토 뷰어</h3>
+	<div class="wrap_option noline">
+		<div class="tit_cont">
+			<strong class="tit_detail tit_photo">포토</strong>
+			<span class="txt_count">(<em>$!{photoCount} 개</em>)</span>
+		</div>
+		<a class="btn_comm btn_alllist" href="/album/photo/list?album_id=$!{command.album_id}&amp;artist_id=$!{command.artist_id}">전체목록</a>
+	</div>
+	#printPhotoViewer($photoList $orderNo $!{onePageCnt} $!{command.album_id})
+</div>
+<div id="daumAjaxHistoryHTMLFragment" style="position:absolute;top:-10000px;"></div> 
+
+<script type="text/javascript">
+daum.Music.Photo.init( imageViewer, "$!{artist.artistId}", "/album/photo/detail.json");
+</script>
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+## 아티스트
+아티스트 : $!{artist}
+<br />
+## 앨범
+앨범 : $!{album}
+<br />
+##이미지
+이미지 : $!{photoList}
+<br />
+##이미지 수
+이미지 수 : $!{photoCount}
+<br />
+##선택된 이미지의 orderNo
+선택된 이미지의 orderNo : $!{orderNo}
+<br />
+##페이지 no
+#set($pageNo = $command.page_no)
+#set($nextNo = $pageNo + 1)
+#set($prevNo = $pageNo - 1)
+
+#set($lastPage = $MathTool.ceil( $MathTool.div($imageCount, $!{onePageCnt})))
+<br />
+## 이미지정보
+이미지 : $orderNo / $photoCount 장 <br>
+
+## 이미지목록
+## 이전페이지 목록을 얻음
+#if($pageNo != 1)
+	<a href="/album/photo/detail?album_id=$!{album.albumId}&page_no=$prevNo">이전</a>
+#end
+<br>
+
+<strong>이전 이미지</strong><br>
+<img src="$preImage.filePath"><br>
+$image.content<br/> 
+$preImage.imageId<br><br>
+
+#foreach($image in $photoList)
+	<img src="$image.filePath"><br>
+	$image.content<br/> 
+	$image.imageId<br>
+#end
+<br>
+
+<strong>다음 이미지</strong><br>
+<img src="$postImage.filePath"><br>
+$image.content<br/> 
+$postImage.imageId<br><br>
+
+다음 페이지 목록을 얻음<br>
+#if(($imageCount / $!{onePageCnt} + 1) > $pageNo)
+	<a href="http://music.daum.net//album/photo/detail?album_id=$!{album.albumId}&page_no=$nextNo">다음</a>
+#end
+<br><br><br>
+
+<strong>선택된 이미지</strong><br>
+<img src="$selectedImage.filePath"><br>
+$image.content<br/> 
+$selectedImage.imageId<br><br>
+
+선택된 이미지에 앨범 정보가 있으면 노출 곡은 최대 2개 노출 <br>
+<br><br>
+앨범ID : $!{album.albumId} <br>
+앨범 제목 : $!{album.title} <br>
+앨범 발행일 : $!{album.releaseDt} <br>
+앨범 타입 : $!{album.typeName}<br>
+앨범 대표 이미지 : $!{album.mainImage.filePath} <br>
+앨범 아티스트 <br>
+#foreach($artist in $album.keyArtistList)
+	$!{artist.artistId} <br>
+	$!{artist.name} <br>
+#end<br>
+대표곡 최대 2개 <br>
+#foreach($song in $album.masterSongList)
+	$!{song.songId} <br>
+	$!{song.title} <br>
+	$!{song.AODLinkId} <br>
+#end
+<br>
+
+##page
+##printPaging($pagingUrl, $command.page_no, $pageHandler)
+#end

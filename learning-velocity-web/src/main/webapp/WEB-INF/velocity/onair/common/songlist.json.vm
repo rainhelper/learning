@@ -1,0 +1,92 @@
+{
+	"songList" : [
+	#foreach($channelSong in $songList)
+		#if($foreach.index > 0),#end
+		#set($song = $channelSong.song)
+		#set($channel = $channelSong.channel)
+		#set($schedule = $channelSong.schedule)
+		{
+			"artistName" : "$!{channelSong.artistName}",
+			"title" : "$!{channelSong.title}",
+			"songId" : "$!{channelSong.songId}",
+			"playTime" : "$!{channelSong.playTime}",
+			"startTime" : "$!{channelSong.startTime}",
+			"updateDtm" : "$!{channelSong.updateDtm}",
+			"lastUpadte" : "$!{channelSong.lastUpdate}",
+			"channel" : {
+				"channelId" : "$!{channel.channelId}",
+				"channelName" : "$!{channel.channelName}",
+				"channelType" : "$!{channel.channelType}"
+			},
+			"schedule" : {
+				"programStartTime" : "$!{schedule.programStartTime}",
+				"programEndTime" : "$!{schedule.programEndTime}",
+				"programMasterName" : "$!{schedule.programMasterName}",
+				"programName" : "$!{schedule.programName}",
+				"tvProgramId" : "$!{schedule.tvProgramId}",
+				"radioProgramId" : "$!{schedule.radioProgramId}",
+			},
+			
+			"song" : {
+				"songId":"$!{song.songId}",
+    			"title":"#strCut($StringUtils.replace($!{song.title}, '"', '&quot;'), 50)",
+    			"keyArtistList": [
+    				#foreach($artist in $song.keyArtistList)
+    					#if($foreach.index > 0),#end
+    					{
+    						"artistId":"$!{artist.artistId}",
+    						"name":"$StringUtils.replace($!{artist.name}, '"', '&quot;')"
+    					} 
+    				#end
+    			],
+    			"featArtistList": [
+    				#foreach($artist in $song.featArtistList)
+    					#if($foreach.index > 0),#end
+    					{
+    						"artistId":"$!{artist.artistId}",
+    						"name":"$StringUtils.replace($!{artist.name}, '"', '&quot;')"
+    					} 
+    				#end
+    			],
+    			"creditArtistList": [
+    				#foreach($artist in $song.creditArtistList)
+    					#if($foreach.index > 0),#end
+    					{
+    						"artistId":"$!{artist.artistId}",
+    						"name":"$StringUtils.replace($!{artist.name}, '"', '&quot;')",
+    						"credit":"$!{artist.creditTitle}"
+    					} 
+    				#end
+    			],
+    			"album" : {
+            		"albumId":"$!{song.album.albumId}",
+            		"title":"$StringUtils.replace($!{song.album.title}, '"', '&quot;')",
+            		"typeCd":"$!{song.album.typeCd}",
+            		"typeName":"$!{song.album.typeName}",
+            		"volume":"$!{song.album.volume}",
+            		"releaseDt":"$!{song.album.releaseDt}",
+            		"playYn":"$!{song.album.playYn}",
+            		"tagType":"$!{song.album.tagType}",
+            		"oneLineNotice":"$!{song.album.oneLineNotice}",
+            		"imageUrl":"$!{song.album.mainImage.filePath}",
+            		"playSongList":"$!{song.album.getPlaySongList()}" 
+            	},
+    			"favorite":"$!{song.favorite}",
+    			"AODLinkId":"$!{song.AODLinkId}",
+    			"lyricsYn":"$!{song.lyricsYn}",
+    			"adultYn":"$!{song.adultYn}",
+    			"albumId":"$!{song.album.albumId}",
+    			"vclipLinkId":"$!{song.vclipLinkId}",
+    			"tvpotVId":"$!{song.tvpotVId}",
+    			"MP3LinkId":"$!{song.MP3LinkId}",
+    			"BGMLinkId":"$!{song.BGMLinkId}",
+    			"bellSalesStatus":"$!{song.bellSalesStatus}",
+    			"ringSalesStatus":"$!{song.ringSalesStatus}",
+    			"typeCd":"$!{song.typeCd}",
+    			"packageSaleYn":"$!{song.album.packageSaleYn}"
+			}
+			
+		}
+	#end
+	]		
+}

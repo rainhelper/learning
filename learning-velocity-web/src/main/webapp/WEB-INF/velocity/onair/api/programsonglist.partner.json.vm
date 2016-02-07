@@ -1,0 +1,47 @@
+{
+"SongList" : {
+    "Count" : "$!{songList.size()}",
+	"ProgramUrl" : "#if("$!{programDetail.mediaType}"=="1" && "$!{programDetail.programId}"!="" )http://music.daum.net/onair/tv?programId=$!{programDetail.programId}#elseif("$!{programDetail.mediaType}"== "4" && "$!{programDetail.programId}"!="" ) http://music.daum.net/onair/radio/channel?channelId=$!{programDetail.channelId}&programId=$!{programDetail.programId}#end",
+	"Song" : [
+	#foreach($song in $songList)
+		#set($songTitle = "#printSongName( $!{song.song} '' 100 false)")
+		
+	#if($velocityCount!=1),#end
+	{
+		    "StartTime" : "${song.startTime}",
+			"PlayTime" : "${song.playTime}",
+			"SongId" : "#if("$!{song.songId}" !="0")$!{song.song.songId}#end",
+			"SongTitle" : "#if("$!{song.songId}" !="0")$!{EscapeUtil.escapeJsonString($songTitle)}#else$!{EscapeUtil.escapeJsonString($!{song.title})}#end",
+			"PcSongUrl" : "#if("$!{song.song.album.albumId}" !="0")http://music.daum.net/album/main?album_id=$!{song.song.album.albumId}&songId=$!{song.song.songId}&popUpPlayer=$!{song.song.songId}#end",
+			"MobileSongUrl" : "#if("$!{song.song.album.albumId}" !="0")http://m.music.daum.net/song/vcliplyrics?album_id=$!{song.song.album.albumId}&songId=$!{song.song.songId}#end",
+			"IosSongUrl" : "#if("$!{song.song.album.albumId}" !="0")daummusic://open?type=song&albumId=$!{song.song.album.albumId}&songId=$!{song.song.songId}#end",
+			"AndroidSongUrl" : "#if("$!{song.song.album.albumId}" !="0")daummusic://song/listen/$!{song.song.songId}#end",
+			"IsAodAvailable" : "#if("$!{song.song.AODLinkId}" !="" && "$!{song.song.AODLinkId}" != "0")Y#{else}N#{end}",
+			"ArtistList" : {
+            #if(${song.song.keyArtistList.size()} > 0)
+				"Artist" : [
+        	    #foreach($artist in ${song.song.keyArtistList})
+					#if($velocityCount!=1),#end
+					{
+					    "ArtistId" : "$!{artist.artistId}",
+						"ArtistName" : "$!{artist.name}"
+					}
+				#end
+				]
+			#else
+				"Artist" : {
+				    "ArtistId" : "",
+					"ArtistName" : "$!{song.artistName}",
+					"ArtistUrl" : ""
+				}
+			#end
+			},
+		"AlbumId" : "#if("$!{song.songId}" !="0")${song.song.album.albumId}#end",
+		"AlbumName" : "#if("$!{song.songId}" !="0")$!{EscapeUtil.escapeJsonString(${song.song.album.title})}#end", 
+		"AlbumImage" : "#if("$!{song.song.album.albumId}" !="0")$ImageUtil.getImageUrl("$!{song.song.album.mainImage.filePath}", "${command.imageSize}x${command.imageSize}", "ALBUM", "C")#else http://m1.daumcdn.net/img-media/mobile/m640/music/img_none2.jpg #end"
+	}
+	#end
+]
+}
+}
+	

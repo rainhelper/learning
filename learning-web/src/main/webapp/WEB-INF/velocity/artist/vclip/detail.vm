@@ -1,0 +1,242 @@
+
+#set($HDYn = "$!{song.vclip.HDYn}")
+#set($vid = $!{song.vclip.tvpotVId})#set($isPreVid = "N")
+#if($StringUtils.equals("$!{song.vclip.FreeYn}", "N"))
+	#if($StringUtils.isNotBlank("$!{musicUser}"))
+		#if(!$StringUtils.equals("$!{authorizedPlayVideo}", "true"))
+			#set($vid = $!{song.vclip.tvpotPreVId})#set($isPreVid = "Y")
+		#end
+	#else
+		#set($vid = $!{song.vclip.tvpotPreVId})#set($isPreVid = "Y")
+	#end
+#end
+<div class="gallery_view section_video">
+	<h3 class="screen_out">뮤직비디오 뷰어</h3>
+	<div class="wrap_option noline">
+		<strong class="tit_detail tit_video">뮤직비디오</strong>
+		#if($StringUtils.equals($!{HDYn},"Y"))	
+		<div class="tool_btn f_r">
+			<a class="btn_comm btn_alllist" href="/artist/vclip/list?artist_id=$!{artist.artistId}">전체목록</a>
+			<a class="btn_detail btn_hdmore" href="/vclip/hdvclip">HD영상 더보기</a>
+		</div>
+		#else
+			<a class="btn_comm btn_alllist" href="/artist/vclip/list?artist_id=$!{artist.artistId}">전체목록</a>
+		#end
+	</div>
+	<div class="video_viewer #if($StringUtils.equals($!{HDYn},"Y"))video_hd#end">
+		<div class="view_head">
+			<div class="box_head">
+				#if(!$StringUtils.equals("$!{song.album.albumId}", "0") && $StringUtils.isNotBlank("$!{song.album.albumId}") )
+				<div class="artist_album">
+					#printAlbumThumb( $!{song.album} 1  "" "")
+					<span class="info">
+						<strong class="tit_song">
+							#printAlbumName( $!{song.album} "" 17 1 true )
+						</strong>
+						<span class="txt_source"> 
+							#printArtistName( $!{song.album.keyArtistList} "tit_artist" 12 false )<span class="txt_bar"> | </span>$!{CheckDate.makeReleaseDate($!{song.album.releaseDt})}
+						</span>
+					</span>
+				</div>
+				#end
+				
+				<div class="song_info">
+					#if($StringUtils.equals($!{HDYn},"Y"))<span class="screen_out">HD영상</span>#end
+					<strong>#printVideoName( $!{song.vclip} "tit_music #if($StringUtils.equals($!{HDYn},'Y'))ico_detail#end" 40 true)</strong>
+					<span class="desc">
+						#printArtistName($!{song.vclip.keyArtistList} "artist_name" 40 true)
+						#if($StringUtils.isNotBlank("$!{song.album.albumId}") && !$StringUtils.equals("$!{song.album.albumId}", "0"))
+						<span class="txt_bar"> | </span>#printAlbumName( $!{song.album} "" 40 4 true )
+						#end
+					</span>
+				</div>
+			</div>
+		</div>
+		
+		<div class="view_body">
+			<div class="box_player#if($StringUtils.equals($!{isPreVid},"Y")) info_charge#end">
+				#if($StringUtils.equals($!{HDYn},"Y"))
+					#set($w = 978)#set($h = 550)
+					#set($info_class = "wrap_hd")
+				#else
+					#set($w = 698)#set($h = 393)
+					#set($info_class = "")
+				#end
+				<div id="body_mv_player" width="$!{w}" height="$!{h}" class="mv_player"></div>
+				#if($StringUtils.equals($!{isPreVid},"Y"))
+				<div id="chargeInfo" class="wrap_charge $!{info_class}">
+					<strong>현재 이 뮤직비디오는 <span class="txt_preview">1분 미리보기</span>가 제공됩니다.</strong>
+					<p>음악듣기 이용권을 사용중인 회원님만 전곡감상이 가능합니다.</p>
+					##<p>음악듣기 이용권을 보유하신 회원님은 <a href="http://login.daum.net/accounts/loginform.do" title="로그인">로그인</a> 하시면 전체 뮤비를 보실 수 있습니다.<a href="#getter('GAIA_DOMAIN', '')/gaia/do/music/notice/read?articleId=79&bbsId=Notice" target="_blank" class="link_preview">뮤비 이용안내</a></p>
+					##<a href="/purchase/ticketitem/list" class="btn_comm btn_buy">이용권 구매</a>
+					##<a href="javascript:;" onclick="daum.Element.hide(daum.$('chargeInfo'));return false;" class="btn_comm btn_close">닫기</a>
+				</div>
+				#end
+			</div>
+			
+			#if($StringUtils.isNotBlank("$!{song.lyrics.lyrics}"))
+			<div class="box_lyrics">
+				<div class="lyrics scroll_lyrics">
+					<p class="fc_txt">
+						$!{song.lyrics.lyrics.replaceAll("\r","").replaceAll("\n", "<br />")} <br />
+					</p>
+				</div>				
+			</div>
+			<div class="wrap_space"></div>
+			#end
+			
+			<div class="box_use #if($CollectionUtils.isEmpty($vclipList))line_bot#end">
+				<div class="wrap_btns">
+					<div class="btn_consumer">
+						<a class="btn_comm btn_recom" href="javascript:;" onclick="daum.Music.API.Recommend.send({id:'$!{song.vclip.vclipId}',el:'recomNum',contents:'vclip', user:'#if($StringUtils.isNotEmpty($!{user.userId}))Y#end'});return false;" title="추천하기"><span class="screen_out">추천</span><em class="num_recom" id="recomNum">$!{song.recommendCount}</em></a>
+						<a class="btn_comm btn_interest" href="javascript:;" title="관심등록하기" onclick="daum.Music.API.Favorite.send({id:'$!{song.vclip.vclipId}', contents:'vclip', el:this});"><span class="screen_out">관심등록</span></a>
+						<a class="btn_comm btn_reply" href="javascript:;" title="댓글쓰기" onclick="daum.Music.focusComment();return false;"><span class="screen_out">댓글쓰기</span></a>
+						
+						#set($link='http://music.daum.net/artist/vclip/detail?artist_id='+$!{artist.artistId}+'&vclip_id='+$!{song.vclip.vclipId})
+						#set($thumb = $ImageUtil.getImageUrl("$!{song.vclip.mainImage.filePath}", "138x103", "VCLIP"))
+						
+						#set($prefix = "#printArtistName($!{song.vclip.keyArtistList} '' 0 false) -  #printVideoName( $!{song.vclip} '' 0 false)")
+						#set($prefix = "#escScript($prefix)")
+						
+						
+						#printSnsButton($!{song.vclip.vclipId} "snsButton2" $!link $prefix "vclip")
+							
+						#if( $!{adminRoleId} && $!{adminRoleId} > 2 )
+                			##<a class="btn_comm btn_recom" href="http://op.admin.music.daum.net/mv_vclips/$!{song.vclip.vclipId}/edit" target="_blank"><em class="num_recom" title="뮤직비디오 운영">admin</em></a>
+							<a class="btn_comm btn_recom" href="http://op2.admin.music.daum.net/vclip/updateForm.daum?vclipId=$!{song.vclip.vclipId}" target="_blank"><em class="num_recom" title="뮤직비디오 운영">admin</em></a>
+                		#end
+					</div>
+				</div>
+
+			</div>
+		</div>	
+		
+		#if(!$CollectionUtils.isEmpty($vclipList))
+		<div class="view_foot"> ## 뮤직비디오 풋터 롤링
+			<div class="viewFrame" #if($StringUtils.equals("$!{vclip.HDYn}", "Y"))style="width:"#end>	## 롤링을 위해서 추가된 태그
+			<div class="wrap_listRoll">	## 롤링을 위해서 추가된 태그
+			<ul id="listRollul" class="list_view">	
+                	#foreach($vclip in $vclipList)
+                	<li vclipId="$!{vclip.vclipId}" class="roll">
+						#if(!$CollectionUtils.isEmpty($vclip.keyArtistList) && (!$CollectionUtils.isEmpty($album.keyArtistList) && $StringUtils.equals("$!{album.keyArtistList.size()}", "1") && !$StringUtils.equals("$!{album.keyArtistList[0].artistId}", "0")) || ($CollectionUtils.isEmpty($album.keyArtistList) && $StringUtils.isNotBlank("$!{artist.artistId}")))
+            				#set($dir = "artist")
+            			#else
+            				#set($dir = "album")
+            			#end
+            			#printVideoThumb( $!{vclip} 2 "" "" $dir)
+                		##printVideoThumb( $vclip 2 )
+						#if($StringUtils.equals("$!{vclip.HDYn}", "Y"))
+						<p class="tit">
+    						<span class="screen_out">HD영상 </span>#printVideoName($vclip "ico_detail ico_hd" 12 true)
+    					</p>
+						#else
+            			<p class="tit">
+            				#printVideoName($vclip "" 18 true)
+            			</p>
+						#end
+                	</li>
+                	#end
+				##printVclip($vclipList $artist) ## vclipt 출력 
+			</ul>
+			</div>
+			</div>
+			<a id="msPrevBtn" class="btn_detail prev_on" title="이전" href="javascript:;">이전</a>
+			<a id="msNextBtn" class="btn_detail next_off" title="다음" href="javascript:;">다음</a>
+		</div>		
+        #end
+	</div>
+</div>
+
+<div>
+	<iframe id="commentFrame" frameborder="0" width="100%" height="" scrolling="no" charset="utf-8" title="댓글 영역" src="#getter('GAIA_DOMAIN', '')/gaia/do/comment/commentList?bbsId=$!{song.vclip.bbsId}&articleId=$!{song.vclip.articleId}&templatePath=/content.htmp"></iframe>
+</div>
+
+#if($StringUtils.equals($!{HDYn},"Y"))#set($amount = 5)#else#set($amount = 4)#end
+<script type="text/javascript">
+	var msRoll = new daum.Music.ListRoll("listRollul", {alimPopup:true, amount:$!{amount}, playingVclipId:"$!{song.vclip.vclipId}", duration:0.5, viewList:true, prevId:"msPrevBtn", nextId:"msNextBtn", defaultIdx:0,perGroup:true, loop:false,preonclassName:"prev_on",preoffclassName:"prev_off",	nextonclassName:"next_on",	nextoffclassName:"next_off"	});
+	msRoll.render();
+	daum.Music.VideoPlayer.add("body_mv_player", "$!{vid}", {thumb:"$!{song.vclip.mainImage.filePath}",hd:"$!{HDYn}"});
+</script>
+
+
+###########################################################################################################
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+
+사용자 정보 <br />
+DAUMID : $!{musicUser.daumId} <br />
+성인여부 : $!{musicUser.adultYn} <br />
+실명인증여부 : $!{user.data.nameCheck}<br />
+<br />
+
+아티스트 정보 <br />
+대표이미지 : $!{artist.mainImage.filePath} <br />
+아티스트명 : $!{artist.name} <br />
+아티스트ID : $!{artist.artistId} <br />
+<br />
+
+곡 정보 <br />
+곡명 : $!{song.title} <br />
+곡ID : $!{song.songId} <br />
+성인여부 : $!{song.adultYn} <br />
+<br />
+ 
+가사 정보  <br /> 
+가사ID : $!{song.lyrics.lyricsId} <br />
+가사 : $!{song.lyrics.lyrics.replaceAll("\r","").replaceAll("\n", "<br />")} <br />
+사용자 정보  daumId : $!{song.lyrics.user.daumId} <br />
+사용자 정보  daumname : $!{song.lyrics.user.daumName} <br />
+<br />
+
+앨범 정보 <br />
+앨범명 : $!{song.album.title} <br />
+앨범 ID : $!{song.album.albumId} <br />
+아티스트 <br />
+#foreach($artist in $song.album.keyArtistList)
+ - 이름 : $!{artist.name} <br />
+ - ID : $!{artist.artistId} <br />
+#end<br />
+발매일 : $!{song.album.releaseDt} <br />
+볼륨 : $!{song.album.volume} <br />
+이미지 : $!{song.album.mainImage.filePath} <br />
+<br />
+
+뮤직비디오 정보 <br />
+비디오명 : $!{song.vclip.title} <br />
+비디오ID : $!{song.vclip.vclipId} <br />
+무료여부 : $!{song.vclip.FreeYn} <br>
+전체보기여부 : $!{authorizedPlayVideo}<br />
+전체 보기 동영상 ID : $!{song.vclip.tvpotVId} <br />
+1분 보기 동영상 ID : $!{song.vclip.tvpotPreVId} <br />
+HDYN : $!{song.vclip.HDYn} <br />
+BBSID : $!{song.vclip.bbsId} <br />
+ARTICLEID : $!{song.vclip.articleId} <br />
+아티스트 <br />
+#foreach($artist in $song.vclip.keyArtistList)
+ - 이름 : $!{artist.name} <br />
+ - ID : $!{artist.artistId} <br />
+#end<br />
+이미지 <br />
+IMAGE ID : $!{song.vclip.mainImage.imageId}<br />
+IMAGE URL : $!{song.vclip.mainImage.filePath}<br />
+<br />
+
+추천 <br />
+전체 Count : $!{song.recommendCount}  <br />
+
+뮤직 비디오 페이지 리스트 <br />
+전체 Count : $!{vclipTotalCount}  <br />
+뮤직비디오 리스트  <br />
+#foreach($vclip in $vclipList)
+ - 이름 : $!{vclip.title} <br />
+ - ID : $!{vclip.vclipId} <br />
+ - TVPOTID : $!{vclip.vclipId} <br />
+ - HDYn : $!{vclip.HDYn} <br />
+ - 이미지 : $!{vclip.mainImage.filePath} <br />
+<br />
+#end<br />
+#end 
+
+
+
+

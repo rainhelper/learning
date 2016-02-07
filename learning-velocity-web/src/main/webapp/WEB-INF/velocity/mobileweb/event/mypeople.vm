@@ -1,0 +1,155 @@
+<div id="daumContent">
+		<h2 class="screen_out">마이피플 채널링 이벤트 알림</h2>
+    <div class="wrap_mp"></div>
+    <div class="tab_mp">
+    	<ol class="tab_menu tab_menu1">
+    		<li class="tab_step1"><span class="screen_out">현재단계</span><span class="txt">알림신청</span></li>
+
+    		<li class="tab_step2"><span class="txt">상세설정</span></li>
+    		<li class="tab_step3"><span class="txt">신청완료</span></li>
+    	</ol>
+    </div>
+    <div class="section_mp"></div>
+</div>
+
+#set($logOn = false)
+#if($StringUtils.isNotBlank("$!{user.userId}"))
+	#set($logOn = true)
+	#set($user_daumId = $!{user.daumId})
+	#set($user_userId = $!{user.userId})
+#end
+
+<script type="text/javascript"> // 로그인 여부, id값 전달
+	daum.addEvent(window, 'load', music.mobile.MyPeople.init.bind(music.mobile.MyPeople, $logOn, "$!{user_userId}", {homeUrl:"/top",  serviceTitle:"뮤직", appYn:"N"}));
+</script>
+<script type="text/template" id="settingTmpl">
+<%
+var i=0, 
+    len=0, 
+    index =0,
+  	_isSubscribe =  obj.isSubscribe,
+    _noticeList = obj.noticeList,
+	_enabledList = obj.enabledList,
+	_txtType = (_isSubscribe === "YES") ? "변경" : "신청";
+%>		
+<h3 class="screen_out">상세설정</h3>
+<form action="#">
+<fieldset>
+	<legend class="screen_out">알림 상세설정</legend>
+	<div class="wrap_set">
+		<h4 class="tit_set">1. 뮤직 공연 초대</h4>
+		<ul class="list_set">
+        <%
+        index = 0; 
+            for( i=0,len=_noticeList.length; i<len; i++){
+        	 	if( _noticeList[i].code.substring(0,1) === "A"){
+        	 	
+                 var code = _noticeList[i].code,
+                     name = _noticeList[i].name,
+                     checkedOnClassName = "",
+                     checkedOffClassName = "",
+                     checked = "";
+				if(( _isSubscribe === "NO" && index==0) || (_isSubscribe === "YES"  && _enabledList[code] == true)){
+				  	checked = 'checked="checked"'; 
+				  	checkedOnClassName = "btn-primary";
+				  	checkedOffClassName = "";
+				 }else{
+				 	checkedOnClassName = "";
+				  	checkedOffClassName = "btn-dark";
+				 }
+				 index += 1;
+        %>			
+    		<li>
+    			<strong class="tit"><%=name%></strong>
+    				<div class="wrap_onoff">
+    				<input type="checkbox" id="<%=code%>" class="inp" value="<%=code%>" <%=checked%> />
+    				<div class="btn-group" data-key="<%=code%>">
+    		          <a href="#" class="comm-btn btn_on <%=checkedOnClassName%>">ON</a>
+    		          <a href="#" class="comm-btn btn_off <%=checkedOffClassName%>">OFF</a>
+    				</div>	
+    			</div>				
+    		</li>
+		<%}}%>
+		</ul>
+		<h4 class="tit_set">2. 영화 시사 초대</h4>
+		<ul class="list_set">
+            <%
+            index = 0; 
+                for( i=0,len=_noticeList.length; i<len; i++){
+            	 	if( _noticeList[i].code.substring(0,1) === "B"){
+            	 	
+                     var code = _noticeList[i].code,
+                         name = _noticeList[i].name,
+                         checkedOnClassName = "",
+                         checkedOffClassName = "",                             
+                         checked = "";
+					 if(( _isSubscribe === "NO" && index==0) || (_isSubscribe === "YES"  && _enabledList[code] == true)){
+					  	checked = 'checked="checked"'; 
+					  	checkedOnClassName = "btn-primary";
+					  	checkedOffClassName = "";
+					 }else{
+					 	checkedOnClassName = "";
+					  	checkedOffClassName = "btn-dark";
+					 }
+					 index += 1;
+            %>			
+			<li>
+				<strong class="tit"><%=name%></strong>
+					<div class="wrap_onoff">
+					<input type="checkbox" id="<%=code%>" class="inp" value="<%=code%>" <%=checked%> />
+					<div class="btn-group" data-key="<%=code%>">
+			          <a href="#" class="comm-btn btn_on <%=checkedOnClassName%>">ON</a>
+			          <a href="#" class="comm-btn btn_off <%=checkedOffClassName%>">OFF</a>
+					</div>	
+				</div>				
+			</li>
+			<%}}%>
+		</ul>
+		<h4 class="tit_set">3. 영화 예매권</h4>
+		<ul class="list_set">
+        <%
+        index = 0; 
+        for( i=0,len=_noticeList.length; i<len; i++){
+    	 	if( _noticeList[i].code.substring(0,1) === "C"){
+    	 	
+             var code = _noticeList[i].code,
+                 name = _noticeList[i].name,
+                 checkedOnClassName = "",
+                 checkedOffClassName = "",                             
+                 checked = "";
+			 if(( _isSubscribe === "NO" && index==0) || (_isSubscribe === "YES"  && _enabledList[code] == true)){
+			  	checked = 'checked="checked"'; 
+			  	checkedOnClassName = "btn-primary";
+			  	checkedOffClassName = "";
+			 }else{
+			 	checkedOnClassName = "";
+			  	checkedOffClassName = "btn-dark";
+			 }
+			 index += 1;
+        %>			
+			<li>
+				<strong class="tit"><%=name%></strong>
+					<div class="wrap_onoff">
+					<input type="checkbox" id="<%=code%>" class="inp" value="<%=code%>" <%=checked%> />
+					<div class="btn-group" data-key="<%=code%>">
+			          <a href="#" class="comm-btn btn_on <%=checkedOnClassName%>">ON</a>
+			          <a href="#" class="comm-btn btn_off <%=checkedOffClassName%>">OFF</a>
+					</div>	
+				</div>				
+			</li>
+		<%}}%>
+		</ul>
+	</div>
+	<h4 class="tit_mp">이용안내</h4>
+	<ul class="list_infomp">
+		<li><span class="img_mp ico_dot"></span>당첨만을 설정하시면, 응모 이벤트 중 당첨된 경우만 알림을 드립니다.</li>
+		<li><span class="img_mp ico_dot"></span>비당첨포함까지 설정하시면 당첨여부와 상관없이 응모한 이벤트의 결과 알림을 받으실 수 있습니다.</li>
+	</ul>
+	<div class="wrap_btn">
+		<a href="#" class="round btn_mypeople2">채널ON <%=_txtType%></a>
+	</div>
+<fieldset>
+</form>
+</script>
+
+#parse("/velocity/mobileweb/realtimeissue.vm")

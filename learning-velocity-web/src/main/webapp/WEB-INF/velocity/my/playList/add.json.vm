@@ -1,0 +1,82 @@
+#if("$!{callback}" != "")
+if (typeof(${callback}) == "function") ${callback} (
+#end
+{
+	"result" : {
+		"type" : "${result.resultType}",
+		"message" : "${result.message}",
+			
+		"info" : {
+			"totalPlayCnt" : "${result.info.totalPlayCnt}",
+            "totalPlayTime" : "${result.info.totalPlayTime}",
+            "modifyDate" : "$CheckDate.makeReleaseDate("$!{result.info.modDttm}")",
+            "mainImage" : "$ImageUtil.getImageUrl("$!{result.info.mainImage.filePath}", "110x110", "ALBUM")",
+            
+            
+    		"addSongList" : [ 
+    		                	#foreach($song in $result.info.addSongList)
+    		                		#if($foreach.index > 0),#end
+    		                		{
+    		                			"songId":"$!{song.songId}",
+    		                			"title": "#stripHTML($!{song.title.replaceAll("'", "&apos;").replaceAll("<", "&lt").replaceAll(">", "&gt")})", ##"#strCut("$!{song.title}", 50)",
+										"albumTitle": "#stripHTML($!{song.album.title.replaceAll("'", "&apos;")})",
+    		                			"keyArtistList": [
+    		                				#foreach($artist in $song.keyArtistList)
+    		                					#if($foreach.index > 0),#end
+    		                					{
+    		                						"artistId":"$!{artist.artistId}",
+    		                						"name":"$!{artist.name.replaceAll("'", "&apos;")}",
+													"thumb":"$ImageUtil.getImageUrl("$!{song.album.mainImage.filePath}", "42x42", "ALBUM")" 
+    		                					} 
+    		                				#end
+    		                			],
+    		                			"featArtistList": [
+    		                				#foreach($artist in $song.featArtistList)
+    		                					#if($foreach.index > 0),#end
+    		                					{
+    		                						"artistId":"$!{artist.artistId}",
+    		                						"name":"$!{artist.name.replaceAll("'", "&apos;")}"
+    		                					} 
+    		                				#end
+    		                			],
+    		                			"creditArtistList": [
+    		                				#foreach($artist in $song.creditArtistList)
+    		                					#if($foreach.index > 0),#end
+    		                					{
+    		                						"artistId":"$!{artist.artistId}",
+    		                						"name":"$!{artist.name.replaceAll("'", "&apos;")}",
+    		                						"credit":"$!{artist.creditTitle}"
+    		                					} 
+    		                				#end
+    		                			],
+    		                			"favorite":"$!{song.favorite}",
+    		                			"AODLinkId":"$!{song.AODLinkId}",
+    		                			"lyricsYn":"$!{song.lyricsYn}",
+    		                			"albumId":"$!{song.album.albumId}",
+    		                			"vclipLinkId":"$!{song.vclipLinkId}",
+    		                			"tvpotVId":"$!{song.tvpotVId}",
+    		                			"MP3LinkId":"$!{song.MP3LinkId}",
+    		                			"BGMLinkId":"$!{song.BGMLinkId}",
+    		                			"bellSalesStatus":"$!{song.bellSalesStatus}",
+    		                			"ringSalesStatus":"$!{song.ringSalesStatus}", 
+										"typeCd":"$!{song.typeCd}",
+										"adultYn":"$!{song.adultYn}", 
+										"packageSaleYn" : "$!{packageSaleYn}"
+    		                			
+    		                		}
+    		                	#end
+    		                	]	
+			}	
+
+		#*
+		"type" : "$!Escape.escapeJava(${result.resultType})",
+		"message" : "$!Escape.escapeJava(${result.message})"
+		*#
+	}
+}
+#if("$!{callback}" != "")
+);
+#end
+
+
+

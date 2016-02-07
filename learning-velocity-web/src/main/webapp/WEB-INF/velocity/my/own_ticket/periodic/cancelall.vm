@@ -1,0 +1,11 @@
+$!{targetListSize}
+
+#foreach($result in $resultList)
+(
+${result.resultType} |
+${result.message.replaceAll('\n', '<br>')}
+)
+<br>
+#end
+
+

@@ -1,0 +1,11 @@
+#parse("/velocity/wing/piece/wingAd.vm")
+#parse("/mot/wing/noticebox.html")##공지박스
+#parse("/velocity/wing/piece/relationArtistAlbum.vm")
+#parse("/velocity/wing/piece/saleWithAlbum.vm")
+#parse("/mot/wing/recentmusicbar.html")##뮤직바최신
+#parse("/mot/wing/bestmusicbar.html")##뮤직바인기
+
+#parse("/mot/wing/realtimechart.html")##실시간차트
+#parse("/mot/wing/hotvclip.html")##hot영상
+##parse("/mot/wing/eventbanner.html")##배너
+##parse("/velocity/wing/piece/wingReport.vm")##제보/신고

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LOG>
+	<LOG_RESULT>
+			<RESULT_CODE>$!{result.resultType}</RESULT_CODE>
+			<RESULT_MESSAGE><![CDATA[$!{result.message}]]></RESULT_MESSAGE>
+			<RECENT_MESSAGE><![CDATA[$!{recentResult}]]></RECENT_MESSAGE>
+	</LOG_RESULT>
+</LOG>

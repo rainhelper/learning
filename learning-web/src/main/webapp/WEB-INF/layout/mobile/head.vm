@@ -1,0 +1,128 @@
+#parse("/layout/mobile/service_def.vm")
+
+#uaCheck()
+##parse("/velocity/common/ua_parser_sample.vm")
+
+#set( $URI = "#getter('URI', '')" )##
+#set( $PATH = "#getter('PATH_URI', '')" )##
+#set( $DOMAIN = $URI.split($PATH)[0] )##
+#if( $StringUtils.isEmpty("#getter('VERSION', '')"))
+	#set( $STATIC_PATH = "/" )
+#else	
+	#set( $STATIC_PATH = "#getter('VERSION', '')" )
+#end
+#set( $STATIC_PATH = $STATIC_PATH.replaceAll("s1", "m1")) 
+
+#set( $DEBUG = "#getter('debugmode', '')" == 2 || $StringUtils.isEmpty("#getter('VERSION', '')") )##
+##
+#if( $DEBUG )##
+	#set( $STATIC_PATH = "/" )##
+#else##
+	#set( $STATIC_PATH = "#getter('VERSION', '')" )##
+#end##
+<meta charset="utf-8">
+<meta name='plink' content='$URI.replace("/mobileweb","")'/>
+#if( $URI.indexOf("/chart/viewer") == -1 )
+<meta name="apple-itunes-app" content="app-id=411835583">
+#end
+
+#parse("/layout/mobile/title.vm")
+$!{headMetaTitle}
+##<title>Daum 뮤직</title>
+##페이스북에 링크시 요약 정보제공을 위해
+#parse("/layout/mobile/opengraph.vm")
+#if($isWVGA)
+  <meta name="viewport" content="user-scalable=no, initial-scale=0.5, maximum-scale=0.5, minimum-scale=0.5" />
+#else
+  <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width#if($ua_result.os.android || $ua_result.browser.name == "dolfin"), target-densityDpi=medium-dpi#end" />
+#end
+  <meta name="format-detection" content="telephone=no" />
+#if($ua_result.os.android || $ua_result.browser.name == "dolfin")     ## 홈화면 추가시 사용될 아이콘 정의(이미지 파일은 서비스에따라 변경) 
+  <link href="http://m1.daumcdn.net/img-contents/mobile/music/320/v1.0/music_android.png" rel="apple-touch-icon-precomposed">
+#else
+  <link href="http://m1.daumcdn.net/img-contents/mobile/music/320/v1.0/music_ios.png" rel="apple-touch-icon-precomposed">
+#end
+#if($isWebviewer)
+  <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+#else
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+#end
+
+#if( $URI.indexOf("/musicevent/iphone2011") > -1 )	## 2011.09 무료쿠폰 프로모션
+	<link href="$!{STATIC_PATH}css/m/promotion/iphone2011.css" type="text/css" rel="stylesheet" />
+#elseif( $URI.indexOf("/mobile2012/photo") > -1 )##
+	<link href="$!{STATIC_PATH}css/m/promotion/mobile2012.css" type="text/css" rel="stylesheet" />
+	<script type="text/javascript" src="$!{STATIC_PATH}js/min.mobile.promotion.js" charset="utf-8"></script>
+#elseif( $URI.indexOf("/promotion/event/2014ios") > -1 )##	
+	<script type="text/javascript" src="$!{STATIC_PATH}js/min.mobile.js" charset="utf-8"></script>
+#else
+#if($isWVGA)
+  <link href="$!{STATIC_PATH}css/m/w.css" type="text/css" rel="stylesheet" /> 
+#else
+  <link href="$!{STATIC_PATH}css/m/newh.css" type="text/css" rel="stylesheet" />
+#end
+
+#if( $URI.indexOf("/app") > -1 )	## new app 화면용 css
+  <link href="$!{STATIC_PATH}css/m/app.css" type="text/css" rel="stylesheet" />
+#end
+
+##<script type="text/javascript" src="$!{STATIC_PATH}js/m/common.js" charset="utf-8"></script>
+##<script type="text/javascript" src="$!{STATIC_PATH}js/m/jigu.mobile.min.js" charset="utf-8"></script>
+    #if( $StringUtils.equals("$URI", "$!{DOMAIN}") || $URI.indexOf("$!{DOMAIN}/?") > -1 || $URI.indexOf("$!{DOMAIN}/top") > -1 || $StringUtils.equals("$URI", "$!{DOMAIN}/mobileweb/") || $URI.indexOf("$!{DOMAIN}/mobileweb/?") > -1 || $URI.indexOf("/mobileweb/top") > -1)##
+    <script type="text/javascript" src="$!{STATIC_PATH}js/min.mobile.top.js" charset="utf-8"></script>
+    #elseif( $URI.indexOf("/imagene/") > -1 )##
+    <script type="text/javascript" src="$!{STATIC_PATH}js/min.mobile.imagene.js" charset="utf-8"></script>
+    #elseif( $URI.indexOf("/event/") > -1 || $URI.indexOf("/mobile2012/photo") > -1)##
+    <script type="text/javascript" src="$!{STATIC_PATH}js/min.mobile.event.js" charset="utf-8"></script>
+    #elseif( $URI.indexOf("/chart/viewer") > -1 )##
+    <script charset='utf-8' type='text/javascript' src='http://d1.daumcdn.net/tiara/tracker/tiara.min.js'></script>
+    <script type="text/javascript" src="$!{STATIC_PATH}js/min.mobile.chartviewer.js" charset="utf-8"></script>
+    ##<script type="text/javascript" src="$!{STATIC_PATH}js/m/common.js" charset="utf-8"></script>
+    <link href="$!{STATIC_PATH}css/m/chartviewer.css" type="text/css" rel="stylesheet" />
+    <div id="daumMinidaum" style="display:none;"></div>
+    #elseif( $URI.indexOf("/musicbar/") > -1 )##
+    <script type="text/javascript" src="$!{STATIC_PATH}js/min.mobile.musicbar.js" charset="utf-8"></script>
+    #elseif( $URI.indexOf("/own_ticket/") > -1 || $URI.indexOf("/ticket/") > -1 )##
+    <script type="text/javascript" src="$!{STATIC_PATH}js/min.mobile.js" charset="utf-8"></script>
+    <script type="text/javascript" src="$!{STATIC_PATH}js/m/my.own.ticket.js" charset="utf-8"></script>
+    <script type="text/javascript" src="$!{STATIC_PATH}js/m/ticket.js" charset="utf-8"></script>
+    #elseif( $URI.indexOf("/purchase/") > -1 )##
+    <script type="text/javascript" src="$!{STATIC_PATH}js/min.mobile.js" charset="utf-8"></script>
+    <script type="text/javascript" src="$!{STATIC_PATH}js/m/cart.js" charset="utf-8"></script>
+    <script type="text/javascript" src="$!{STATIC_PATH}js/m/my.own.ticket.js" charset="utf-8"></script>
+    #elseif( $URI.indexOf("/onair/") > -1)##
+<!--[if lt IE 9]>
+    <script type="text/javascript" src="http://s1.daumcdn.net/svc/original/U03/cssjs/jquery/jquery-1.11.0.js"></script>
+<![endif]-->
+<!--[if gte IE 9]><!-->
+    <script type="text/javascript" src="http://s1.daumcdn.net/svc/original/U03/cssjs/jquery/jquery-2.1.0.js"></script>
+<!--<![endif]-->
+    <script type="text/javascript" src="$!{STATIC_PATH}js/min.mobile.js" charset="utf-8"></script>
+    <script type="text/javascript" src="$!{STATIC_PATH}js/min.mobile.onair.js"></script>
+	<script type="text/javascript" src="http://m1.daumcdn.net/svc/original/U03/cssjs/slide/slide-1.2.13.standalone.min.js"></script>
+## 타 라이브러리와의 충돌을 피하기 위하여 반드시 jQuery.noConflict 를 사용하여야 한다. $ 변수 축약형을 사용하고자 할 때는 반드시 scope 을 분리하여 다른 부분에 영향 받지 않도록 하여야 한다.
+<script type="text/javascript">
+jQuery.noConflict();
+</script>
+    #elseif( $URI.indexOf("/artist/") > -1  || $URI.indexOf("/album/") > -1 || $URI.indexOf("/song/") > -1)##
+    <!--[if lt IE 9]>
+        <script type="text/javascript" src="http://s1.daumcdn.net/svc/original/U03/cssjs/jquery/jquery-1.11.0.js"></script>
+    <![endif]-->
+    <!--[if gte IE 9]><!-->
+    <script type="text/javascript" src="http://s1.daumcdn.net/svc/original/U03/cssjs/jquery/jquery-2.1.0.js"></script>
+    <!--<![endif]-->
+    <script type="text/javascript" src="$!{STATIC_PATH}js/min.mobile.js" charset="utf-8"></script>
+    ## 타 라이브러리와의 충돌을 피하기 위하여 반드시 jQuery.noConflict 를 사용하여야 한다. $ 변수 축약형을 사용하고자 할 때는 반드시 scope 을 분리하여 다른 부분에 영향 받지 않도록 하여야 한다.
+    <script type="text/javascript">
+        jQuery.noConflict();
+    </script>
+    #else
+    <script type="text/javascript" src="$!{STATIC_PATH}js/min.mobile.js" charset="utf-8"></script>
+	#end
+<script type="text/javascript" src="$!{STATIC_PATH}js/m/mobile_billing.js" charset="utf-8"></script>
+#end
+
+<!--[if lte IE 8]>
+<script src="http://m1.daumcdn.net/svc/original/U03/cssjs/sizzle/sizzle-1.10.7.min.js"></script>
+<script src="http://m1.daumcdn.net/svc/original/U0301/cssjs/JSON-js/fc535e9cc8/json2.min.js"></script>
+<![endif]-->

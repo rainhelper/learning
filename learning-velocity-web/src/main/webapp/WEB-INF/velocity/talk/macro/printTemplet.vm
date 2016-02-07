@@ -1,0 +1,446 @@
+#*
+templeteName 종류
+BA : 텍스트기본
+AI : 통이미지
+AL : 앨범형
+SL : 곡리스트
+VL : 동영상뷰어
+PV : 포토뷰어
+PO : 폴리스트
+VC : 1단 동영상
+LP : 생중계플레이어
+*#
+
+#macro(printTemplateBA $talkContent)
+	<div class="detail_cont detail_post">
+	    <h4 class="screen_out">소개 글 컨텐츠</h4>
+	    #if( "$!{talkContent.title}" != "")
+		    <strong class="tit_comm">$!{talkContent.title}</strong>
+		#end
+
+		#if($StringUtils.indexOf($!{talkContent.contents},"iframe") > 0)
+			#set($new_contents = $!{StringUtils.replace($!{talkContent.contents},'src','class="iframeArea" src')})
+            <p class="txt_comm">
+	            $new_contents
+            </p>
+            <script type="text/javascript">
+                daum.Music.Talk.resizeLivePlayer($(".iframeArea"));
+            </script>
+		#else
+	    <p class="txt_comm">
+		    $!{talkContent.contents}
+	    </p>
+		#end
+	</div>
+#end
+
+#macro(printTemplateAI $talkContent)
+	<div class="detail_cont detail_post">
+	    <h4 class="screen_out">소개 글 컨텐츠</h4>
+		#if( "$!{talkContent.title}" != "")
+            <strong class="tit_comm">$!{talkContent.title}</strong>
+		#end
+        <div>
+            <p class="txt_comm"></p>
+            <strong class="screen_out">소개 글 이미지 목록</strong>
+		    <a #if("$!{talkContent.linkUrl}" != "")href="$!{talkContent.linkUrl}"#end target="_blank" style="height: auto" class="link_post">
+			    <img src="$!{ImageUtil.getMobileImageUrl("$!{talkContent.imageUrl}", "640x0", "PHOTO", "R")}" style="position: relative" class="thumb_visual" alt="$!{EscapeUtil.encodeHtmlTag($!{talkContent.title})}">
+		    </a>
+	    </div>
+	</div>
+#end
+
+#macro(printTemplateAL $talkContent)
+	<div class="detail_cont detail_music">
+	    <h4 class="screen_out">음악 리스트 컨텐츠</h4>
+		#if( "$!{talkContent.albumTitle}" != "")
+            <strong class="tit_comm">$!{talkContent.albumTitle}</strong>
+		#end
+	    <div class="item_album">
+	        <strong class="screen_out">앨범리스트</strong>
+	        <ul class="list_album">
+				#foreach($album in $talkContent.albumList)
+	            <li>
+	                <a #if("$!{talkContent.landingUrlList[$foreach.index]}" != "" && ($isAndroid == true || $isIos == true))href="javascript:daum.Music.Talk.landingKakaoMusicAlbum('$!{talkContent.landingUrlList[$foreach.index]}');"#end target="_blank" class="link_album">
+	                     <img src="$!{ImageUtil.getMobileImageUrl("$!{album.mainImage.filePath}", "640x0", "PHOTO", "R")}" width="60" height="60" class="thumb_album" alt="$!{EscapeUtil.encodeHtmlTag($!{album.title})}">
+						<span class="desc_album">
+							<strong class="tit_music">$!{album.title}</strong>
+							<span class="txt_name">$!{album.keyArtistList[0].name}</span>
+						</span>
+	                </a>
+	            </li>
+				#end
+	        </ul>
+	    </div>
+	</div>
+#end
+
+#macro(printTemplateSL $talkContent)
+	<div class="detail_cont detail_music">
+	    <h4 class="screen_out">음악 리스트 컨텐츠</h4>
+		#if( "$!{talkContent.songTitle}" != "")
+	    <strong class="tit_comm">$!{talkContent.songTitle} </strong>
+		#end
+	    <div class="item_music">
+	        <strong class="screen_out">음악리스트</strong>
+            #set($trackIds = "")
+	        <ol class="list_music">
+				#foreach($song in $talkContent.songList)
+	            <li>
+                    #if($isAndroid == true || $isIos == true)
+                        <a href="javascript:daum.Music.Talk.landingKakaoMusic('$!{talkContent.talkIdList[$foreach.index]}');" class="link_music">
+                        #if("$!{talkContent.talkIdList[$foreach.index]}" != "0")
+                            #set($trackIds = $trackIds + $!{talkContent.talkIdList[$foreach.index]} + "|")
+                        #end
+                    #else
+                        <a href="javascript:;" class="link_music" style="cursor: default;">
+                    #end
+	                    <img src="$!{ImageUtil.getMobileImageUrl("$!{song.album.mainImage.filePath}", "640x0", "PHOTO", "R")}" width="38" height="38" class="thumb_music" alt="$!{EscapeUtil.encodeHtmlTag($!{song.title})}">
+						<span class="info_music">
+							<em class="num_music">#if( ${velocityCount} < 10 ) 0${velocityCount} #else ${velocityCount} #end </em>
+							<span class="desc_music">
+								<strong class="tit_music">$!{song.title}</strong>
+								<span class="txt_name">$!{song.keyArtistList[0].name} - $!{song.album.title}</span>
+                                #if($isAndroid == true || $isIos == true)
+                                    <span class="ico_comm ico_music">음악 재생하기</span>
+                                #end
+							</span>
+						</span>
+	                </a>
+	            </li>
+				#end
+
+	        </ol>
+            #if("$!trackIds" != "" && $talkContent.songList.size() > 1)
+                <div class="wrap_btn">
+                    <a href="javascript:daum.Music.Talk.landingKakaoMusic('$!trackIds');" class="btn_vote link_result1">곡 리스트 전체듣기</a>
+                </div>
+            #end
+        </div>
+	</div>
+#end
+
+#macro(printTemplateVL $talkContent)
+	<div class="detail_cont detail_video">
+	    <h4 class="screen_out">동영상 컨텐츠</h4>
+		#if( "$!{talkContent.vclipTitle}" != "")
+            <strong class="tit_comm">$!{talkContent.vclipTitle}</strong>
+		#end
+        <strong class="screen_out">동영상 목록</strong>
+	    <ul class="list_video">
+			#foreach($vclip in $talkContent.vclipList)
+	        <li>
+		        <a href="javascript:;" onclick="daum.Music.Talk.doPlayTheMovie('full', '$!{vclip.tvpotVId}', '$!{ImageUtil.getMobileImageUrl("$!{vclip.mainImage.filePath}", "640x0", "VIDEO", "R")}', '320', '240')" class="link_svideo">
+					<span class="thumb_svideo">
+						<img src="$!{ImageUtil.getMobileImageUrl("$!{vclip.mainImage.filePath}", "640x0", "VIDEO", "R")}" width="130" height="92" alt="$!{EscapeUtil.encodeHtmlTag($!{vclip.title})}">
+						<span class="ico_comm ico_splay">재생하기</span>
+					</span>
+					<span class="info_svideo">
+						$!{vclip.title}
+
+                        #if( $!{vclip.adultYn} == "Y")
+							<span class="ico_comm ico_19" title="19세 이상 등급">&nbsp;</span>
+	                    #elseif ( $!{vclip.adultYn} == "A")
+                            <span class="ico_comm ico_all" title="전체 이용 가능">&nbsp;</span>
+                        #elseif ( $!{vclip.adultYn} == "2")
+                            <span class="ico_comm ico_12" title="12세 이상 이용 가능">&nbsp;</span>
+                        #elseif ( $!{vclip.adultYn} == "5")
+                            <span class="ico_comm ico_15" title="15세 이상 이용 가능">&nbsp;</span>
+		                #else
+                            <span class="ico_comm ico_all" title="전체 이용 가능">&nbsp;</span>
+                        #end
+					</span>
+			        <span style="opacity: 0.6">
+				        $!{vclip.keyArtistList[0].name}
+			        </span>
+	            </a>
+	        </li>
+			#end
+	    </ul>
+	</div>
+#end
+
+#macro(printTemplatePV $talkContent)
+<div class="detail_cont detail_post">
+    <h4 class="screen_out">소개 글 컨텐츠</h4>
+	#if( "$!{talkContent.photoTitle}" != "")
+        <strong class="tit_comm">$!{talkContent.photoTitle}</strong>
+	#end
+    <div class="visual_post" style="min-height:260px;">
+        <strong class="screen_out">소개 글 이미지 목록</strong>
+	    <div id="templetePV_$!{talkContent.templeteOrder}"></div>
+    </div>
+    <div class="info_post info_post_$!{talkContent.templeteOrder}">
+        <p class="desc_post desc_post_$!{talkContent.templeteOrder}" id="desc_area" style="display:none; height:50px;">
+            <em class="num_post_$!{talkContent.templeteOrder}">1.</em> <span class="desc_photo_text_$!{talkContent.templeteOrder}"></span>
+        </p>
+        <div class="paging_post" id="paging_area" style="z-index:888;">
+				<span class="inner_paging">
+					#foreach($photo in $talkContent.photoUrlList)
+                        <span class="ico_comm num_page_$!{talkContent.templeteOrder}"  style="cursor: pointer;">${velocityCount}</span>
+					#end
+                </span>
+        </div>
+    </div>
+</div>
+	<script type="text/javascript">
+        function resizePhotoViewer$!{talkEntireContent.templeteOrder}() {
+            if (util.userAgent().platform != 'mobile') {
+                var viewerWidth = jQuery("#templetePV_$!{talkEntireContent.templeteOrder}").width();
+                var listHeight = viewerWidth * 3 / 4;
+                var childSilde = jQuery("#templetePV_$!{talkEntireContent.templeteOrder} :first-child").attr('id');
+                jQuery("#templetePV_$!{talkEntireContent.templeteOrder}").height(listHeight);
+                jQuery("#" + childSilde).height(listHeight);
+            }
+        }
+
+        var lastWidth = $(window).width();
+        $(window).resize(function(){
+            resizePhotoViewer$!{talkEntireContent.templeteOrder}();
+            lastWidth = $(window).width();
+        });
+
+        $(window).load(function() {
+            resizePhotoViewer$!{talkEntireContent.templeteOrder}();
+        });
+	</script>
+#end
+
+#macro(printTemplatePVData $talkContent)
+    var items_$!{talkContent.templeteOrder} = [];
+    #set( $count = 0 )
+    #foreach($photo in $talkContent.photoUrlList)
+        items_$!{talkContent.templeteOrder}.push({
+            toHTML: function() { return '<a href="/talk/viewer?board_id=$!{talkContent.boardId}&temp_order=$!{talkContent.templeteOrder}&view_img_order=${count}" class="link_post">' +
+	                                        '<img src="$!{ImageUtil.getFaceDetectImageUrl("$!{photo}", "C640x600")}" id="image_area" class="thumb_visual" alt="">' +
+                                        '</a>';
+                               }
+        });
+        #set( $count = $count + 1 )
+    #end
+
+    var items_text_${talkContent.templeteOrder} = [];
+    #foreach($photo in $talkContent.photoList)
+        items_text_$!{talkContent.templeteOrder}.push('$!{EscapeUtil.encodeHtmlTag($!{photo.imageComment})}');
+    #end
+
+    var dataSource_$!{talkContent.templeteOrder} = new slide.DataSource(items_$!{talkContent.templeteOrder});
+    var option_$!{talkContent.templeteOrder} = {};
+    var slider_$!{talkContent.templeteOrder} = new slide.Slide(jQuery("#templetePV_$!{talkContent.templeteOrder}").get(0), dataSource_$!{talkContent.templeteOrder}, option_$!{talkContent.templeteOrder});
+
+    jQuery(".num_page_$!{talkContent.templeteOrder}").first().addClass("on");
+        slider_$!{talkContent.templeteOrder}.on('slide:after', function _slideAfter(type) {
+        jQuery(".num_page_$!{talkContent.templeteOrder}").removeClass("on");
+        jQuery(".num_page_$!{talkContent.templeteOrder}").eq(dataSource_$!{talkContent.templeteOrder}.getIndex()).addClass("on");
+    });
+
+    jQuery(".num_page_${talkContent.templeteOrder}").click(function() {
+        slider_${talkContent.templeteOrder}.setIndex(jQuery(this).index());
+        jQuery(".num_page_${talkContent.templeteOrder}").removeClass("on");
+        jQuery(".num_page_${talkContent.templeteOrder}").eq(dataSource_${talkContent.templeteOrder}.getIndex()).addClass("on");
+
+        jQuery(".desc_photo_text_$!{talkContent.templeteOrder}").html(items_text_$!{talkContent.templeteOrder}[jQuery(this).index()]);
+        jQuery(".num_post_$!{talkContent.templeteOrder}").html(jQuery(this).index() + 1 + ".");
+    });
+
+    var currentIndex_$!{talkContent.templeteOrder} = 0;
+    slider_$!{talkContent.templeteOrder}.on('slide:after', function _slideAfter(type) {
+        currentIndex_$!{talkContent.templeteOrder} = dataSource_$!{talkContent.templeteOrder}.getIndex();
+
+        jQuery(".desc_photo_text_$!{talkContent.templeteOrder}").html(items_text_$!{talkContent.templeteOrder}[currentIndex_$!{talkContent.templeteOrder}]);
+        jQuery(".num_post_$!{talkContent.templeteOrder}").html(currentIndex_$!{talkContent.templeteOrder} + 1 + ".");
+    });
+
+    if (items_text_$!{talkContent.templeteOrder}[0] != "") {
+        jQuery(".desc_photo_text_$!{talkContent.templeteOrder}").html(items_text_$!{talkContent.templeteOrder}[currentIndex_$!{talkContent.templeteOrder}]);
+        jQuery(".num_post_$!{talkContent.templeteOrder}").html(currentIndex_$!{talkContent.templeteOrder} + 1 + ".");
+        jQuery(".desc_post_$!{talkContent.templeteOrder}").show();
+    }else{
+		jQuery(".info_post_$!{talkContent.templeteOrder}").addClass("info_type1");
+	}
+
+#end
+
+#macro(printTemplatePO $talkContent)
+	#if ( 2 == $talkContent.pollIdList.size() || 4 == $talkContent.pollIdList.size() )
+	    <div class="detail_cont detail_vote">
+	        <h4 class="screen_out">투표 컨텐츠</h4>
+		    #if( "$!{talkContent.pollTitle}" != "")
+                <strong class="tit_comm">$!{talkContent.pollTitle}</strong>
+		    #end
+	        <dl class="vote_term"><dt class="txt_term">기간</dt> <dd class="date_term">$!{CheckDate.makeReleaseDate($!{talkContent.pollStartTime})} ~ $!{CheckDate.makeReleaseDate($!{talkContent.pollEndTime})}</dd></dl>
+	        <div>
+	            <fieldset>
+	                <legend class="screen_out">투표 입력폼</legend>
+	                <div class="vote_info vote_type1">
+	                    <span class="ico_comm ico_vs" id="ico_vs$!{talkContent.templeteOrder}_1" style="display: none;">$!{talkContent.pollTitle}</span>
+		                #if(4 == $talkContent.pollIdList.size())
+                            <span class="ico_comm ico_vs" id="ico_vs$!{talkContent.templeteOrder}_2" style="display: none;">$!{talkContent.pollTitle}</span>
+		                #end
+	                    <ul class="list_vote">
+							#foreach($poll in $talkContent.pollIdList)
+	                            <li>
+	                                <div class="vote_item" >
+                                        <label class="lab_vote" for="voteMusic$!{talkContent.templeteOrder}_$!{velocityCount}">
+                                            <span class="wrap_thumb" id="position$!{talkContent.templeteOrder}_$!{velocityCount}">
+	                                            <img src="$!{ImageUtil.getFaceDetectImageUrl("$!{talkContent.pollImageUrlList[${foreach.index}]}", "C300x280")}" class="thumb_vote" alt="$!{EscapeUtil.encodeHtmlTag($!{talkContent.pollNameList[${foreach.index}]})}">
+                                            </span>
+											<span class="vote_object">
+												<strong class="txt_name">$!{talkContent.pollNameList[${foreach.index}]}</strong>
+												<span class="txt_sub">$!{talkContent.pollCommentList[${foreach.index}]}</span>
+											</span>
+                                        </label>
+                                        <span class="wrap_inp">
+	                                        <input type="radio" id="voteMusic$!{talkContent.templeteOrder}_$!{velocityCount}" name="vote$!{talkContent.templeteOrder}" class="ico_comm inp_object" value="$!{talkContent.pollIdList[$foreach.index]}">
+                                        </span>
+	                                </div>
+	                            </li>
+							#end
+	                    </ul>
+	                    <div class="wrap_btn">
+		                    #set($diff = $CheckDate.diffOfDate($!{talkContent.pollEndTime}))
+		                    #set($diff2 = $CheckDate.diffOfDate($!{talkContent.pollStartTime}))
+							#set($returnCode = $!{talkContent.pollResponseCode})
+		                    #if($returnCode == "00")
+                                <a class="btn_vote link_result2" id="voteResult$!{talkContent.pollSeq}" onclick="showPollResultForTalk($!{diff2}, $!{talkContent.pollSeq});" style="cursor: pointer;">투표 결과 보기</a>
+                                <button class="btn_vote btn_voting2" id="voteButton$!{talkContent.pollSeq}" onclick="pollVoteForTalk($!{diff}, $!{diff2}, $!{talkContent.pollSeq}, 'vote$!{talkContent.templeteOrder}' ); return false;">투표 하기</button>
+			                #elseif($returnCode == "01")
+                                <a class="btn_vote link_result2" id="voteResult$!{talkContent.pollSeq}" onclick="showPollResultForTalk($!{diff2}, $!{talkContent.pollSeq});" style="cursor: pointer;">투표 결과 보기</a>
+                                <button class="btn_vote btn_voting1" id="voteButton$!{talkContent.pollSeq}" onclick="pollVoteForTalk($!{diff}, $!{diff2}, $!{talkContent.pollSeq}, 'vote$!{talkContent.templeteOrder}' ); return false;">투표 하기</button>
+		                    #elseif($returnCode == "10")
+                                <a class="btn_vote link_result1" id="voteResult$!{talkContent.pollSeq}" onclick="showPollResultForTalk($!{diff2}, $!{talkContent.pollSeq});" style="cursor: pointer;">투표 결과 보기</a>
+                                <button class="btn_vote btn_voting2" id="voteButton$!{talkContent.pollSeq}" onclick="pollVoteForTalk($!{diff}, $!{diff2}, $!{talkContent.pollSeq}, 'vote$!{talkContent.templeteOrder}' ); return false;">투표 하기</button>
+		                    #elseif($returnCode == "11")
+                                <a class="btn_vote link_result3" id="voteResult$!{talkContent.pollSeq}" onclick="showPollResultForTalk($!{diff2}, $!{talkContent.pollSeq});" style="cursor: pointer;">투표 결과 보기</a>
+                                <button class="btn_vote btn_voting1" id="voteButton$!{talkContent.pollSeq}" onclick="pollVoteForTalk($!{diff}, $!{diff2}, $!{talkContent.pollSeq}, 'vote$!{talkContent.templeteOrder}' ); return false;">투표 하기</button>
+		                    #end
+                            <input type="hidden" id="vote$!{talkContent.pollSeq}" value="$!{talkContent.loginYn}"/>
+	                    </div>
+	                </div>
+	            </fieldset>
+	        </div>
+	    </div>
+    <script type="text/javascript">
+        function setVsMark$!{talkContent.templeteOrder}(){
+            var middle1 = jQuery("#position$!{talkContent.templeteOrder}_1").height() / 2;
+            jQuery("#ico_vs$!{talkContent.templeteOrder}_1").css({top : middle1  });
+            jQuery("#ico_vs$!{talkContent.templeteOrder}_1").show();
+            #if(4 == $talkContent.pollIdList.size())
+                var middle2 = jQuery("#position$!{talkContent.templeteOrder}_1").height() + 84 + jQuery("#position$!{talkContent.templeteOrder}_3").height() / 2;
+                jQuery("#ico_vs$!{talkContent.templeteOrder}_2").css({top :middle2});
+                jQuery("#ico_vs$!{talkContent.templeteOrder}_2").show();
+            #end
+        }
+
+        var lastWidth = $(window).width();
+        $(window).resize(function(){
+            setVsMark$!{talkContent.templeteOrder}();
+            lastWidth = $(window).width();
+        });
+
+
+        $(window).load(function() {
+            setVsMark$!{talkContent.templeteOrder}();
+        });
+    </script>
+	#else
+        <div class="detail_cont detail_vote">
+	        <h4 class="screen_out">투표 컨텐츠</h4>
+	        #if( "$!{talkContent.pollTitle}" != "")
+                <strong class="tit_comm">$!{talkContent.pollTitle}</strong>
+	        #end
+	        <dl class="vote_term"><dt class="txt_term">기간</dt> <dd class="date_term">$!{CheckDate.makeReleaseDate($!{talkContent.pollStartTime})} ~ $!{CheckDate.makeReleaseDate($!{talkContent.pollEndTime})}</dd></dl>
+		    <div>
+		        <fieldset>
+		            <legend class="screen_out">투표 입력폼</legend>
+		            <div class="vote_info vote_type2">
+		                <ul>
+							#foreach($poll in $talkContent.pollIdList)
+		                    <li>
+		                        <div class="vote_item">
+		                            <span class="wrap_inp"><input type="radio" id="voteMusic$!{talkContent.templeteOrder}_$!{velocityCount}" name="vote$!{talkContent.templeteOrder}" class="ico_comm inp_object" value="$!{talkContent.pollIdList[${foreach.index}]}"></span>
+		                            <label class="lab_vote" for="voteMusic$!{talkContent.templeteOrder}_$!{velocityCount}">
+		                                <span class="wrap_thumb"><img src="$!{ImageUtil.getFaceDetectImageUrl("$!{talkContent.pollImageUrlList[${foreach.index}]}", "C300x280")}" width="60" height="60" class="thumb_vote" alt="$!{EscapeUtil.encodeHtmlTag($!{talkContent.pollNameList[${foreach.index}]})}"></span>
+										<span class="vote_object">
+											<strong class="txt_name">$!{talkContent.pollNameList[${foreach.index}]}</strong>
+											<span class="txt_sub">$!{talkContent.pollCommentList[${foreach.index}]}</span>
+										</span>
+		                            </label>
+		                        </div>
+		                    </li>
+							#end
+		                </ul>
+		                <div class="wrap_btn">
+			                #set($diff = $CheckDate.diffOfDate($!{talkContent.pollEndTime}))
+			                #set($diff2 = $CheckDate.diffOfDate($!{talkContent.pollStartTime}))
+			                #set($returnCode = $!{talkContent.pollResponseCode})
+			                #if($returnCode == "00")
+                                <a class="btn_vote link_result2" id="voteResult$!{talkContent.pollSeq}" onclick="showPollResultForTalk($!{diff2}, $!{talkContent.pollSeq});" style="cursor: pointer;">투표 결과 보기</a>
+                                <button class="btn_vote btn_voting2" id="voteButton$!{talkContent.pollSeq}" onclick="pollVoteForTalk($!{diff}, $!{diff2}, $!{talkContent.pollSeq}, 'vote$!{talkContent.templeteOrder}' ); return false;">투표 하기</button>
+			                #elseif($returnCode == "01")
+                                <a class="btn_vote link_result2" id="voteResult$!{talkContent.pollSeq}" onclick="showPollResultForTalk($!{diff2}, $!{talkContent.pollSeq});" style="cursor: pointer;">투표 결과 보기</a>
+                                <button class="btn_vote btn_voting1" id="voteButton$!{talkContent.pollSeq}" onclick="pollVoteForTalk($!{diff}, $!{diff2}, $!{talkContent.pollSeq}, 'vote$!{talkContent.templeteOrder}' ); return false;">투표 하기</button>
+			                #elseif($returnCode == "10")
+                                <a class="btn_vote link_result1" id="voteResult$!{talkContent.pollSeq}" onclick="showPollResultForTalk($!{diff2}, $!{talkContent.pollSeq});" style="cursor: pointer;">투표 결과 보기</a>
+                                <button class="btn_vote btn_voting2" id="voteButton$!{talkContent.pollSeq}" onclick="pollVoteForTalk($!{diff}, $!{diff2}, $!{talkContent.pollSeq}, 'vote$!{talkContent.templeteOrder}' ); return false;">투표 하기</button>
+			                #elseif($returnCode == "11")
+                                <a class="btn_vote link_result3" id="voteResult$!{talkContent.pollSeq}" onclick="showPollResultForTalk($!{diff2}, $!{talkContent.pollSeq});" style="cursor: pointer;">투표 결과 보기</a>
+                                <button class="btn_vote btn_voting1" id="voteButton$!{talkContent.pollSeq}" onclick="pollVoteForTalk($!{diff}, $!{diff2}, $!{talkContent.pollSeq}, 'vote$!{talkContent.templeteOrder}' ); return false;">투표 하기</button>
+			                #end
+			                <input type="hidden" id="vote$!{talkContent.pollSeq}" value="$!{talkContent.loginYn}"/>
+		                </div>
+		            </div>
+		        </fieldset>
+		    </div>
+		</div>
+	#end
+#end
+
+#macro(printTemplateVC $talkContent)
+	<div class="detail_cont detail_video">
+	    <h4 class="screen_out">동영상 컨텐츠</h4>
+		#if( "$!{talkContent.title}" != "")
+            <strong class="tit_comm">$!{talkContent.title}</strong>
+		#end
+        <p class="txt_comm"></p>
+	    <a href="javascript:;" onclick="daum.Music.Talk.doPlayTheMovie('full', '$!{talkContent.videoInfo.tvpotVId}', '$!{ImageUtil.getFaceDetectImageUrl("$!{talkContent.videoInfo.mainImage.filePath}", "C640x400")}', '320', '240')" class="link_mvideo">
+            <img src="$!{ImageUtil.getFaceDetectImageUrl("$!{talkContent.videoInfo.mainImage.filePath}", "C640x400")}", "", "VIDEO", "R")}" class="thumb_visual" alt="$!{EscapeUtil.encodeHtmlTag($!{talkContent.videoInfo.title})}">
+	        <span class="ico_comm ico_mplay">재생하기</span>
+	    </a>
+        <script type="text/javascript">
+            daum.Music.Talk.resizeLivePlayer($(".link_mvideo"));
+        </script>
+	</div>
+#end
+
+#macro(printTemplateLP $talkContent)
+	<div class="detail_cont detail_video">
+	    <h4 class="screen_out">생중계 플레이어 컨텐츠</h4>
+        <p class="txt_comm"></p>
+	    <iframe class="livePlayerFrame" width="100%" src="http://vfarm.tv.kakao.com/controller/live/viewer/Live.html?pdDaumId=$!{talkContent.pdDaumId}&liveLoc=daum_music&m_profile=$!{talkContent.mProfiles}" frameborder='0' scrolling='no'></iframe>
+	    <script type="text/javascript">
+	        daum.Music.Talk.resizeLivePlayer($(".livePlayerFrame"));
+	    </script>
+	</div>
+#end
+
+#macro(printTemplateMR $talkContent)
+<div class="detail_cont detail_post" #if($isAndroid == false && $isIos == false && $StringUtils.isEmpty($talkContent.serviceUserIdEnc)) style="display: none;" #end>
+    <h4 class="screen_out">뮤직룸 연결</h4>
+    #if( "$!{talkContent.title}" != "")
+        <strong class="tit_comm">$!{talkContent.title}</strong>
+    #end
+    <div>
+        <p class="txt_comm"></p>
+        <strong class="screen_out">뮤직룸 연결 이미지 목록</strong>
+        #if($isAndroid)
+            #set($customUrl = $talkContent.ANDROID_customUrl)
+        #else
+            #set($customUrl = $talkContent.IOS_customUrl)
+        #end
+        <a #if($isAndroid || $isIos) href="javascript:launchMusicApp('$!{customUrl}');" #else href="javascript:playerUrl('$!{talkContent.serviceUserIdEnc}', '$!{talkContent.trackId}');" #end style="height: auto" class="link_post">
+            <img src="#if($isAndroid || $isIos)$!{ImageUtil.getMobileImageUrl("$!{talkContent.MO_imageUrl}", "640x0", "PHOTO", "R")}#else$!{ImageUtil.getMobileImageUrl("$!{talkContent.PC_imageUrl}", "640x0", "PHOTO", "R")}#end" style="position: relative" class="thumb_visual" alt="$!{EscapeUtil.encodeHtmlTag($!{talkContent.title})}">
+        </a>
+    </div>
+</div>
+#end

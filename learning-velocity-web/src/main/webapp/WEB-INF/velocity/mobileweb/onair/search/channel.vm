@@ -1,0 +1,358 @@
+#uaCheck()
+#set($urlParam = "mediaType="+${command.mediaType})
+
+#set($urlParam = $urlParam + "&channelIds="+${command.channelIdsToString()})
+
+#if("$!{command.radioChannelType}" != "")
+	#set($urlParam = $urlParam+"&radioChannelType="+$!{command.radioChannelType})
+#end
+#if("$!{command.tvChannelType}" != "")
+	#set($urlParam = $urlParam+"&tvChannelType="+$!{command.tvChannelType})
+#end
+
+
+#if("$!{command.searchTimeType}" != "")
+	#set($urlParam = $urlParam+"&searchTimeType="+$!{command.searchTimeType})
+#end
+#if("$!{command.searchSTime}" != "")
+	#set($urlParam = $urlParam+"&searchSTime="+$!{command.searchSTime})
+#end
+#if("$!{command.searchETime}" != "")
+	#set($urlParam = $urlParam+"&searchETime="+$!{command.searchETime})
+#end
+#set($minDay = "20140204")
+#set($searchDate = $!{command.searchDate})
+#set($link = "/onair/search/channel?"+$urlParam+"&")
+
+<div id="daumContent" class="cont_now" role="main">
+<div id="mArticle">
+<form id="searchChannelForm" name="searchForm" action="/onair/search/channel" method="get">
+	<input type="hidden" name="channelIds" value="${command.channelIdsToString()}">
+	<input type="hidden" name="radioChannelType" value="$!{command.radioChannelType}">
+	<input type="hidden" name="tvChannelType" value="$!{command.tvChannelType}">
+	<input type="hidden" name="mediaType" value="$!{command.mediaType}"/>
+	<input type="hidden" name="searchDate" value="$!{command.searchDate}"/>
+	
+	<h2 class="screen_out">방금 그 곡</h2>
+	<div class="now_navi">
+		<h3 class="tit_navi">상세검색</h3>
+		<a href="javascript:;" class="btn_prev" onclick="window.history.back();"><span class="ico_now ico_prev"></span>이전</a>
+	</div>
+	<strong class="screen_out">채널 선택</strong>
+	#parse("/velocity/mobileweb/onair/search/menu.vm")
+	
+	#if("$!command.mediaType" != "4")
+		<h4 class="screen_out">TV</h4>
+	#else
+		<h4 class="screen_out">Radio</h4>
+	#end	
+	<ul class="list_channel">
+		#if("$!command.mediaType" != "4")
+		<li #if("$!{command.tvChannelType}" =="1" || ("$!{command.tvChannelType}" =="" && "$!{command.radioChannelType}" =="" && "${command.channelIdsToString()}" == ""))class="on"#end>
+			<a href="javascript:;" class="link_channel" id="tvChannelType">TV전체</a>
+		 </li>
+		#else
+		<li #if("$!{command.radioChannelType}" =="4" || ("$!{command.tvChannelType}" =="" && "$!{command.radioChannelType}" =="" && "${command.channelIdsToString()}" == ""))class="on"#end>
+			<a href="javascript:;" class="link_channel" id="radioChannelType">Radio전체</a>
+		</li>
+		#end	
+		#foreach($channel in $channelList)
+			#set($checked = "")
+			#foreach($selectedChannel in $command.channelIds)
+				#if($selectedChannel == ${channel.channelId})
+					#set($checked = "class='on'")
+					#break
+				#end
+			#end
+			
+			#if($!command.mediaType == ${channel.mediaType})
+			<li $checked>
+				<input type="hidden" value="${channel.channelId}">
+				<a id="channelType_${channel.channelId}" href="javascript:;" class="link_channel" data-channelType="channelType_$!{channel.mediaType}">${channel.channelName}</a>
+			</li>
+			#end
+		#end	
+	</ul>
+	
+	
+	<div id="parentCalwrap" class="now_date time_open"><!-- date_open, time_open 클래스 추가시 달력 활성화-->
+		<strong class="screen_out">날짜</strong>
+		
+		<button type="button" class="btn_timeset" onclick="music.mobile.Onair.toggleTimeSet()">
+			<span class="ico_now">시간 상세 설정 열기</span>
+		</button>
+		
+		<div id="dateCon">
+			<div class="date_cont">
+				
+
+				#if( $MathTool.toNumber("$!{searchDate}") > $MathTool.toNumber("$!{minDay}") )
+					<a class="link_date" href="$!{link}searchDate=$!CheckDate.getDiffDate($searchDate, -1)"><span class="ico_now ico_prev">이전 날</span></a>
+				#else
+					<em class="link_date"><span class="ico_now ico_prev">이전 날</span></em>
+				#end	
+	        		<span class="cont_date"><span class="date_num">$CheckDate.makeReleaseDate("$!{searchDate}")</span>($CheckDate.getDayNameByDate("$!{searchDate}"))</span>
+				#if($MathTool.toNumber($CheckDate.diffOfDate("$!{searchDate}")) > 0)	
+					<a class="link_date" href="$!{link}searchDate=$CheckDate.getDiffDate($searchDate, 1)"><span class="ico_now ico_next">다음 날</span></a>
+				#else
+					<em class="link_date"><span class="ico_now ico_next">다음 날</span></em>
+				#end 
+	        </div>
+
+	    </div>
+		<div id="monthCon">
+
+	    </div>
+		<div id="calendarBtnCon">
+			#if($StringUtils.isNotBlank("$!{searchDate}"))
+			<a  href="javascript:;" class="btn_calendar" onclick="calendarLayer.toggle('$!{searchDate}');return false;"><span class="ico_now ico_calendar">달력 열기/닫기</span></a>
+			#end
+	    </div>
+		<div id="calwrap" class="calendar_comm">
+    		
+    	</div>
+		<script type="text/javascript">
+			// 달력
+
+        	var changeTimelineLocation = function(searchDate){
+				location.href = "/onair/search/channel?${urlParam}&searchDate=" + searchDate;
+			}
+			
+        	// 레이어 달력	
+        	var calendarLayer = new music.mobile.OnairCalendar(
+        		{
+        			selectedDay : "$!searchDate",
+        			calContainerId : "calwrap",
+        			useScheduleDays : false,
+        			selectDateAddFunc : changeTimelineLocation,
+					minDay : "$!minDay",
+					parentCalwrapId : "parentCalwrap",
+					dateContainerId : "monthCon",
+					calentBtnContainerId :  "calendarBtnCon"
+        		}
+        	);
+        	</script>	
+		
+		
+		<div id="infoTimeWrap" class="info_time">
+			<strong class="screen_out">시간 선택</strong>
+			<ul id="titTimeList" class="tab_time">
+				<li #if($StringUtils.equals("$!{command.searchTimeType}","total"))class="on"#end>
+					<input type="radio" name="searchTimeType" value="total" class="screen_out" id="st_t1" onclick="music.mobile.Onair.setSearchTime('st_t1','total','searchChannelForm','timeOptWrap');" #if($StringUtils.equals("$!{command.searchTimeType}","totla"))checked#end>
+					<label class="link_tab" for="st_t1">시간전체</label>
+				</li>
+				<li #if($StringUtils.equals("$!{command.searchTimeType}","am"))class="on"#end>
+					<input type="radio" name="searchTimeType" value="am" class="screen_out" id="st_t2" onclick="music.mobile.Onair.setSearchTime('st_t2','am','searchChannelForm','timeOptWrap');" #if($StringUtils.equals("$!{command.searchTimeType}","am"))checked#end>
+					<label class="link_tab" for="st_t2">오전</label>
+				</li>
+				<li #if($StringUtils.equals("$!{command.searchTimeType}","pm"))class="on"#end>
+					<input type="radio" name="searchTimeType" value="pm" class="screen_out" id="st_t3" onclick="music.mobile.Onair.setSearchTime('st_t3','pm','searchChannelForm','timeOptWrap');" #if($StringUtils.equals("$!{command.searchTimeType}","pm"))checked#end>
+					<label class="link_tab" for="st_t3">오후</label>
+				</li>
+				<li #if($StringUtils.equals("$!{command.searchTimeType}","custom"))class="on"#end>
+					<input type="radio" name="searchTimeType" value="custom" class="screen_out" id="st_t4" onclick="music.mobile.Onair.setSearchTime('st_t4','custom','','timeOptWrap');" #if($StringUtils.equals("$!{command.searchTimeType}","custom"))checked#end>
+					<label class="link_tab" for="st_t4">직접입력</label>
+				</li>
+			</ul>
+			
+			<div id="timeOptWrap" class="time_opt" #if(!$StringUtils.equals("$!{command.searchTimeType}","custom"))style="display:none;"#end>
+				<div class="opt_now">
+					<div class="inner_opt">
+						<input type="hidden"  id="searchSTimeInp"  name="searchSTime" value="$!{command.searchSTime}">
+						<label for="timeStart" class="screen_out">조회 시작 시간</label>
+						<select id="timeStart" class="opt_select" onclick="music.mobile.Onair.scrollToTarget('infoTimeWrap')" onchange="music.mobile.Onair.changeTimeSelectBox(this,'searchSTimeInp','searchChannelForm')">
+							#foreach($indexNum  in [0..$!{command.searchETime}])
+								<option #if("$!{indexNum}" == "$!{command.searchSTime}")selected="selected"#end value="$!indexNum">$!indexNum</option>
+							#end
+						</select>
+						<span class="box_arrow"><span class="ico_now ico_arrow"></span></span>
+					</div>
+				</div>
+				<span class="txt_inclusive">-</span>
+				<div class="opt_now">
+					<div class="inner_opt">
+						<input type="hidden"  id="searchETimeInp" name="searchETime"   value="$!{command.searchETime}">
+						<label for="timeEnd" class="screen_out">조회 종료 시간</label>
+						<select id="timeEnd" class="opt_select" onclick="music.mobile.Onair.scrollToTarget('infoTimeWrap')" onchange="music.mobile.Onair.changeTimeSelectBox(this,'searchETimeInp','searchChannelForm')">
+							#foreach($indexNum  in [$!{command.searchSTime}..24])
+								<option #if("$!{indexNum}" == "$!{command.searchETime}")selected="selected"#end value="$!indexNum">$!indexNum</option>
+							#end
+						</select>
+						<span class="box_arrow"><span class="ico_now ico_arrow"></span></span>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+	
+	
+</form>	
+
+
+
+#if(!$CollectionUtils.isEmpty($schduleKeyList))
+	
+	#foreach($schduleKey in $schduleKeyList)
+	
+		
+	#set($channelSongListByDate = ${channelSongMap.get($schduleKey)})	
+	
+	#if(!$CollectionUtils.isEmpty($channelSongListByDate))
+	
+	<strong class="screen_out">곡 리스트</strong>
+	<ul class="list_timeline">
+	#set($count = 0)
+	#set($songStartTime = "")
+	#foreach($channelSong in $channelSongListByDate)
+		#set($count = $count+1)
+    	#if($count == 1)
+			#set($songStartTime = ${channelSong.startTime})
+		#end
+    	
+    	<li #if("$!{channelSong.hotYn}" == "Y" && "$!{channelSong.copy}" != "")class="hot"#end>
+			#if("$!{channelSong.hotYn}" == "Y" && "$!{channelSong.copy}" != "")
+				<span class="timeline_hot"><em class="emph_hot">HOT</em><span class="txt_hot">$!{channelSong.copy}</span></span>	
+    		#end
+			<!-- 2014-04-02 수정 시작 --> 
+    		#if("$!{channelSong.song.album.albumId}" != "0")
+    		<a href="/album/main?album_id=${channelSong.song.album.albumId}" class="link_album">
+    		#else
+    		<a href="#none" class="link_album">
+    		#end
+    			#if("$!{channelSong.song.album.albumId}" != "0" && "$!{channelSong.song.album.mainImage.filePath}" != "")
+        		<img src='$ImageUtil.getMobileImageUrl("$!{channelSong.song.album.mainImage.filePath}", "100x100", "ALBUM", "C")' width="50" height="50" class="thumb_img" alt="${channelSong.title}">
+        		#else
+        		<img src="http://m1.daumcdn.net/img-media/mobile/m640/music/img_none2.jpg"  width="50" height="50" class="thumb_img" alt="${channelSong.title}">
+        		#end
+    		</a>
+    		<a href="javascript:;" class="link_info" onclick="music.mobile.Timeline.moreViewLayer(this);">
+    			<span class="timeline_info">
+    				<span class="txt_time"><span class="ico_now ico_time">방송시간 </span><span class="txt_num" data-time="${channelSong.startTime}">$!{channelSong.startTime.substring(8,10)}:$!{channelSong.startTime.substring(10,12)}</span></span>
+    				<strong class="tit_song"><span class="screen_out">곡명 </span>#if(${channelSong.songId} != 0)#strCut(${channelSong.song.title}, 30) #else #strCut(${channelSong.title}, 30)#end - <span class="screen_out">아티스트명 </span>
+    					#if("$!{channelSong.song.songId}" != "0")
+    						#set($artistCount = 0)
+    						#set($etcArtistCount = 0)
+    						#foreach($songArtist in $!{channelSong.song.keyArtistList})
+    							#set($artistCount = $artistCount +1)
+								#set($strCutLen = 10)
+    							#if($!{channelSong.song.keyArtistList.size()} == 1)
+    								#set($strCutLen = 30)
+    							#end								
+    							#strCut(${songArtist.name}, $strCutLen, "..")#if($artistCount < $!{channelSong.song.keyArtistList.size()} && $artistCount < 2),#end
+    							#if($artistCount == 2) #set($etcArtistCount = $!{channelSong.song.keyArtistList.size()} - 2) #break #end
+    						#end
+    						#if($etcArtistCount > 0)
+    						외 ${etcArtistCount}명 
+    						#end
+    					#else #strCut($!{channelSong.artistName}, 30, "..")
+    					#end
+    				</strong> <!-- off 클래스 추가시 딤드 처리 -->
+					#set($printProgramName = "")
+					#if($StringUtils.isNotBlank("$!{command.programName}"))
+						#set($pret = $channelSong.schedule.programName.replaceAll("(?i).*($!{command.programName}).*","$1"))
+						#set($printProgramName = $channelSong.schedule.programName.replaceAll("$pret","<span style='color:#fb6765'>$pret</span>"))
+					#else
+						#set($printProgramName = $channelSong.schedule.programName)
+					#end
+					
+    				<span class="txt_info"><span class="screen_out">프로그램 </span>${channelSong.channel.channelName} - $!{printProgramName}</span>
+    			</span>
+    			<span class="btn_side"><span class="ico_now ico_fold">추가 제공 서비스 열기/닫기</span></span>
+    		</a>
+			#if($ua_result.os.ios)
+				 #if($MathTool.toNumber($ua_result.browser.major) > 3)
+					<a href="javascript:;" class="btn_side #if("$!{channelSong.song.songId}" == 0 || "$!{channelSong.song.AODLinkId}" == "" || "$!{channelSong.song.AODLinkId}" =="0")btn_off#end" #if("$!{channelSong.song.songId}" != 0 && "$!{channelSong.song.AODLinkId}" != "" && "$!{channelSong.song.AODLinkId}" !="0") onclick="music.mobile.mMusicPlay.playOnApp('SO', '$!{channelSong.song.songId}','$!{channelSong.song.album.albumId}');return false;" #end><span class="ico_now ico_listen">듣기</span></a>
+				#else
+					<a href="javascript:;" class="btn_side onclick="alert('사용하시는 IOS 버전에서는 지원하지 않는 기능입니다. IOS를 최신버전으로 업그레이드 해 주세요');"><span class="ico_now ico_listen">듣기</span></a>
+				#end
+			#elseif($ua_result.os.android)
+				<a href="javascript:;" class="btn_side #if("$!{channelSong.song.songId}" == 0 || "$!{channelSong.song.AODLinkId}" == "" || "$!{channelSong.song.AODLinkId}" =="0")btn_off#end" #if("$!{channelSong.song.songId}" != 0 && "$!{channelSong.song.AODLinkId}" != "" && "$!{channelSong.song.AODLinkId}" !="0") onclick="music.mobile.mMusicPlay.playOnApp('SO', '$!{channelSong.song.songId}', '$!{channelSong.song.album.albumId}');return false;" #end><span class="ico_now ico_listen">듣기</span></a>
+			#else
+				<a href="javascript:;" class="btn_side btn_off"><span class="ico_now ico_listen">듣기</span></a>
+			#end
+   		<div class="timeline_fold">
+    			#btnPlayListOnAir($!{channelSong.schedule.programId}, "program", $!{channelSong.channel.mediaType}, $!{channelSong.channel.channelId})
+    			#btnPlayListOnAir($!{channelSong.song.songId}, "lyrics", $!{channelSong.sogn.lyricsYn}, $!{channelSong.song.album.albumId})
+    			#btnPlayListOnAir($!{channelSong.song.songId}, "buy", $!{channelSong.song.MP3LinkId}, $!{channelSong.song.album.albumId})
+    			#btnPlayListOnAir($!{channelSong.song.songId}, "app", $!{channelSong.song.AODLinkId}, $!{channelSong.song.album.albumId})
+    		</div>
+    		#if("$!{channelSong.song.songId}" != 0 && "$!{channelSong.song.AODLinkId}" != "" && "$!{channelSong.song.AODLinkId}" !="0")
+    		<div id="sId_${channelSong.song.songId}_$foreach.index" class="audio"></div>
+    		#end
+    	</li>
+    	
+    	#if($count == ${songList.size()})
+    		#set($songEndTime = ${channelSong.startTime})	
+    	#end
+    	
+    #end
+	</ul>	
+	 <a href="javascript:;" class="btn_more" onclick="music.mobile.SearchTimeLine.getBottomSongList();return false;">펼쳐보기<span class="ico_now ico_more"></span></a> <!-- 2014-04-02 클래스 수정 -->
+	
+	
+	 #end
+	 
+	#end 
+	 
+#else
+	<p class="txt_noti result_type2">
+		검색결과가 없습니다<br>
+		날짜, 시간 범위를 변경해보세요.
+	</p>
+		 
+	 
+#end	
+	
+	<a href="/onair/timeline" class="link_sort link_live"><span class="ico_now"></span>실시간 보기</a>
+	
+
+
+	
+#print_onAirBanner($bannerList)		
+#SearchForm("only_bottom")
+	
+</div>
+</div>
+
+#parse("/velocity/mobileweb/realtimeissue.vm")	
+
+
+<script type="text/javascript">
+var tvChannelType="$!{command.tvChannelType}";
+var radioChannelType="$!{command.radioChannelType}";
+var selectedChannelIds = [];
+#foreach($selChannel in $!{command.channelIds})
+selectedChannelIds.push("${selChannel}");
+#end
+selectedChannelIds.join("",",");
+
+#if("$!totalPage" != "")
+var totalPage = $!totalPage;
+#else
+var totalPage = 0;
+#end
+
+	var nextPageNo = $!{command.pageNo}+1;
+	var totalPage = $!totalPage;
+	var option = {
+	 	 tvChannelType : tvChannelType,
+		 radioChannelType : radioChannelType,
+		 selectedChannelIds : selectedChannelIds,
+		 nextPageNo : nextPageNo,
+		 searchDate : "$!{command.searchDate}",
+		 totalCnt : ${totalCnt},
+		 totalPage : totalPage,
+		 searchSTime : "$!{command.searchSTime}",
+		 searchETime : "$!{command.searchETime}",
+		 type : "channel"
+	};
+	
+	jQuery("document").ready(
+    function(){
+    	new music.mobile.SearchTimeLine.init(option);
+    });
+	
+	jQuery("ul.list_channel li a.link_channel").click(music.mobile.SearchTimeLine.selectChannelId);
+	
+</script>

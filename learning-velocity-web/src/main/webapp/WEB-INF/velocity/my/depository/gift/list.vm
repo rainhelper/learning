@@ -1,0 +1,94 @@
+## 컨텐츠 영역
+#set( $type = "gift")
+#set( $typeStr = "선물한 음악")
+<div class="wrap_cont section_own">
+	<h3 class="tit_mymusic tit_own">구매 음악</h3>
+	#printDepositoryMenu($!{type})
+ 	<div class="music_chart $!{type}">
+		<h4 class="screen_out">$!{typeStr}</h4>
+		#printDepositoryList($!{type} $!{myList} $!{myCount} $!{typeStr} $!{command})
+
+		<div class="wrap_paging">
+			#printPaging($pagingUrl, $command.page_no, $pageHandler, "", 10)
+		</div>
+	</div>
+</div>
+#printSNSList( $myList )
+<script type="text/javascript">
+//new daum.Music.CheckBoxDrag("trackContainer");
+//var checkboxDrag = daum.Music.selectByDrag().init("#trackContainer .track", "col_check");
+</script>
+#* 
+<div id="FTMessage">
+---------------------<br/>
+개발 체크<br/>
+---------------------<br/>	
+1. 
+	<br>
+</div>
+*#
+#if($StringUtils.equals("$!{command.debugmode}","2"))
+선물한 갯수: #if($!{myCount}) $myCount #else 0 #end <br/>
+
+#if($!{myList})
+	#foreach($item in $myList)
+		노래ID: $item.song.songId<br/> 
+		제목: $item.song.title<br/> 
+		성인여부: $item.song.adultYn<br/> 
+	
+		#foreach($artist in $item.song.keyArtistList)
+			아티스트명 : $artist.name (아티스트아이디 : $artist.artistId)<br/>
+		#end
+		#foreach($artist in $item.featArtistList)
+			피처링아티스트명 : $artist.name (피처링아이디 : $artist.artistId) <br/>
+		#end	
+		
+		듣기아이디(널이면 비활성화): #if($!{item.song.AODLinkId}) $item.song.AODLinkId #end <br/>
+		가사정보 : $item.song.lyricsYn<br/>
+		앨범ID: $item.album.albumId<br/>
+	
+		종류: $item.type<br/>
+		받은사람: $item.owner.daumName<br/>
+		날짜 : $!CheckDate.makeReleaseDate($!{item.ownDate}) <br/>
+	---------------------<br/>	
+	#end
+#end
+
+<b>왼쪽레프트정보</b><br/>
+다음이름: $left.cpDaumName <br/>
+전화번호 $left.cpNumber <br/>
+유저아뒤 : $left.userId <br/>
+음악감상잔여일 $left.aodLeftDay <br/>
+mp3잔여곡 : $left.Mp3LeftCount <br>
+<br>
+MY 뮤직<br/> 
+플레이리스트 $left.myPlayCount <br/>
+
+#foreach($item in $left.myPlayList)<br/>
+	ㅡ순서: $item.playListId || 이름: $item.playListName ($item.totalPlayCnt) || 디폴트: $item.gubunCd
+#end <br/>
+
+<br/>
+즐겨 듣는 음악 <br/>
+최근 들은 음악 <br/>
+관심음악 : $left.favoriteCount <br/>
+관심음악제일마지막에 저장된 탭 : $left.lastSavedObjType <br/>
+구매음악 : $left.ownCount <br/>
+		
+MY관리 <br/>
+이용권현황 $left.ticketOwnCount <br/>
+내알림  $left.announceCount <br/>
+내설정 <br/>
+
+공지사항 <br/><br/>
+#foreach($item in $left.recentNoticeList)<br/>
+	#if($foreach.index < 4)
+		$item.get("SUBJECT") ||  $item.get("URL") <br />
+	#end
+#end <br />	
+<br>
+
+현재페이지 : $command.getPage_no() <br/>
+
+
+#end

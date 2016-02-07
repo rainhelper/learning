@@ -1,0 +1,19 @@
+#uaCheck()
+
+<div id="daumContent" class="cont_music cont_selection">
+	#tabSym()
+		
+	<div class="section_bar">
+		<ul class="list_info list_bar">
+        #foreach($board in $boardList)
+			#musicBarList()
+        #end
+		</ul>
+		#mobilePaging($pagingUrl, $command.page_no, $pageHandler)
+	</div>
+</div>
+#parse("/velocity/mobileweb/realtimeissue.vm")
+
+
+
+

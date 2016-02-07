@@ -1,0 +1,12 @@
+#set($headTitle = "talk:music" )
+#set($boardTitle = "" )
+#if("$!{talkDetailContent.title}" != "")
+    #set($boardTitle = $!{talkDetailContent.title} + " ")
+#end
+#if("$!{talkDetailContent.subTitle}" != "")
+    #set($boardTitle = $!boardTitle + $!{talkDetailContent.subTitle})
+#end
+#if("$!{boardTitle}" != "")
+    #set($headTitle = $!boardTitle + " | " + $headTitle)
+#end
+#set( $headMetaTitle = '<title>'+$!{headTitle}+'</title>' )

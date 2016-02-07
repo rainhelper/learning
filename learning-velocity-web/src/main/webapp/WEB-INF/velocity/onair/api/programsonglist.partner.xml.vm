@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<SongList>
+<Count>$!{songList.size()}</Count>
+<ProgramUrl>#if("$!{programDetail.mediaType}"=="1" && "$!{programDetail.programId}"!="" )<![CDATA[http://music.daum.net/onair/tv?programId=$!{programDetail.programId}]]>#elseif("$!{programDetail.mediaType}"== "4" && "$!{programDetail.programId}"!="" ) <![CDATA[http://music.daum.net/onair/radio/channel?channelId=$!{programDetail.channelId}&programId=$!{programDetail.programId}]]>#end</ProgramUrl>
+#foreach($song in $songList)
+	<Song>
+		<StartTime><![CDATA[${song.startTime}]]></StartTime>
+        <PlayTime><![CDATA[${song.playTime}]]></PlayTime>
+        <SongId>#if("$!{song.songId}" !="0")<![CDATA[$!{song.song.songId}]]>#end</SongId>
+        <SongTitle>#if("$!{song.songId}" !="0")<![CDATA[#printSongName( $!{song.song} "" 100 false)]]>#else<![CDATA[$!{song.title}]]>#end</SongTitle>
+        <PcSongUrl>#if("$!{song.song.album.albumId}" !="0")<![CDATA[http://music.daum.net/album/main?album_id=$!{song.song.album.albumId}&songId=$!{song.song.songId}&popUpPlayer=$!{song.song.songId}]]>#end</PcSongUrl>
+        <MobileSongUrl>#if("$!{song.song.album.albumId}" !="0")<![CDATA[http://m.music.daum.net/song/vcliplyrics?album_id=$!{song.song.album.albumId}&songId=$!{song.song.songId}]]>#end</MobileSongUrl>
+        <IosSongUrl>#if("$!{song.song.album.albumId}" !="0")<![CDATA[daummusic://open?type=song&albumId=$!{song.song.album.albumId}&songId=$!{song.song.songId}]]>#end</IosSongUrl>
+		<AndroidSongUrl>#if("$!{song.song.album.albumId}" !="0")<![CDATA[daummusic://song/listen/$!{song.song.songId}]]>#end</AndroidSongUrl>
+		<IsAodAvailable>#if("$!{song.song.AODLinkId}" !="" && "$!{song.song.AODLinkId}" != "0")Y#{else}N#{end}</IsAodAvailable>
+        <ArtistList>
+        	#if(${song.song.keyArtistList.size()} > 0)
+        		#foreach($artist in ${song.song.keyArtistList})
+        	<Artist>
+                <ArtistId><![CDATA[$!{artist.artistId}]]></ArtistId>
+                <ArtistName><![CDATA[$!{artist.name}]]></ArtistName>
+        	</Artist>	
+        		#end
+        	#else
+        	<Artist>	
+                <ArtistId/>
+                <ArtistName><![CDATA[$!{song.artistName}]]></ArtistName>
+                <ArtistUrl/>
+        	</Artist>	
+        	#end
+        </ArtistList>
+        <AlbumId>#if("$!{song.songId}" !="0")<![CDATA[${song.song.album.albumId}]]>#end</AlbumId>
+        <AlbumName>#if("$!{song.songId}" !="0")<![CDATA[${song.song.album.title}]]>#end</AlbumName>
+        <AlbumImage>#if("$!{song.song.album.albumId}" !="0")<![CDATA[$ImageUtil.getImageUrl("$!{song.song.album.mainImage.filePath}", "${command.imageSize}x${command.imageSize}", "ALBUM", "C")]]>#else<![CDATA[http://m1.daumcdn.net/img-media/mobile/m640/music/img_none2.jpg]]>#end</AlbumImage>
+    </Song>
+#end
+</SongList>

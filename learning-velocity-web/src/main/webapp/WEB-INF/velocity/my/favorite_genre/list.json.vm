@@ -1,0 +1,28 @@
+#if("$!{callback}" != "")
+	if (typeof(${callback}) == "function") ${callback} (
+	#end
+	{
+		"list" :[
+				#foreach($item in $myGenreList)
+				{
+					"big_genreName" : "$!{item.genreName}",
+					"big_genreCode" : "$!{item.genreCode}",
+					
+					"small_genre": [
+							#foreach($genre in $item.genreList)
+							#if($foreach.index > 0) , #end
+							{
+								"genreName": "$!{genre.genreName}",
+								"genreCode" : "$!{genre.genreCode}",
+								"userChecked": "$!{genre.userChecked}"
+							}
+							#end
+							]					
+					
+				}#if($velocityHasNext),#end
+				#end
+				]
+	}
+	#if("$!{callback}" != "")
+	);
+#end

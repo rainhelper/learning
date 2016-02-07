@@ -1,0 +1,44 @@
+#if ( $!requestURI.indexOf("/viewer") >-1 || $!requestURI.indexOf("/detail") > -1 || $!requestURI.indexOf("/quiz") > -1 || $!requestURI.indexOf("/webview") > -1 )
+#else
+	<hr class="hide">
+	<footer id="daumFoot" class="d_foot">
+	#if( $!requestURI.indexOf("/pollResult") > -1 )
+        <a href="/talk/detail/$!{menuId}/$!{boardId}" class="link_close"><span class="ico_comm ico_close">닫기</span></a>
+	#else
+        #if($!is_kakaotalk_webview)
+            <small class="copr_info" style="padding: 10px 0 10px 0;"></small>
+        #else
+            <small class="copr_info"><a href="#none" class="link_daumcorp">&copy;Daum Kakao Corp.</a></small>
+        #end
+	#end
+    </footer>
+#end
+
+#if( $!requestURI.indexOf("/detail") > -1 )
+<hr class="hide">
+<footer id="daumFoot" class="d_foot">
+    #if($!is_kakaotalk_webview)
+    #else
+        <small class="copr_info">
+            <a href="http://www.daumkakao.com/main" class="link_policy">회사소개</a>
+            <span class="txt_bar"></span>
+            <a href="http://www.kakao.com/policy/terms" class="link_policy">이용약관</a>
+            <span class="txt_bar"></span>
+            <a href="http://www.kakao.com/policy/privacy" class="link_policy">개인정보취급방침</a>
+            <span class="txt_bar"></span>
+            <a href="http://www.kakao.com/policy/oppolicy" class="link_policy">운영정책</a>
+            <a href="javascript:;" class="link_daumcorp" style="cursor: none;">&copy;Daum Kakao Corp.</a>
+        </small>
+    #end
+    <div class="bnr_add bnr_detail" id="bnr_footer" style="display: none;">
+        <a href="http://contents.kakao.com/music/1428491158377.html" target="_blank" class="link_bnr">
+            <img src="http://cfile20.uf.daum.net/image/256CDB4E55644C9006971F" class="img_bnr" alt="카카오뮤직 앱설치하기">
+        </a>
+    </div>
+</footer>
+#elseif($!requestURI.indexOf("/webview") > -1)
+<hr class="hide">
+<footer id="daumFoot" class="d_foot">
+    <small class="copr_info"><a href="#none" class="link_daumcorp">&copy;Daum Kakao Corp.</a></small>
+</footer>
+#end

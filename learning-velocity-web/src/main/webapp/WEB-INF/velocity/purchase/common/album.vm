@@ -1,0 +1,23 @@
+<strong class="tit_ablum">오늘의 추천앨범</strong><!-- 2014-05-14 수정 -->
+<ul class="list_ablum">
+#foreach($album in $recommendAlbumList)		
+	#if($foreach.index<=5)
+		
+		#set($link = "/my/playList/detail?playlist_id=$!{value}")
+		#set($onclick = "daum.Music.Playlist.detail('$!{value}');return false;")
+			
+	<li#if($foreach.index==5) class="lst"#end>
+		<span class="box_ablum">
+			<a href="/album/main?album_id=${album.albumId}" class="link_ablum">
+				<img src='$ImageUtil.getImageUrl("$!{album.mainImage.filePath}", "110x110", "ALBUM", "C")' alt=''>
+				<span class="frame_ablum"></span>
+			</a>
+			<a href="#none" class="ico_coupon ico_listen" onclick="daum.Music.AodPlayer.add(this, $!{album.albumId}, 'itemTypeAlbumId' );return false;">앨범듣기</a>
+		</span>
+		<em><a href="/album/main?album_id=$!{album.albumId}" class="link_info link_name"><span class="screen_out">앨범이름 : </span>#printAlbumName( $album "" 14 1 true )</a></em>
+		#printArtistName( $album.keyArtistList "link_info link_artist" 20 true)
+##		<a href="/artist/main?artist_id=$!{album.artistId}" class="link_info link_artist"><span class="screen_out">아티스트 : </span>#printArtistName( $album.keyArtistList "" 12 false )</a>
+	</li>
+	#end
+#end	
+</ul>

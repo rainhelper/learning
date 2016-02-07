@@ -1,0 +1,15 @@
+#if("$!{callback}" != "")
+if (typeof(${callback}) == "function") ${callback} (
+#end
+{
+	"songList" : [
+#foreach(${song} in ${dto.songResult.documentList})
+	#if(${foreach.index} > 0) , #end
+	${JsonTool.toJson(${song.song})}
+#end
+	]
+}
+#if("$!{callback}" != "")
+);
+#end
+

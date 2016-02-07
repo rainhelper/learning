@@ -1,0 +1,24 @@
+#if("$!{callback}" != "")
+if (typeof(${callback}) == "function") ${callback} (
+#end
+{
+	"result" : {
+		"type" : "${result.resultType}",
+		"message" : "${result.message}",
+			
+		"info" : {
+			"totalPlayCnt" : "${result.info.totalPlayCnt}",
+            "totalPlayTime" : "${result.info.totalPlayTime}",
+            "modifyDate" : "$CheckDate.makeReleaseDate("$!{result.info.modDttm}")",
+            "mainImage" : "$ImageUtil.getImageUrl("$!{result.info.mainImage.filePath}", "110x110", "ALBUM")"
+			}
+
+		#*
+		"type" : "$!Escape.escapeJava(${result.resultType})",
+		"message" : "$!Escape.escapeJava(${result.message})"
+		*#
+	}
+}
+#if("$!{callback}" != "")
+);
+#end

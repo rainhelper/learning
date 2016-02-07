@@ -1,0 +1,11 @@
+#parse("/velocity/purchase/common/bi_prepare_error.vm")
+{
+	"Rcvseq": "$!{rsvseq}",
+	"Pgcate": "$!{pgcate}",
+	"Purchaseseq": "$!{purchaseSeq}",
+	"errorCode": "$!{errorCode}",
+	"errorName": "$!{errorMsg}",
+	"ResultUrl" : "$!{resultUrl}",
+	"RtnParam" : "$!{rtnParam}",
+	"Periodic" : "$!{periodic}"
+}

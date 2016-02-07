@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XML>
+	<RESULT>
+		<RESULT_CODE>$!{result}</RESULT_CODE> 
+	</RESULT>
+</XML>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+#if($StringUtils.equals("$!{type}","normal"))
+<Music>
+	<Set>
+		<Group class="layout_talk_vertical" label="layout_talk_vertical">
+			#foreach($topImageItem in $topImageItemList)
+			<Item label="default_img">
+				<A href="$!{topImageItem.linkurl.replaceAll("&","&amp;")}">
+					<Img alt="$!{topImageItem.imagealt.replaceAll("&","&amp;")}" src="$!{topImageItem.imageurl.replaceAll("&","&amp;")}"/>
+					<Copy>$!{topImageItem.copy1.replaceAll("&","&amp;")}</Copy>
+					<Select label="icon" options="none,play1,viewer1">$!{topImageItem.imagetype}</Select>
+				</A>
+			</Item>
+			#end
+		</Group>
+		<A href="$!{topShortCutItem.linkurl.replaceAll("&","&amp;")}">
+			<Copy>$!{topShortCutItem.copy1.replaceAll("&","&amp;")}</Copy>
+		</A>
+	</Set>
+</Music>
+#else 
+<Music>
+	<Set>
+		<Group class="layout_talk_promotion" label="layout_talk_promotion">
+			#foreach($topImageItem in $topImageItemList)
+			#if($velocityCount == 1)
+			<Item label="promotion_img">
+			#else
+			<Item label="default_img">
+			#end
+				<A href="$!{topImageItem.linkurl.replaceAll("&","&amp;")}">
+					<Img alt="$!{topImageItem.imagealt.replaceAll("&","&amp;")}" src="$!{topImageItem.imageurl.replaceAll("&","&amp;")}"/>
+					<Copy>$!{topImageItem.copy1.replaceAll("&","&amp;")}</Copy>
+					#if($velocityCount == 1)
+					<Select label="icon" options="none,play2,viewer2">$!{topImageItem.imagetype.replaceAll("1","2")}</Select>
+					#else
+					<Select label="icon" options="none,play1,viewer1">$!{topImageItem.imagetype}</Select>
+					#end
+				</A>
+			</Item>
+			#end
+		</Group>
+		<A href="$!{topShortCutItem.linkurl.replaceAll("&","&amp;")}">
+			<Copy>$!{topShortCutItem.copy1.replaceAll("&","&amp;")}</Copy>
+		</A>
+	</Set>
+</Music>
+#end

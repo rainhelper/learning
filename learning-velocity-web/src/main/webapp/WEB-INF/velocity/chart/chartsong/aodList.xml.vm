@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XML>
+	<RESULT>
+		<RESULT_CODE>$!{aodDto.resultCode}</RESULT_CODE> 
+	</RESULT>
+	<SONG_LIST>
+#if(${chartSongList.size()} > 0)	
+#foreach($item in $chartSongList)	
+
+	#set ( $adult = "1" )
+	#if($item.adultYn == "Y") #set ( $adult = "1" )
+	#elseif($item.adultYn == "N") #set ( $adult = "0" )
+	#else #set ( $adult = "0" )
+	#end	
+		<SONG>
+			<SONG_ID>$!{item.songId}</SONG_ID> 
+			<SONG_TITLE><![CDATA[$!{item.title}]]></SONG_TITLE> 
+			<TYPECD>$!{item.typeCd}</TYPECD> 
+			<ARTISTS>
+			#if($item.keyArtistList.size()>0)
+				#foreach($artist in $item.keyArtistList)
+					<ARTIST>
+						<ARTIST_ID><![CDATA[$!{artist.artistId}]]></ARTIST_ID>
+						<ARTIST_NAME>#if($artist.name)<![CDATA[$!{artist.name}]]>#else<![CDATA[아티스트없음]]>#end</ARTIST_NAME>
+					</ARTIST>
+				#end
+			#end
+			</ARTISTS>
+			<ALBUMID>$!{item.album.albumId}</ALBUMID> 
+			<VOLUME>$!{item.album.volume}</VOLUME> 
+			<TYPECODE>$!{item.album.typeCd}</TYPECODE>		
+			<TYPENAME>$!{item.album.typeName}</TYPENAME>			
+			<ALBUM_TITLE><![CDATA[$!{item.album.title}]]></ALBUM_TITLE>
+			<ALBUM_RELEASEDATE><![CDATA[$!{item.album.releaseDt}]]></ALBUM_RELEASEDATE> 
+			<ALBUM_IMGPATH>$!{item.album.mainImage.filePath}</ALBUM_IMGPATH>
+			<ALBUM_IMGHEIGHT>$!{item.album.mainImage.height}</ALBUM_IMGHEIGHT>
+			<ALBUM_IMGWIDTH>$!{item.album.mainImage.width}</ALBUM_IMGWIDTH>			
+            <ADULT_YN>$!{item.adultYn}</ADULT_YN>
+			<AOD_SERVICE_YN>#if($!{item.AODLinkId}) 1 #else 0 #end</AOD_SERVICE_YN>
+			<MP3_SERVICE_YN>#if($!{item.MP3LinkId}) 1 #else 0 #end</MP3_SERVICE_YN>
+			<BGM_SERVICE_YN>#if($!{item.BGMLinkId}) 1 #else 0 #end</BGM_SERVICE_YN>
+			<FEAT_ARTIST_NAME>$!{item.featAllArtistWithComma}</FEAT_ARTIST_NAME> 
+		</SONG>
+#end
+#else
+	보유곡이 존재하지 않습니다.
+#end
+</SONG_LIST>
+</XML>

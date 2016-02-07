@@ -1,0 +1,72 @@
+#uaCheck()
+
+
+<div id="daumContent"  class="cont_buy" role="main">
+<h2 class="screen_out">이용권</h2>
+#printPurchaseMenuMobile("3")
+#if(!$CollectionUtils.isEmpty($dto.ticketList))
+<div class="buy_ticket">
+	<h3 class="screen_out">내 이용권 관리</h3>
+	<strong class="tit_ticket">보유 이용권</strong>
+	<ul class="list_ticket">
+		#foreach($ticket in $dto.ticketList)
+		<li>
+			<div class="ticket_use">
+				#if($StringUtils.equals("$!{ticket.ticketUseStatus}","USE"))
+					<span class="ico_use">사용중</span>
+				#elseif($StringUtils.equals("$!{ticket.ticketUseStatus}","UNUSE"))
+					<span class="ico_use ico_unused">미사용</span>
+				#end
+			</div>
+			<div class="ticket_name">
+				<strong class="tit_use" id="title_$!{ticket.order.orderId}" title="$!{ticket.order.item.title}">$!{ticket.order.item.title}</strong>
+				<span class="txt_use">
+				#if($StringUtils.equals("$!{ticket.useCode}", "N"))
+					#if($StringUtils.equals("$!{dto.isAodUse()}","Y"))
+						사용중 듣기이용권 기간만료 후 사용 가능
+					#else
+						사용가능
+					#end
+				#else
+					#printRemainderInfo( $!{ticket} $!{dto.user} $!{dto.isAodUse()})
+				#end
+				</span>
+			</div>
+			#if($StringUtils.equals("$!{ticket.useCode}", "N"))
+				#if($StringUtils.equals("$!{dto.isAodUse()}","Y"))
+					 
+				#else
+					<div class="ticket_btn"><a href='javascript:music.mobile.MyOwnTicket.click(this, "$!{ticket.order.orderId}", "");' class="link_use">사용하기</a></div>
+				#end
+			#end
+		</li>
+		#end
+	</ul>
+	
+	<div class="ticket_remain">
+		<strong class="tit_ticket">구매가능 MP3 잔여곡</strong>
+		<div class="ticket_name">
+			<strong class="tit_use">${left.mp3LeftCount}곡 다운로드 가능 
+				<br/><br/>(다운로드 이용권은 PC웹과 안드로이드앱에서만 사용가능합니다.)</strong>
+			<span class="txt_use"></span>
+		</div>
+	</div>
+</div>
+</div>
+
+#if($StringUtils.equals("$!{isDaumMusicApp}", "true"))
+<script type="text/javascript">
+	function goToAppMain(){
+	   	JSInterface.goToContentMenu();
+    }
+</script>
+#end
+#else	
+<div class="buy_noticket">
+	<h3 class="screen_out">내 이용권 관리</h3>
+	<strong class="tit_noticket">사용 가능한 이용권이 없습니다</strong>
+	<a href="/ticket/ticketitem/list" class="btn_buy link_purchase">이용권 구매</a>
+	<a href="/coupon" class="btn_buy link_coupon">쿠폰 등록</a>
+</div>
+#end
+#parse("/velocity/mobileweb/realtimeissue.vm")

@@ -1,0 +1,81 @@
+<div class="section_album">
+	<div class="wrap_option">		
+		<div class="tit_cont f_l">
+			<h3>$!{chooseLable.lableName}</h3>
+		</div>
+		<div class="sort_option f_r">
+			#if($StringUtils.isNotBlank("$!{command.genre_cd}"))#set($subgenrecode = "&genre_cd=" + $command.genre_cd)#end
+			#if($StringUtils.equals("$!{command.order_type}","DATE")||$StringUtils.isBlank("$!{command.order_type}"))#set($classNameDate = "link_option")#end
+			#if($StringUtils.equals("$!{command.order_type}","POP"))#set($classNamePop = "link_option")#end
+			#if($StringUtils.equals("$!{command.order_type}","TITLE"))#set($classNameTitle = "link_option")#end
+			#if($StringUtils.equals("$!{command.recommend_yn}","Y"))#set($classNameRecom = "link_option")#set($classNameDate = "")#end
+			<a class="$!{classNameDate}" onclick="daum.Music.labelDetail('$!{chooseLable.lableId}','DATE');return false;" href="/genre/lablealbum/list?lable_id=$!{chooseLable.lableId}&order_type=DATE">최신순</a><span class="txt_bar">|</span>
+			<a class="$!{classNamePop}" onclick="daum.Music.labelDetail('$!{chooseLable.lableId}','POP');return false;" href="/genre/lablealbum/list?lable_id=$!{chooseLable.lableId}&order_type=POP">인기순</a><span class="txt_bar">|</span>
+			##<a class="$!{classNameTitle}" onclick="daum.Music.labelDetail('$!{chooseLable.lableId}','TITLE');return false;" href="/genre/lablealbum/list?lable_id=$!{chooseLable.lableId}&order_type=TITLE">제목순</a><span class="txt_bar">|</span>
+			<a class="$!{classNameRecom}" onclick="daum.Music.labelDetail('$!{chooseLable.lableId}','Y');return false;" href="/genre/lablealbum/list?lable_id=$!{chooseLable.lableId}&recommend_yn=Y">추천앨범</a>
+		</div>
+	</div>	
+	<div class="wrap_album">
+		#if(!$CollectionUtils.isEmpty($lableAlbumList)) 
+		<ul class="list_album">
+			#foreach($album in $lableAlbumList)
+			<li>
+				#printAlbumSet( $album "" )
+			</li>
+			#end
+		</ul>
+		#else
+		<div class="wrap_nodata">
+			<strong>저장된 앨범이 없습니다</strong>
+		</div>
+		#end
+	</div>
+	##page
+    #printPaging($pagingUrl, $command.page_no, $pageHandler, "", 10)
+</div>
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+국내:<br/>
+#foreach($lable in $domesticLableList)
+	레이블id : $lable.lableId <br/>
+	레이블명 : $lable.lableName <br/>
+#end
+<br/>
+해외:<br/>
+#foreach($lable in $foreignLableList)
+	레이블id : $lable.lableId <br/>
+	레이블명 : $lable.lableName <br/>
+#end
+<br/>
+선택레이블:<br/>
+레이블id: $chooseLable.lableId<br/>
+레이블명: $chooseLable.lableName<br/>
+이미지주소: $chooseLable.imageUrl<br/>
+홈페이지주소: $chooseLable.websiteUrl<br/>
+소개글: $chooseLable.info<br/>
+소개주소: $chooseLable.infoUrl<br/>
+<br/><br/>
+#foreach($album in $lableAlbumList)
+	앨범아이디 : $album.albumId <br/>
+	앨범명 : $album.title <br/>
+	앨범볼륨 : $album.volume <br/>
+	앨범타입코드 : $album.typeCd <br/>
+	앨범타입명 : $album.typeName <br/>
+	앨범이미지 : $album.mainImage.filePath <br/>
+	앨범재생여부 : $album.playYn <br/>
+	추천수 : $album.recommendCount <br/>
+	발매일 : $album.releaseDt <br/>
+	타이틀곡명 : $album.masterSong.title <br/> 
+	타이틀곡아이디 : $album.masterSong.songId <br/> 
+	타이틀곡듣기여부 : $album.masterSong.AODLinkId <br/>
+	#foreach($artist in $album.keyArtistList)
+		아티스트명 : $artist.name<br/>
+		아티스트아이디 : $artist.artistId<br/>
+		아티스트링크 : 아직 형식미정입니다.<br/>
+	#end
+	<br/><br/>
+#end
+
+#end
+
+

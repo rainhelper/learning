@@ -1,0 +1,1449 @@
+#macro(escUrl $str)$!Escape.url($str)#end
+#macro(SearchForm $type)
+#if(!$StringUtils.equals("$!{isDaumMusicApp}", "true"))
+#if("$type" == "only_top")
+	<div id="innerSearchLayer" class="wrap_search bg_search" >
+	    <form action="/search/list" id="innerSearchForm" class="inside_sch" name="innerSearchForm" role="search" #if("$type" != "search")onsubmit="return music.mobile.submit();"#end>
+    	    <input type="hidden" value="song" name="type">
+    			<fieldset>
+					<legend class="screen_out">내부 검색어 입력폼</legend>
+					<div class="box_search">
+						<input type="search" id="inner_search" class="tf_keyword" value="" name="query" placeholder="앨범, 곡, 아티스트 검색" title="앨범, 곡, 아티스트 검색" name="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+						<input type="hidden" name="referer" value="music">
+						<button type="submit" id="btn_search_inner" class="btn_search">검색</button>
+    		    	</div>
+    			</fieldset>
+   		</form>
+		<div  id="inner_suggest_layer" class="suggest-layer-holder d_sgt inner_suggest"></div>
+    </div>
+#elseif("$type" == "only_bottom")
+	<div id="innerSearchLayer" class="wrap_search">
+		<form action="/search/list" id="innerSearchForm" class="inside_sch" name="innerSearchForm" role="search" #if("$type" != "search")onsubmit="return music.mobile.submit();"#end>
+				<input type="hidden" value="song" name="type">
+					<fieldset>
+						<legend class="screen_out">내부 검색어 입력폼</legend>
+						<div class="box_search">
+							<input type="search" id="inner_search" class="tf_keyword" value="" name="query" placeholder="앨범, 곡, 아티스트 검색" title="앨범, 곡, 아티스트 검색" name="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+							<input type="hidden" name="referer" value="music">
+							<button type="submit" id="btn_search_inner" class="btn_search">검색</button>
+    					</div>
+    				</fieldset>
+    	</form>
+		<div  id="inner_suggest_layer" class="suggest-layer-holder d_sgt  inner_suggest"></div>
+	</div>
+#elseif("$type" == "top_in_two")
+	<div id="innerSearchLayer_top" class="wrap_search bg_search">
+		<form action="/search/list" id="innerSearchForm_top" class="inside_sch" name="innerSearchForm" role="search" #if("$type" != "search")onsubmit="return music.mobile.submit_top();"#end>
+				<input type="hidden" value="song" name="type">
+					<fieldset>
+						<legend class="screen_out">내부 검색어 입력폼</legend>
+						<div class="box_search">
+							<input type="search" id="inner_search_top" class="tf_keyword" value="" name="query" placeholder="앨범, 곡, 아티스트 검색" title="앨범, 곡, 아티스트 검색" name="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+							<input type="hidden" name="referer" value="music">
+							<button type="submit" id="btn_search_inner_top" class="btn_search">검색</button>
+    					</div>
+    				</fieldset>
+    	</form>
+		<div  id="inner_suggest_layer_Top" class="suggest-layer-holder d_sgt  inner_suggest"></div>
+	</div>
+	<script type="text/javascript">
+	    var innerSearchLayerTop=new daum.Suggest(document.getElementById("innerSearchLayer_top"),{
+		    formEl: "innerSearchForm_top",
+	        layerEl: "innerSearchLayer_top",
+	        suggestNumber: 10,
+	        maxRecentQueryInSuggest: 0,
+	        serviceProfile: "",
+	        enableLatestKeyword : false,
+	        searchURL: "/search/list",
+	    	endpoint: {
+	    	    url: "http://suggest.common.daum.net/music",
+	    		query:"multiple=1&mod=json&cate=album|artist|song"
+		    }
+	    });
+	</script>
+#else
+	<div id="innerSearchLayer_bottom" class="wrap_search">
+		<form action="/search/list" id="innerSearchForm_bottom" class="inside_sch" name="innerSearchForm2" role="search" #if("$type" != "search")onsubmit="return music.mobile.submit_bottom();"#end>
+				<input type="hidden" value="song" name="type">
+					<fieldset>
+						<legend class="screen_out">내부 검색어 입력폼</legend>
+						<div class="box_search">
+							<input type="search" id="inner_search_bottom" class="tf_keyword" value="" name="query" placeholder="앨범, 곡, 아티스트 검색" title="앨범, 곡, 아티스트 검색" name="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+							<input type="hidden" name="referer" value="music">
+							<button type="submit" id="btn_search_inner_bottom" class="btn_search">검색</button>
+    					</div>
+    				</fieldset>
+    	</form>
+		<div  id="inner_suggest_layer_Bottom" class="suggest-layer-holder d_sgt  inner_suggest"></div>
+	</div>
+	<script type="text/javascript">
+	    var innerSearchLayerBottom=new daum.Suggest(document.getElementById("innerSearchLayer_bottom"),
+		{
+		    formEl: "innerSearchForm_bottom",
+	        layerEl: "innerSearchLayer_bottom",
+	        suggestNumber: 10,
+	        maxRecentQueryInSuggest: 0,
+	        serviceProfile: "",
+	        enableLatestKeyword : false,
+	        searchURL: "/search/list",
+	    	endpoint: {
+	    	    url: "http://suggest.common.daum.net/music",
+	    		query:"multiple=1&mod=json&cate=album|artist|song"
+		    }
+	    });
+	</script>
+#end	
+#end
+#end
+
+#macro(SearchResultPageForm $type, $keyword)
+#if(!$StringUtils.equals("$!{isDaumMusicApp}", "true"))
+#if("$type" == "top_in_two")
+	<div id="innerSearchLayer_top" class="wrap_search bg_search">
+		<form action="/search/list" id="innerSearchForm_top" class="inside_sch" name="innerSearchForm" role="search" #if("$type" != "search")onsubmit="return music.mobile.submit_top();"#end>
+				<input type="hidden" value="song" name="type">
+					<fieldset>
+						<legend class="screen_out">내부 검색어 입력폼</legend>
+						<div class="box_search">
+							<input type="search" id="inner_search_top" class="tf_keyword" value="$keyword" name="query" title="앨범, 곡, 아티스트 검색" name="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+							<input type="hidden" name="referer" value="music">
+							<button type="submit" id="btn_search_inner_top" class="btn_search">검색</button>
+    					</div>
+    				</fieldset>
+    	</form>
+		<div  id="inner_suggest_layer_Top" class="suggest-layer-holder d_sgt  inner_suggest"></div>
+	</div>
+	<script type="text/javascript">
+	    var innerSearchLayerTop=new daum.Suggest(document.getElementById("innerSearchLayer_top"),{
+		    formEl: "innerSearchForm_top",
+	        layerEl: "innerSearchLayer_top",
+	        suggestNumber: 10,
+	        maxRecentQueryInSuggest: 0,
+	        serviceProfile: "",
+	        enableLatestKeyword : false,
+	        searchURL: "/search/list",
+	    	endpoint: {
+	    	    url: "http://suggest.common.daum.net/music",
+	    		query:"multiple=1&mod=json&cate=album|artist|song"
+		    }
+	    });
+	</script>
+#else
+	<div id="innerSearchLayer_bottom" class="wrap_search">
+		<form action="/search/list" id="innerSearchForm_bottom" class="inside_sch" name="innerSearchForm2" role="search" #if("$type" != "search")onsubmit="return music.mobile.submit_bottom();"#end>
+				<input type="hidden" value="song" name="type">
+					<fieldset>
+						<legend class="screen_out">내부 검색어 입력폼</legend>
+						<div class="box_search">
+							<input type="search" id="inner_search_bottom" class="tf_keyword" value="$keyword" name="query" title="앨범, 곡, 아티스트 검색" name="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+							<input type="hidden" name="referer" value="music">
+							<button type="submit" id="btn_search_inner_bottom" class="btn_search">검색</button>
+    					</div>
+    				</fieldset>
+    	</form>
+		<div  id="inner_suggest_layer_Bottom" class="suggest-layer-holder d_sgt  inner_suggest"></div>
+	</div>
+	<script type="text/javascript">
+	    var innerSearchLayerBottom=new daum.Suggest(document.getElementById("innerSearchLayer_bottom"),
+		{
+		    formEl: "innerSearchForm_bottom",
+	        layerEl: "innerSearchLayer_bottom",
+	        suggestNumber: 10,
+	        maxRecentQueryInSuggest: 0,
+	        serviceProfile: "",
+	        enableLatestKeyword : false,
+	        searchURL: "/search/list",
+	    	endpoint: {
+	    	    url: "http://suggest.common.daum.net/music",
+	    		query:"multiple=1&mod=json&cate=album|artist|song"
+		    }
+	    });
+	</script>
+#end	
+#end
+#end
+
+#macro(btnPlayList)
+				<div class="wrap_action">
+					##<a #if("$!song.lyricsYn" == "Y")#if("$song_type" != "adult")href="/song/vcliplyrics?song_id=$!{song.songId}&album_id=$!{song.album.albumId}"#else href="javascript:;" onclick="alert('해당곡은 실명인증이 된 19세 이상 사용자만 이용 가능합니다')"#end#end class="bround btn_lyrics #if("$!song.lyricsYn" != "Y") off#end">&nbsp;
+					<a #if("$!song.lyricsYn" == "Y")#if("$song_type" != "adult")href="/song/vcliplyrics?song_id=$!{song.songId}&album_id=$!{song.album.albumId}"#else href="javascript:;" onclick=music.mobile.adultcheck()#end#end class="bround btn_lyrics #if("$!song.lyricsYn" != "Y") off#end">
+						<span class="ico_music ico_lyrics"></span>가사
+					</a>
+					<a href="/album/main?album_id=$!{song.album.albumId}" class="bround btn_album">
+						<span class="ico_music ico_album"></span>앨범 
+					</a>
+					##2013-06-14 모바일웹 결제붙이는 과정에서 듣기버튼 삭제하고 mp3 구매로 변경 
+ #if("$!{song.MP3LinkId}"!="" && "$!{song.MP3LinkId}"!="0")
+					<a href="javascript:;" onclick="music.mobile_billing.mMusicMp3buy.goMp3Add('$!{song.songId}', '$!{song.album.albumId}'); return false;" class="bround btn_buy">MP3 구매</a>				
+ #else
+		             <a class="bround btn_buy off">MP3 구매</a>
+ #end
+#if($ua_result.os.ios && "$!{song.AODLinkId}"!="" && "$!{song.AODLinkId}"!="0")
+    #if($MathTool.toNumber($ua_result.browser.major) > 3)
+					##<a href="/appHub?obj_type=SO&obj_id_list=$!{song.songId}" class="bround btn_app">
+					<a onclick="music.mobile.mMusicPlay.playOnApp('SO', '$!{song.songId}', '$!{song.album.albumId}');return false;" href="javascript:;" class="bround btn_app">
+    #else
+					<a href="javascript:;" onclick="alert('사용하시는 IOS 버전에서는 지원하지 않는 기능입니다. IOS를 최신버전으로 업그레이드 해 주세요');" class="bround btn_app">
+    #end
+#elseif(($ua_result.os.android && $StringUtils.equals("$!{command.for_android_app}", "Y")) && "$!{song.AODLinkId}"!="" && "$!{song.AODLinkId}"!="0")
+		            <a onclick="music.mobile.mMusicPlay.playOnApp('SO', '$!{song.songId}', '$!{song.album.albumId}');return false;" href="javascript:;" class="bround btn_app">
+#else
+##					<a class="bround btn_app off">
+					<a onclick="music.mobile.mMusicPlay.playOnKakaoMusicAppWithDaumSongId('$!{song.songId}');return false;" href="javascript:;" class="bround btn_app">
+#end
+						듣기
+					</a>
+					<div id="sId_$!{song.songId}" class="audio"></div>
+				</div>			
+#end
+
+#macro(btnPlayListAlbum)
+				<div class="wrap_action">
+					##<a #if("$!song.lyricsYn" == "Y")#if("$song_type" != "adult")href="/song/vcliplyrics?song_id=$!{song.songId}&album_id=$!{song.album.albumId}"#else href="javascript:;" onclick="alert('해당곡은 실명인증이 된 19세 이상 사용자만 이용 가능합니다')"#end#end class="bround btn_lyrics #if("$!song.lyricsYn" != "Y") off#end">&nbsp;
+					<a #if("$!song.lyricsYn" == "Y")#if("$song_type" != "adult")href="/song/vcliplyrics?song_id=$!{song.songId}&album_id=$!{song.album.albumId}"#else href="javascript:;" onclick=music.mobile.adultcheck()#end#end class="bround btn_lyrics btn_lyrics_big #if("$!song.lyricsYn" != "Y") off#end">
+						<span class="ico_music ico_lyrics ico_lyrics_big"></span>가사
+					</a>
+
+					##2013-06-14 모바일웹 결제붙이는 과정에서 듣기버튼 삭제하고 mp3 구매로 변경 
+ #if("$!{song.MP3LinkId}"!="" && "$!{song.MP3LinkId}"!="0")
+					<a href="javascript:;" onclick="music.mobile_billing.mMusicMp3buy.goMp3Add('$!{song.songId}', '$!{song.album.albumId}'); return false;" class="bround btn_buy btn_buy_big">MP3 구매</a>				
+ #else
+		             <a class="bround btn_buy btn_buy_big off">MP3 구매</a>
+ #end
+#if($ua_result.os.ios && "$!{song.AODLinkId}"!="" && "$!{song.AODLinkId}"!="0")
+    #if($MathTool.toNumber($ua_result.browser.major) > 3)
+					##<a href="/appHub?obj_type=SO&obj_id_list=$!{song.songId}" class="bround btn_app">
+					<a onclick="music.mobile.mMusicPlay.playOnApp('SO', '$!{song.songId}', '$!{song.album.albumId}');return false;" href="javascript:;" class="bround btn_app btn_app_big">
+    #else
+					<a href="javascript:;" onclick="alert('사용하시는 IOS 버전에서는 지원하지 않는 기능입니다. IOS를 최신버전으로 업그레이드 해 주세요');" class="bround btn_app btn_app_big">
+    #end
+#elseif(($ua_result.os.android && $StringUtils.equals("$!{command.for_android_app}", "Y")) && "$!{song.AODLinkId}"!="" && "$!{song.AODLinkId}"!="0")
+		            <a onclick="music.mobile.mMusicPlay.playOnApp('SO', '$!{song.songId}', '$!{song.album.albumId}');return false;" href="javascript:;" class="bround btn_app btn_app_big">
+#else
+					<a class="bround btn_app btn_app_big off">
+#end
+						듣기
+					</a>
+					<div id="sId_$!{song.songId}" class="audio"></div>
+				</div>			
+#end
+
+#macro(btnPlayListOnAir $id $type $value $value2)
+    #if( $StringUtils.equals( "$!{type}", "program" ))
+		#set($_classname = '')
+		#if( "$!id" == "")
+			#set($_classname = ' off')
+		#end
+		#set($_href = "#none")
+		#if($_classname == "")
+			#if("$value" == "1")
+				#set($_href = '/onair/tv/detail?programId='+$id)
+			#elseif($value == "4")
+				#set($_href = '/onair/radio/detail?channelId='+$value2+'&programId='+$id)
+			#end
+		#end
+		
+		<span class="desc_fold"><a href="$_href" class="link_timeline $_classname">선곡표</a></span>
+	#elseif( $StringUtils.equals( "$!{type}", "lyrics" ))
+		#set($_classname ='off')	
+		#set($_action = 'href="#none"')	
+		
+		#if("$!id" != "" || "$!value" == "Y")
+    		#set($_classname = '')
+    		#set($_action = 'href="/song/vcliplyrics?album_id='+$!value2+'&song_id='+$!id+'"')
+		#end
+		<span class="desc_fold"><a $_action class="link_timeline $_classname">가사</a></span>
+
+	#elseif( $StringUtils.equals( "$!{type}", "app" ))
+        #if($ua_result.os.ios && "$!{value}"!="" && "$!{value}"!="0")
+            #if($MathTool.toNumber($ua_result.browser.major) > 3)
+			<span class="desc_fold"><a href="javascript:;" class="link_timeline" onclick="music.mobile.mMusicPlay.playOnApp('SO', '$!id', '$!value2');return false;">듣기</a></span>
+            #else
+			<span class="desc_fold"><a href="javascript:;" class="link_timeline off" onclick="alert('사용하시는 IOS 버전에서는 지원하지 않는 기능입니다. IOS를 최신버전으로 업그레이드 해 주세요');">듣기</a></span>
+            #end
+        #elseif($ua_result.os.android && "$!{value}"!="" && "$!{value}"!="0")
+        	<span class="desc_fold"><a href="javascript:;" class="link_timeline" onclick="music.mobile.mMusicPlay.playOnApp('SO', '$!id', '$!value2');return false;">듣기</a></span>
+        #else
+			<span class="desc_fold"><a href="javascript:;" class="link_timeline off" >듣기</a></span>
+		#end
+	#elseif( $StringUtils.equals( "$!{type}", "buy" ))
+
+		#set($_classname = 'off')
+		#set($_onclick = '')
+		
+		#if("$!value" != "" && "$!value" != "0")
+			#set($_classname = '')
+			#set($_onclick = 'onclick="music.mobile_billing.mMusicMp3buy.goMp3Add('+$!id+', '+$!value2+'); return false;"')
+		#end
+		
+		<span class="desc_fold"><a href="#none" class="link_timeline $_classname" $_onclick>MP3구매</a></span> 
+    #end
+#end
+
+
+#macro(btnPlayListOnAirDetail $id $type $value $value2)
+	#if( $StringUtils.equals( "$!{type}", "lyrics" ))
+		#set($_classname ='off')	
+		#set($_action = 'href="#none"')	
+		
+		#if("$!id" != "" || "$!value" == "Y")
+    		#set($_classname = '')
+    		#set($_action = 'href="/song/vcliplyrics?album_id='+$!value2+'&song_id='+$!id+'"')
+		#end
+		<span class="desc_fold"><a $_action class="link_timeline $_classname">가사</a></span>
+	#elseif( $StringUtils.equals( "$!{type}", "album" ))
+		#set($_classname ='off')	
+		#set($_action = 'href="#none"')	
+		
+		#if("$!id" != "" && "$!id" != "0")
+    		#set($_classname = '')
+    		#set($_action = 'href="/album/main?album_id='+$!id+'"')
+		#end
+		<span class="desc_fold"><a $_action class="link_timeline $_classname">앨범보기</a></span>
+	#elseif( $StringUtils.equals( "$!{type}", "buy" ))
+
+		#set($_classname = 'off')
+		#set($_onclick = '')
+		
+		#if("$!value" != "" && "$!value" != "0")
+			#set($_classname = '')
+			#set($_onclick = 'onclick="music.mobile_billing.mMusicMp3buy.goMp3Add('+$!id+', '+$!value2+'); return false;"')
+		#end
+		
+		<span class="desc_fold"><a href="#none" class="link_timeline $_classname" $_onclick>MP3구매</a></span> 
+	#elseif( $StringUtils.equals( "$!{type}", "app" ))
+        #if($ua_result.os.ios && "$!{value}"!="" && "$!{value}"!="0")
+            #if($MathTool.toNumber($ua_result.browser.major) > 3)
+			<span class="desc_fold"><a href="javascript:;" class="link_timeline" onclick="music.mobile.mMusicPlay.playOnApp('SO', '$!id', '$!value2');return false;">듣기</a></span>
+            #else
+			<span class="desc_fold"><a href="javascript:;" class="link_timeline off" onclick="alert('사용하시는 IOS 버전에서는 지원하지 않는 기능입니다. IOS를 최신버전으로 업그레이드 해 주세요');">듣기</a></span>
+            #end
+        #elseif($ua_result.os.android && "$!{value}"!="" && "$!{value}"!="0")
+        	<span class="desc_fold"><a href="javascript:;" class="link_timeline" onclick="music.mobile.mMusicPlay.playOnApp('SO', '$!id', '$!value2');return false;">듣기</a></span>
+        #else
+			<span class="desc_fold"><a href="javascript:;" class="link_timeline off" >듣기</a></span>
+		#end
+    #end
+#end
+
+
+
+#macro(rankedPlayList $type)
+## 19긐 처리
+#set($song_type = "")
+#if($musicUser)
+#set($user_daumId = $!{musicUser.daumId})
+#set($user_adultYn = $!{musicUser.adultYn})
+#elseif($user)
+#set($user_daumId = $!{user.daumId})
+#set($user_adultYn= $!{user.adultYn})
+#end
+#if(("$!song.adultYn"=="Y") && ("$user_adultYn")!="Y")
+#set($song_type = "adult")
+#end
+#if("$type"=="top")
+#if($velocityCount%2==1)
+#set($bg_cont="bg_cont")
+#else
+#set($bg_cont="")
+#end
+#else
+#if($velocityCount%2==0)
+#set($bg_cont="bg_cont")
+#else
+#set($bg_cont="")
+#end
+#end
+#if($velocityCount < 6)
+		<li class="$!bg_cont#if(($velocityCount==5) && ("$type"=="top")) lst#end#if($foreach.count == 1) open#end" >
+			<div class="wrap_cont">
+				<a href="javascript:;" class="wrap_folding">
+					<span class="thumb"> 
+						<img #if($isWVGA) width="62" height="62" #else width="41" height="41"#end alt="" class="loading" data-src="$ImageUtil.getMobileImageUrl("$!{song.album.mainImage.filePath}", "41x41", "ALBUM", "C")">
+						<span class="bg_outline"></span>
+						<span class="wrap_rank">
+							<span class="bg_dark"></span>
+							<span class="txt_rank #if($!song.rank < 4) fc_em#end">$!song.rank<span class="screen_out">위</span></span>
+						</span>
+					</span>
+					<span class="info">
+						<span class="wrap_song"> 
+							<strong class="tit">#strCut($song.title, 20)</strong>
+							
+							##if("$!song.adultYn"=="Y")<span class="ico_rating" title="19세 미만 청취 불가"><span class="inner">19</span></span>#end
+							#adultIcon($!song.adultYn)		
+							#if($!song.featArtistList.size()>0)(#foreach($artist in $!song.featArtistList)#if($velocityCount==1)Feat. #else, #end$artist.name#end)#end
+							
+						</span>
+						<span class="txt_info">
+							#foreach($artist in $song.keyArtistList)#if($velocityCount!=1), #end$artist.name#end
+						</span>
+					</span>
+					<span class="bround btn_fold">
+						<span class="ico_music ico_fold">펼치기/접기</span>
+					</span>
+				</a>
+				#if($ua_result.os.ios)
+					#if($MathTool.toNumber($ua_result.browser.major) > 3)
+						<a class="bround btn_listen #if("$!{song.AODLinkId}"=="" || "$!{song.AODLinkId}"=="0")off#end" title="곡 듣기" #if("$!{song.AODLinkId}"!="" && "$!{song.AODLinkId}"!="0") href="javascript:;" onclick="music.mobile.mMusicPlay.playOnApp('SO', '$!{song.songId}', '$!{song.album.albumId}');return false;" #end>
+							<span class="ico_music ico_listen">듣기</span>
+						</a>
+					#else
+						<a class="bround btn_listen #if("$!{song.AODLinkId}"=="" || "$!{song.AODLinkId}"=="0")off#end" title="곡 듣기" #if("$!{song.AODLinkId}"!="" && "$!{song.AODLinkId}"!="0") href="javascript:;" onclick="alert('사용하시는 IOS 버전에서는 지원하지 않는 기능입니다. IOS를 최신버전으로 업그레이드 해 주세요');" #end>
+							<span class="ico_music ico_listen">듣기</span>
+						</a>
+					#end
+				#elseif($ua_result.os.android)
+					<a class="bround btn_listen #if("$!{song.AODLinkId}"=="" || "$!{song.AODLinkId}"=="0")off#end" title="곡 듣기" #if("$!{song.AODLinkId}"!="" && "$!{song.AODLinkId}"!="0") href="javascript:;" onclick="music.mobile.mMusicPlay.playOnApp('SO', '$!{song.songId}', '$!{song.album.albumId}');return false;" #end>
+						<span class="ico_music ico_listen">듣기</span>
+					</a>
+				#else
+					<a class="bround btn_listen off" title="곡 듣기" >
+							<span class="ico_music ico_listen">듣기</span>
+					</a>
+				#end
+
+			</div>
+#*
+#else 
+			<div class="wrap_cont wrap_noimg">
+				<a href="javascript:;" class="wrap_folding">
+					<span class="txt_rank" style="text-align:center;">$!song.rank</span>
+					<span class="info">
+						<span class="wrap_song"> 
+							<strong class="tit">#strCut($song.title, 22)</strong>
+							#if("$!song.adultYn"=="Y")<span class="ico_rating" title="19세 미만 청취 불가"><span class="inner">19</span></span>#end
+							#if($!song.featArtistList.size()>0)(#foreach($artist in $!song.featArtistList)#if($velocityCount==1)Feat. #else, #end$artist.name#end)#end
+						</span>
+						<span class="txt_info">
+							#foreach($artist in $song.keyArtistList)#if($velocityCount!=1), #end$artist.name#end
+						</span>
+					</span>
+					<span class="bround btn_fold">
+						<span class="ico_music ico_fold">펼치기/접기</span>
+					</span>
+				</a>
+				<a class="bround btn_listen #if("$!{song.AODLinkId}"=="" || "$!{song.AODLinkId}"=="0")off#end" title="곡 듣기" #if("$!{song.AODLinkId}"!="" && "$!{song.AODLinkId}"!="0") href="javascript:;" onclick="music.mobile.mMusicPlay.playSample('$!{song.songId}','$!{song_type}','close');"#end>
+					<span class="ico_music ico_listen">듣기</span>
+				</a>
+			</div>
+*#
+	#btnPlayList()
+		</li>
+#end
+
+#end
+#macro(playList $page $disc)
+## 19긐 처리
+#set($song_type = "")
+#if($musicUser)
+#set($user_daumId = $!{musicUser.daumId})
+#set($user_adultYn = $!{musicUser.adultYn})
+#elseif($user)
+#set($user_daumId = $!{user.daumId})
+#set($user_adultYn= $!{user.adultYn})
+#end
+#if(("$!song.adultYn"=="Y") && ("$user_adultYn")!="Y")
+#set($song_type = "adult")
+#end
+## 페이지 값을 있을 경우
+#if($page)
+#set($listCount=$velocityCount+(($page - 1)*10))
+#else
+#set($listCount=$velocityCount)
+#end
+## 앨범에서 디스크별 구분
+#if($disc)
+#if("$!{song.discNo}"=="1")
+#set($discNo=$!{song.discNo})
+#end
+#if("$discNo"!="$!{song.discNo}" && "$!{song.discNo}"!="0")
+#set($tmpCount=$velocityCount)
+		</ol>
+		<strong class="wrap_disc">Disc. $!{song.discNo}</strong>
+		<ol class="list_info list_music">
+#end
+#if("$!{song.discNo}"!="0")
+#if($tmpCount)
+#set($listCount=$!{song.discNo}+"-"+($velocityCount - ($tmpCount - 1)))
+#else
+#set($listCount=$!{song.discNo}+"-"+($velocityCount))
+#end
+#end
+#end
+			<li#if($StringUtils.equals("$!foreach.index", "0") && !$listFirst) class="open"#set($listFirst = true)#end>
+				<div class="wrap_cont">
+					<a href="javascript:;" class="wrap_folding">
+						<span class="num_rank">$listCount</span>
+						<span class="info">
+							<span class="wrap_song"> 
+								<strong class="tit">#strCut($song.title, 22)</strong>
+								
+								##if("$!song.adultYn"=="Y")<span class="ico_rating" title="19세 미만 청취 불가"><span class="inner">19</span></span>#end
+								#adultIcon($!song.adultYn)
+								
+								#if($!song.featArtistList.size()>0)(#foreach($artist in $!song.featArtistList)#if($velocityCount==1)Feat. #else, #end$artist.name#end)#end
+							</span>
+							<span class="txt_info">#foreach($artist in $song.keyArtistList)#if($velocityCount!=1), #end$artist.name#end</span>
+						</span>
+						<span class="bround btn_fold">
+							<span class="ico_music ico_fold">펼치기/접기</span>
+						</span>
+					</a>
+					#if($ua_result.os.ios)
+						#if($MathTool.toNumber($ua_result.browser.major) > 3)
+							<a class="bround btn_listen #if("$!{song.AODLinkId}"=="" || "$!{song.AODLinkId}"=="0")off#end" title="곡 듣기" #if("$!{song.AODLinkId}"!="" && "$!{song.AODLinkId}"!="0") href="javascript:;" onclick="music.mobile.mMusicPlay.playOnApp('SO', '$!{song.songId}', '$!{song.album.albumId}');return false;" #end>
+								<span class="ico_music ico_listen">듣기</span>
+							</a>
+						#else
+							<a class="bround btn_listen #if("$!{song.AODLinkId}"=="" || "$!{song.AODLinkId}"=="0")off#end" title="곡 듣기" #if("$!{song.AODLinkId}"!="" && "$!{song.AODLinkId}"!="0") href="javascript:;" onclick="alert('사용하시는 IOS 버전에서는 지원하지 않는 기능입니다. IOS를 최신버전으로 업그레이드 해 주세요');" #end>
+								<span class="ico_music ico_listen">듣기</span>
+							</a>
+						#end
+					#elseif($ua_result.os.android)
+						<a class="bround btn_listen #if("$!{song.AODLinkId}"=="" || "$!{song.AODLinkId}"=="0")off#end" title="곡 듣기" #if("$!{song.AODLinkId}"!="" && "$!{song.AODLinkId}"!="0") href="javascript:;" onclick="music.mobile.mMusicPlay.playOnApp('SO', '$!{song.songId}', '$!{song.album.albumId}');return false;" #end>
+							<span class="ico_music ico_listen">듣기</span>
+						</a>
+					#else
+						<a class="bround btn_listen off" title="곡 듣기" >
+							<span class="ico_music ico_listen">듣기</span>
+						</a>
+					#end
+				</div>
+#btnPlayList()
+			</li>
+#set($discNo=$!{song.discNo})
+#end
+
+#macro(playListAlbum $page $disc)
+## 19긐 처리
+#set($song_type = "")
+#if($musicUser)
+#set($user_daumId = $!{musicUser.daumId})
+#set($user_adultYn = $!{musicUser.adultYn})
+#elseif($user)
+#set($user_daumId = $!{user.daumId})
+#set($user_adultYn= $!{user.adultYn})
+#end
+#if(("$!song.adultYn"=="Y") && ("$user_adultYn")!="Y")
+#set($song_type = "adult")
+#end
+## 페이지 값을 있을 경우
+#if($page)
+#set($listCount=$velocityCount+(($page - 1)*10))
+#else
+#set($listCount=$velocityCount)
+#end
+## 앨범에서 디스크별 구분
+#if($disc)
+#if("$!{song.discNo}"=="1")
+#set($discNo=$!{song.discNo})
+#end
+#if("$discNo"!="$!{song.discNo}" && "$!{song.discNo}"!="0")
+#set($tmpCount=$velocityCount)
+		</ol>
+		<strong class="wrap_disc">Disc. $!{song.discNo}</strong>
+		<ol class="list_info list_music">
+#end
+#if("$!{song.discNo}"!="0")
+#if($tmpCount)
+#set($listCount=$!{song.discNo}+"-"+($velocityCount - ($tmpCount - 1)))
+#else
+#set($listCount=$!{song.discNo}+"-"+($velocityCount))
+#end
+#end
+#end
+			<li#if($StringUtils.equals("$!foreach.index", "0") && !$listFirst) class="open"#set($listFirst = true)#end>
+				<div class="wrap_cont">
+					<a href="javascript:;" class="wrap_folding">
+						<span class="num_rank">$listCount</span>
+						<span class="info">
+							<span class="wrap_song"> 
+								<strong class="tit">#strCut($song.title, 22)</strong>
+								
+								##if("$!song.adultYn"=="Y")<span class="ico_rating" title="19세 미만 청취 불가"><span class="inner">19</span></span>#end
+								#adultIcon($!song.adultYn)
+								
+								#if($!song.featArtistList.size()>0)(#foreach($artist in $!song.featArtistList)#if($velocityCount==1)Feat. #else, #end$artist.name#end)#end
+							</span>
+							<span class="txt_info">#foreach($artist in $song.keyArtistList)#if($velocityCount!=1), #end$artist.name#end</span>
+						</span>
+						<span class="bround btn_fold">
+							<span class="ico_music ico_fold">펼치기/접기</span>
+						</span>
+					</a>
+					#if($ua_result.os.ios)
+						#if($MathTool.toNumber($ua_result.browser.major) > 3)
+							<a class="bround btn_listen #if("$!{song.AODLinkId}"=="" || "$!{song.AODLinkId}"=="0")off#end" title="곡 듣기" #if("$!{song.AODLinkId}"!="" && "$!{song.AODLinkId}"!="0") href="javascript:;" onclick="music.mobile.mMusicPlay.playOnApp('SO', '$!{song.songId}', '$!{song.album.albumId}');return false;" #end>
+								<span class="ico_music ico_listen">듣기</span>
+							</a>
+						#else
+							<a class="bround btn_listen #if("$!{song.AODLinkId}"=="" || "$!{song.AODLinkId}"=="0")off#end" title="곡 듣기" #if("$!{song.AODLinkId}"!="" && "$!{song.AODLinkId}"!="0") href="javascript:;" onclick="alert('사용하시는 IOS 버전에서는 지원하지 않는 기능입니다. IOS를 최신버전으로 업그레이드 해 주세요');" #end>
+								<span class="ico_music ico_listen">듣기</span>
+							</a>
+						#end
+					#elseif($ua_result.os.android)
+						<a class="bround btn_listen #if("$!{song.AODLinkId}"=="" || "$!{song.AODLinkId}"=="0")off#end" title="곡 듣기" #if("$!{song.AODLinkId}"!="" && "$!{song.AODLinkId}"!="0") href="javascript:;" onclick="music.mobile.mMusicPlay.playOnApp('SO', '$!{song.songId}', '$!{song.album.albumId}');return false;" #end>
+							<span class="ico_music ico_listen">듣기</span>
+						</a>
+					#else
+						<a class="bround btn_listen off" title="곡 듣기" >
+							<span class="ico_music ico_listen">듣기</span>
+						</a>
+					#end
+				</div>
+#btnPlayListAlbum()
+			</li>
+#set($discNo=$!{song.discNo})
+#end
+
+
+#macro(playListAlbumNew $page $disc)
+## 19긐 처리
+	#set($song_type = "")
+	#if($musicUser)
+		#set($user_daumId = $!{musicUser.daumId})
+		#set($user_adultYn = $!{musicUser.adultYn})
+	#elseif($user)
+		#set($user_daumId = $!{user.daumId})
+		#set($user_adultYn= $!{user.adultYn})
+	#end
+	#if(("$!song.adultYn"=="Y") && ("$user_adultYn")!="Y")
+		#set($song_type = "adult")
+	#end
+## 페이지 값을 있을 경우
+	#if($page)
+		#set($listCount=$velocityCount+(($page - 1)*10))
+	#else
+		#set($listCount=$velocityCount)
+	#end
+## 앨범에서 디스크별 구분
+	#if($disc)
+		#if("$!{song.discNo}"=="1")
+			#set($discNo=$!{song.discNo})
+		#end
+		#if("$discNo"!="$!{song.discNo}" && "$!{song.discNo}"!="0")
+			#set($tmpCount=$velocityCount)
+        </ol>
+        <strong class="wrap_disc">Disc $!{song.discNo}</strong>
+        <ol class="list_info list_music">
+		#end
+		#if("$!{song.discNo}"!="0")
+			#if($tmpCount)
+				#set($listCount=($velocityCount - ($tmpCount - 1)))
+			#else
+				#set($listCount=($velocityCount))
+			#end
+		#end
+	#end
+    <li>
+					<span class="num_rank">$listCount</span>
+						<span class="info_music">
+							#if( $StringUtils.equals("$!{song.masterYn}", "Y") )
+								<span class="ico_music ico_title" title="타이틀곡">&nbsp;</span>
+							#end
+								<strong class="tit_info">#strCut($song.title, 22)</strong>
+
+							##if("$!song.adultYn"=="Y")<span class="ico_rating" title="19세 미만 청취 불가"><span class="inner">19</span></span>#end
+
+
+							#if($!song.featArtistList.size()>0)(#foreach($artist in $!song.featArtistList)#if($velocityCount==1)Feat. #else, #end$artist.name#end)#end
+							#adultIcon($!song.adultYn)
+
+							<span class="txt_info">#foreach($artist in $song.keyArtistList)#if($velocityCount!=1), #end$artist.name#end</span>
+
+						</span>
+						#if("$!{song.lyricsYn}"=="Y")
+							<a href="/song/vcliplyrics?song_id=$!song.songId&album_id=$!album.albumId" class="bround btn_lyric">가사</a>
+						#else
+                            <span class="bround btn_lyric">가사</span>
+						#end
+						<a class="bround btn_listen #if("$!{song.AODLinkId}"=="" || "$!{song.AODLinkId}"=="0")btn_nolisten#end" title="곡 듣기" #if("$!{song.AODLinkId}"!="" && "$!{song.AODLinkId}"!="0") href="javascript:;" onclick="music.mobile.mMusicPlay.playOnKakaoMusicAppWithDaumSongId('$!{song.songId}');return false;" #end>
+##						<a onclick="music.mobile.mMusicPlay.playOnKakaoMusicAppWithDaumSongId('$!{song.songId}');return false;" href="javascript:;" class="bround btn_listen">
+##					    <a href="#none" class="bround btn_listen">
+							#if("$!{song.AODLinkId}"=="" || "$!{song.AODLinkId}"=="0")
+                                <span class="ico_music ico_noplay">재생</span>
+							#else
+								<span class="ico_music ico_play">재생</span>
+							#end
+						</a>
+    </li>
+	#set($discNo=$!{song.discNo})
+#end
+
+
+
+#macro(musicBarList)
+			<li>
+				<div class="wrap_cont">
+					<a href="/musicbar/detail?board_id=$!{board.boardId}" class="wrap_thumb">
+						<span class="thumb">  
+							<img #if($isWVGA) width="135" height="90" #else width="90" height="60" #end alt="" class="loading" data-src="$ImageUtil.getMobileImageUrl("$!board.imageUrl", "90x60", "PHOTO", "S")">
+							<span class="bg_outline"></span>
+						</span>
+						<span class="desc">#if("$!board.subTitle"!="")<em class="fc_blue">$!board.subTitle</em><span class="txt_bar"> | </span>#end$CheckDate.makeReleaseDate($!{board.regdttm})</span>
+						<strong class="tit">#strCut("$!board.title", 50)</strong>
+					</a>
+				</div>
+			</li>
+#end
+#macro(mVideoList $type)
+##뮤비 유료 화 값이 1이면 full 버전 0이면 1분버전
+##뮤비 19금 y 인것은 사용자 user 의 19금이 y 일때만 플레이 가능
+##FreeYn[$vclip.FreeYn]tvpotPreVId[$vclip.tvpotPreVId]
+##뮤직비디오유료화여부(0일 경우는 유료화아님, 1일경우가 유료화) : $authorizedPlayVideoList[$!{foreach.index}]
+#if("$authorizedPlayVideoList[$!{foreach.index}]"=="1" || "$authorizedPlayVideoList[$!{foreach.index}]"=="true")
+#set($video_id = $!{vclip.tvpotVId})
+#set($movie_type = "full")
+#else
+#set($video_id = $!{vclip.tvpotPreVId})
+#set($movie_type = "pre")
+#end
+##뮤직바일땐 freeYn이 Y경우는 전곡듣기임
+#if("$type"=="musicbar")
+#set($video_id = $!{vclip.tvpotVId})
+#set($movie_type = "full")
+#if($StringUtils.equals("$!{vclip.freeYn}", "N"))
+    #if($StringUtils.isNotBlank("$!{musicUser}"))
+    	#if(!$StringUtils.equals("$!{board.authorizedPlayVideo}", "true"))
+    		#set($video_id = $!{vclip.tvpotPreVId})
+    		#set($movie_type = "pre")
+    	#end
+    #else
+    	#set($video_id = $!{vclip.tvpotPreVId})
+    	#set($movie_type = "pre")
+    #end
+#end
+#end
+#if($musicUser)
+#set($user_daumId = $!{musicUser.daumId})
+#set($user_adultYn = $!{musicUser.adultYn})
+#elseif($user)
+#set($user_daumId = $!{user.daumId})
+#set($user_adultYn= $!{user.adultYn})
+#end
+#if(("$!vclip.adultYn"=="Y") && ("$user_adultYn")!="Y")
+#set($movie_type = "adult")
+#end
+#set($thumb_img = $!{ImageUtil.getMobileImageUrl("$!{vclip.mainImage.filePath}", "94x70", "VIDEO", "C")})
+			<li>
+				<div class="wrap_cont wrap_video">
+                        #if($ua_result.os.android && $StringUtils.equals("$!{isDaumMusicApp}", "true"))	
+    					<a class="wrap_thumb" href="javascript:;"  onclick="JSInterface.playVclip('$!{video_id}')">
+                        #else
+    					<a class="wrap_thumb" href="javascript:;"  onclick="music.mobile.mMoviePlay('$!{movie_type}','$!{video_id}','$!{thumb_img}')">
+                        #end
+						#if($StringUtils.equals("$type", "vclip"))
+							#set($num = $foreach.count)
+							#if($StringUtils.isNotBlank("$!{command.page_no}"))
+								#set($num = $num + (($command.page_no - 1) * 20))
+							#end
+						<strong class="num#if($num < 4) num_top#end">$!num</strong>
+						#end
+						<span class="thumb" id="thumb_$!{video_id}">
+##if($ua_result.isAndroid)
+##							<video src="http://rt.flvs.daum.net:8080/RTES/Redirect?vid=$!{vclip.tvpotVId}" poster="$ImageUtil.getMobileImageUrl("$!{vclip.mainImage.filePath}", "94x70", "VIDEO", "C")" class="thumb_img"></video>
+##else
+							<img #if($isWVGA)width="141" height="105"#else width="94" height="70"#end alt="" data-src="$!{thumb_img}" class="thumb_img">
+							<span class="img_g ico_play"></span>
+							<span class="bg_outline"></span>
+##end
+#if($ua_result.os.android)
+<div style='position:absolute;top:0;left:0;'><video src='http://rt.flvs.daum.net:8080/RTES/Redirect?vid=$!{video_id}' poster='$!{thumb_img}' width='1' height='1' class='thumb_img' id='m_$!{video_id}' controls='controls'></video></div>
+#end
+						</span>
+						<span class="info">
+							<span class="wrap_song">
+								<strong class="tit">$!{vclip.title}
+								##if("$!vclip.adultYn"=="Y")<span class="ico_rating" title="19세 미만 청취 불가"><span class="inner">19</span></span>#end
+								#adultIcon($!vclip.adultYn)
+                                
+								</strong>
+							</span>
+							<span class="txt_info">#foreach($artist in $vclip.keyArtistList)#if($velocityCount!=1), #end$artist.name#end</span>
+						</span>
+					</a>
+				</div>
+			</li>
+#end
+##############################################################################################################
+## PRINT PAGINATION ##########################################################################################
+## pageHandler로 구동되는 표준 페이징 처리
+## 사용법 : #printPaging("$!{domain}/search/mainSearch.do?query=${query}&pageNo=", $page, $pageHandler)
+#macro(mobilePaging $urlbase $page $pageHandler $className)
+#set($temp = $command.toString())
+#set($commandStr = '$!command')
+#set($base = $Link.relative($request.getAttribute('javax.servlet.forward.request_uri')))$base.setAppendParams(false)
+#set($pageNoParam = "page_no")
+#foreach($key in $Params.keySet())
+	#set($value = $Render.eval("${commandStr}.$key") )
+	#if(!$StringUtils.contains("$!{value}", "script") && $StringUtils.isNotBlank("$!{value}"))
+		#if($key != "query" && $key != "search_word")
+			$base.setParam($key, $!Escape.url($value), false)
+		#else
+			$base.setParam($key, $value, false)
+		#end
+	#end
+#end
+
+#if( $pageHandler.totalCnt > $pageHandler.onePageCnt )
+    #set ($totalCnt = 0)
+	#if ($pageHandler)
+		#set ($totalCnt = $pageHandler.totalCnt)
+	#end
+	#if ($totalCnt gt 0)
+    <div class="paging_comm $!{className}">
+		#set($pageHandler.oneBlockCnt = 4)	## for test 
+        #set($blockPage=$pageHandler.getBlockPage($page))
+        #set($blockNextPage=$pageHandler.getBlockNextPage($blockPage))
+        #if($blockPage>$pageHandler.totalBlock)
+			#set($start=($pageHandler.totalPage/$pageHandler.oneBlockCnt) * $pageHandler.oneBlockCnt + 1)
+            #set($stop=$pageHandler.totalPage)
+		#elseif($blockPage==$pageHandler.totalBlock)
+			#set($start=$blockNextPage - $pageHandler.oneBlockCnt)
+			#set($stop=$pageHandler.totalPage)
+        #else
+            #set($start=$blockNextPage - $pageHandler.oneBlockCnt)
+            #set($stop=$blockNextPage - 1)
+		#end
+        #if($stop==0)#set($stop=1)#end  
+		#set($urlbase=$urlbase.replaceAll("mobileweb/",""))
+		
+		#if($blockPage>1)
+            #set($prev_stop=$start - 1)
+			##<a  href="${urlbase}$prev_stop" class="bround btn_paging prev_on"><span class="ico_comm ico_prev">이전</span></a>
+			#set($prevUrlBase=$!base.param($pageNoParam, $!prev_stop))
+			#set($prevUrl=$prevUrlBase.toString().replaceAll("mobileweb/",""))
+			<a  href="$!prevUrl" class="bround btn_paging prev_on"><span class="ico_comm ico_prev">이전</span></a>
+		#else
+			<span class="bround btn_paging prev_off"><span class="ico_comm ico_prev">이전</span></span>
+		#end
+
+        #foreach($pageNumber in [$start..$stop])
+            #if($pageNumber==$page)
+			<span class="screen_out">현재페이지</span><em class="bround on">$pageNumber</em>
+            #else
+			##<a href="${urlbase}$pageNumber" class="bround">$pageNumber</a>
+			#set($pageUrlBase=$!base.param($pageNoParam, $!pageNumber))
+			#set($pageUrl=$pageUrlBase.toString().replaceAll("mobileweb/",""))
+			<a href="$!pageUrl" class="bround">$pageNumber</a>
+            #end
+        #end
+
+		#if($blockPage<$pageHandler.totalBlock)
+            #set($next_stop=$blockNextPage + $pageHandler.oneBlockCnt - 1 )
+            #set($nextlink=${blockNextPage})
+			##<a href="${urlbase}$blockNextPage" class="bround btn_paging next_on"><span class="ico_comm ico_next">다음</span></a>
+			#set($nextUrlBase=$!base.param($pageNoParam, $!blockNextPage))
+			#set($nextUrl=$nextUrlBase.toString().replaceAll("mobileweb/",""))
+			<a href="$!nextUrl" class="bround btn_paging next_on"><span class="ico_comm ico_next">다음</span></a>
+		#else
+			<span class="bround btn_paging next_off"><span class="ico_comm ico_next">다음</span></span>
+			
+		#end
+    </div>
+	#end
+#end	
+#end
+#macro(snsLayer $className)
+<div id="narrowSocialShareContainer" style="overflow:hidden;"></div>
+
+<!-- 소셜쉐어 include -->
+##<script src="//s1.daumcdn.net/svc/original/U03/cssjs/socialshare/socialshare-1.3.7.min.js"></script>
+<script src="http://s1.daumcdn.net/svc/original/U03/cssjs/socialshare/socialshare-1.7.2.min.js"></script>
+
+<script>
+window.onload = function () {
+    var narrowEl = document.getElementById('narrowSocialShareContainer');
+    new socialshare.Main(narrowEl, {
+        isNarrow: true,
+		moreViewContainer: document.getElementById('socialShareMoreViewContainer'),
+        link: shareSNS.link,
+        prefix: shareSNS.prefix,
+		service_name: "다음뮤직",
+		url_info:{
+		    title: shareSNS.prefix,
+            imageurl: [shareSNS.image_path!=undefined?shareSNS.image_path:""],
+			type: "music"
+		},
+		kakaoAPI:{
+	    	appkey: "cc75fb47dba850710a89eb0217eeeae0"
+		}
+    });
+};
+</script>
+#*	 <div class="sns_comm $!{className}">
+				<ul class="list_sns">
+					<li class="fst"><a class="btn_sns" href="javascript:;" onclick="shareSNS('', 'mypeople');"><span class="ico_sns sns_mypeople"><span class="ico_sns ico_new">new</span><span class="text">마이피플로 공유</span></span></a></li>
+					<li><a class="btn_sns" href="javascript:;" onclick="shareSNS('', 'twitter');"><span class="ico_sns sns_twitter">트위터로 공유</span></a></li>
+					<li><a class="btn_sns" href="javascript:;" onclick="shareSNS('', 'facebook');"><span class="ico_sns sns_facebook">페이스북으로 공</span></a></li>
+					<li>
+						<a href="javascript:;" onclick="music.mobile.toggleSNSLayer('snsLayerBtn', 'snsLayer');" class="btn_sns" id="snsLayerBtn"><span class="ico_sns sns_plus" id="snsLayerBtnIcon">더보기</span></a>
+					</li>
+				</ul>
+				<ul class="list_sns_more hide" id="snsLayer"><!-- 더보기버튼을 누르면 hide 클래스가 show로 바뀜.-->
+					<li><a class="btn_sns" href="javascript:;" onclick="shareSNS('', 'nate');"><span class="ico_sns sns_cyworld">싸이월드</span></a></li>
+					<li><a class="btn_sns" href="javascript:;" onclick="shareSNS('', 'me2day');"><span class="ico_sns sns_metoday">미투데이</span></a></li>
+					<li><a class="btn_sns" href="javascript:;" onclick="shareSNS('', 'yozm');"><span class="ico_sns sns_yozm">요즘&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
+					<li class="lst"><a href="javascript:;" onclick="music.mobile.toggleSNSLayer('snsLayerBtn', 'snsLayer');" class="btn_sns"><span class="ico_sns sns_close"> <em class="txt_close">닫기</em></span></a></li>
+				</ul>
+			</div><!-- sns_comm -->
+2013-02-14 웹투앱2차작업
+*#
+#end
+
+#macro(uaCheck)
+#* 2012.12.10  ua_check_core.vm 안씀
+#set($ua_string = $request.getHeader("User-Agent"))
+#parse("/velocity/common/ua_check_core.vm")
+#set($isWVGA=false)
+#if(($ua_result.isOpera || $ua_result.isPolaris || $ua_result.isWebviewer) && !$ua_result.isOperaMini)
+#set($isWVGA=true)
+#end
+*#
+#set($isDaumMobileApp = ($!request.getHeader("cookie").toLowerCase().indexOf("daumglueapp") > 0))
+#set($isDaumMusicApp = ($!request.getHeader("cookie").toLowerCase().indexOf("daumglueapp=daummusic")>-1))
+#parse("/velocity/common/ua_setting.vm")
+#end
+
+#macro(btnPrev)
+	#if(!$StringUtils.equals("$!{isDaumMusicApp}", "true"))	
+			<a href="javascript:;" onclick="window.history.back();" class="bround btn_prev" title="이전">
+				<span class="ico_music ico_arrow"></span>이전
+			</a>
+	#end
+#end
+
+#macro(tabImagene)
+	<div class="intro_month">
+		<p class="cont">
+			<span>음악 평론가 선정단과 함께</span>
+    		<span>매달 좋은 앨범을 추천하여 소개합니다.</span>
+		</p>
+	</div>
+	<div class="tab_month">
+		<ul class="tab_menu">
+			<li #if($!requestURI.indexOf("/main") >-1)class="on"#end><a href="/imagene/main" class="tab">이달의 앨범</a></li>
+			<li #if($!requestURI.indexOf("/description") >-1)class="on"#end><a href="/imagene/description" class="tab">선정기준</a></li>
+		</ul>
+	</div>
+#end
+
+#macro(tabSym)
+	<div class="support_music">
+		<h2 class="tit">SUPPORT YOUR MUSIC</h2>
+		<p class="cont">SYM은 좋은 음악을 하고 있지만 대중과 <br>
+			소통이 어려운 환경에 있는 아티스트를 지원하는 <br>
+		음악프로젝트입니다</p>
+	</div>
+	
+	<ul class="tab_sym">
+		<li #if($StringUtils.endsWith($!requestURI, "/sym/") || $!requestURI.indexOf("/info") >-1)class="on"#end><a href="/sym/" class="tab">소개</a></li>
+		<li #if($!requestURI.indexOf("/story") >-1)class="on"#end><a href="/sym/story?menu_id=8&board_type=SYM" class="tab">story</a></li>
+	</ul>
+#end
+
+#macro(adultIcon $adultYn)
+	##if("$!vclip.adultYn"=="Y")<span class="ico_rating" title="19세 미만 청취 불가"><span class="inner">19</span></span>#end
+    #if($StringUtils.equals("$!{adultYn}", "Y"))
+    	<span class="ico_comm ico_adult" title="이 정보내용은 청소년 유해매체물로서 정보통&#13;신망 이용 촉진 및 정보보호 등에 관한 법률 및&#13;청소년보호법의 규정에 의하여 19세 미만의 &#13;청소년이 이용할 수 없습니다.">&nbsp;</span>
+    #elseif($StringUtils.equals("$!{adultYn}", "A"))
+    	<span class="ico_comm ico_all" title="전체 이용 가능">&nbsp;</span>
+    #elseif($StringUtils.equals("$!{adultYn}", "2"))
+    	<span class="ico_comm ico_12" title="12세 이상 이용 가능">&nbsp;</span>
+    #elseif($StringUtils.equals("$!{adultYn}", "5"))
+    	<span class="ico_comm ico_15" title="15세 이상 이용 가능">&nbsp;</span>
+    #end##
+#end
+
+
+##############모바일 뮤직바 @###################
+##BA : 텍스트 기본
+#macro(printMobileMusicBarTemplateBA $board)
+	<div class="cont_info #if("$song_list"!="on") cont_line#end">
+		#set($boardTitle = $!board.title)
+        #if($StringUtils.isNotBlank("$!{boardTitle}"))<strong class="tit fc_blue">$boardTitle</strong>#end
+        #if($StringUtils.indexOf($!board.contents,"iframe")>0)
+		#set($new_contents=$StringUtils.replace($!board.contents,"src",'class="musicbar_video" width="100%" src'))
+		<p class="txt">
+			$!new_contents
+		</p>
+		<script type="text/javascript">
+		music.mobile.Appender.resizeVideoPlayer();
+	    </script>
+		#else
+		<p class="txt">
+			$!board.contents
+		</p>
+		#end
+	</div>
+#end
+
+##TB:상단타이틀
+#macro(printMobileMusicBarTemplateTB $board)
+	<div class="cont_info #if("$song_list"!="on") cont_line#end">
+		#set($boardTitle = $!board.title)
+		#if("$!boardTitle"!="")<strong class="tit fc_blue">$!boardTitle</strong>#end
+		#if("$!board.subTitle.replaceAll('<br>','')"!="")<strong class="tit fc_blue">$!board.subTitle</strong>#end
+		<img width="100%" data-src="$ImageUtil.getMobileImageUrl("$!board.imageUrl", "640x0", "PHOTO", "R")" class="thumb_block loading" alt="">
+	</div>
+#end
+
+##AI:통이미지
+#macro(printMobileMusicBarTemplateAI $board)
+	<div class="cont_img #if("$song_list"!="on") cont_line#end">
+		#set($boardTitle = $!board.title)
+		#if("$!boardTitle"!="")<strong class="tit fc_blue">$!boardTitle</strong>#end
+		#if("$!board.linkUrl"!="")<a href="$!board.linkUrl">#end
+		<img width="100%" data-src="$ImageUtil.getMobileImageUrl("$!board.imageUrl", "640x0", "PHOTO", "R")" class="thumb_block loading" alt="">#if("$board.linkUrl"!="")</a>#end
+	</div>
+#end
+
+##IT:이미지+텍스트
+#macro(printMobileMusicBarTemplateIT $board)
+	<div class="cont_img #if("$song_list"!="on") cont_line#end">
+		#set($boardTitle = $!board.title)
+		#if("$!boardTitle"!="")<strong class="tit fc_blue">$!boardTitle</strong>#end
+		<p class="txt">
+			$!board.contents	
+		</p>
+	</div>
+#end
+
+##VC:동영상
+#macro(printMobileMusicBarTemplateVC $board)
+	#if("$!{board.videoInfo.tvpotVId}"!="")
+    <div class="cont_info #if("$song_list"!="on") cont_line#end">
+    	#set($boardTitle = $!board.title)
+    	#if("$!boardTitle"!="")<strong class="tit fc_blue">$!boardTitle</strong>#end
+    </div>
+    #if(!$StringUtils.equals("$!{board.videoInfo.svcstatus}", "2"))
+    	<div class="video_ready">
+    		동영상 준비중
+    	</div>
+    #else
+    #set($vclip=$board.videoInfo)
+    	<ul class="list_info list_thumb">
+    #mVideoList("musicbar")
+    	</ul>
+    #set($song_list="on")    	
+    #end
+    #end
+#end
+
+##SL:곡리스트
+#macro(printMobileMusicBarTemplateSL $board)
+    #set($boardTitle = $!board.songTitle)
+	#if("$!boardTitle"!="")
+	<div class="cont_info #if("$song_list"!="on") cont_line#end">
+		<strong class="tit fc_blue">$!boardTitle</strong>
+	</div>
+	#end
+	<ol class="list_info list_music" #if("$song_list"=="on" && "$!boardTitle"=="") style="margin-top:0;border-top:none;" #end>
+    #foreach ($song in $board.songList)
+		#playList()
+		#set($temp = $songIdArr.add("$!{song.songId}"))
+		#if($foreach.first)#set($albumIdForApp = $!{song.album.albumId})#end
+    #end
+    </ol>
+#end
+
+##AL:앨범형
+#macro(printMobileMusicBarTemplateAL $board)
+		#set($boardTitle = $!board.albumTitle)
+		<div class="cont_albuminfo #if("$!boardTitle"!="") cont_line#end">
+			#if("$!boardTitle"!="")
+				<strong class="tit_bar fc_blue">$!boardTitle</strong>
+			#end	
+		#foreach ($album in $board.albumList)
+			<div class="info_album">
+				<a href="/album/main?album_id=$!{album.albumId}" class="thumb_link">
+					<img #if($isWVGA) width="141" height="141" #else width="94" height="94" #end alt="" data-src="$ImageUtil.getMobileImageUrl("$!album.mainImage.filePath", "110x110", "ALBUM", "C")" class="thumb_block loading" alt="">
+				</a>
+				<div class="albuminfo_append">
+					<dl class="txt_info">
+						<dt class="tit_info"><a href="#none" class="link_tit"></a></dt>
+						<dd class="txt_desc"><a href="/album/main?album_id=$!{album.albumId}" class="link_desc">#strCut("$!{album.title}", 20)</a></dd>
+					</dl>
+					<dl class="txt_info">
+						<dt class="tit_info"></dt>
+						<dd class="txt_desc">$CheckDate.makeReleaseDate($!{album.releaseDt})</dd>
+					</dl>
+					<dl class="txt_info">
+						<dt class="tit_info"></dt>
+						<dd class="txt_desc">
+							#foreach($artist in $album.keyArtistList)#if($foreach.count!=1), #end#if($StringUtils.equals("$!{artist.artistId}", "0"))$artist.name#else<a href="/artist/main?artist_id=$!{artist.artistId}" class="link_desc">$artist.name</a>#end#end
+						</dd>
+					</dl>
+				</div>
+			</div>
+		#end
+		</div>
+#end
+
+##PV:포토뷰어
+#macro(printMobileMusicBarTemplatePV $board)
+	<div class="cont_photo #if("$song_list"!="on") cont_line#end">	
+	#set($boardTitle = $!board.photoTitle)
+	#if("$!boardTitle"!="")
+		<strong class="tit_bar fc_blue">$!boardTitle</strong>
+	#end
+		<div class="photo_thumb">
+			<ul class="list_photo">
+				#foreach($img in $board.photoList)
+					#if($velocityCount > 3)
+						#break
+					#end
+					<li #if($foreach.count ==1)class="fst on"#end>
+						<a href="/musicbar/viewer?menu_id=$!{command.menu_id}&board_id=$!{command.board_id}&temp_order=$!{board.templeteOrder}&view_img_order=${foreach.index}" class="thumb_block">
+							<img src="$ImageUtil.getImageUrl("$!{img.filePath}", "110x110", "PHOTO", "S")" width="100%" height="100%" alt=""/>
+						</a>
+					</li>
+				#end
+			</ul>
+        </div>
+		#if($!{board.photoList.size()} > 3)
+		<a href="/musicbar/viewer?menu_id=$!{command.menu_id}&board_id=$!{command.board_id}&temp_order=$!{board.templeteOrder}&view_img_order=3" class="btn_more">더보기(3/$!{board.photoList.size()})<span class="ico_music ico_more"></span></a>
+		#end
+	</div>
+#end
+
+##PO:폴형
+#macro(printMobileMusicBarTemplatePO $board)
+	<div class="cont_poll #if("$song_list"!="on") cont_line#end">	
+		<div class="wrap_poll">
+					<legend class="screen_out">투표하기</legend>
+					#set($boardTitle = $!board.pollTitle)
+					<strong class="tit_bar fc_blue">$!boardTitle</strong>
+						<input type="hidden" name="menuId" value="$boardInfo.menuId"/>
+    					<input type="hidden" name="boardId" value="$board.boardId"/>
+					<ul class="list_poll">
+						#if(!$CollectionUtils.isEmpty($board.pollItemList))
+    						#foreach ($poll in $board.pollItemList)
+    							<li #if( $velocityCount == 1 )class="fst"#end><input type="radio" class="screen_out" name="pollId" id="$!{board.pollSeq}_$!{poll.pollId}" value="$!{poll.pollId}" />
+                                <label class="lab_item ico_radio " for="$!{board.pollSeq}_$!{poll.pollId}" onclick="music.mobile.Appender.select(this);">$!{poll.pollItem}</label>
+    							</li>
+    						#end
+						#end
+					</ul>
+				<div class="wrap_btn">
+					#set($diff = $CheckDate.diffOfDate($board.pollEndTime))
+					#set($diff2 = $CheckDate.diffOfDate($board.pollStartTime))
+					<a href="javascript:;" class="bround btn_poll btn_vote" onclick="music.mobile.Appender.pollVote($!diff, $!diff2, $!{board.pollSeq});return false;">투표</a>
+					<a href="/musicbar/pollResult?board_id=$!{board.boardId}&poll_seq=$!{board.pollSeq}" class="bround btn_poll">결과보기</a>
+				</div>
+		</div>
+	</div>
+#end
+
+##VL:동영상뷰어용 리스트
+#macro(printMobileMusicBarTemplateVL $board)
+    	#set($boardTitle = $!board.vclipTitle)
+	<div class="cont_info">
+		#if("$!boardTitle"!="")<strong class="tit fc_blue">&nbsp;$!boardTitle</strong>#end
+	</div>	
+	<div class="cont_info cont_line">
+	</div>			
+    #if(!$CollectionUtils.isEmpty($board.vclipList))
+    	#foreach ($vclip in $board.vclipList)
+            #if(!$StringUtils.equals("$!{vclip.svcstatus}", "2"))
+            	<div class="video_ready">
+            		동영상 준비중
+            	</div>
+            #else
+                	<ul class="list_info list_thumb">
+            			#mVideoList("musicbar")
+                	</ul>
+                #set($song_list="on")    	
+    		#end
+    	#end	
+    #end	
+#end
+
+##LP:생중계플레이어
+#macro(printMobileMusicBarTemplateLP $board)
+	#set($liveLoc = "daum_music")
+	<div class="cont_info #if("$song_list"!="on") cont_line#end">
+		<iframe class="livePlayerFrame" width="100%" src="http://videofarm.daum.net/controller/live/viewer/Live.html?pdDaumId=$!{board.pdDaumId}&liveLoc=$!{liveLoc}&m_profile=$!{board.mProfiles}" frameborder='0' scrolling='no'></iframe>
+	</div>
+	#set($song_list="on")
+	<script type="text/javascript">
+		music.mobile.Appender.resizeLivePlayer();
+	</script>
+#end
+
+##타이틀 얻기 
+#macro(getOpenGraphData $titleMap $path)
+	#set($path=$path.replaceAll("/mobileweb",""))
+
+	#set($keyArr = $path.replaceAll("^\/", "").split("/"))
+	#set($title = "")
+	#set($image = "")
+	#set($description = "")
+	#set($songImage = "")
+	#set($songTitle = "")
+
+	#foreach($key in $keyArr)
+		#if($titleMap.containsKey($key))
+			##if($titleMap.get($key).children)
+			#if( $StringUtils.isNotEmpty("$!{titleMap.get($key).title}") )
+			#set($title = $titleMap.get($key).title)
+			#end
+			#if( $StringUtils.isNotEmpty("$!{titleMap.get($key).image}") )
+			#set($image = $titleMap.get($key).image)
+			#end
+			#if( $StringUtils.isNotEmpty("$!{titleMap.get($key).description}") )
+			#set($description = "#escTitle($titleMap.get($key).description)")
+			#end
+			#if( $StringUtils.isNotEmpty("$!{titleMap.get($key).songTitle}") )
+				#set($songTitle = $titleMap.get($key).songTitle)
+			#end
+			#if( $StringUtils.isNotEmpty("$!{titleMap.get($key).songImage}") )
+				#set($songImage = $titleMap.get($key).songImage)
+			#end
+			#set($titleMap = $titleMap.get($key))
+			##end
+		#else
+			#break
+		#end
+	#end
+#end
+
+#macro(getHeadTitle $titleMap $path)
+	#set($path=$path.replaceAll("/mobileweb",""))
+	
+	#set($keyArr = $path.replaceAll("^\/", "").split("/"))
+	#set($title = "")
+
+	#foreach($key in $keyArr)
+		#if($titleMap.containsKey($key))
+			##if($titleMap.get($key).children)
+			#if( $StringUtils.isNotEmpty("$!{titleMap.get($key).title}") )
+			#set($title = $titleMap.get($key).title)
+			#end
+			#set($titleMap = $titleMap.get($key))
+			##end
+		#else
+			#break
+		#end
+	#end
+#end
+
+################################################
+################### mp3 단건 구매시###################
+#################################################
+#macro(print_CartSubmitForm)
+	<form id="frmCart" name="frmCart"></form>
+#end
+
+#macro(print_CartActionScript $cartList $how $totalDownloadCount $daumId $cmd $denialList $overLimitCartCount)
+<script type="text/javascript">
+var cartalbum = [];
+#if( $albumCartList.size()>0)
+    #set($strSongId = "")
+    #set($salePrice = 0)
+    #set($price = 0)
+    #set($count = 0)
+	#set($_albumId = "")
+    #foreach($item in $albumCartList)
+	    #set($_albumId = $!{item.song.album.albumId})
+        #if( $!{item.song.album.albumId} )
+            #if( $StringUtils.isNotEmpty("$!{strSongId}"))#set( $strSongId = $strSongId+ "/") #end
+            #set( $strSongId = $strSongId + "$!{item.song.songId}")
+            #set( $salePrice = $salePrice + $item.salePrice )
+            #set( $price = $price + $item.price )
+            #set($count = $count +1 )
+		#end
+
+		#if($velocityHasNext) 
+		#if( $!{item.song.album.albumId} != $albumCartList.get($foreach.count).song.album.albumId )
+        	cartalbum["$!{_albumId}"]={type:"album", albumId:"$!{_albumId}", price:"$!price", salePrice:"$!salePrice", songCount:"$count", songIdList:"$!strSongId" };
+			#set($strSongId = "")#set($salePrice = 0)#set($price = 0)#set($count = 0)
+		#end
+		#end
+	#end
+    cartalbum["$!{_albumId}"]={type:"album", albumId:"$!{_albumId}",price:"$!price", salePrice:"$!salePrice", songCount:"$count", songIdList:"$!strSongId" };
+#end
+ 
+#set($preAId = "")
+#set( $idx = 0 ) 
+var songlist = {
+#foreach($item in $albumCartList)
+#set( $artist = "")
+#set( $tit = "")
+    #if( $idx==0 || $preAId != $!{item.song.album.albumId} )
+	
+#if($!item.song.album.keyArtistList.size()>0)
+	#set( $artist = $!item.song.album.keyArtistList.get(0).name.replaceAll("'", "&apos;").replaceAll('"', '&quot;'))
+#end
+#if( $!{item.song.album.title} )
+#set( $tit = $!item.song.album.title.replaceAll("'", "&apos;").replaceAll('"', '&quot;'))
+#end
+	#if( $idx > 0),#end
+    "$!{item.song.album.albumId}" : {"type":"album", "id":"$idx", "songId":"$!{item.song.album.albumId}",  "songTitle":"#escScript( $!{tit} )", "artist":"$!{artist}", "salePrice":cartalbum["$!{item.song.album.albumId}"].salePrice, "price":cartalbum["$!{item.song.album.albumId}"].price, "isHave" :#if("$!{item.ownStatus}" == "Y")"true"#else"false"#end, "isBuy" :#if($!{item.song.MP3LinkId})"true"#else"false"#end, songIdList:cartalbum["$!{item.song.album.albumId}"].songIdList, songCount:cartalbum["$!{item.song.album.albumId}"].songCount }
+    #set( $idx = $idx + 1 )
+	#end
+	#set( $preAId = $!{item.song.album.albumId} )
+#end
+#if( $albumCartList.size()>0),#end
+ 
+#foreach($item in $songCartList)
+#set( $artist = "")##
+#set( $tit = "")##
+#if($!item.song.keyArtistList.size()>0)##
+	#set( $artist = $!item.song.keyArtistList.get(0).name.replaceAll("'", "&apos;").replaceAll('"', '&quot;'))##
+#end##
+#if( $!{item.song.title} )
+#set( $tit = $!{item.song.title.replaceAll("'", "&apos;").replaceAll('"', '&quot;')})##
+#end
+
+"$!{item.song.songId}" : {"type":"song", "id":"$idx", "songId" : "$!{item.song.songId}", "songTitle":"#escScript( $!{tit} )", "typeCd" : "$!{item.song.typeCd}", "artist":"$!{artist}", "salePrice":"$!{item.salePrice}", "price":"$!{item.price}", "isHave" :#if("$!{item.ownStatus}" == "Y")"true"#else"false"#end, "isBuy" :#if($!{item.song.MP3LinkId})"true"#else"false"#end, songIdList:"", songCount:"1"}
+#if( $velocityHasNext),#end
+#set( $idx = $idx + 1 ) 
+#end
+}
+ 
+#set($payment = "MOBILE")
+#if($daumCashBalance>0)
+	#set($payment = "DAUMCASH")
+#end
+
+var cart = music.mobile.Cart; 
+music.mobile.Cart.init("cartList", {
+	form : document.frmCart,
+	song_list:songlist, 
+	album_in_song_list:cartalbum, 
+	how: "$!{how}", 
+	cart_action_type : "#if("$cmd.cart_action_type"=="GIFT")$cmd.cart_action_type#{else}PURCHASE#end",  
+	daum_cash :#if($daumCashBalance==-9999)100#{else}$daumCashBalance#end,
+	payment : "$!{payment}",
+	referer : "$!{cmd.referer}", 
+	#if($StringUtils.equals("$!{command.debugmode}", "2"))
+	debug_mode : "true",
+	#end
+	BI_DOMAIN : "#getter('BI_DOMAIN', '')", 
+	SERVICE_DOMAIN : "#getter('SERVICE_DOMAIN', '')"
+	});
+</script>
+#end
+
+#macro(print_CartList $how $type $cartList)
+#set( $listcount = 0)
+#set( $tmpCartList = $cartList)
+
+#foreach($item in $cartList)
+	#set($strSongId = "")
+    #set($salePrice = 0)
+    #set($price = 0)
+    #set($count = 0)
+
+     #if( $type == "album")
+        #foreach($itemSong in $tmpCartList)
+        	#if( $item.song.album.albumId == $itemSong.song.album.albumId)
+                #set( $strSongId = $strSongId +"/"+ "$!{itemSong.song.songId}")
+                #set( $salePrice = $salePrice + $itemSong.salePrice )
+                #set( $price = $price + $itemSong.price )
+                #set( $count = $count +1 )
+			#end
+		#end
+		
+        #set( $artistList = $item.song.album.keyArtistList)
+        #set( $title = $!item.song.album.title )
+        #set( $play_time = "-" )
+		#if( $artistList.size()>0)
+			#set( $artist = $artistList.get(0).name )
+		#else
+			#set( $artist = "" )
+		#end
+        #set( $price = $price )
+        #set( $sale_price = $salePrice )
+        #set( $songid =  $item.song.album.albumId)
+        #set( $albumid = $item.song.album.albumId)
+    #else
+ 
+        #set( $artistList = $item.song.keyArtistList)
+        #set( $title = $!item.song.title )
+		#set( $play_time = "-")
+		#if( !$StringUtils.equals("$!{item.song.trackLength}", "0"))
+			#set( $play_time = $!item.song.getTrackLengthMinute() )
+		#end
+		#if( $artistList.size()>0)
+			#set( $artist = $artistList.get(0).name )
+		#else
+			#set( $artist = "" )
+		#end
+		
+        #set( $price = $!item.price )
+        #set( $salePrice = $!item.salePrice)
+        #set( $songid = $item.song.songId)
+        #set( $albumid = "")
+    #end
+#end##foreach
+		<ul class="list_album">
+			<li><strong class="tit_album">상품명</strong>#strCut($!artist,10) <span class="txt_emph">#strCut($title,20)</span></li>
+			<li><strong class="tit_album">상품가격</strong><span class="txt_num">
+					#if($StringUtils.equals("$!{price}","0"))무료#else#toCurrency($!{price})</span>원#end</li>
+		</ul>
+		<div class="buy_check">
+			<strong class="tit_check">결제 수단 선택</strong>
+			<ul class="list_check">
+				<li #if($daumCashBalance!=-9999)class="on"#end>
+					<input type="radio" id="daumCash" name="daumBuy" class="inp_check" checked="checked">
+					<label for="daumCash" class="lab_check">Daum 캐쉬 결제</label>
+					<span class="txt_check">(잔액 <span class="txt_num">#if($daumCashBalance!=-9999)#toCurrency($!{daumCashBalance})#else-#end</span>원)</span>
+					<a href="javascript:;" onclick='music.mobile.openCash();return false;' target="_blank" class="link_charge">충전하기</a>
+				</li>
+				<li #if($daumCashBalance!=-9999)class="on"#end>
+					<input type="radio" id="phoneCash" name="daumBuy" class="inp_check">
+					<label for="phoneCash" class="lab_check">핸드폰 결제</label>
+				</li>
+				<li>
+					<input type="radio" id="cardCash" name="daumBuy" class="inp_check">
+					<label for="cardCash" class="lab_check">신용카드 결제</label>
+					<span class="txt_check">(<span class="txt_num">1,000</span>원 이하 결제 불가)</span>
+				</li>
+			</ul>
+		</div>
+		<dl class="buy_money">
+			<dt class="tit_money">최종 결제 금액</dt>
+			<dd class="item_money">
+				<span class="txt_num">#if($StringUtils.equals("$!{price}","0"))무료#else#toCurrency($!{salePrice})</span>원#end
+				<span class="info_money">(부가세 10% 포함)</span>
+			</dd>
+		</dl>
+		<div class="buy_btns">
+			<p class="txt_buy">$!{user.daumName}님, 위 내역을 결제 하시겠습니까?</p>
+			<button id="btnSubmit" type="button" class="btn_buy btn_pay" value="submit">결제하기</button>
+			<button id="btnCancel" type="button" class="btn_buy btn_cancel" value="취소">취소</button>
+		</div>
+#end
+
+
+#macro(print_onAirBanner $bannerLis)
+#if( !$CollectionUtils.isEmpty($bannerList) )
+#set( $firstIdx = $MathTool.random(0, $bannerList.size()) )
+#set( $firstBanner = $bannerList.get($firstIdx) )
+<div class="link_bnr_wrap">
+<a href="$!{firstBanner.url}" class="link_bnr">
+	<img src="$!{firstBanner.imagepath}" alt="" width="100%">
+</a>
+</div>
+#end
+#end
+
+#macro(printPurchaseMenuMobile $idx)
+	<div class="section_tab">
+		<a href="/ticket/halfsale" class='link_sort#if($StringUtils.equals("$!{idx}","1")) sort_on#end'><span class="txt_bar">|</span>3개월 반값 할인</a>
+		<a href="/ticket/ticketitem/list" class='link_sort#if($StringUtils.equals("$!{idx}","2")) sort_on#end'><span class="txt_bar">|</span>전체 이용권</a>
+		<a href="/my/own_ticket/ticket/list" class='link_sort#if($StringUtils.equals("$!{idx}","3")) sort_on#end'><span class="txt_bar">|</span>이용권 관리</a>
+	</div>
+#end	
+
+#macro(printPurchaseMenuApp $idx)
+	<strong class="screen_out">구매 이용권 메뉴</strong>
+	<ul class="tab_purchase">
+		<li #if($StringUtils.equals("$!{idx}","1"))class="on"#end><a href="/ticket/halfsale/app" class="link_tit"><span class="ico_purchase ico_tit"></span>3개월 반값 할인</a></li><!-- on클래스 추가시 활성화 --> 
+		<li #if($StringUtils.equals("$!{idx}","2"))class="on"#end><a href="/ticket/ticketitem/app/all" class="link_tit"><span class="ico_purchase ico_tit"></span>전체 이용권</a></li>	
+		<li #if($StringUtils.equals("$!{idx}","3"))class="on"#end><a href="/my/own_ticket/ticket/app/list" class="link_tit"><span class="ico_purchase ico_tit"></span>이용권 관리</a></li>
+	</ul>
+#end	

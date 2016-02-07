@@ -1,0 +1,69 @@
+#uaCheck()
+#set($event_id = $request.getParameter("event_id"))
+<div id="daumContent" class="cont_spe">
+	<h2 class="screen_out">스페셜</h2>
+	<ul class="wrap_spemenu">
+		<li class="menu1"><a href="/event/main?event_id=$!event_id " class="pround"><span class="inner">스페셜홈</span></a></li>
+		<li class="menu2"><a href="/event/photo_vclip/list?event_id=$!event_id " class="pround"><span class="inner">포토동영상</span></a></li>
+		<li class="menu3 on"><a href="/event/detail?event_id=$!event_id " class="pround"><span class="inner">상세정보</span></a></li>
+		<li class="menu4"><a href="/event/eventInfo?event_id=$!event_id " class="pround"><span class="inner">이벤트</span></a></li>
+	</ul>
+	<h3 class="screen_out">상세정보</h3>
+#if($!{albumList})
+	<div class="section_info">
+		<h4 class="tit">관련앨범</h4>
+	#foreach($album in $albumList)
+		<div class="wrap_cont">
+			<a href="#" class="thumb">
+				<img #if($isWVGA)width="141" height="141"#else width="94" height="94"#end alt="$!{item.title}" src="$ImageUtil.getMobileImageUrl("$!{album.mainImage.filePath}", "94x94", "ALBUM", "C")">
+				<span class="outline"></span>
+			</a>
+			<div class="cont">
+				<dl class="info_data">
+					<dt class="tit_base">아티스트</dt>
+					<dd class="desc">#foreach($artist in $album.keyArtistList)#if($velocityCount!=1) ,#end<a class="fc_tit" href="/artist/main?artist_id=$!{artist.artistId}">$artist.name</a><br/>#end</dd>
+				</dl>
+				<dl class="info_data">
+					<dt class="tit_base">앨범정보</dt>
+					<dd class="desc">$!{album.typeName} $!{album.recordTypeName}</dd>
+				</dl>
+				<dl class="info_data">
+					<dt class="tit_base">발매정보</dt>
+					<dd class="desc">$CheckDate.makeReleaseDate($!{album.releaseDt})</dd>
+				</dl>
+			</div>
+		</div>
+	#end
+	</div>
+#end
+#if($!{contents})
+	<div class="section_desc">
+		<h4 class="screen_out">관련정보</h4>
+		$!{contents}
+	</div>
+#end
+</div>
+#parse("/velocity/mobileweb/realtimeissue.vm")
+#*
+관련앨범 : 
+#if($!{albumList})
+	#foreach($album in $albumList)
+		앨범ID : $album.albumId <br/>
+		앨범명 : $album.title <br/>
+		앨범발매일 : $album.releaseDt <br/>
+		앨범듣기여부 : $album.playYn <br/>
+		앨범의이미지 : $album.mainImage.imageId <br/>
+		앨범이미지주소 : $album.mainImage.filePath <br/>
+		
+		#foreach($artist in $album.keyArtistList)
+			아티스트ID : $artist.artistId  아티스트명 : $artist.name<br/>
+		#end
+		<br/>
+	#end 
+#end
+<br/>
+
+
+하단내용 : 
+	#if($!{contents}) $contents #else 0 #end <br/>
+*#

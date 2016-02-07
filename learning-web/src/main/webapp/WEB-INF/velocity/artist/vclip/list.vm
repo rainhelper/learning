@@ -1,0 +1,134 @@
+#set($pageNo = "$!{command.page_no}")
+#set($artistId = "$!{command.artist_id}")
+#set($albumId = "$!{command.album_id}")
+##set($count = 1)
+##set($idNum = $vclipList.size()*$pageNo - 1)
+<div class="gallery_view section_video">
+<h3 class="screen_out">뮤직비디오 목록</h3>
+	<div class="wrap_option">
+		<div class="tit_cont">
+			<strong class="tit_detail tit_video">뮤직비디오</strong>
+			<span class="txt_count">(<em>$!{vclipTotalCount}개</em>)</span>
+		</div>
+		<div class="sort_option f_r">
+			<a href="/artist/vclip/list?artist_id=$!{artistId}&page_no=$!{pageNo}&order_type=01">
+				<em #if($StringUtils.equals("$!{orderType}", "01") || !$StringUtils.isNotBlank($!{orderType}))class="link_option"#end>최신순</em>
+			</a>
+			
+			<span class="txt_bar">|</span>
+			<a href="/artist/vclip/list?artist_id=$!{artistId}&page_no=$!{pageNo}&order_type=02">
+				<em #if($StringUtils.equals("$!{orderType}", "02"))class="link_option"#end>추천순</em>
+			</a>
+			<span class="txt_bar">|</span>
+			<a href="/artist/vclip/list?artist_id=$!{artistId}&page_no=$!{pageNo}&order_type=03">
+				<em #if($StringUtils.equals("$!{orderType}", "03"))class="link_option"#end>제목순</em>
+			</a>
+		</div>
+	</div>
+#if( $vclipList.size() > 0 )
+<div class="wrap_list_mv">
+	<div class="box_list_mv">
+		<ul id="trackContainer" class="list_mv">
+		#foreach($vclip in $vclipList)
+			<li style="position:relative;">
+				#if((!$CollectionUtils.isEmpty($album.keyArtistList) && $StringUtils.equals("$!{album.keyArtistList.size()}", "1") && !$StringUtils.equals("$!{album.keyArtistList[0].artistId}", "0")) || ($CollectionUtils.isEmpty($album.keyArtistList) && $StringUtils.isNotBlank("$!{artist.artistId}")))
+					#set($dir = "artist")
+				#else
+					#set($dir = "album")
+				#end
+				#printVideoThumb( $!{vclip} 1 $foreach.index "" $dir)
+				<div class="wrap_info">
+					<strong class="wrap_title">
+						## $command.artist_id와 $vclip.artist_id가 동일하지 않아서 SET
+						#if($StringUtils.equals("$!{vclip.HDYn}", "Y"))
+							#printVideoName($vclip "ico_detail ico_hd" 12 true)
+						#else
+							#printVideoName( $!{vclip} "" 16 true )
+						#end
+					</strong>
+					<span class="wrap_artist">
+						#printArtistName($!{vclip.keyArtistList} "" 20 true)
+					</span>
+					<em class="txt_date">$!{CheckDate.makeReleaseDate($!{vclip.regDateTime})}</em>
+					<span class="song_listen">
+						#printSongName( $!{vclip.song} "ico_comm ico_listen" 20 true true false)
+					</span>
+				</div>
+			</li>
+			##set($count = $!{count} + 1)
+			##set($idNum = $!{idNum} + 1)
+		#end
+			
+		#set($vclipListCount = $!{vclipList.size()})
+    	#if($!{vclipListCount} < 20)
+    	#set($rest = 4 - $!{vclipListCount}%4)
+    	#foreach($i in [1..$rest])
+    		<li style="position:relative;">
+    		</li>
+    	#end
+    	#end
+		</ul>
+		#printVideoCover()
+	</div>
+	
+    ##page
+    #printPaging($pagingUrl, $command.page_no, $pageHandler, "", 10)
+</div>
+#else
+	<div class="no_listinfo">
+		<p class="fc_txt">저장된 뮤직비디오가 없습니다.</p>
+	</div>
+#end
+</div>
+<script type="text/javascript">
+	var VideoDataList = [];
+	#foreach( $video in $vclipList )
+		VideoDataList.push({
+			linkType : "artist",
+			vclipId : "$!{video.vclipId}",
+			songId : "$!{video.song.songId}",
+			albumId : "$!{video.album.albumId}",
+			artistId : "#getArtistId($!{video})",
+			count : "$!{foreach.count}",
+			size : "$!{$vclipList.size()}"
+		});
+	#end
+	daum.Music.Video.init({containerId: "trackContainer", totalCount:$vclipList.size(), imgString:"thumbLink", colCount:4, isPromotion:false, arrow:false});
+	var controller = new daum.Music.ListPrototype();
+	controller.initialize({tag:'li'});
+</script>
+
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+
+
+아티스트 <br />
+이미지 : $artist.mainImage.filePath <br />
+이름 : $artist.name <br /> 
+<br />
+
+뮤직비디오 전체 수  : $!{vclipTotalCount} <br />
+
+# 01 or 없음 : 최신순 || 02 : 추천순 || 03 : 제목순 <br />
+뮤직비디오 정렬  : $!{orderType} <br />
+<br />
+
+뮤직비디오<br />
+#foreach($vclip in $vclipList)
+	$!{foreach.index} <br />
+	ID : $!{vclip.vclipId} <br />
+	TVPOTID : $!{vclip.tvpotVId} <br />
+	제목 : $!{vclip.title} <br />
+	이미지 : $!{vclip.mainImage.filePath} <br />
+	등록일 : $!{vclip.regDateTime} <br />
+	곡 ID : $!{vclip.song.songId} <br />
+	곡제목 : $!{vclip.song.title} <br />
+	듣기여부 : $!{vclip.song.AODLinkId} <br />
+	아티스트 <br />
+	#foreach($artist in $vclip.keyArtistList)
+	 - 이름 : $!{artist.name} <br />
+	 - ID : $!{artist.artistId} <br />
+	#end<br />
+#end
+
+#end

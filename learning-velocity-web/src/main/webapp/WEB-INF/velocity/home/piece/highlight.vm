@@ -1,0 +1,317 @@
+
+<div class="article_highlight">
+	<div class="section_hotissue">
+		<h3 class="screen_out">핫이슈 공감</h3>
+		<ul class="list_hotissue">
+		#if(!$CollectionUtils.isEmpty($hotissueUpList))
+			#foreach($motTemplete in $hotissueUpList)
+			<li class="fst_cont CT_ZONE_HOME_HOTISSUE">
+				<a class="thumb_link" href="#replaceAmp($!{motTemplete.linkUrl})" title="#escTitle($!{motTemplete.title})">
+					<img width="250" height="248" alt="#escTitle($!{motTemplete.title})" src="$ImageUtil.getImageUrl("$!{motTemplete.imageUrl}", "250x248", "PHOTO", "C")"/>
+					<span class="ico_hotissue"></span>
+					<span class="thumb_line"></span>
+				</a>
+				<span class="wrap_info">
+					<span class="bg_txt"></span>
+					<span class="txt_info">						
+						<a class="tit" href="#replaceAmp($!{motTemplete.linkUrl})"><strong>#strCut("$!{motTemplete.title}", 40)</strong><span class="ico_arrow">&nbsp;</span></a>
+						<span class="song_info">
+						#foreach($song in $hotissueSongList)
+                    		#if($song.songId == $motTemplete.generalText)
+								#printSongArtistName( $song, "ico_comm ico_listen" 30 true )
+                    		#end
+                    	#end
+						</span>
+					</span>
+				</span>
+			</li>
+			#end
+		#end
+
+		#if(!$CollectionUtils.isEmpty($hotissueDownList))
+            #foreach($motTemplete in $hotissueDownList)
+			<li class="CT_ZONE_HOME_HOTISSUELIST">
+				<a class="thumb_link f_l" href="#replaceAmp($!{motTemplete.linkUrl})" title="#escTitle($!{motTemplete.title})">
+				#foreach($song in $hotissueSongList)
+					#if($song.songId == $motTemplete.generalText)
+					<img width="42" height="42" alt="#escTitle($!{motTemplete.title})" src="$ImageUtil.getImageUrl("$!{song.album.mainImage.filePath}", "42x42", "ALBUM")"/>
+					<span class="line_thumb"></span>
+					#end
+				#end
+				</a>
+				<span class="info_desc">
+					<a href="#replaceAmp($!{motTemplete.linkUrl})" title="#escTitle($!{motTemplete.title})">#strCut("$!{motTemplete.title}", 23)</a>
+					#foreach($song in $hotissueSongList)
+                		#if($song.songId == $motTemplete.generalText)
+							#printTopSongArtistName( $song, "ico_top ico_listen" 20 true )
+                		#end
+                	#end
+				</span>
+			</li>
+            #end
+		#end
+		</ul>
+		
+		#if(!$CollectionUtils.isEmpty($leftUpBannerList))		
+		<div class="bnr_info CT_ZONE_HOME_BANNER">
+			#foreach($motTemplete in $leftUpBannerList)
+			<a href="#replaceAmp($!{motTemplete.linkUrl})" class="bnr_img" style="display:none;">
+				<img alt="이미지 배너" width="208" height="69" src="$ImageUtil.getImageUrl("$!{motTemplete.imageUrl}", "208x69", "PHOTO", "C")"/>
+			</a>
+			#end
+			<div class="navi_bnr">
+				#foreach($motTemplete in $leftUpBannerList)
+				<a class="ico_top" href="javascript:;">배너선택버튼</a>
+				#end
+			</div>
+		</div>
+		#end
+	</div>
+
+	<div class="section_chart">
+		<h3 class="screen_out">인기차트  TOP10</h3>
+		
+		<div class="wrap_cate">
+			<ul class="category_cont f_l">
+				<li class="fst on"><a class="cate1" href="javascript:;">실시간</a></li> ## onclick="checkboxDrag.init('#trackContainerReal .track', 'section_checkbox');"
+				<li><a class="cate2" href="javascript:;">일간</a></li> ## onclick="checkboxDrag.init('#trackContainerDate .track', 'section_checkbox');"
+				<li><a class="cate3" href="javascript:;">주간</a></li> ## onclick="checkboxDrag.init('#trackContainerWeek .track', 'section_checkbox');"		
+			</ul>
+			
+			##### 실시간 차트
+			<div class="wrap_date_info">
+    			<div class="current_day">
+    				#set($date = $!{CheckDate.getDiffHour($chartMap.get("realTimeMaxDate"),1)})
+    				#printImageDate($date "day" "") ##YYYY.MM.DD
+    				<span class="time">
+    					<span class="num_comm time$StringUtils.mid($date, 8, 1)">$StringUtils.mid($date, 8, 1)</span>
+    					<span class="num_comm time$StringUtils.mid($date, 9, 1)">$StringUtils.mid($date, 9, 1)</span>
+    					<span class="num_comm colon">:</span>
+    					<span class="num_comm time0">0</span>
+    					<span class="num_comm time0">0</span>		
+    				</span>
+    			</div>
+    			
+    			#printTopChartMore( "실시간 차트 더보기" "/chart/chartsong/list" )
+			</div>
+			
+			##### 일간 차트
+			<div class="wrap_date_info" style="display:none;">
+				#set($date = $chartMap.get("dayMaxDate"))
+    			<div class="current_day info_day">
+    				##<a class="box_date" href="javascript:;" onclick="daum.Music.Layer.view({el:this,type:'calendarDay',classname:'layer_info layer_cal cal_days',left:-19, arrow_left:21});drawDayCalendar();return false;">
+					<span class="box_date">
+            			#printImageDate($date "day" "") ##YYYY.MM.DD
+					</span>
+    			</div>
+    			#printTopChartMore( "일간 차트 더보기" "/chart/chartsong/list?date_key=3" )
+			</div>
+			
+			#### 주간 차트
+			<div class="wrap_date_info" style="display:none;">
+				#set($date = $chartMap.get("weekMaxDate"))
+    			<div class="current_day info_day">
+    				##<a class="box_date" href="javascript:;" onclick="daum.Music.Layer.view({el:this,type:'calendarWeek',classname:'layer_info layer_cal cal_weeks'});drawWeekCalendar();return false;">
+					<span class="box_date">
+            			#set($weekMap = $CheckDate.getWeekNumForChart($date))
+            			#set($month = "$weekMap.get('month')")
+            			#if($month.length() == 1)#set($mm = "0" + $month)#else#set($mm = $month)#end
+            			#set($weekDate = "$weekMap.get('year')$mm")
+               			#printImageDate($weekDate "week" $weekMap.get("weekNum")) ##YYYY.MM
+            		</span>
+    			</div>
+    			#printTopChartMore( "주간 차트 더보기" "/chart/chartsong/list?date_key=2" )
+			</div>
+		</div>
+		
+		<ol id="trackContainerReal" class="list_music list_realtime">
+			#if(!$CollectionUtils.isEmpty($realTimeChartSongList))
+				#printTop10ChartSongList($realTimeChartSongList "list_realtime" "Real")
+			#end
+			#printRecommandSonginTop($recommandSong "list_realtime" "Real")
+		</ol>
+		<div class="wrap_tool_btn">
+			<div class="tool_btn f_l">
+				#printListButtonMusicBarAndTop("song", "listen" "" "Real" "Real")		
+			</div>
+			#printTopChartMore( "실시간 차트 더보기" "/chart/chartsong/list" )
+		</div>
+		
+		<ol id="trackContainerDate" class="list_music list_day" style="display:none;">
+			#if(!$CollectionUtils.isEmpty($dayChartSongList))
+				#printTop10ChartSongList($dayChartSongList "list_day" "Date")
+			#end
+			#printRecommandSonginTop($recommandSong "list_day" "Date")
+		</ol>
+		<div class="wrap_tool_btn" style="display:none;">
+			<div class="tool_btn f_l">
+				#printListButtonMusicBarAndTop("song", "listen" "" "Date" "Date")		
+			</div>
+			#printTopChartMore( "일간 차트 더보기" "/chart/chartsong/list?date_key=3" )
+		</div>
+			
+		<ol id="trackContainerWeek" class="list_music list_week" style="display:none;">
+			#if(!$CollectionUtils.isEmpty($weekChartSongList))
+				#printTop10ChartSongList($weekChartSongList "list_week" "Week")
+			#end
+			#printRecommandSonginTop($recommandSong "list_week" "Week")
+			
+		</ol>
+		<div class="wrap_tool_btn" style="display:none;">
+			<div class="tool_btn f_l">
+				#printListButtonMusicBarAndTop("song", "listen" "" "Week" "Week")		
+			</div>
+			#printTopChartMore( "주간 차트 더보기" "/chart/chartsong/list?date_key=2" )
+		</div>
+	</div>
+</div>
+
+#printSNSListTwo($realTimeChartSongList $recommandSong)
+#printSNSListTwo($dayChartSongList $recommandSong)
+#printSNSListTwo($weekChartSongList $recommandSong)
+
+<div class="section_album" id="recentAlbumSection">
+	<h3 class="screen_out">최신앨범정보</h3>
+	<div class="cont_album">
+		<div class="wrap_cate">
+			<ul class="category_cont">
+				<li class="fst on"><a class="tab_interior" href="javascript:;" title="국내 최신">국내 최신</a></li>
+				<li><a class="tab_foreign" href="javascript:;" title="해외 최신">해외 최신</a></li>
+			</ul>
+		</div>
+
+		#if(!$CollectionUtils.isEmpty($koreanAlbumList))
+		<div class="wrap_cont wrap_domestic">
+        	<h4 class="screen_out">국내 최신 앨범정보</h4>
+        	<div class="wrap_album">
+        		<ul class="list_album CT_ZONE_HOME_ALBUMLIST">
+        			#foreach ($album in $koreanAlbumList)
+        			<li>
+        				#printAlbumThumb( $album 4 "" "top")
+        				<strong class="tit_album">
+                    		#printAlbumName( $album "" 20 1 true )
+                    	</strong>
+        				<span class="txt_artist">
+    						#printArtistName( $album.keyArtistList "" 20 true )
+        				</span>
+        			</li>
+        			#end
+        		</ul>
+        	</div>
+		
+    		#if($koreanAlbumList.size() > 5)
+    		<div class="wrap_folding CT_ZONE_HOME_ALBUMLIST_MORE">
+    			<a id="btnDomesticAlbumUnFold" class="link_unfold" href="javascript:;"><span class="arr_comm">펼치기</span></a>
+        		<a id="btnDomesticAlbumFold" class="link_fold" href="javascript:;"><span class="arr_comm">접기</span></a>
+    		</div>
+    		#end
+    		
+    		<a class="btn_comm btn_more" href="/genre/genrealbum/list">더보기</a>
+		</div>
+		#end
+
+		#if(!$CollectionUtils.isEmpty($foreignAlbumList))
+		<div class="wrap_cont wrap_foreign" style="display:none;">
+    		<h4 class="screen_out">해외 최신 앨범정보</h4>
+    		<div class="wrap_album">
+    			<ul class="list_album">
+    				#foreach ($album in $foreignAlbumList)
+    				<li>
+    					#printAlbumThumb( $album 4 "" "top")
+    					<strong class="tit_album">
+                    		#printAlbumName( $album "" 20 1 true )
+                    	</strong>
+    					<span class="txt_artist">
+    						#printArtistName( $album.keyArtistList "" 20 true )
+    					</span>
+    				</li>
+    				#end
+    			</ul>
+			</div>
+		
+    		#if($foreignAlbumList.size() > 5)
+    		<div class="wrap_folding">
+    			<a id="btnForeignAlbumUnFold" class="link_unfold" href="javascript:;"><span class="arr_comm">펼치기</span></a>
+        		<a id="btnForeignAlbumFold" class="link_fold" href="javascript:;"><span class="arr_comm">접기</span></a>
+    		</div>
+    		#end
+    		
+    		<a class="btn_comm btn_more" href="/genre/genrealbum/list?genre_group_cd=PO">더보기</a>
+		</div>
+		#end
+	</div>
+</div>
+
+<script type="text/javascript">
+	// 좌상단 배너 롤링
+	(function(){
+        var list = daum.$$(".bnr_info .bnr_img");
+		var tab = daum.$$(".bnr_info .navi_bnr .ico_top");
+        daum.Element.show(list[0]); // default 0
+		daum.Element.addClassName(tab[0], "on");
+    })();
+	
+	daum.Music.setTab(
+		daum.$$(".bnr_info .navi_bnr .ico_top"), 
+		daum.$$(".bnr_info .bnr_img"), 
+		daum.$$(".bnr_info .navi_bnr .ico_top")
+	);		
+	
+	// 실시간 차트
+	var realtimeListCtr = new daum.Music.ListPrototype();
+	realtimeListCtr.initialize({isDuplicate:true, shiftSelect:true, checkboxName:"trackCheckboxReal"});
+	new daum.Music.HomeChart({"className":"list_realtime"});
+	
+	// 일간 차트
+	var dayListCtr = new daum.Music.ListPrototype();
+	dayListCtr.initialize({isDuplicate:true, shiftSelect:true, checkboxName:"trackCheckboxDate"});
+	new daum.Music.HomeChart({"className":"list_day"});
+	
+	// 주간차트
+	var weekListCtr = new daum.Music.ListPrototype();
+	weekListCtr.initialize({isDuplicate:true, shiftSelect:true, checkboxName:"trackCheckboxWeek"});
+	new daum.Music.HomeChart({"className":"list_week"});
+	daum.Music.Home.setChartTab();
+
+	#if($koreanAlbumList.size() > 5)
+	var domesticAlbum = daum.Music.adjustView({
+		"btnUnFoldId" : "btnDomesticAlbumUnFold",
+		"btnFoldId" : "btnDomesticAlbumFold",
+		"contentSelector" : ".wrap_domestic .wrap_album .list_album li",
+		"type" : "control",
+		"defaultNum" : 5,
+		"containerId" : "recentAlbumSection",
+		"view" : "show" 
+	});
+	#end
+
+	#if($foreignAlbumList.size() > 5)
+	var foreignAlbum = daum.Music.adjustView({
+		"btnUnFoldId" : "btnForeignAlbumUnFold",
+		"btnFoldId" : "btnForeignAlbumFold",
+		"contentSelector" : ".wrap_foreign .wrap_album .list_album li",
+		"type" : "control",
+		"defaultNum" : 5,
+		"containerId" : "recentAlbumSection",
+		"view" : "show"
+	});
+	#end
+	
+	#if($koreanAlbumList.size() > 5 && $foreignAlbumList.size() > 5)
+	domesticAlbum.setCallbackObject(foreignAlbum);
+	foreignAlbum.setCallbackObject(domesticAlbum);
+	#end
+
+	daum.Music.setTab(
+		daum.$$(".section_album .wrap_cate .category_cont li a"), 
+		daum.$$(".section_album .wrap_cont"), 
+		daum.$$(".section_album .wrap_cate .category_cont li")
+	);
+	
+	//체크박스 드래그 기능
+	//new daum.Music.CheckBoxDrag("trackContainerReal"); 이건 옛날
+	// 이게 새로만든건데 안써서 없애버렸다
+	//var checkboxDrag = daum.Music.selectByDrag();
+	//checkboxDrag.init("#trackContainerReal .track", "section_checkbox");
+	
+</script>

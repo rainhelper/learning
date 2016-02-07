@@ -1,0 +1,157 @@
+## 컨텐츠 영역
+#set( $type = "mp3")
+#set( $typeStr = "MP3")
+<div class="wrap_cont section_own">
+	<h3 class="tit_mymusic tit_own">구매 음악</h3>
+##	#printDepositoryMenu($!{type})
+	<div class="mp3_noti">
+		<h4 class="screen_out">MP3 다운로드 안내</h4>
+		<ul class="list">
+			<li class="ico_noti">일부 MP3의 경우 음원 권리사의 정책에 따라 재다운로드 기간이 1년으로 제한됩니다. &nbsp; #*<a href="http://bbs.music.daum.net/gaia/do/notice/read?bbsId=Notice&pageIndex=1&articleId=90" title="자세히보기">자세히보기</a>*#</li>
+            <li class="ico_noti">MP3 다운로드가 안되거나, 다운로드 매니저 설치 오류가 발생할 때는 다운로드 매니저 FAQ를 확인해 주세요. &nbsp;<a href="http://cs.daum.net/faq/65/12034.html" title="FAQ보기" target="_blank">FAQ보기</a></li>
+        </ul>
+	</div>
+ 	<div class="music_chart $!{type}">
+		<h4 class="screen_out">$!{typeStr}</h4>
+		#printDepositorySearch($!{command} $!{ownTotalCnt} $type)
+		## 아티스트일 경우에만.
+		#if( $StringUtils.isNotBlank("$!{command.search_type}"))
+			#printDepositoryArtistSuggest($!{type} $!{myArtistList} $!{command})
+		#end
+		#printDepositoryList($!{type} $!{myList} $!{myCount} $!{typeStr} $!{command})
+
+		<div class="wrap_paging">
+			#printPaging($pagingUrl, $command.page_no, $pageHandler, "", 10)
+		</div>
+	</div>
+</div>
+ 
+<script type="text/javascript">
+daum.Music.MyDepository.init({
+	purchaseType:"MP3", 
+	search_id : "$!{command.search_id}", 
+	search_char : "$!{command.search_char}",
+	search_type : "$!{command.search_type}"
+	#if( $StringUtils.isNotBlank("$!{command.search_type}"))
+	,tabObject:daum.$$(".wrap_list_artist .tab_mycont")[0]
+	,listObject:daum.$$(".wrap_list_artist .list_keyword")[0]
+	#end
+});
+
+domReady(function(){
+	if(daum.$("DownloaderLauncher")){
+		 daum.addEvent(daum.$("DownloaderLauncher"), 'mouseout', function(e){
+		 	daum.Music.Downloader.check(e);
+		 }); 
+	}
+});
+
+
+//new daum.Music.CheckBoxDrag("trackContainer");
+//var checkboxDrag = daum.Music.selectByDrag().init("#trackContainer .track", "col_check");
+</script>
+##end
+<div id="flashContainer"></div>
+
+<script type="text/javascript">
+    domReady( function(){
+        daumMusic.JsPlayer.embedSWF( "flashContainer", null, daum.Music.BitPlayer.stop );
+    });
+</script>
+
+
+#if($StringUtils.equals("$!{command.debugmode}","2"))
+
+<div id="FTMessage">
+---------------------<br/>
+FT 체크<br/>
+---------------------<br/>	
+1. 곡리스트 영역 - 가사및 다운로드 확인해야 함.<br/>
+ 
+
+	<br>
+</div>
+	
+MP3 갯수: #if($!{myCount}) $myCount #else 0 #end <br/>
+현재오더링 :  #if($!{command.getOrdering()}) $command.getOrdering() #end (디폴트:최신순) <br/><br/>
+
+#if($!{command.getSearch_artist()}) 찾는아티스트이름: $command.getSearch_artist() #end <br/>
+#if($!{command.getSearch_title()}) 찾는노래제목: $command.getSearch_title() #end <br/><br/>
+#if($!{myArtistList})
+	#foreach($item in $myArtistList)
+		 아티스트아이디: $item.artist.artistId<br/>
+	      아티스트명 : $item.artist.name<br/>
+		 곡수: $item.ownCount<br/>
+	#end
+#end
+
+#if($!{myList})	
+	#foreach($item in $myList)
+		노래ID: $item.song.songId<br/> 
+		제목: $item.song.title<br/> 
+		성인여부: #if($!{item.adultYn}) $item.adultYn #end / $item.song.adultYn<br/> 
+		다운로드상태 : $item.status <br/>
+		#foreach($artist in $item.keyArtistList)
+			아티스트명 : $artist.name (아티스트아이디 : $artist.artistId) <br/>
+		#end
+		#foreach($artist in $item.featArtistList)
+			피처링아티스트명 : $artist.name (피처링아이디 : $artist.artistId) <br/>
+		#end		
+		#if($!{item.giver.daumName}) 보낸사람 : $item.giver.daumName #end <br/>
+		
+		앨범명: $item.song.album.title (앨범ID: $item.song.album.albumId)<br/>
+		앨범타입CD : $item.song.album.typeCd <br/>
+		앨범타입네임 : $item.song.album.typeName <br/>
+		앨범볼륨 : $item.song.album.volume <br/>
+		
+		듣기아이디(널이면 비활성화): #if($!{item.song.AODLinkId}) $item.song.AODLinkId #end <br/>
+		가사정보 : $item.song.lyricsYn<br/>
+		뮤직비디오아이디 (널이면 비활성화) :#if($!{item.song.vclipLinkId}) $item.song.vclipLinkId #end <br/>
+		MP3아이디(널이면 비활성화) :#if($!{item.song.MP3LinkId}) $item.song.MP3LinkId #end <br/>
+		BGM아이디(널이면 비활성화) :#if($!{item.song.BGMLinkId}) $item.song.BGMLinkId #end <br/>
+		Bell판매상태(널이면 비활성화) :#if($!{item.song.bellSalesStatus}) $item.song.bellSalesStatus #end <br/>
+		ring판매상태(널이면 비활성화) :#if($!{item.song.ringSalesStatus}) $item.song.ringSalesStatus #end <br/>
+		구매일: $!CheckDate.makeReleaseDate($!{item.ownDate}) <br/>
+		--------------<br/>	
+	#end
+#end
+
+
+<b>왼쪽레프트정보</b><br/>
+다음이름: $left.cpDaumName <br/>
+전화번호 $left.cpNumber <br/>
+유저아뒤 : $left.userId <br/>
+음악감상잔여일 $left.aodLeftDay <br/>
+mp3잔여곡 : $left.Mp3LeftCount <br>
+
+<br>
+MY 뮤직<br/> 
+플레이리스트 $left.myPlayCount <br/>
+
+#foreach($item in $left.myPlayList)<br/>
+	ㅡ순서: $item.playListId || 이름: $item.playListName ($item.totalPlayCnt) || 디폴트: $item.gubunCd
+#end <br/>
+
+<br/>
+즐겨 듣는 음악 <br/>
+최근 들은 음악 <br/>
+관심음악 : $left.favoriteCount <br/>
+관심음악제일마지막에 저장된 탭 : $left.lastSavedObjType <br/>
+구매음악 : $left.ownCount <br/>
+		
+MY관리 <br/>
+이용권현황 $left.ticketOwnCount <br/>
+내알림  $left.announceCount <br/>
+내설정 <br/>
+
+공지사항 <br/><br/>
+#foreach($item in $left.recentNoticeList)<br/>
+	#if($foreach.index < 4)
+		$item.get("SUBJECT") ||  $item.get("URL") <br />
+	#end
+#end <br />	
+<br>
+
+현재페이지 : $command.getPage_no() <br/>
+
+#end

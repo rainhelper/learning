@@ -1,0 +1,15 @@
+#if("$!{callback}" != "")
+if (typeof(${callback}) == "function") ${callback} (
+#end
+{
+	"boardList" : [
+#foreach(${board} in ${dto.boardResult.documentList})
+	#if(${foreach.index} > 0) , #end
+	${JsonTool.toJson(${board})}
+#end
+	]
+}
+#if("$!{callback}" != "")
+);
+#end
+

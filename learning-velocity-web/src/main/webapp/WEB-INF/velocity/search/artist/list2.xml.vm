@@ -1,0 +1,20 @@
+#set($artistList = $dto.artistResult.documentList)
+$response.setContentType("text/xml")<?xml version="1.0" encoding="UTF-8"?>
+#if("$!{artistList}" != "")
+<Artists>
+#foreach($artist in $artistList)
+	<Artist>
+		<ArtistId>$!{artist.docid}</ArtistId>
+#if("$!{artist.artist_name}" != "")		<ArtistName><![CDATA[$!{artist.artist_name}]]></ArtistName>#else		<ArtistName/>#end
+
+#if("$!{artist.artist_thumb_url}" != "")		<MainImage><![CDATA[$!{artist.artist_thumb_url}]]></MainImage>#else		<MainImage/>#end
+
+#if("$!{artist.getBirthDate()}" != "")		<BirthDateTime><![CDATA[$!{artist.getBirthDate()}]]></BirthDateTime>#else		<BirthDateTime/>#end
+
+		<ServicePageUrl><![CDATA[http://music.daum.net/artist/artist.do?artistId=$!{artist.docid}]]></ServicePageUrl>
+#if("$!{artist.getRepresentationSong().getTitle()}" != "")		<RepresentationSongTitle><![CDATA[$!{artist.getRepresentationSong().getTitle()}]]></RepresentationSongTitle>#else		<RepresentationSongTitle/>#end
+
+	</Artist>
+#end
+</Artists>
+#end

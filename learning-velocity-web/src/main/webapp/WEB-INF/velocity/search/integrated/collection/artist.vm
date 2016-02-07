@@ -1,0 +1,224 @@
+
+#if(($!{artistCount}) && $!{artistCount} > 0)
+<div class="section_artist" id="artistSection">
+	
+	<div class="wrap_title">
+		<h3 class="tit_search tit_artist">아티스트</h3>
+		<span class="txt_bar"> | </span>
+		<span class="txt_quantity">총 <strong class="fc_blue ls_0">$!{artistCount}</strong> 건</span>
+	</div>
+	
+	<ul class="list_info" id="searchArtistList">
+	#if(!$CollectionUtils.isEmpty($artistList))
+		#foreach($artist in $artistList)
+		<li>
+			#printArtistThumb($artist 2)
+			
+			<div class="wrap_info">
+				<span class="txt_name">
+					<a href="/artist/main?artist_id=$!{artist.artist_id}" onclick="daum.Music.artistDetail($!{artist.artist_id});return false;" title="#stripHTML($!{artist.artist_name})">
+						${HtmlTool.cutHighlightedKoreanString("$!{artist.artist_name}", 18, "...")}
+					</a>
+				</span>
+				
+				#if($StringUtils.isNotBlank("$!{artist.credit_name}") || (!$StringUtils.equals("$!{artist.type_name}", "None") && $StringUtils.isNotBlank("$!{artist.type_name}")))
+				<dl class="col_info">
+					<dt>활동</dt>
+					<dd>
+						#set($activityInfo = "")
+						#if($StringUtils.isNotBlank("$!{artist.credit_name}"))
+							#set($activityInfo = $!{artist.credit_name})
+						#else
+							#if(!$StringUtils.equals("$!{artist.type_name}", "None"))
+								#set($activityInfo = $!{artist.type_name})
+							#end
+						#end
+						#if($StringUtils.isNotBlank("$!{artist.artist_lifetime}") && ($StringUtils.isNotBlank("$!{artist.birthDt}") || $StringUtils.isNotBlank("$!{artist.deathDt}")))
+							#if($StringUtils.isNotBlank("$!{artist.birthDt}"))
+								#set($activityInfo = "$activityInfo" + "($!{CheckDate.makeReleaseDate($!{artist.birthDt})}")
+							#end
+							#if($StringUtils.isNotBlank("$!{artist.deathDt}"))
+								#set($activityInfo = "$activityInfo" + " ~ $!{CheckDate.makeReleaseDate($!{artist.deathDt})})")
+							#else
+								#set($activityInfo = "$activityInfo" + ")")
+							#end
+						#end	
+						<span title="$activityInfo">#strCut("$activityInfo.replaceAll('\|','\, ')", 20)</span>
+					</dd>
+				</dl>
+				#end
+				
+				#set($belongedBandList = $!{artist.getBelongedBandList()})
+				#if($!{belongedBandList} && $belongedBandList.size() > 0)
+				<dl class="col_info">
+					<dt>그룹</dt>
+					<dd>
+					#foreach($band in $belongedBandList)
+						#if( $foreach.index == 0)
+    						#if($foreach.index > 0), #end
+    						#if($StringUtils.isNotBlank("$!{band.artistId}") && !$StringUtils.equals("$!{band.artistId}","0"))<a href="/artist/main?artist_id=$!{band.artistId}" onclick="daum.Music.artistDetail($!{band.artistId});return false;" title="#stripHTML($!{band.name})">#strCut("#stripHTML($!{band.name})",20)</a>#else<span title="#stripHTML($!{band.name})">#strCut("#stripHTML($!{band.name})",20)</span>#end
+						#end
+					#end
+					#if($!{artist.moreBand})...&nbsp;&nbsp;#end
+					</dd>
+				</dl>
+				#end
+				
+				#set($song = $artist.getRepresentationSong())
+				#if($StringUtils.isNotBlank("$!{song.songId}") && !$StringUtils.equals("$!{song.songId}", "0"))
+				#if($StringUtils.isNotBlank("$!{song.title}"))
+				<span class="wrap_listen">
+					#if($StringUtils.equals("$song.listenYn", "Y")) #set ( $_listenAble = true ) #else #set ( $_listenAble = false ) #end
+					#if($_listenAble)<a class="ico_comm ico_listen" title="$!{song.title}" #if($_listenAble)onclick="daum.Music.AodPlayer.add(this,$!{song.songId});return false;"#end href="javascript:;">#else<span class="ico_comm ico_nolisten">#end
+					${HtmlTool.cutHighlightedKoreanString("$!{song.title}", 16, "...")}
+					#if($_listenAble)</a>#else</span>#end
+				</span>
+				#end
+				#end
+				
+			</div>
+		</li>
+		#end
+	#end
+	</ul>
+	
+	#if($!{artistCount} > 6)
+	<div class="wrap_folding">
+		<a href="#artistSection" id="btnArtistListFold" class="btn_fold">접기</a>
+		<a href="javascript:;" id="btnArtistListUnFold" class="btn_unfold">펼치기</a>
+		<a href="/search/artist/list?query=$!{query}" class="link_more">아티스트 더보기</a>
+	</div>
+	
+	<script type="text/javascript">
+		var artistExtendView = new daum.Music.ExtendView({
+			"btnUnFoldId" : "btnArtistListUnFold",
+    		"btnFoldId" : "btnArtistListFold",
+    		"containerId" : "searchArtistList",
+			"jsonUrl" : "/search/artist/list_for_unfolding.json",
+			"query" : "$!{command.encodedQuery}",
+			"type" : "artist",
+			"totalCount" : $!{artistCount}, 
+			"defaultNum" : 6
+		});
+	</script>
+	#else 
+	<div class="wrap_more">
+		<a href="/search/artist/list?query=$!{query}" class="link_more">아티스트 더보기</a>
+	</div>
+	#end
+</div>
+#end
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+
+<!-- 아티스트 -->
+	#if(($!{artistCount}) && $!{artistCount} > 0)
+		<div class="collTitle"><h3>아티스트 <span class="num">($!{dto.artistResult.getStartNum()}-$!{dto.artistResult.getEndNum(3)} / 총  $artistCount건)</span></h3></div>			
+		<div class="collWid collTot">
+		#foreach($artist in $artistList)
+			##if($StringUtils.equals("$!{artist.artist_exact_yn}", "Y"))
+			#if($foreach.index < 10)
+			<div class="clearfix #if ($foreach.index == 0) mThumImgListFst #else mThumImgList #end">
+				<a href="/artist/artist.do?artistId=$!{artist.artist_id}" class="collImg" onclick="return gLink(null, 'ACTY', '1', '1');"><img src="$ImageOldUtil.getImageUrl("$!{artist.thumb}", $ImageOldUtil.ARTIST_74_107)" width="74" height="107" alt="#getStrongText(${artist.artist_name})" class="oline"></a>
+				<div class="collCont">
+					<span class="tit2 subj2"><a href="/artist/artist.do?artistId=$!{artist.artist_id}" onclick="return gLink(null, 'ACTY', '2', '1');">$!{artist.artist_name}  #if( $StringUtils.isNotEmpty("$!{artist.artist_name_kor}") )($artist.artist_name_kor)#end</a></span>
+					
+					#if($StringUtils.isNotEmpty("$!{artist.typeName}") || $StringUtils.isNotEmpty("$!{artist.nation_name}") || $StringUtils.isNotEmpty("$!{artist.debut_dttm}"))
+					<dl class="collDl">
+						<dd class="tit">활동정보</dd>
+						<dd class="con">
+							#set($chkL = "off")
+							#if($StringUtils.isNotEmpty("$!{artist.credit_name}"))
+								$!{artist.credit_name}
+								#set($chkL = "on")
+							#else
+								#if($StringUtils.isNotEmpty("$!{artist.type_name}"))
+									$!{artist.type_name}
+									#set($chkL = "on")
+								#end
+							#end
+							#if($StringUtils.isNotEmpty("$!{artist.nation_name}"))
+								#if($StringUtils.equals($!{chkL},"on")) <span class="vline"> | </span> #end
+								$!{artist.nation_name}
+								#set($chkL = "on")
+							#end
+				#*
+							#if($StringUtils.isNotEmpty("$!{artist.debut_dttm}")&&!$StringUtils.equals($!{artist.debut_dttm},"00000000"))
+								#if($StringUtils.equals($!{chkL},"on")) <span class="vline"> | </span> #end
+								$ConverterUtil.formatByStar(${artist.debut_dttm}, "****") 데뷔
+							#end
+				*#		
+							#if($StringUtils.isNotEmpty("$!{artist.artist_lifetime}"))
+								#if($StringUtils.equals($!{chkL},"on")) <span class="vline"> | </span> #end
+								$!{artist.artist_lifetime}
+							#end
+						</dd>
+					</dl>
+					#end
+					
+					#if($StringUtils.isNotEmpty("$!{artist.class_name}") || $StringUtils.isNotEmpty("$!{artist.genre_name}"))
+					<dl class="collDl">
+						<dd class="tit">장르</dd>
+						<dd class="con">
+							#if($StringUtils.isNotEmpty("$!{artist.class_name}"))
+								<a href="/genre/genre.do?styleKind=genre&genreCode=$!{artist.class_id}" onclick="return gLink(null, 'ACTY', '3', '1');">$!{artist.class_name}</a>
+								#if($StringUtils.isNotEmpty("$!{artist.genre_name}")) &gt; #end
+							#end
+							#if($StringUtils.isNotEmpty("$!{artist.genre_name}"))
+								<a href="/genre/genre.do?styleKind=styleGroup&styleGroupCode=$!{artist.genre_id}" onclick="return gLink(null, 'ACTY', '4', '1');">$!{artist.genre_name}</a>#end
+						</dd>
+					</dl>
+					#end
+					#set($song = $artist.getRepresentationSong())
+					#if($StringUtils.isNotEmpty("$!{song.songId}"))
+    				<dl class="collDl">
+    					<dd class="tit">대표곡</dd>
+    					<dd class="con">
+    						<a href="/song/song.do?songId=$!{song.songId}" class="gray_d2 fl" title="$!{song.title} 곡 상세정보 바로가기"   onclick="return gLink(null, 'ACTY', '5', '1');">$!{song.title}</a>
+							#if($StringUtils.equals("$song.listenYn", "Y")) #set ( $_listenAble = true ) #else #set ( $_listenAble = false ) #end
+							<input class="typeBtn btSetMiniSmall btMiniSmallListen#if(!$_listenAble)_dis#end" type="button" #if($_listenAble)onclick="listenSong('$!{song.songId}');return gLink(null, 'ACTY', '6', '1');"#else disabled="true"#end title="#escTitle($!{song.title}) 곡 듣기" value="#escTitle($!{song.title}) 곡 듣기"/>		
+    					</dd>
+    				</dl>
+					#end
+					
+					#set($memberList = $!{artist.getMemberList()})
+					#if($!{memberList} && $memberList.size() > 0)
+					<dl class="collDl">
+						<dd class="tit">멤버</dd>
+						<dd class="con">
+							#foreach($member in $memberList)#if($foreach.index > 0), #end 
+								#if( $StringUtils.isNotEmpty("$!{member.artistId}") && !$StringUtils.equals("${member.artistId}","0"))<a href="/artist/artist.do?artistId=$!{member.artistId}" class="stit" onclick="return gLink(null, 'ACTY', '8', '1');">$member.name</a>#else $member.name#end 
+							#end
+							#if($!{artist.moreMember})...&nbsp;&nbsp;<a href="/artist/intro.do?artistId=$!{artist.artist_id}#wArtiMember" class="mlink" target="_blank" onclick="return gLink(null, 'ACTY', '8', '1');">더보기</a>#end
+						</dd>
+					</dl>
+					#end
+					#set($belongedBandList = $!{artist.getBelongedBandList()})
+					#if($!{belongedBandList} && $belongedBandList.size() > 0)
+					<dl class="collDl">
+						<dd class="tit">소속</dd>
+						<dd class="con">
+							#foreach($band in $belongedBandList)#if($foreach.index > 0), #end 
+								#if($StringUtils.isNotEmpty("$!{band.artistId}") && !$StringUtils.equals("$!{band.artistId}","0"))<a href="/artist/artist.do?artistId=$!{band.artistId}" class="stit" onclick="return gLink(null, 'ACTY', '7', '1');">$!{band.name}</a>#else $!{band.name}#end 
+							#end
+							#if($!{artist.moreBand})...&nbsp;&nbsp;<a href="/artist/artist.do?artistId=$!{artist.artist_id}" class="mlink" target="_blank" onclick="return gLink(null, 'ACTY', '7', '1');">더보기</a>#end
+						</dd>
+					</dl>
+					#end					
+														
+				</div>
+			</div>
+			#end
+		#end
+		
+		</div>
+		#if($!{artistCount} > 2)
+			<div class="moreArea"><a href="/search/artist.do?query=$!{command.encodedQuery}" onclick='return gExtraLink(this, "ACTY", "1")'>아티스트 더보기</a></div>
+		#else
+			<div class="nmoreArea"></div>
+		#end
+		#if($dto.artistResult.isDrawingEndLine)
+		<div id="line"></div><hr/>
+		#end
+	#end
+#end

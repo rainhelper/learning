@@ -1,0 +1,49 @@
+#uaCheck()
+<div id="daumContent" class="cont_detail">
+	<h2 class="screen_out">상세</h2>
+	<div class="section_intro">
+		<div class="cont_navi">
+			<h3 class="tit">선정단 리뷰</h3>
+			#btnPrev()
+		</div>
+		
+		<div class="wrap_detail_tit">
+			<a href="/album/main?album_id=$!{album.albumId}">
+			<div class="thumb">
+				<img #if($isWVGA)width="49" height="49"#else width="33" height="33"#end alt="이미지정보" src="$ImageUtil.getMobileImageUrl("$!{album.mainImage.filePath}", "41x41", "ALBUM", "C")">
+				<span class="outline"></span>
+			</div>
+			<h4 class="tit"><span class="tit_album">$!{album.title}</span></h4>
+			</a>
+		</div>
+		
+		#if($StringUtils.isNotBlank("$!{imageneInfo.criticims}"))
+		<div class="wrap_cont">
+    		#set ( $tmp_description = "$!{imageneInfo.criticimsContents}" )
+    		#set ( $tmp_description = $tmp_description.replaceAll("\r","").replaceAll("\n", "<br />"))
+			<strong class="tit_hundred">$!{imageneInfo.criticims}님의 리뷰</strong>
+			$tmp_description
+		</div>
+		#end
+	</div>
+	
+#SearchForm("only_bottom")
+</div>
+
+#parse("/velocity/mobileweb/realtimeissue.vm")
+#*
+
+앨범 <br>
+albumId : $!{album.albumId}<br>
+title : $!{album.title}<br>
+typeName : $!{album.typeName}<br>
+mainImage : $!{album.mainImage.filePath}<br>
+썸네일 : $ImageUtil.getMobileImageUrl("$!{album.mainImage.filePath}", "41x41", "ALBUM", "C") <br/>
+
+<br/>
+
+앨범소개<br/>
+- 앨범소개 : $!{album.description}<br><br>
+
+
+*#

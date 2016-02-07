@@ -1,0 +1,13 @@
+#parse("/velocity/wing/piece/wingAd.vm")
+##parse("/mot/wing/noticebox.html")##공지박스
+##parse("/velocity/wing/piece/musicquiz.vm")##뮤직듣기평가
+##parse("/velocity/wing/piece/mypeopleAlarm.vm")##마이피플알람설정
+#parse("/mot/wing/hotvclip.html")##hot영상
+#parse("/mot/wing/recentmusicbar.html")##뮤직바최신
+#parse("/mot/wing/bestmusicbar.html")##뮤직바인기
+<script type="text/javascript">
+domReady( function(){
+var lastc = daum.Music.getLastTagChild("mRight","div");
+if(lastc){daum.addClassName(lastc,"wrap_lst");}
+});
+</script>

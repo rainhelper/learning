@@ -1,0 +1,40 @@
+{
+"serviceid" : "music",
+"sectionid" : "album_search",
+"title" : "앨범 검색 결과 목록",
+"list" :[
+#foreach($item in $dto.albumResult.documentList)
+	#if($foreach.index > 0)
+		,
+	#end
+{
+	"serviceid":"music",
+	"sectionid":"album",
+	"itemid" : "$!{item.docid}",
+	"title" : "$!{item.album_name}, $!{StringCutUtil.removeTagJSON($!{item.album_name})}",
+	"link" : "/album/album.do?songId=$!{item.docid}",
+	"etc" : {
+    	"artist" : [
+    	{
+					"artistId" : "$!{item.artist_id}",
+					"artistname" : "${StringCutUtil.removeTagJSON($!{item.artist_name})}"
+		}
+    	],
+    	"volume" : "$!{item.album_volume}",
+    	"releasedate" : "$!{item.release_date}",
+    	"thumbnail" : "$!{item.album_thumb_url}",
+    	"titlesongid" : "$!{item.title_song_id}",
+    	"titlesongname" : "$!{item.title_song_name}"    	
+    }
+}
+#end
+]
+,
+"paging" : {
+        "page" : $!{command.pageNo},
+        "count_per_page" : $!{dto.ph.onePageCnt},
+#set($page_count = $MathTool.ceil($MathTool.div($!{dto.ph.totalCnt},$!{dto.ph.onePageCnt})))
+        "page_count" : $page_count,
+        "count" : $!{dto.ph.totalCnt}
+    }
+}

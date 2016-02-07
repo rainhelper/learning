@@ -1,0 +1,58 @@
+{
+"SongList" : {
+    "LastUpdate" : "$!{command.endTime}",
+    "ModifyFlag" : "Y",
+    "HasSongList" : #if(${songList.size()} > 0)"Y"#else "N"#end,
+	"Song" : [
+    #foreach($song in $songList)
+		#set($songTitle = "#printSongName( $!{song.song} '' 100 false)")
+	#if($velocityCount!=1),#end
+	{
+	    "ChannelTypeCd" : #if("$!{song.channel.mediaType}" == "1") "TV" #else "라디오" #end ,
+	    "ChannelName" : "$!{EscapeUtil.escapeJsonString($!{song.channel.channelName})}",
+		"ChannelId" : "$!{song.channel.channelId}",
+		"ChannelUrl" : #if("$!{song.schedule.radioProgramId}" !="" || "$!{song.schedule.tvProgramId}" !="") "http://music.daum.net/onair/search/channel?channelIds=${song.channel.channelId}&mediaType=$!{song.channel.mediaType}"#end ,
+		"ProgramMasterName" : "$!{EscapeUtil.escapeJsonString($!{song.schedule.programMasterName})}",
+		"ProgramId" : "$!{song.schedule.programId}",
+		"ProgramUrl" : "#if("$!{song.channel.mediaType}" == "1" && "$!{song.schedule.programId}" !="") http://music.daum.net/onair/tv?programId=$!{song.schedule.programId} #elseif("$!{song.channel.mediaType}" == "4" &&"$!{song.schedule.programId}" !="") http://music.daum.net/onair/radio/channel?channelId=$!{song.channel.channelId}&programId=$!{song.schedule.programId}#end" , 
+		"UpdateTime" : "${song.updateDtm}",
+		"StartTime" : "${song.startTime}",
+		"ProgramName" : "$!{EscapeUtil.escapeJsonString($!{song.schedule.programName})}",
+		"ProgramStartDate" : "#if("$!{song.schedule.programStartTime}" != "" && $!{song.schedule.programStartTime.length()} >= 8)$!{song.schedule.programStartTime.substring(0,8)}#else $!{song.schedule.programStartTime} #end" ,
+		"ProgramStartTime" : "#if("$!{song.schedule.programStartTime}" != "" && $!{song.schedule.programStartTime.length()} >= 12)$!{song.schedule.programStartTime.substring(8,12)}#end" ,
+		"SongId" : "#if("${song.song.songId}" !="0")${song.song.songId}#end" ,
+		"SongTitle" : "#if("${song.song.songId}" !="0")$!{EscapeUtil.escapeJsonString(${songTitle})}#else$!{EscapeUtil.escapeJsonString($!{song.title})}#end" ,
+		"SongUrl" : "#if("${song.song.songId}" !="0")http://music.daum.net/album/main?album_id=${song.song.album.albumId}&songId=${song.song.songId}#end" ,
+		"ArtistList" : {
+		    #if(${song.song.keyArtistList.size()} > 0)
+				"Artist" : [
+        		#foreach($artist in ${song.song.keyArtistList})
+				#if($velocityCount!=1),#end
+				{
+				    "ArtistId" : "${artist.artistId}",
+					"ArtistName" : "$!{EscapeUtil.escapeJsonString(${artist.name})}",
+					"ArtistUrl" : "http://music.daum.net/artist/main?artist_id=${artist.artistId}"
+				}
+				#end
+				]
+			#else
+				"Artist" : {
+				    "Artistid" : "",
+					"ArtistName" : "$!{EscapeUtil.escapeJsonString(${song.artistName})}",
+					"ArtistUrl" : ""
+				}
+				
+				
+			#end	
+		},
+		"AlbumId" : "#if("${song.song.songId}" !="0")${song.song.album.albumId}#end" ,
+		"AlbumName" : "#if("${song.song.songId}" !="0")$!{EscapeUtil.escapeJsonString(${song.song.album.title})}#end" ,
+		"AlbumUrl" : "#if("${song.song.album.albumId}" !="0")http://music.daum.net/album/main?album_id=${song.song.album.albumId}#end" ,
+        "AlbumImage" : "#if("${song.song.songId}" !="0")$ImageUtil.getImageUrl("$!{song.song.album.mainImage.filePath}", "${command.imageSize}x${command.imageSize}", "ALBUM", "C")#end" ,
+		"LyricsUrl" : "#if("${song.song.songId}" !="0")http://music.daum.net/album/main?album_id=${song.song.album.albumId}&songId=${song.song.songId}#end" ,
+		"CollenctionTime" : "${song.lastUpdate}"
+	}
+	#end
+	]
+}
+}

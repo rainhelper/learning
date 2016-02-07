@@ -1,0 +1,19 @@
+{
+"status" : $status,
+"korean" : [
+#foreach($album in $koreanAlbumList)
+{
+	        "albumId" : "$!{album.albumId}",
+			"type" : "1"
+}#if($velocityHasNext),#end
+#end
+],
+"foreign" : [
+#foreach($album in $foreignAlbumList)
+{
+	        "albumId" : "$!{album.albumId}",
+			"type" : "2"
+}#if($velocityHasNext),#end
+#end
+]
+}

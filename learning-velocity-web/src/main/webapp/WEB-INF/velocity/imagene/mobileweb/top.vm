@@ -1,0 +1,275 @@
+#uaCheck()
+<div id="daumContent" class="cont_top">
+	<h2 class="screen_out">뮤직홈</h2>
+	#SearchForm("only_top")
+
+	<!-- 뮤직 스페셜-최신앨범 -->
+	<div class="special_top">
+	#foreach($motTemplete in $motTempleteList)
+		#if($StringUtils.isNotBlank("$!{motTemplete.linkUrl}") && $foreach.count == 1)
+    	<div class="section_special">
+        	<div class="head">
+				<h3 class="tit">뮤직 스페셜</h3>
+			</div>
+        	<div class="cont">
+				<a href="$!{motTemplete.linkUrl}" class="link">
+					<span class="thumb">
+						<img #if($isWVGA) width="444" height="129"#else width="296" height="86"#end alt="" data-src="$!{motTemplete.imageUrl}" class="loading">
+						<span class="outline"></span>
+					</span>
+					<em class="info fc_blue">#strCut("$!{motTemplete.title}", 100)</em>
+				</a>
+			</div>
+        </div>
+		#end
+	#end
+		<div class="section_newalbum">
+			<div class="head">
+				<h3 class="tit">최신앨범</h3>
+			</div>
+			<div class="crop">
+    			<div class="wrap_newalbum swiper" id="swiper">
+					## initTopRecommendAlbum 자바스크립트 함수로 그린다.
+    			</div>
+			</div>
+			<div class="paging">
+				<p class="paging_swipe" id="pagingToggle"><span class="num">1</span><span class="num">2</span><span class="num">3</span></p>
+				<button class="btn_page btn_prev" id="swipeBtnPrev"><span class="ico_comm">이전</span></button>
+				<button class="btn_page btn_next" id="swipeBtnNext"><span class="ico_comm">다음</span></button>
+			</div>
+			
+		</div>
+	</div>
+	<!-- //뮤직 스페셜-최신앨범 -->
+
+
+	<!-- 실시간 TOP100 -->
+	<div class="section_realtime">
+		<div class="wrap_head">
+			<h3 class="tit">실시간 TOP100</h3>
+		</div>
+		<span class="link_more">
+			<a href="/chart/main" class="txt_info">더보기</a> <span class="ico_music ico_arr"></span>
+		</span>
+		<ol class="list_info list_realtime">
+        #foreach($song in $chartSongList)
+			#rankedPlayList("top")
+        #end
+		</ol>
+		<a href="/chart/list?genre_cd=TORA" class="btn_more">
+			<strong>실시간 TOP100 더보기</strong> <span class="ico_comm ico_more"></span>
+		</a>
+	</div>
+	<!-- //실시간 TOP100 -->
+
+	#*
+	<div class="section_bnr">
+		<h3 class="screen_out">이벤트</h3>
+		#foreach($motTemplete in $motTempleteList)
+		<a href="$!motTemplete.linkUrl" class="bnr_info">
+			<div class="bnr_img"><em class="fc_red">아이폰과 환상궁합,</em> 뮤직앱 다운로드</div>
+		</a>
+		#end
+	</div>
+	*#
+	
+	<!-- 뮤직 BAR -->
+	<div class="section_bar">
+		<div class="wrap_head">
+			<h3 class="tit">뮤직 BAR</h3>
+		</div>
+		<ul class="list_info list_bar">
+        #foreach($board in $recentBoardList)
+			#musicBarList()
+        #end
+		</ul>
+		
+		<ul class="list_info list_category">
+			<li>
+				<div class="wrap_cont">
+					<a href="/ticket/ticketitem/list" class="tit_chart">
+						<span class="ico_comm ico_album"></span>
+						<span class="f_l">이용권 구매 및 관리</span>
+						<span class="ico_comm ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="wrap_cont">
+					<a href="/musicbar/djalbum/list" class="tit_chart">
+						<span class="ico_comm ico_album"></span>
+						<span class="f_l">DJ 추천음악</span>
+						<span class="ico_comm ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			
+			<!--li>
+				<div class="wrap_cont">
+					<a href="/imagene/main" class="tit_chart">
+						<span class="ico_comm ico_album"></span>
+						<span class="f_l">이달의 앨범</span>
+						<span class="ico_comm ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="wrap_cont">
+					<a  href="/sym/" class="tit_chart">
+						<span class="ico_comm ico_album"></span>
+						<span class="f_l">SUPPORT YOUR MUSIC</span>
+						<span class="ico_comm ico_arrow"></span>
+					</a>
+				</div>
+			</li-->
+			<li>
+				<div class="wrap_cont">
+					<a href="/vclip/chart" class="tit_chart">
+						<span class="ico_comm ico_best"></span>
+						<span class="f_l">인기 뮤직비디오</span>
+						<span class="ico_comm ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="wrap_cont">
+					<a href="/vclip/top" class="tit_chart">
+						<span class="ico_comm ico_best"></span>
+						<span class="f_l">스페셜 클립</span>
+						<span class="ico_comm ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="wrap_cont">
+					<a href="/appIntro" class="tit_chart">
+						<span class="ico_comm ico_mobile"></span>
+						<span class="f_l">아이폰, 안드로이드 뮤직 앱 안내</span>
+						<span class="ico_comm ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="wrap_cont">
+					<a href="/event/mypeople" class="tit_chart">
+						<span class="ico_comm ico_mypeople"></span>
+						<span class="f_l">시사회/콘서트 이벤트 채널ON</span>
+						<span class="ico_comm ico_arrow"></span>
+					</a>
+				</div>
+			</li>
+		</ul>
+		
+		<span class="link_more">
+			<a href="/musicbar/top" class="txt_info">더보기</a> <span class="ico_music ico_arr"></span>
+		</span>
+	</div>
+	<!-- //뮤직 BAR -->
+	
+</div>
+
+
+
+
+## swiper setting
+<script type="text/javascript">
+var recommendAlbumListJSON = [##
+#***##foreach($album in $recommendAlbumList)##
+#***##***##set($imgsrc = $!{album.mainImage.filePath})##
+#***##***##set($imgsrc = $ImageUtil.getMobileImageUrl($imgsrc, "150x150", "ALBUM", "C"))##
+#***##***##if($MathTool.mod($foreach.index, 3) == 0 && !$foreach.first),#end##
+#***##***##if($MathTool.mod($foreach.index, 3) == 0)##
+
+{ items :[ ##
+#***##***##end
+#***##***##if($MathTool.mod($foreach.index, 3) != 0),#end##
+		
+	{"albumId" : "$!{album.albumId}",
+	"imageSrc" : "$!imgsrc",
+	"artistName" : "#foreach($artist in $album.keyArtistList)#if($foreach.count!=1), #end$!Escape.html($!artist.name)#end",
+	"title" : "$!Escape.html($!{album.title})"
+	}##
+#***##***##if($MathTool.mod($foreach.index, 3) == 2 || $foreach.last)##
+	
+	]
+}##
+#***##***##end##		
+#***##***##end##	
+];##
+
+initTopRecommendAlbum(recommendAlbumListJSON,$!isWVGA);
+
+</script>
+	
+#parse("/velocity/mobileweb/realtimeissue.vm")
+
+#*
+실시간챠트100<br/>
+#foreach($song in $chartSongList)
+	순위 : $song.rank<br/>
+	변동순위 : $song.modRank<br/>
+	곡제목 : $song.title<br/>
+	곡아이디 : $song.songId<br/>
+	가사유무 : $song.lyricsYn<br/>
+	뮤직비디오유무 : $song.vclipLinkId<br/>
+	티비팟아이디 : $song.tvpotVId<br/>
+	썸네일 : $ImageUtil.getMobileImageUrl("$!{song.album.mainImage.filePath}", "33x33", "ALBUM", "C")
+	앨범아이디 :  $song.album.albumId<br/>
+	듣기아이디(널이면 비활성화) : $song.AODLinkId<br/>
+	19금 여부 : $song.adultYn
+	아티스트 :<br/>
+	#foreach($artist in $song.keyArtistList)
+		아티스트명 : $artist.name<br/>
+		아티스트아이디 : $artist.artistId<br/>
+	#end
+	피쳐링아티스트 :<br/>
+	#foreach($artist in $song.featArtist)
+		아티스트명 : $artist.name<br/>
+		아티스트아이디 : $artist.artistId<br/>
+	#end
+	<br/>
+#end
+<hr/>
+
+
+최신앨범 한국꺼 5개<br/>
+#foreach($album in $recommendAlbumList)
+	앨범아이디 : $album.albumId <br/>
+	앨범명 : $album.title <br/>
+	앨범볼륨 : $album.volume <br/>
+	앨범이미지 : $album.mainImage.filePath <br/>
+	앨범재생여부 : $album.playYn <br/>
+	발매일 : $album.releaseDt <br/>
+	#foreach($artist in $album.keyArtistList)
+		아티스트명 : $artist.name<br/>
+		아티스트아이디 : $artist.artistId<br/>
+	#end
+	<br/><br/>
+#end
+<hr/>
+
+
+배너<br/>
+#foreach($motTemplete in $motTempleteList)
+$motTemplete
+이미지 : $motTemplete.imageUrl <br/>
+링크 : $motTemplete.linkUrl <br/>
+<br/><br/>
+#end
+<hr/>
+
+최신  뮤직바 2개<br/>
+#foreach($board in $recentBoardList)
+	뮤직바아이디 : $board.boardId <br/>
+	글제목 : $board.title <br/>
+	카테고리 : $board.subTitle <br/>
+	요약 : $board.summary <br/>
+	이미지 : $board.imageUrl <br/>
+	추천수 : $board.recommendCount <br/>
+	댓글수 : $board.replyCount <br/>
+	등록일 : $board.regdttm <br/>
+	작성자 : $board.writer.nickName <br/>
+	링크 : 낫옛 <br/><br/>
+#end
+<hr/>
+*#

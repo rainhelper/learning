@@ -1,0 +1,6 @@
+{
+	"DaumId": "$!{dto.user.daumId}",
+	"DaumName": "$!{dto.user.daumName}",
+	"DownloadRemainder": "$!{dto.downloadRemainder}",
+	"OwnYn": "$!{dto.ownYn}"
+}

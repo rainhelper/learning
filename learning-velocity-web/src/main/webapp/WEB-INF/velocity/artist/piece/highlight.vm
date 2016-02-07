@@ -1,0 +1,187 @@
+
+<h2 class="screen_out">상세</h2>
+<h3 class="screen_out">아티스트</h3>
+
+<div class="article_menu">
+##	#printDetailNaviTabBar($artist "") ## 아티스트 상세 Navi Tab
+#***#<strong class="tit_artist">##
+#***##***##set($nameList = [$!{artist.nameKorLang},$!{artist.nameOrgLang},$!{artist.nameEngLang},$!{artist.realName},$!{artist.nickName}])##
+#***##***##set($hasItem = false)#foreach($name in $nameList)#if($StringUtils.isNotBlank("$!{name}"))#set($hasItem = true)#end#end##
+#***##***##set($prevName = false)##
+#***##***##set($nickNameString = "")##
+#***##***##foreach($name in $nameList)#if($StringUtils.isNotBlank("$!{name}"))#if($prevName)#set($nickNameString = $nickNameString + ", ")#end#set($nickNameString = $nickNameString + $name)#set($prevName = true)#end#end##
+#***##***##set( $a = "#escTitle($!artist.name)" )
+#***##***##set( $a = $a.replaceAll("'","\'") )
+#***##***##set($nickNameLen = 40)#if($StringUtils.isNotBlank("$!{artist.name}"))#set($nickNameLen = 84 - $artist.name.length())#end
+###***##***#<a href="#" title="$!{a} #if($StringUtils.isNotBlank("$nickNameString"))($nickNameString)#end">
+		<span>#strCut($!{artist.name}, 60)##
+	#***##***##***#<em class="fs_12">#if($StringUtils.isNotBlank("$nickNameString")) (#strCut($nickNameString, $nickNameLen))#end</em>##
+		</span>
+##	#***##***#</a>##
+#***#</strong>##
+</div>
+
+<div class="article_info">
+	
+	<h4 class="screen_out">아티스트 기본정보</h4>
+	<div class="wrap_thumb">
+		#printArtistDetailHighlightThumbnail($artist) ## 아티스트 상세 아티스트 썸네일
+	</div>
+
+	<div class="artist_info">
+		
+#set($artistTypeName = $!{artist.bandTypeName})
+#set($bandTypeName = ["One man", "Band", "Group", "Duet", "Trio", "Quartet", "Quintet", "Sextet", "Orchestra", "Project", "Choir", "None"])
+#set($artistType = "singleType")
+#foreach($typeName in $bandTypeName)
+	#if($artistTypeName.indexOf($bandTypeName[$foreach.index]) > -1)
+		#set($artistType = "bandType")
+	#end
+#end
+
+#if($StringUtils.equals("$!{artistType}", "bandType"))
+		#if(!$StringUtils.equals("$artistTypeName", "None"))
+		<dl class="list_info">
+			#if($StringUtils.isNotBlank("$!{artist.bandTypeName}") || $StringUtils.isNotBlank("$!{artist.birthDt}") || !$CollectionUtils.isEmpty($actAreaList))
+			<dt class="tit_detail tit_activity">활동정보</dt>
+        	<dd>
+    			#if($StringUtils.isNotBlank("$!{artist.bandTypeName}"))$artist.bandTypeName#end
+    			#if($StringUtils.isNotBlank("$!{artist.birthDt}"))
+    			($!StringUtils.left($!{artist.birthDt}, 4)년 결성#if($StringUtils.isNotBlank("$!{artist.deathDt}"))~$!StringUtils.left($!{artist.deathDt}, 4)년 해체#end)
+				#end
+				#if(!$CollectionUtils.isEmpty($actAreaList))
+        			#foreach($area in $actAreaList)
+        				#if($foreach.index != 0),#end
+                    	$area
+        			#end
+        		#end
+        	</dd>
+			#end
+        </dl>
+	    #end
+
+		<dl class="list_info">
+			#if($StringUtils.isNotBlank("$!{artist.strActYear}"))
+			<dt class="tit_detail tit_period">활동연대</dt>
+        	<dd>
+        		$!{artist.strActYear}년대#if($StringUtils.isNotBlank("$!{artist.endActYear}") && !$StringUtils.equals("$!{artist.strActYear}", "$!{artist.endActYear}")) ~ $!{artist.endActYear}년대#end
+        	</dd>
+			#end
+        </dl>
+        
+        <dl class="list_info">
+        	#printArtistDetailInfoActivityName($artistNameList) ## 아티스트 상세 활동명
+        </dl>
+        
+        <dl class="list_info">
+        	#printArtistDetailInfoDebut($artist) ## 아티스트 상세 데뷔정보
+        </dl>
+        
+        <dl class="list_info">
+			#if(!$CollectionUtils.isEmpty($artistCurrnetbandMemberList))
+        	<dt class="tit_detail tit_member">멤버</dt>
+        	<dd>
+#**************##foreach($member in $artistCurrnetbandMemberList)
+#******************##if($foreach.index != 0), #end#printThumbTooltipText( $member.name, $ImageUtil.getImageUrl("$!{member.mainImage.filePath}", "45x45", "ALBUM"), "fc_blue", "/artist/main?artist_id=$!{member.artistId}", "daum.Music.artistDetail($!{member.artistId});return false;" )
+#******************##if(!$CollectionUtils.isEmpty($member.bandMemberCreditList))(#foreach($credit in $member.bandMemberCreditList)#if($foreach.index != 0), #end$credit#end)#end
+###******************##if($foreach.index > 4)#break;#end
+#**************##end
+###**************##if($artistCurrnetbandMemberList.size() > 6)
+###**************#<a class="btn_more" href="#memberInfo" onclick="daum.Fx.scrollTo('memberInfo');return false;">
+###******************#<img width="36" height="11" alt="더보기" src="http://s1.daumcdn.net/img-contents/music/2011_home/common/link_more.gif">
+###**************#</a>
+###**************##end
+        	</dd>
+        	#end
+        </dl>
+#else
+    	<dl class="list_info">
+			#if($StringUtils.isNotBlank("$!{artist.creditTitle1}") || $StringUtils.isNotBlank("$!{artist.creditTitle2}") || $StringUtils.isNotBlank("$!{artist.strActYear}") || $StringUtils.isNotBlank("$!{artist.endActYear}"))
+			<dt class="tit_detail tit_activity">활동정보</dt>
+        	<dd>
+				#set($hasCredit = true)
+				#if(!$StringUtils.isNotBlank("$!{artist.creditTitle1}") && !$StringUtils.isNotBlank("$!{artist.creditTitle2}"))
+					#set($hasCredit = false)
+				#end
+				#if($StringUtils.isNotBlank("$!{artist.creditTitle1}"))$artist.creditTitle1#end
+#**************##if($StringUtils.isNotBlank("$!{artist.creditTitle2}")), $artist.creditTitle2#end
+    			#if($StringUtils.isNotBlank("$!{artist.strActYear}") && $StringUtils.isNotBlank("$!{artist.endActYear}"))
+					#if($StringUtils.equals("$!{artist.strActYear}", "$!{artist.endActYear}"))
+						#if($hasCredit)(#end$artist.strActYear년대#if($hasCredit))#end
+					#else
+						#if($hasCredit)(#end$artist.strActYear년대 ~ $artist.endActYear년대#if($hasCredit))#end
+					#end
+				#end
+				#if(!$CollectionUtils.isEmpty($actAreaList))
+					#foreach($area in $actAreaList)#if($foreach.index != 0),#end$area#end
+        		#end
+        	</dd>
+			#end
+    	</dl>
+    	
+    	<dl class="list_info">
+			#if(!$CollectionUtils.isEmpty($artistBandList))
+        	<dt class="tit_detail tit_group">그룹</dt>
+        	<dd>
+        		#foreach($artist in $artistBandList)
+					#if(!$StringUtils.equals("$!{artist.bandOrderNo}", "999"))(전)#end#printThumbTooltipText( $artist.name, $ImageUtil.getImageUrl("$!{artist.mainImage.filePath}", "45x45", "ALBUM"), "fc_blue", "/artist/main?artist_id=$!{artist.artistId}", "daum.Music.artistDetail($!{artist.artistId});return false;" )#if($foreach.count != $artistBandList.size()),#end
+        		#end
+        	</dd>
+        	#end
+    	</dl>
+    	
+    	<dl class="list_info">
+    		#printArtistDetailInfoActivityName($artistNameList) ## 아티스트 상세 활동명
+    	</dl>
+    	
+    	<dl class="list_info">
+			#if($StringUtils.isNotBlank("$!{artist.birthDt}") || $StringUtils.isNotBlank("$!{artist.birthCity}"))
+        	<dt class="tit_detail tit_life">생몰</dt>
+        	<dd>
+        		#if($StringUtils.isNotBlank("$!{artist.birthDt}"))$!{CheckDate.makeReleaseDate($!{artist.birthDt})}#if($StringUtils.isNotBlank("$!{artist.deathDt}"))~ $!{CheckDate.makeReleaseDate($!{artist.deathDt})}#else ~ 현재#end	#end
+				#if($StringUtils.isNotBlank("$!{artist.birthCity}"))#if($StringUtils.isNotBlank("$!{artist.birthDt}") || $StringUtils.isNotBlank("$!{artist.deathDt}")),#end $!{artist.birthCity} 출생#end
+        	</dd>
+			#end
+    	</dl>
+		
+    	<dl class="list_info">
+			#if($StringUtils.isNotBlank("$!{artist.height}") || $StringUtils.isNotBlank("$!{artist.weight}") || $StringUtils.isNotBlank("$!{artist.bloodType}"))
+			<dt class="tit_detail tit_body">신체</dt>
+        	<dd>
+				#set($comma1 = false)#set($comma2 = false)
+#**************##if($StringUtils.isNotBlank("$!{artist.height}"))키 $!{artist.height}cm#set($comma1 = true)#end
+#**************##if($StringUtils.isNotBlank("$!{artist.weight}"))#if($comma1),#end 몸무게 $!{artist.weight}kg#set($comma2 = true)#end
+#**************##if($StringUtils.isNotBlank("$!{artist.bloodType}"))#if(($comma1 && !$comma2) || $comma2),#end $!{artist.bloodType}형#end
+        	</dd>
+			#end
+    	</dl>
+    	
+    	<dl class="list_info">
+    		#printArtistDetailInfoDebut($artist) ## 아티스트 상세 데뷔정보
+    	</dl>
+    	
+    	<dl class="list_info">
+			#if(!$CollectionUtils.isEmpty($artistFamilyList))
+        	<dt class="tit_detail tit_family">가족</dt>
+        	<dd>
+        		#foreach($artist in $artistFamilyList)
+        			#if($foreach.index != 0),#end
+        			$!{artist.content}
+					#printThumbTooltipText( $!{artist.name}, $ImageUtil.getImageUrl("$!{artist.mainImage.filePath}", "45x45", "ALBUM"), "fc_blue", "/artist/main?artist_id=$!{artist.artistId}", "daum.Music.artistDetail($!{artist.artistId});return false;" )
+                #end
+        	</dd>
+        	#end
+    	</dl>
+#end
+##    	<dl class="list_info">
+##    		#printArtistDetailInfoSite($artist) ## 아티스트 상세 사이트정보
+##    	</dl>
+		
+##		<div class="btn_consumer">
+			#printArtistDetailHighlightBtnSet("artist", $artist, "") ## 아티스트 상세 아티스트 공통 버튼 세트
+##		</div>
+		
+	</div>
+
+	
+</div>

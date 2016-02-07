@@ -1,0 +1,200 @@
+<script type="text/javascript">
+	var itemJson = { 
+		'item' : { 
+#foreach ($item in $dto.mobileItemList)
+	#if($foreach.index>0),#end
+	'$!{item.corpCd}$!{item.typeCd}$!{item.sectionCd}':{'price':$!{item.price},'itemId':'$!{item.itemId}','itemName':'$!{item.itemName}','listenUrl':'$!{item.prelistenUrl}'}
+#end
+		},
+		'corp' : [
+#set ($corp = "")
+#foreach ($item in $dto.mobileItemList)
+	#if($corp != $item.corpCd) #if($corp!=""),#end '$item.corpCd' #set($corp = $item.corpCd) #end
+#end
+#set ($corp = "")	
+		],
+		'type' : {
+#set ($corp = "")
+#set ($type = "")
+#foreach ($item in $dto.mobileItemList)
+	#if($corp != $item.corpCd) #if($corp!="")],#end '$item.corpCd' : [ #set($corp = $item.corpCd) #set($type = "") #end
+	#if($type != $item.typeCd) #if($type!=""),#end '$item.typeCd' #set($type = $item.typeCd) #end
+#end
+#if($corp!="")]#end
+#set ($corp = "")
+#set ($type = "")
+		},
+		'section' : {
+#set ($corp_type = "")
+#set ($section = "")
+#foreach ($item in $dto.mobileItemList)
+	#if($corp_type != "$!{item.corpCd}$!{item.typeCd}" ) #if($corp_type!="")],#end '$!{item.corpCd}$!{item.typeCd}' : [ #set($corp_type = "$!{item.corpCd}$!{item.typeCd}") #set($section = "") #end
+	#if($section != $item.sectionCd) #if($section!=""),#end '$item.sectionCd' #set($section = $item.sectionCd) #end
+#end
+#if($corp_type!="")]#end
+#set ($corp_type = "")
+#set ($section = "")
+		}		
+	};
+	
+	function setCorp(el) { _phone.bellSet(el); }	
+	function setType(el) { _phone.bellSet(el); }
+	function setBuy(el) { _phone.buySet(el); }
+	daum.addEvent(window, 'load', function(){
+		daum.Browser.resizePop(473, 700);
+	}); 
+	</script>
+<div id="wPhone" class="popWrap">	
+	<div id="wSelSong">
+	<form name="frm">
+	<input type="hidden" name="songId" value="$!{command.songId}">
+		#printPhoneTopInfo($dto)
+		#printPhoneCorporation()
+		<dl class="setLst clearfix" id="setBuy">
+			<dt class="setTit titForBuy">구입/선물</dt>
+			<dd><input type="radio" name="forbuy" id="buyMine" value="mine" checked="true"><label for="buyMine">내 폰 설정</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</dd>
+			<dd><input type="radio" name="forbuy" id="buyGift" value="gift"><label for="buyGift">선물하기</label></dd>
+		</dl>	
+			
+		<dl class="setLst clearfix" id="setBell">
+			<!--<dt class="setTit titBellType">벨 종류</dt>-->
+			<dt class="setTit titOption">상세설정</dt>
+			<dd><input type="radio" name="type" id="bellLong" value="LO" disabled="true"><label for="bellLong">라이브벨 롱(60초)</label>&nbsp;&nbsp;</dd>
+			<dd><input type="radio" name="type" id="bellNm" value="NO" disabled="true"><label for="bellNm">라이브벨 일반(40초)</label>&nbsp;&nbsp;</dd>
+			<dd><input type="radio" name="type" id="bellOrg" value="OR" disabled="true"><label for="bellOrg">원음벨 64poly</label></dd>
+		</dl>
+		<script type="text/javascript">daum.Music.OnOffClass(daum.$('setBell'), {tagName:'input', onDefault:false, fnCallback:setType});</script>
+
+		<dl class="setLst clearfix" id="setSection">
+			<dt class="setTit titSection">구간선택</dt>
+			<dd><input type="radio" name="section" id="secHigh" value="HI" disabled="true"><label for="secHigh">하이라이트</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</dd>
+			<dd><input type="radio" name="section" id="secFirst" value="HE" disabled="true"><label for="secFirst">전반부</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</dd>
+			<dd><input type="radio" name="section" id="secEnd" value="BA" disabled="true"><label for="secEnd">후반부</label></dd>
+		</dl>
+		<script type="text/javascript">daum.Music.OnOffClass(daum.$('setSection'), {tagName:'input', onDefault:false});</script>
+		
+		<div id="buyMineCont" style="display:none">
+		</div>
+		<div id="buyGiftCont" style="display:none">
+    		<dl class="setLst clearfix">
+    			<dt class="setTit titSender2">보내는사람</dt>
+    			<dd><select id="send1" onchange="_phone.chNum(event);"><option value="010" selected>010</option><option value="011">011</option><option value="016">016</option><option value="017">017</option><option value="018">018</option><option value="019">019</option></select> <input type="text" class="inp" id="send2" maxlength="4" onkeyPress="if((event.keyCode<48)||(event.keyCode>57))event.returnValue=false;" style="ime-mode:disabled"> <input type="text" class="inp" id="send3" maxlength="4" onkeyPress="if((event.keyCode<48)||(event.keyCode>57))event.returnValue=false;" style="ime-mode:disabled"></dd>						
+    		</dl>
+		</div>
+		<script type="text/javascript">daum.Music.OnOffClass(daum.$('setBuy'), {tagName:'input', isTab:true, tabBody:'Cont', fnCallback:setBuy});</script>
+		
+		<dl class="setLst clearfix">
+			<dt class="setTit titSender">받는사람</dt>
+			<dd><select id="get1" onchange="_phone.chNum(event);"><option value="010" selected>010</option><option value="011">011</option><option value="016">016</option><option value="017">017</option><option value="018">018</option><option value="019">019</option></select> <input type="text" class="inp" id="get2" maxlength="4" onKeyPress="return _phone.onlyNum(event, false);" style="ime-mode:disabled"> <input type="text" class="inp" id="get3" maxlength="4" onKeyPress="return _phone.onlyNum(event, false);" style="ime-mode:disabled"></dd>
+		</dl>  
+		
+	</form>
+	</div>
+	
+	<div class="btnSend">
+		<div class="btn">			
+			<a href="#" onclick="_phone.bellSubmit();" title="확인"><img src="http://i1.daumcdn.net/img-contents/music/2009_home/phonemusic/bt_ok_1.gif" alt="확인"></a>
+			<a href="#" onclick="window.close();" title="닫기"><img src="http://i1.daumcdn.net/img-contents/music/2009_home/phonemusic/bt_close.gif" alt="닫기"></a>
+		</div>
+	</div>
+	<script type="text/javascript">	
+		var _phone = new daum.Music.Phone();
+		_phone.bellInit("$!{dto.cpNumber}");
+	</script>
+    <div class="notiMsg">
+        <strong>※ 잠깐!!  스마트폰 쓰시나요?<br>
+        <span style="color:red;">스마트폰은 결제를 해도 벨소리 사용이 불가능합니다. ( 대부분 불가 )</span><br>
+        &gt; <a title="스마트폰 자세히 보기" class="blue_d1" target="_blank" href="http://bbs.music.daum.net/gaia/do/music/notice/read?articleId=26&amp;bbsId=Notice"> 스마트폰 자세히 보기</a></strong><br>
+        <br>
+        <strong>※ 잠깐!!  라이브벨 미지원 단말기 쓰시나요?</strong><br>
+        미지원 단말기는 결제를 해도 라이브벨 사용이 불가능합니다.<br>
+        &gt; <a title="라이브벨 미지원 단말기 조회" class="blue_d1" onclick="window.open('http://bell.dmzone.co.kr/daum/bell_live_confirm.asp','livebellCheck','width=400,height=580');return false;" href="http://bell.dmzone.co.kr/daum/bell_live_confirm.asp">라이브벨 미지원 단말기 조회</a><br>
+        <br>
+        ※ 휴대폰에 저장될 때 데이터 통화료가 별도 부과되며, 여러 번 저장하면 <br>
+        과다청구될 수 있습니다. 
+	</div>
+
+</div>	
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+	
+	
+#*
+========= 모바일(벨) ========
+<br/>
+곡제목 : $dto.songInfo.title <br/>
+곡아이디 : $dto.songInfo.songId <br/>
+앨범제목 : $dto.songInfo.album.title <br/>
+앨범아이디 : $dto.songInfo.album.albumId <br/>
+앨범커버 : $dto.songInfo.album.mainImage.filePath <br/>
+아티스트명 : $dto.songInfo.artistName <br/>
+아티스트아이디 : $dto.songInfo.artistId <br/>
+<br/>
+<br/>
+전화번호 : $dto.cpNumber
+<br/>
+<br/>
+#foreach ($mobileItem in $dto.mobileItemList)
+           통신사(Corp) : $mobileItem.corpCd<br/>
+           타입(Type) : $mobileItem.typeCd<br/>
+           구간(Section) : $mobileItem.sectionCd<br/>
+           가격 : $mobileItem.price<br/>
+    ITEMID : $mobileItem.itemId<br/>
+    ITEMNAME : $mobileItem.itemName<br/>
+           미리듣기 주소 : $mobileItem.prelistenUrl<br/>
+	------------------------------<br/>
+    </br>
+#end
+*#
+#*
+확인 후 결제내역페이지
+예)http://music_mobile.daum.net/mobile/bellPurchaseOption.do?songId=8074033&itemId=BEG0013&getNumber=01023107128
+
+선물하기 예)http://music_mobile.daum.net/mobile/bellPurchaseOption.do?songId=8074033&itemId=BEG0013&getNumber=01023107128&sendNumber=01023107128
+*#
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+========= 모바일(벨) ========
+<br/>
+곡제목 : $dto.songInfo.title <br/>
+곡아이디 : $dto.songInfo.songId <br/>
+앨범제목 : $dto.songInfo.album.title <br/>
+앨범아이디 : $dto.songInfo.album.albumId <br/>
+앨범커버 : $dto.songInfo.album.mainImage.filePath <br/>
+#foreach ($artist in $dto.songInfo.keyArtistList)
+	아티스트아이디 : $artist.artistId<br/>
+	아티스트명 : $artist.name<br/>
+#end
+<br/>
+<br/>
+전화번호 : $dto.cpNumber
+<br/>
+<br/>
+#foreach ($mobileItem in $dto.mobileItemList)
+           통신사(Corp) : $mobileItem.corpCd<br/>
+           타입(Type) : $mobileItem.typeCd<br/>
+           구간(Section) : $mobileItem.sectionCd<br/>
+           가격 : $mobileItem.price<br/>
+    ITEMID : $mobileItem.itemId<br/>
+    ITEMNAME : $mobileItem.itemName<br/>
+           미리듣기 주소 : $mobileItem.prelistenUrl<br/>
+	------------------------------<br/>
+    </br>
+#end
+<br/>
+<br/>
+확인 후 결제내역페이지
+예)http://music.daum.net/purchase/bell/option.popup?songId=8074033&itemId=BEG0013&getNumber=01023107128
+
+선물하기 예)http://music.daum.net/purchase/bell/option.popup?songId=8074033&itemId=BEG0013&getNumber=01023107128&sendNumber=01023107128
+#end

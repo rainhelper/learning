@@ -1,0 +1,5 @@
+#if($request.getServerName().endsWith(".kakao.com"))
+    #parse("/velocity/common/error_kakao.vm")
+#else
+    #parse("/velocity/common/error_daum.vm")
+#end

@@ -1,0 +1,195 @@
+
+<div id="popWrap" class="cont_registApp">
+<!-- popHead -->
+	<div id="popHead">
+		<h1 class="logoArea">
+			<strong id="logo" class="text_imgpop">Support your music 지원서</strong>
+			<strong id="applicationLogo" class="title">지원서</strong>
+		</h1>
+	</div>
+	<!-- //popHead -->
+	<!-- popContent -->
+	<div id="popContent">
+		<div class="wrap">
+			<form name="registForm" class="regist_app" method="post" action="/sym/registForm.popup" target="hiddenSubmitForm">
+				<fieldset>
+					<legend class="screen_out legend">지원서</legend>
+					
+					<div class="form">
+						<div class="block line_bottom">
+							<label class="tit_label text_imgpop text_artist" for="artist">* 아티스트명</label>
+							<input class="input_text artist required" id="artist" name="artistName" type="text" maxlength="60" value="$!{symArtist.artistName}" disabled>
+							<p class="reg_info">* 접수된 지원서는 수정이 불가합니다.</p>
+							##<button class="btn_pop btn_profile_photo" type="button" onclick="daum.Music.Sym.openPhotoUploaderPopup();return false;">* 프로필 사진 첨부</button>
+							<ul id="imageListWrapper" class="files_upload photos_upload">
+								#foreach($image in $symArtist.artistImages)
+								<li><span class="name_img image">$!{image.title}</span></li>
+                                #end
+							</ul>
+						</div>
+						<div class="block line_bottom">
+							<strong class="block tit text_imgpop text_infomation">연락가능한 신상정보</strong>
+							<!-- p class="row row_name">
+								<label class="tit_label" for="name">* 이름</label>
+								<input class="input_text name required" id="name" name="candidateName" type="text" maxlength="60" value="$!{symArtist.candidateName}" disabled>
+							</p -->
+							<p class="row row_phone">
+								<label class="tit_label" for="phone">* 전화번호</label>
+								<input class="input_text phone required" id="phone" name="phone" type="text" maxlength="20" value="$!{symArtist.phone}" disabled>
+							</p>
+							<p class="row row_email">
+								<label class="tit_label" for="email">* 이메일</label>
+								<input class="input_text email required" id="email" name="email" type="text" maxlength="50" value="$!{symArtist.email}" disabled>
+							</p>						
+						</div>
+						<div class="block line_bottom row_support">
+							<label class="tit_label text_imgpop text_support" for="support">* 지원동기</label>
+							<textarea class="input_textarea support required" id="support" name="applyMtv" title="지원동기" disabled>$!{symArtist.applyMtv}</textarea>
+						</div>
+						<div class="block line_bottom">
+							<strong class="tit text_imgpop text_team">팀소개</strong>
+							<p class="row row_member_instruments">
+								<label class="tit_label" for="member_instruments">멤버(이름, 나이, 악기 포지션 등)</label>
+								<input class="input_text member_instruments" id="member" name="member" type="text" value="$!{symArtist.member}" disabled>
+							</p>
+							<p class="row row_member_instruments">
+								<label class="tit_label" for="member_instruments">간단한 팀 소개</label>
+								<input class="input_text member_instruments" id="intro" name="intro" type="text" value="$!{symArtist.intro}" disabled>
+							</p>
+							<p class="row row_year_formation">
+								<label class="tit_label" for="year_formation">결성시기</label>
+								<input class="input_text year_formation" id="year_formation" name="debutDt" type="text" value="$!{symArtist.debutDt}" disabled>
+							</p>
+							<p class="row row_whether_album">
+								<label class="tit_label" for="whether_album">* 음반/음원<br/>&nbsp;&nbsp;발매 여부</label>
+								<span class="wrap_radio">
+									<input type="radio" class="radio" name="albumYn" id="radioAlbumY" value="Y" #if($StringUtils.equals("$!{symArtist.albumYn}", "Y"))checked#end disabled>
+									<label class="lbl" for="radioAlbumY">발매</label>
+								</span>
+								<span class="wrap_radio">
+									<input type="radio" class="radio" name="albumYn" id="radioAlbumN" value="N" #if($StringUtils.equals("$!{symArtist.albumYn}", "N"))checked#end disabled>
+									<label class="lbl" for="radioAlbumN">미발매</label>
+								</span>
+							</p>
+							
+							<p class="row row_label_affiliation">
+								<label class="tit_label" for="label_affiliation">* 레이블 소속여부</label>
+								<span class="wrap_radio">
+									<input type="radio" class="radio" name="lableYn" id="radioLableY" value="Y" #if($StringUtils.equals("$!{symArtist.lableYn}", "Y"))checked#end disabled>
+									<label class="lbl" for="radioLableY">소속</label>
+								</span>
+								<span class="wrap_radio">
+									<input type="radio" class="radio" name="lableYn" id="radioLableN" value="N" #if($StringUtils.equals("$!{symArtist.lableYn}", "N"))checked#end disabled>
+									<label class="lbl" for="radioLableN">무소속</label>
+								</span>
+							</p>
+							<p class="row row_career_activites">
+								<label class="tit_label" for="career_activities">* 활동 경력</label>
+								<input class="input_text career_activities required" id="career_activities" name="activity" type="text" value="$!{symArtist.activity}" disabled>
+							</p>
+							<p class="row row_record_number">
+								<label class="tit_label" for="record_number">* 녹음 가능한 곡수</label>
+								<input class="input_text record_number required" id="record_number" name="songCnt" type="text" maxlength="10" value="$!{symArtist.songCnt}" disabled>
+							</p>
+							<p class="row row_community_homepage">
+								<label class="tit_label label_community_homepage" for="community_homepage">커뮤니티/홈페이지/SNS</label>
+								<input class="input_text community_homepage" id="community_homepage" name="homepageUrl" type="text" value="$!{symArtist.homepageUrl}" disabled>
+							</p>
+							<p class="row row_other">
+								<label class="tit_label" for="other">기타</label>
+								<input class="input_text other" id="other" name="etc" type="text" value="$!{symArtist.etc}" disabled>
+							</p>
+						</div>
+						<div class="block line_bottom row_selecting_music">
+							<label class="tit_label text_imgpop text_selecting_music" for="selecting_music">Support your music 선정시 이런 음반을 만들고 싶다</label>
+							<textarea cols="60" rows="10" class="input_textarea selecting_music" id="selecting_music" name="goal" title="Support your music 선정시 이런 음반을 만들고 싶다" disabled>$!{symArtist.goal}</textarea>
+						</div>
+						<div id="vclipWrapper" class="block line_bottom add_url">
+							<p class="top">
+								<label class="tit_label text_imgpop text_url" for="url">* 자작곡 라이브 동영상 URL (공개로 설정된 TV팟 URL)</label>
+								##<a class="btn_add btn_pop" href="#" onclick="daum.Music.Sym.addVclipInputBox();return false;">추가하기</a>
+								##<a class="up_tvport" href="http://tvpot.daum.net/upload/ClipUpload.do?from=gnb" target="_blank">TV팟 업로드 하러가기<span class="ico_arrow">&nbsp;</span></a>
+							</p>
+							##<input id="firstVclip" class="input_text url" type="text"/>
+							#foreach($vclip in $symArtist.artistVclips)
+								<input type="text" class="vclip input_text url" value="$!{vclip.filePath}" disabled>
+								<input type="text" class="vclip input_text url" value="$!{vclip.filePath}" disabled>
+                            #end
+
+							##<p id="vclipInfo" class="wrap_introduction">URL 넣는 방법&nbsp;&nbsp;:&nbsp;&nbsp;TV팟에 올리신 영상에서 TV팟 퍼가기 &gt; 주소 퍼가기  &gt; 복사하기 후 위의 입력란에 붙여넣기<br/>
+							##<span class="txt_youtubeurl">(유투브 URL도 가능)</span></p>
+						</div>
+						<div class="block line_bottom row_sources">
+							<label class="tit_label text_imgpop text_sources" for="sources">* 음원(데모 포함) 있을 시 첨부</label>
+							##<input class="input_text sources" id="sources" name="image" type="text" disabled>
+							
+							##<button class="btn_pop btn_upload" type="button">파일올리기</button>
+							##<div class="btn_pop btn_upload" id="coca_uploader"><!-- 업로더 플래시가 임베딩 될 div --></div>
+							##<span class="attach_info">최대 10개 첨부 가능</span>
+							<ul id="fileListWrapper" class="files_upload">
+							#foreach($song in $symArtist.artistSongs)
+                            	<span class="name_img file">$!{song.title}</span>
+                            #end
+							</ul>
+						</div>
+					</div>
+					
+					<div class="btnArea">
+						<a href="javascript:;" onclick="window.close();return false;" class="btn_pop btn_confirm">확인</a>
+						##<button class="btn_pop btn_application" onclick="daum.Music.Sym.submitRegisterForm();return false;">지원서 제출하기</button>
+						##<a class="btn_pop btn_application" onclick="daum.Music.Sym.submitRegisterForm();return false;">지원서 제출하기</a>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+	</div>
+	<!-- //popContent -->
+</div>
+
+<script type="text/javascript">
+	domReady(function(){
+		if(location.href.indexOf("resize=true") > -1 ) {
+			window.resizeTo(620, 800);
+			//daum.Browser.resizePop(500, 600);
+		}	
+	});
+</script>
+
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+
+아래의 정보로 접수가 완료됐습니다.<br/><br/><br/>
+아티스트명 : $symArtist.artistName<br/>
+이름 : $symArtist.candidateName<br/>
+전화번호 :$symArtist.phone<br/>
+이메일 :$symArtist.email<br/>
+지원동기 :$symArtist.applyMtv<br/>
+멤버 :$symArtist.member<br/>
+소개 :$symArtist.intro<br/>
+결성년도 :$symArtist.debutDt<br/>
+음반 발매 여부 :$symArtist.albumYn<br/>
+레이블 소속 여부 :$symArtist.lableYn<br/>
+활동 경력 :$symArtist.activity<br/>
+녹음 가능한 곡수 :$symArtist.songCnt<br/>
+커뮤니티 또는 홈페이지 주소 :$symArtist.homepageUrl<br/>
+기타 :$symArtist.etc<br/>
+이런음반 만들고 싶다 :$symArtist.goal<br/>
+==========================<br/>
+이미지 :<br/>
+#foreach($image in $symArtist.artistImages)
+	$image.filePath<br/>
+#end
+==========================<br/>
+song :<br/>
+#foreach($song in $symArtist.artistSongs)
+	곡주소 :$song.filePath<br/> 
+	곡명 :$song.title<br/>
+#end
+==========================<br/>
+vclip :<br/>
+#foreach($vclip in $symArtist.artistVclips)
+	링크 : $vclip.filePath<br/>
+#end
+
+#end
+

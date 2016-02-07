@@ -1,0 +1,389 @@
+#macro(makeParamCaseDateKey $date_key)
+	&date=$command.date
+#end
+
+
+## 미리듣기 퀴즈 우측상단 날짜정보
+#macro(printChartDateInfoQuiz  $dateKey $date $link )
+	#set( $urlDepthOpt = [ 
+		["date_key","$!{dateKey}"]
+    ])
+	#set( $commonParam = "#makeUrlParamList($urlDepthOpt)")
+	
+	#set( $calendarTypeMap = { 
+		"1":"monthCal",
+		"2":"weekCal",
+		"5":"weekCal",
+		"3":"dayCal"
+	})
+	#set($calType = "$calendarTypeMap.get($dateKey)")
+	
+	#set($minDayMap = { "weekCal" : 20110101, "dayCal" : 20110101 })
+ 
+	<script type="text/javascript">
+	var drawCalendar = function(){
+    	var calendar = new daum.Music.Calendar(
+			"calendarDiv", 
+			{ 	headId 		:	"calendarHead"
+			  , typeToCal	:	"$calType" 
+			  , link		:	"$link${commonParam}"
+			  , minDay   	:   $minDayMap.get($calType)
+			},
+		#if( $StringUtils.equals("$calType", "weekCal") )
+			#set($weekMap = $CheckDate.getWeekNum("$date"))
+			{ 	year		:	"$weekMap.get('year')"
+			  , month		:	"$weekMap.get('month')"
+			  , day			:	"01"
+			  , week		:   "$weekMap.get('weekNum')"
+			}
+		#else
+			{ 	year		:	$StringUtils.substring($date, 0, 4)
+			  , month		:	$StringUtils.substring($date, 4, 6)
+			  #if( $date.length() > 6 )
+			  , day			:	$StringUtils.substring($date, 6, 8)
+			  #end 
+			}
+		#end
+		);
+ 
+    	calendar.render();
+	};
+	</script>
+	
+
+	#if( $StringUtils.equals( "$!{command.date_key}", "3" ) )
+	<h3 class="screen_out">일간 종합 순위</h3>
+	<div class="current_day info_day f_r">
+		<a class="box_date" href="javascript:;" onclick="daum.Music.Layer.view({el:this,type:'calendarDay',classname:'layer_info layer_cal cal_days',left:-19, arrow_left:21});drawCalendar();return false;">
+			#printImageDate($date "day" "") ##YYYY.MM.DD
+		</a>
+		#if($Number.toNumber($date) <= $minDayMap.get($calType))
+			<span class="arr_comm prev_off" title="이전일">이전일</span>
+		#else
+			<a class="arr_comm prev" href="$!{link}${commonParam}&amp;date=$CheckDate.getDiffDate($date, -1)" title="이전일">이전일</a>
+		#end	
+		#if($StringUtils.equals($maxDateYn, "Y"))
+			<span class="arr_comm next_off" title="다음일">다음일</span>
+		#else
+			<a class="arr_comm next" href="$!{link}${commonParam}&amp;date=$CheckDate.getDiffDate($date, 1)" title="다음일">다음일</a>
+		#end
+	</div>
+	#else
+		
+	<h3 class="screen_out">주간 종합 순위</h3>
+	<div class="current_day info_day f_r">
+		<a class="box_date" href="javascript:;" onclick="daum.Music.Layer.view({el:this,type:'calendarWeek',classname:'layer_info layer_cal cal_weeks'});drawCalendar();return false;">
+			#set($weekMap = $CheckDate.getWeekNum($date))
+			#set($month = "$weekMap.get('month')")
+			#if($month.length() == 1)#set($mm = "0" + $month)#else#set($mm = $month)#end
+			#set($weekDate = "$weekMap.get('year')$mm")
+   			#printImageDate($weekDate "week" $weekMap.get("weekNum")) ##YYYY.MM
+		</a>
+		#if($Number.toNumber($date) <= $minDayMap.get($calType))
+			<span class="arr_comm prev_off" title="저번주">저번주</span>
+		#else
+			<a class="arr_comm prev" href="$!{link}${commonParam}&amp;date=$CheckDate.getDiffDate($date, -7)" title="저번주">저번주</a>
+		#end
+		#if($StringUtils.equals($maxDateYn, "Y"))
+			<span class="arr_comm next_off" title="다음주">다음주</span>
+		#else
+			<a class="arr_comm next" href="$!{link}${commonParam}&amp;date=$CheckDate.getDiffDate($date, 7)" title="다음주">다음주</a>
+		#end
+	</div>
+	#end
+#end
+
+#if( $!{command.date_key} ) #set ( $command.date_key = 3 ) #end
+#if( $!{command.date} ) #set ( $command.date = $Number.toNumber($Date.getCurrentYyyymmdd())) #end
+<div id="daumtrans"><img src="https://logins.daum.net/accounts/auth.gif" width="0" height="0" alt="" /></div> ##로그인 유지
+<div class="wrap1">
+	<div id="flashWrapper" class="guide">
+	<script type="text/javascript">
+		var ver = 1.0;
+		//var ver = new Date().getTime();
+		var flash_var = "testGameURL=http://photo-contents.daum-img.net/music/game/ListenQuizGame_20110714.swf?version="+ver+"&userId=$!{user.userId}&daumName=$!{user.daumName}&gameId=387&gameName=anygame&introAd=&endingAd=http://cfile110.uf.daum.net/image/15015A324CA4613149D6BF&endingAdLink=http://lovebeat.game.daum.net/event/100929_missA/";
+
+		daum.showFlash("http://photo-contents.daum-img.net/game/201010/02/d1m.swf","640","480","flashWrapper",{
+				allowScriptAccess: "always",
+				flashVars: flash_var,
+				bgcolor: "#ffffff"
+			});
+
+	</script>
+	</div>
+	##<a href="http://music.daum.net/extraEvent/final2010/" title="크리스마스 프로모션 바로가기" target="_blank"><img src="http://i1.daumcdn.net/img-contents/music/2010_home/event/promotion2010final.png" class="png24" style="position:absolute;top:157px;left:64px;"></a>
+</div>
+<div id="aboutGame" class="wrap2">
+	<img src="http://i1.daumcdn.net/img-contents/music/2010_home/event/img_mp_2.jpg" alt="">
+</div>
+
+ 
+<div class="wrap3">
+	<div class="king" id="king">
+		<div class="tit_h3"><img src="http://i1.daumcdn.net/img-contents/music/2010_home/event/img_mp_4.jpg" alt=""></div>
+
+		<div class="t_search">
+#set($dateKey =  $!{command.date_key})
+#set($date = $command.getDate())
+#set($link = "/event/game/prelistenquiz?")
+       	#set( $urlDepthOpt = [ 
+        		["date_key","$!{dateKey}"],
+				["view_type","result"]
+            ])
+        	#set( $commonParam = "#makeUrlParamList($urlDepthOpt)")
+         
+        	#set( $calendarTypeMap = { 
+        		"1":"monthCal",
+        		"2":"weekCal",
+        		"5":"weekCal",
+        		"3":"dayCal"
+        	})
+        	#set($calType = "$calendarTypeMap.get($dateKey)")
+			
+			#set($minDayMap = { "weekCal" : 20110101, "dayCal" : 20110101 })
+         
+        	<script type="text/javascript">
+        	var drawCalendar = function(){
+            	var calendar = new daum.Music.Calendar(
+        			"calendarDiv", 
+        			{ 	headId 		:	"calendarHead"
+        			  , typeToCal	:	"$calType" 
+        			  , link		:	"$link${commonParam}"
+					  , minDay   	:   $minDayMap.get($calType)
+        			},
+        		#if( $StringUtils.equals("$calType", "weekCal") )
+        			#set($weekMap = $CheckDate.getWeekNum("$date"))
+        			{ 	year		:	"$weekMap.get('year')"
+        			  , month		:	"$weekMap.get('month')"
+        			  , day			:	"01"
+        			  , week		:   "$weekMap.get('weekNum')"
+        			}
+        		#else
+        			{ 	year		:	$StringUtils.substring($date, 0, 4)
+        			  , month		:	$StringUtils.substring($date, 4, 6)
+        			  #if( $date.length() > 6 )
+        			  , day			:	$StringUtils.substring($date, 6, 8)
+        			  #end 
+        			}
+        		#end
+        		);
+         
+            	calendar.render();
+        	};
+        	</script>
+			
+			<div class="dateNavi ps_r">
+        	#if( $StringUtils.equals( "$!{command.date_key}", "3" ) )
+        	<h3 class="screen_out">일간 종합 순위</h3>
+        	<div class="current_day info_day f_r">
+        		<a class="box_date" href="javascript:;" onclick="daum.Music.Layer.view({el:this,type:'calendarDay',classname:'layer_info layer_cal cal_days',left:-19, arrow_left:21});drawCalendar();return false;">
+        			#printImageDate($date "day" "") ##YYYY.MM.DD
+        		</a>
+        		#if($Number.toNumber($date) <= $minDayMap.get($calType))
+        			<span class="arr_comm prev_off" title="이전일">이전일</span>
+        		#else
+        			<a class="arr_comm prev" href="$!{link}${commonParam}&amp;date=$CheckDate.getDiffDate($date, -1)" title="이전일">이전일</a>
+        		#end	
+        		#if($StringUtils.equals($maxDateYn, "Y"))
+        			<span class="arr_comm next_off" title="다음일">다음일</span>
+        		#else
+        			<a class="arr_comm next" href="$!{link}${commonParam}&amp;date=$CheckDate.getDiffDate($date, 1)" title="다음일">다음일</a>
+        		#end
+        	</div>
+        	#else
+        	<h3 class="screen_out">주간 종합 순위</h3>
+        	<div class="current_day info_day f_r">
+        		<a class="box_date" href="javascript:;" onclick="daum.Music.Layer.view({el:this,type:'calendarWeek',classname:'layer_info layer_cal cal_weeks'});drawCalendar();return false;">
+        			#set($weekMap = $CheckDate.getWeekNum($date))
+        			#set($month = "$weekMap.get('month')")
+        			#if($month.length() == 1)#set($mm = "0" + $month)#else#set($mm = $month)#end
+        			#set($weekDate = "$weekMap.get('year')$mm")
+           			#printImageDate($weekDate "week" $weekMap.get("weekNum")) ##YYYY.MM
+        		</a>
+        		#if($Number.toNumber($date) <= $minDayMap.get($calType))
+        			<span class="arr_comm prev_off" title="저번주">저번주</span>
+        		#else
+        			<a class="arr_comm prev" href="$!{link}${commonParam}&amp;date=$CheckDate.getDiffDate($date, -7)" title="저번주">저번주</a>
+        		#end
+        		#if($StringUtils.equals($maxDateYn, "Y"))
+        			<span class="arr_comm next_off" title="다음주">다음주</span>
+        		#else
+        			<a class="arr_comm next" href="$!{link}${commonParam}&amp;date=$CheckDate.getDiffDate($date, 7)" title="다음주">다음주</a>
+        		#end
+        	</div>
+        	#end				
+			
+ 
+        	
+			##	#printChartDateInfoQuiz($!{command.date_key} $command.getDate())
+				## 일간차트
+##				#if( $StringUtils.equals( "$!{command.date_key}", "3" ) )
+##					#set($startPrevDate = "20090701" )
+##					#set($flagPrev = "#getServiceDate( $command.getDate() $startPrevDate )" )
+##					#set($flagNext = "#getSetviceLastDate( $command.getDate() $command.getLastDate() )" )
+##
+##					#if( $StringUtils.equals($!{flagPrev},'true') )
+##						<a href="/event/game/prelistenquiz?date_key=${command.date_key}&date=$command.getBeforeDay($command.date)#king" class="arrow btPrev" title="이전일로 이동">이전일로 이동</a>
+##					#else
+##					<span class="arrow btPrevOff"></span>
+##					#end
+##
+##
+##
+##					<span class="date b">$CheckDate.makeReleaseDate($!{command.date})</span>
+##					#if( $StringUtils.equals($!{flagNext},'true') )
+##					<a href="/event/game/prelistenquiz?date_key=3&date=$command.getNextDay($command.date)#king" class="arrow btNext" title="다음일로 이동">다음일로 이동</a>
+##					#else
+##						<span class="arrow btNextOff"></span>
+##					#end
+##				#else
+##					#set($endDate = $command.date)
+##					#set($startDate = $command.getThisMonDayOfWeek($endDate))
+##
+##					#set($startPrevDate = "20090701" )
+##					#set($flagPrev = "#getServiceDate( $command.getBeforeDayOfWeek( $command.date ) $startPrevDate )" )
+##					#set($flagNext = "#getSetviceLastDate( $command.getDate() $command.getLastDayOfWeek() )" )
+##
+##					#if( $StringUtils.equals($!{flagPrev},'true') )
+##						<a href="/event/game/prelistenquiz?date_key=${command.date_key}&date=$!{command.getBeforeDayOfWeek($!{command.date})}#king" class="arrow btPrev" title="저번주로 이동">저번주로 이동</a>
+##					#else
+##						<span class="arrow btPrevOff"></span>
+##					#end
+##					<span class="date b">#Str2DateForWeek($startDate, $endDate)</span>
+##					#if( $StringUtils.equals($!{flagNext},'true') )
+##						<a href="/event/game/prelistenquiz?date_key=${command.date_key}&date=$!{command.getNextDayOfWeek($!{command.date})}#king" class="arrow btNext" title="다음주로 이동">다음주로 이동</a>
+##					#else
+##						<span class="arrow btNextOff"></span>
+##					#end
+##				#end
+##				<img class="btCal cu_p" src="http://i1.daumcdn.net/img-contents/music/2008_home/common/ico_calendar.gif" alt="달력으로 선택" onclick="daum.Event.stopEvent(event);daum.Element.toggle('dSelDateCal');">
+##				<div id="dSelDateCal" class="jsCal hide">
+##					<div class="innerCal">
+##						<div id="calText" class="calText b"></div>
+##						<a href="javascript:;" class="typeBtn btPrev" onclick="daum.stopEvent(event);chartCal.setPrevMonth();" title="이전달로 이동">이전달로 이동</a>
+##						<a href="javascript:;" class="typeBtn btNext" onclick="daum.stopEvent(event);chartCal.setNextMonth();" title="다음달로 이동">다음달로 이동</a>
+##						<div id="cal" class="conTblCal"></div>
+##					</div>
+##				</div>
+			</div>
+
+
+			<div class="search_type" >
+				#if( ${command.date_key} == "3" ) #set( $subtab = 0 )  #set( $subtabFg = 0 )
+				#elseif( ${command.date_key} == "2" ) #set( $subtab = 1 )  #set( $subtabFg = 1 )
+				#else #set( $subtab = 0 ) #set( $subtabFg = 0 )
+				#end
+				<a href="/event/game/prelistenquiz?date_key=3&view_type=result"><img src="http://i1.daumcdn.net/img-contents/music/2010_home/event/tab_1#if(${subtab}=="0")on#end.jpg" alt="일간"></a><a href="/event/game/prelistenquiz?date_key=2&view_type=result"><img src="http://i1.daumcdn.net/img-contents/music/2010_home/event/tab_2#if(${subtab}=="1")on#end.jpg" alt="주간"></a>
+			</div>
+		</div>
+ 
+<script type="text/javascript">
+function callb( anchorObj ){
+	var data = anchorObj.data;
+	daum.Element.toggle('dSelDateCal');
+	#if( ${command.date_key} == "2" )
+		var date = new Date( data.year, data.month-1, data.day);
+		var weekNum = date.getDay()+1;
+		if(weekNum != 7) { date = new Date( date.getFullYear(),date.getMonth(),date.getDate()+(7-weekNum));	}
+	#else
+	var date = new Date( data.year, data.month-1, data.day );
+	#end
+
+	#if( $StringUtils.equals( "$!{command.date_key}","2") )## 주간
+	var lastServiceDate = "$command.getLastDayOfWeek()";//주간
+	var firstServiceDate = "20090701";
+	#else
+	var firstServiceDate = "20090701";
+	var lastServiceDate = "$command.getLastDate()";//일간
+	#end
+
+	var selectSerivceDate = this.getFullDate(date);
+	if( firstServiceDate <= selectSerivceDate && lastServiceDate >= selectSerivceDate ){
+		anchorObj.href =  "/event/game/prelistenquiz?date_key=$!{command.date_key}&date="+selectSerivceDate+"&view_type=result";
+	} else {
+		alert("선택일은 랭킹 데이터가 존재하지 않습니다.");
+	}
+
+} 
+daum.Event.addEvent(document, "click", function(event){
+	if(daum.$("dSelDateCal")) daum.$("dSelDateCal").style.display='none';
+});
+
+daum.Event.addEvent(window, "load", function(){
+	document.title = "Daum 뮤직 - 듣기평가";
+	#if( !$StringUtils.isEmpty( "$!{command.view_type}" ) )
+	daum.Fx.scrollTo('king', {duration:1, offset:-50});
+	#end
+});
+</script>
+		<div class="table">
+			<table cellpadding="0" cellspacing="0" summary="" width="701">
+				<colgroup>
+					<col width="144"><col width="230"><col width="189">
+				</colgroup>
+				<thead>
+				<tr>
+					<th><img src="http://i1.daumcdn.net/img-contents/music/2010_home/event/table_th_1.jpg" alt="랭킹순위" width="189"></th>
+					<th><img src="http://i1.daumcdn.net/img-contents/music/2010_home/event/table_th_2.jpg" alt="닉네임" width="256"></th>
+					<th><img src="http://i1.daumcdn.net/img-contents/music/2010_home/event/table_th_3.jpg" alt="총 퀴즈점수 합계" width="256"></th>
+				</tr>
+				</thead>
+				<tbody>
+				#foreach ($gameRank in $gameRankList)
+				<tr>
+					<td class="rank">
+						#if( $StringUtils.equals( "$!{gameRank.rank}", "1") )
+						<img src="http://i1.daumcdn.net/img-contents/music/2010_home/event/bul_1.jpg" alt="">
+						<img src="http://i1.daumcdn.net/img-contents/music/2010_home/event/bul_1.jpg" alt="">
+						<img src="http://i1.daumcdn.net/img-contents/music/2010_home/event/bul_1.jpg" alt="">
+						<img src="http://i1.daumcdn.net/img-contents/music/2010_home/event/bul_1.jpg" alt="">
+						<img src="http://i1.daumcdn.net/img-contents/music/2010_home/event/bul_1.jpg" alt="">
+						<img src="http://i1.daumcdn.net/img-contents/music/2010_home/event/bul_1.jpg" alt="">
+						#elseif( $StringUtils.equals( "$!{gameRank.rank}", "2") )
+						<img src="http://i1.daumcdn.net/img-contents/music/2010_home/event/bul_1.jpg" alt="">
+						<img src="http://i1.daumcdn.net/img-contents/music/2010_home/event/bul_1.jpg" alt="">
+						#elseif( $StringUtils.equals( "$!{gameRank.rank}", "3") )
+						<img src="http://i1.daumcdn.net/img-contents/music/2010_home/event/bul_1.jpg" alt="">
+						#end
+						<strong class="red">$!{gameRank.rank}</strong>위
+					</td>
+					<td class="name"><strong>$!{gameRank.daumName}</strong></td>
+					<td class="sum"><strong class="red">$Number.format("integer", $gameRank.score)</strong>점</td>
+				</tr>
+				#end
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<iframe id="callDummay" width="0" height="0" style="position:absolute;top:-99px;left:-99px;"></iframe>
+<script type="text/javascript">
+function callDummyFrame() {
+	var iframe = daum.$("callDummay");
+	var callUrl = "http://music.daum.net/player/game/dummy/dummyQuizCount.html";
+	if(!iframe) return;
+	iframe.src = callUrl+"?time="+new Date().getTime();
+}
+
+var daumtrans = function(){
+	var daumtrans = document.getElementById("daumtrans");
+	daumtrans.innerHTML = '<img src="https://logins.daum.net/accounts/auth.gif" width="0" height="0" alt="" />';
+};
+
+setInterval( daumtrans, 40000 );
+</script>
+#if( $StringUtils.equals("$!{command.debugmode}", "2") )
+	
+		$weekMap	
+		$month
+	
+	
+	$command.date <br/>
+#foreach ($gameRank in $gameRankList)
+	$!{gameRank.rank} <br/>
+	$!{gameRank.daumName} <br/>
+	$gameRank.score  <br/>
+#end
+#end
+				

@@ -1,0 +1,54 @@
+#uaCheck()
+
+<div id="daumContent" class="cont_music cont_selection">
+	#tabSym()
+	
+	<div class="wrap_selection">
+		<div class="wrap_head">
+			<h3 class="tit fc_blue">SUPPORT YOUR MUSIC</h3>
+		</div>
+		<div class="cont">
+			<p class="desc">음악성을 지닌 아티스트들이 소셜 펀드레이징을 통해 음반 제작, 단독 공연 개최 등을 통해 자신의 음악을 세상에 알리고, 최종적으로 아티스트가 자립할 수 있도록 지원하는 민트페이퍼의 음악 프로젝트로 Daum뮤직과 함께 합니다. 네티즌 후원금을 통해 아티스트는 음반을 제작할 수 있게 되고, 후원자들은 투자를 통해 음반 제작에 참여하며 투자에 대한 보상을 받게 됩니다.<br>
+민트페이퍼는 음반 제작 및 발매 기념 공연 개최 등을 통해 아티스트가 자립할 수 있도록 지원하며, Daum뮤직은 일정액의 후원금과 홍보배너, 프로젝트 진행을 위한 온라인 플랫폼을 제공합니다.</p>
+		</div>
+		<div class="wrap_head">
+			<h3 class="tit">SYM은 어떻게 진행되나요?</h3>
+		</div>
+		<div class="cont">
+			<ol class="desc_num">
+				<li>접수 : 음반 발매를 원하는 아티스트들은 Daum 뮤직을 통해 지원서 접수</li>
+				<li>투표 : 선정된 후보를 대상으로 Daum뮤직에서 온라인과 오프라인 오디션 후 현장투표 진행</li>
+				<li>펀드 : 투표를 통해 선정된 아티스트에게 음반 제작을 위한 후원 펀드레이징을 진행 (Daum뮤직에서 일정액 지원 + 네티즌 후원금 펀드레이징)</li>
+				<li>보상 : 후원에 참여한 네티즌에게는 후원금액만큼의 다양하고 재미있는 아티스트로부터의 보상제공 (예 : 사인 음반, 공연 초대, 아티스트와 MT가기, 결혼 식 축가 제공, 뮤비 출연 등)</li>
+				<li>음반제작 및 공연 : 펀드레이징 성공 후 민트페이퍼의 지원을 통해 음반 제작 진행. 음반 발매 후 역시 민트페이퍼의 지원을 통해 음반 발매기념 공연 개최 </li>
+			</ol>
+		</div>
+		<div class="wrap_head">
+			<h3 class="tit">SYM에 참여하면 어떤 좋은 점이 있나요?</h3>
+		</div>
+		<div class="cont cont_benefit">
+			<strong class="desc_top">아티스트</strong>
+			<ol class="desc_num">
+				<li>외부 자본의 개입 없이 네티즌 후원금을 통해 음반을 제작할 수 있습니다.</li>
+				<li>펀딩 성공 시 Daum 뮤직에서 추가후원금 100만원과 홍보 배너로 빵빵한 지원을 받을 수 있습니다.</li>
+				<li>민트페이퍼를 통해 선배 아티스트들의 멘토링과 녹음을 위한 기반 시설을 제공 받으며, 음반 발매 및 발매 기념 공연을 할 수 있습니다.</li>
+				<li>2012년 한 해 동안 다양한 방식으로 민트페이퍼의 지원을 받을 수 있으며, 3팀의 프로젝트 완료 후 결산 공연 SYM CIRCUIT에 참여하게 됩니다.</li>
+			</ol>
+			<strong class="desc_top">후원자</strong>
+			<ol class="desc_num">
+				<li>후원금 투자를 통해 음반 제작에 참여하며 아티스트와 직접적인 관계를 맺을 수 있습니다.</li>
+				<li>사인 음반부터 아티스트와 함께하는 MT, 결혼식 축가, 나만의 노래 제작 등 아티스트의 다양한 아이디어로 결정된 후원 금액에 따른 다양한 보상을 제공 받을 수 있습니다.</li>
+				<li>후원에 참여하면 가장 먼저 thanks to에 본인의 이름이 기재된 음반을 받을 수 있습니다.</li>
+			</ol>
+		</div>
+		<div class="wrap_head">
+			<h3 class="tit">이용안내</h3>
+		</div>
+		<div class="cont guide_box">
+			<p class="desc">아티스트 지원서 접수와 네티즌 투표 참여, 후원 결제는 <em class="fc_blue">PC웹을 통해서 이용</em>하실 수 있습니다.</p>
+		</div>
+	</div>
+
+</div>
+
+#parse("/velocity/mobileweb/realtimeissue.vm")

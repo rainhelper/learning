@@ -1,0 +1,317 @@
+
+## 인기차트 상단 네비 탭
+#macro(printChartNaviTab $chartType $genreCd $dateKey $date $pageNo)
+	#set( $URI = "#getter('URI', '')" )
+    <ul class="tab_cont tab_chart">
+    	<li class="chart_menu1#if($URI.indexOf('/chart/chartsong/list') !=-1) on#end CT_ZONE_CHARTTAB1"><a href="/chart/chartsong/list">종합</a></li>
+    	<li class="chart_menu2#if($URI.indexOf('/chart/chartsong/genre') !=-1) on#end CT_ZONE_CHARTTAB2"><a href="/chart/chartsong/genre">장르별 차트</a></li>
+    	<li class="chart_menu4 CT_ZONE_CHARTTAB4"><a href="/vclip/chart">뮤비 차트</a></li>
+    	<li class="chart_menu5 CT_ZONE_CHARTTAB5"><a href="/musicbar/musicbar/list?menu_id=11">테마리스트</a></li>
+    </ul>	
+#end
+
+## 인기차트 상단 장르 카테고리 
+#macro(printChartGenreCategory $chartType $genreCd $dateKey $date $pageNo)
+	#set( $urlDepthOpt = [ 
+		["date_key","$!{dateKey}"],
+    	["date","$!{date}"]
+    ])
+	#set( $commonParam = "#makeUrlParamList($urlDepthOpt)")
+
+	<ul class="category_cont f_l">
+    	##<li class="fst#if($StringUtils.equals('TORA', $genreCd) && !$StringUtils.equals('mobile', $!{chartType})) on#end"><a class="cate1 CT_ZONE_CHARTCATE1" href="/chart/chartsong/list?${commonParam}&amp;genre_cd=TORA">종합</a></li>
+    	<li class="fst#if($StringUtils.equals('KORA', $genreCd)) on#end"><a class="cate2 CT_ZONE_CHARTCATE2" href="/chart/chartsong/genre?${commonParam}&amp;genre_cd=KORA">가요</a></li>
+    	<li#if($StringUtils.equals('PORA', $genreCd)) class="on"#end><a class="cate3 CT_ZONE_CHARTCATE3" href="/chart/chartsong/genre?${commonParam}&amp;genre_cd=PORA">POP</a></li>
+    	<li#if($StringUtils.equals('OSRA', $genreCd)) class="on"#end><a class="cate4 CT_ZONE_CHARTCATE4" href="/chart/chartsong/genre?${commonParam}&amp;genre_cd=OSRA">OST</a></li>
+    	<li#if($StringUtils.equals('IDRA', $genreCd)) class="on"#end><a class="cate5 CT_ZONE_CHARTCATE5" href="/chart/chartsong/genre?${commonParam}&amp;genre_cd=IDRA">아이돌</a></li>
+    	<li#if($StringUtils.equals('INRA', $genreCd)) class="on"#end><a class="cate6 CT_ZONE_CHARTCATE6" href="/chart/chartsong/genre?${commonParam}&amp;genre_cd=INRA">인디</a></li>
+    	<li#if($StringUtils.equals('TRRA', $genreCd)) class="on"#end><a class="cate7 CT_ZONE_CHARTCATE7" href="/chart/chartsong/genre?${commonParam}&amp;genre_cd=TRRA">트로트</a></li>
+    	<li#if($StringUtils.equals('JPRA', $genreCd)) class="on"#end><a class="cate8 CT_ZONE_CHARTCATE8" href="/chart/chartsong/genre?${commonParam}&amp;genre_cd=JPRA">J-POP</a></li>
+    	<li#if($StringUtils.equals('JARA', $genreCd)) class="on"#end><a class="cate9 CT_ZONE_CHARTCATE9" href="/chart/chartsong/genre?${commonParam}&amp;genre_cd=JARA">재즈</a></li>
+    	<li#if($StringUtils.equals('CLRA', $genreCd)) class="on"#end><a class="cate10 CT_ZONE_CHARTCATE10" href="/chart/chartsong/genre?${commonParam}&amp;genre_cd=CLRA">클래식</a></li>
+		<li#if($StringUtils.equals('WORA', $genreCd)) class="on"#end><a class="cate11 CT_ZONE_CHARTCATE11" href="/chart/chartsong/genre?${commonParam}&amp;genre_cd=WORA">월드뮤직</a></li>
+    	<li#if($StringUtils.equals('RERA', $genreCd)) class="on"#end><a class="cate12 CT_ZONE_CHARTCATE12" href="/chart/chartsong/genre?${commonParam}&amp;genre_cd=RERA">종교음악</a></li>
+    	<li#if($StringUtils.equals('ETRA', $genreCd)) class="on"#end><a class="cate13 CT_ZONE_CHARTCATE13" href="/chart/chartsong/genre?${commonParam}&amp;genre_cd=ETRA">기타</a></li>
+		##if($StringUtils.equals("2", "$dateKey"))
+    	##<li#if($StringUtils.equals("mobile", "$!{chartType}")) class="on"#end><a class="cate14" href="/chart/chartsong/list?${commonParam}&amp;chart_type=mobile">폰뮤직</a></li>
+    	##end
+    </ul>
+#end
+
+## 인기차트 상단 시간 카테고리 
+#macro(printChartDateCategory $chartType $genreCd $dateKey $date $pageNo)
+	#set( $urlDepthOpt = [ 
+		["genre_cd", "$!{genreCd}"]
+    ])
+	#set( $commonParam = "#makeUrlParamList($urlDepthOpt)")
+
+	<ul class="category_cont f_l total_cate">
+    	<li class="fst#if($StringUtils.equals('4', $dateKey)) on#end"><a class="cate1 CT_ZONE_CHARTCATE1" href="/chart/chartsong/list?${commonParam}&amp;date_key=4">실시간</a></li>
+    	<li#if($StringUtils.equals('3', $dateKey)) class="on"#end><a class="cate2 CT_ZONE_CHARTCATE2" href="/chart/chartsong/list?${commonParam}&amp;date_key=3">일간</a></li>
+    	<li#if($StringUtils.equals('2', $dateKey)) class="on"#end><a class="cate3 CT_ZONE_CHARTCATE3" href="/chart/chartsong/list?${commonParam}&amp;date_key=2">주간</a></li>
+    	<li#if($StringUtils.equals('1', $dateKey)) class="on"#end><a class="cate4 CT_ZONE_CHARTCATE4" href="/chart/chartsong/list?${commonParam}&amp;date_key=1">월간</a></li>
+    </ul>
+#end
+
+## YYYY.MM 또는 YYYY.MM.DD 포맷으로 리턴
+## type : month, week, day
+#macro(printImageDate $date $type $week)
+	#if($StringUtils.equals($type, "day"))#set($total = 7)#else#set($total = 5)#end
+	#foreach($index in [0..$total])
+		<span class="num_comm num$StringUtils.mid($date, $index, 1)">$StringUtils.mid($date, $index, 1)</span>
+		#if($StringUtils.equals($type, "day"))
+			#if($index == 3 || $index == 5)<span class="num_comm spot">.</span>#end
+		#else
+			#if($index == 3)<span class="num_comm spot">.</span>#end
+    	#end
+	#end
+	#if($StringUtils.equals($type, "week"))
+		<span class="num_comm spot">.</span>
+		<span class="num_comm week$week">$week주</span>
+	#end
+#end
+
+## 인기차트 우측상단 날짜정보
+#macro(printChartDateInfo $chartType $genreCd $dateKey $date $pageNo $link)
+	#set( $urlDepthOpt = [ 
+    	["chart_type","$!{chartType}"],
+    	["genre_cd","$!{genreCd}"],
+		["date_key","$!{dateKey}"]
+    ])
+	#set( $commonParam = "#makeUrlParamList($urlDepthOpt)")
+	
+	#set( $calendarTypeMap = { 
+		"1":"monthCal",
+		"2":"weekCal",
+		"5":"weekCal",
+		"3":"dayCal"
+	})
+	 
+	#if( $calendarTypeMap.get($dateKey) )
+	#set( $calType = "$calendarTypeMap.get($dateKey)" )
+	
+	#set( $isTORA = false ) ## 카테고리 
+	#if( $StringUtils.equals("$!{genreCd}", "TORA") || !$StringUtils.isNotBlank("$!{genreCd}"))#set($isTORA = true)#end
+
+	## day, week, month
+	#if( $isTORA )
+		#set($minDayMap = { "monthCal" : 20090731, "weekCal" : 20090704, "dayCal" : 20090701 })
+	#else
+		#set($minDayMap = { "monthCal" : 20110531, "weekCal" : 20110709, "dayCal" : 20110801 })
+	#end
+	
+	<script type="text/javascript">
+	var drawCalendar = function(){
+    	var calendar = new daum.Music.Calendar(
+			"calendarDiv", 
+			{ 	headId 		:	"calendarHead"
+			  , typeToCal	:	"$calType" 
+			  , link		:	"$link${commonParam}"
+			  , minDay   	:   $minDayMap.get($calType)
+			},
+		#if( $StringUtils.equals("$calType", "weekCal") )
+			#set($weekMap = $CheckDate.getWeekNumForChart("$date"))
+			{ 	year		:	"$weekMap.get('year')"
+			  , month		:	"$weekMap.get('month')"
+			  , day			:	"01"
+			  , week		:   "$weekMap.get('weekNum')"
+			}
+		#else
+			{ 	year		:	$StringUtils.substring($date, 0, 4)
+			  , month		:	$StringUtils.substring($date, 4, 6)
+			  #if( $date.length() > 6 )
+			  , day			:	$StringUtils.substring($date, 6, 8)
+			  #end 
+			}
+		#end
+		);
+    	calendar.render();
+	};
+	</script>
+	#end
+	
+	#if($StringUtils.equals("4", "$dateKey"))
+    <h3 class="screen_out">실시간 종합 순위</h3>
+	<div class="current_day f_r">
+		#printImageDate($date "day" "") ##YYYY.MM.DD
+		<span class="time">
+			<span class="num_comm time$StringUtils.mid($date, 8, 1)">$StringUtils.mid($date, 8, 1)</span>
+			<span class="num_comm time$StringUtils.mid($date, 9, 1)">$StringUtils.mid($date, 9, 1)</span>
+			<span class="num_comm colon">:</span>
+			<span class="num_comm time0">0</span>
+			<span class="num_comm time0">0</span>
+		</span>
+	</div>
+	#elseif($StringUtils.equals("3", "$dateKey"))
+	<h3 class="screen_out">일간 종합 순위</h3>
+	<div class="current_day info_day f_r">
+		<a class="box_date" href="javascript:;" onclick="daum.Music.Layer.view({el:this,type:'calendarDay',classname:'layer_info layer_cal cal_days',left:-19, arrow_left:21});drawCalendar();return false;">
+			#printImageDate($date "day" "") ##YYYY.MM.DD
+		</a>
+		#if($Number.toNumber($date) <= $minDayMap.get($calType))
+			<span class="arr_comm prev_off" title="이전일">이전일</span>
+		#else
+			<a class="arr_comm prev" href="$!{link}${commonParam}&amp;date=$CheckDate.getDiffDate($date, -1)" title="이전일">이전일</a>
+		#end	
+		#if($StringUtils.equals($maxDateYn, "Y"))
+			<span class="arr_comm next_off" title="다음일">다음일</span>
+		#else
+			<a class="arr_comm next" href="$!{link}${commonParam}&amp;date=$CheckDate.getDiffDate($date, 1)" title="다음일">다음일</a>
+		#end
+	</div>
+	#elseif($StringUtils.equals("2", "$dateKey") || $StringUtils.equals("5", "$dateKey"))
+	<h3 class="screen_out">주간 종합 순위</h3>
+	<div class="current_day info_day f_r">
+		<a class="box_date" href="javascript:;" onclick="daum.Music.Layer.view({el:this,type:'calendarWeek',classname:'layer_info layer_cal cal_weeks'});drawCalendar();return false;">
+			#set($weekMap = $CheckDate.getWeekNumForChart($date))
+			#set($month = "$weekMap.get('month')")
+			#if($month.length() == 1)#set($mm = "0" + $month)#else#set($mm = $month)#end
+			#set($weekDate = "$weekMap.get('year')$mm")
+   			#printImageDate($weekDate "week" $weekMap.get("weekNum")) ##YYYY.MM
+		</a>
+		#if($Number.toNumber($date) <= $minDayMap.get($calType))
+			<span class="arr_comm prev_off" title="저번주">저번주</span>
+		#elseif($StringUtils.equals("$!{dateKey}", "5"))
+			<a class="arr_comm prev" href="$!{link}&amp;date=$CheckDate.getDiffDate($date, -7)" title="저번주">저번주</a>
+		#else
+			<a class="arr_comm prev" href="$!{link}${commonParam}&amp;date=$CheckDate.getDiffDate($date, -7)" title="저번주">저번주</a>
+		#end
+		#if($StringUtils.equals($maxDateYn, "Y"))
+			<span class="arr_comm next_off" title="다음주">다음주</span>
+		#elseif($StringUtils.equals("$!{dateKey}", "5"))
+			<a class="arr_comm next" href="$!{link}&amp;date=$CheckDate.getDiffDate($date, 7)" title="다음주">다음주</a>
+		#else
+			<a class="arr_comm next" href="$!{link}${commonParam}&amp;date=$CheckDate.getDiffDate($date, 7)" title="다음주">다음주</a>
+		#end
+	</div>
+	#elseif($StringUtils.equals("1", "$dateKey"))
+	<h3 class="screen_out">월간 종합 순위</h3>
+	<div class="current_day info_day f_r">
+		<a class="box_date" href="javascript:;" onclick="daum.Music.Layer.view({el:this,type:'calendarMonth',classname:'layer_info layer_cal cal_month',left:-19, arrow_left:21});drawCalendar();return false;">
+			#printImageDate($date "month" "") ##YYYY.MM		
+		</a>
+		#if($Number.toNumber($date) <= $minDayMap.get($calType))
+			<span class="arr_comm prev_off" title="이전달">이전달</span>
+		#else
+			<a class="arr_comm prev" href="$!{link}${commonParam}&amp;date=$CheckDate.getBeforeMonthLastDay($date)" title="이전달">이전달</a>
+		#end
+		#if($StringUtils.equals($maxDateYn, "Y"))
+			<span class="arr_comm next_off" title="다음달">다음달</span>
+		#else
+    		<a class="arr_comm next" href="$!{link}${commonParam}&amp;date=$CheckDate.getNextMonthLastDay($date)" title="다음달">다음달</a>
+		#end
+	</div>
+	#end
+#end
+
+## 순위정보 탭
+#macro(printChartRankTab $chartType $genreCd $dateKey $date $pageNo $link)
+	#set( $urlDepthOpt = [ 
+    	["chart_type","$!{chartType}"],
+    	["genre_cd","$!{genreCd}"],
+		["date_key","$!{dateKey}"],
+    	["date","$!{date}"]
+    ])
+	#set( $commonParam = "#makeUrlParamList($urlDepthOpt)")
+    <a class="fst" href="${link}${commonParam}&amp;page_no=1">1 ~ 50위</a>
+    <a href="${link}${commonParam}&amp;page_no=2">51 ~ 100위</a>
+#end
+
+## 핫이슈공감 - 앨범 섬네일
+#macro(printHotAlbum $song)
+<div class="hot_album">
+	<a class="album_type4" href="$!{song.hotIssue.titleLink}">
+		<img src="$song.album.mainImage.filePath" width="150" height="150" alt="$song.album.title">
+		<span class="bg_album4"></span>
+	</a>
+	<a class="ico_songlisten" href="#" title="앨범듣기">앨범듣기</a>
+</div>
+#end
+
+## 핫이슈공감 - 앨범 날짜 
+#macro(printAlbumDate $song )
+	<div class="date_album_cd">
+        #set( $rDate = $song.hotIssue.regdttm )
+        #set( $arrDate = ["$!StringUtils.left($rDate,1)", "$!StringUtils.mid($rDate,1,1)", "$!StringUtils.mid($rDate,2,1)",
+            				"$!StringUtils.mid($rDate,3,1)", "$!StringUtils.mid($rDate,4,1)","$!StringUtils.mid($rDate,5,1)", 
+            				"$!StringUtils.mid($rDate,6,1)", "$!StringUtils.mid($rDate,7,1)"
+        ])
+        <span class="box_date">
+        	<span class="num_comm num$!{arrDate.get(0)}">$!{arrDate.get(0)}</span>
+        	<span class="num_comm num$!{arrDate.get(1)}">$!{arrDate.get(1)}</span>
+        	<span class="num_comm num$!{arrDate.get(2)}">$!{arrDate.get(2)}</span>
+        	<span class="num_comm num$!{arrDate.get(3)}">$!{arrDate.get(3)}</span>
+        	<span class="num_comm spot">.</span>
+        	#if( !$StringUtils.equals("$!{arrDate.get(4)}","0"))
+        	<span class="num_comm num$!{arrDate.get(4)}">$!{arrDate.get(4)}</span>#end
+        	<span class="num_comm num$!{arrDate.get(5)}">$!{arrDate.get(5)}</span>
+        	<span class="screen_out">.</span>
+        </span>
+        <span class="wrap_day">
+        	<span class="box_date">
+        		#if( !$StringUtils.equals("$!{arrDate.get(6)}","0"))
+        		<span class="num_comm num$!{arrDate.get(6)}">$!{arrDate.get(6)}</span>#end
+        		<span class="num_comm num$!{arrDate.get(7)}">$!{arrDate.get(7)}</span>
+        	</span>
+        </span>
+	</div>	
+#end
+
+## 핫이슈공감 -  소셜웹 tr
+#macro( printSocialWebWrap $song $count)
+<tr class="open_direct hide opendirect" id="opendirect$!{song.songId}_$!{count}" >
+	<td colspan="4"></td>
+</tr>
+#end
+
+## 핫이슈공감 -  테이블
+#macro(printIssueSongTable $issueSongList )
+	#foreach($song in $issueSongList)
+	#set($title = $song.title.replaceAll("\'","&apos;"))
+	#set($artistName = $!StringCutUtil.removeTag( "#printArtistName( $!{song.keyArtistList} '' 20 true )") )
+	<tr id="track$!{song.songId}" class="track" tag="chart">
+			##if( $StringUtils.equals( "$!{listType}", "chart" ) )
+		<td class="col_check">
+			#printListCol("check" $song $song.album false "")
+			##printListCol("check" $song $song.album false "" "checkboxDrag")
+		</td>
+		<td class="col_album">
+			#printAlbumThumb( $!{song.album} 1 "" "" )
+		</td>
+		<td class="col_title">
+			<strong class="txt_time">$CheckDate.dateFormat("MM.dd", "MM.dd", "yyyyMMddHHmmss", "$!{song.hotIssue.regdttm}")</strong>
+            <span class="txt_bar">|</span>
+			#printSongName( $!{song} "fw_b CT_ZONE_LIST_SONG" 40 true false false)
+			##printListHotIssueIcon( $!{song} "")
+			<a class="txt_album" href="$!{song.hotIssue.titleLink}">$!{song.hotIssue.title}</a>
+		</td>
+		<td class="col_artist">
+			#printArtistName( $!{song.keyArtistList} "CT_ZONE_LIST_ARTIST" 16 true )
+		</td>
+		<td class="col_listen">
+        	#printListItemButton( $!{song.songId} "listen" $!{song.AODLinkId} "" false "" "" "" "" "" "" "")
+        </td>
+        <td class="col_lyrics">
+        	#printListItemButton( $!{song.songId} "lyrics" $!{song.lyricsYn} $count "tr" "" $!{foreach.count} "" "" $!{song.typeCd} "" "")
+        </td>
+        <td class="col_video">
+        	#printListItemButton( $!{song.songId} "video" $!{song.vclipLinkId} 11 "chart" "" "" "" $!{foreach.count} "" "" $!{song.typeCd} )
+        </td>
+        <td class="col_my">
+        	#printListItemButton( $!{song.songId} "my" true "" $!{song.AODLinkId} "" "" "" "" "" "" "")
+        </td>
+        <td class="col_export">
+        	<div class="wrap_export_btn">
+        		#printListItemButton( $!{song.songId} "sns" true "$!song.AODLinkId" "" "" "" "" "" "" "" "")
+        	</div>
+        </td>
+        <td class="col_buy">
+    		#printListItemButton( $!{song.songId} "mp3" $!{song.MP3LinkId} "" "" $!{song.album.albumId} "" "" "" "" "" "")
+    		#printListItemButton( $!{song.songId} "bgm" $!{song.BGMLinkId} "" "" "" "" "" "" "" "" "")
+        </td>
+    </tr>
+	#end
+	
+	#printSNSList($!{issueSongList})
+	
+#end

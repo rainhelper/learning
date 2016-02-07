@@ -1,0 +1,35 @@
+var searchData = [
+#foreach($item in $dto.albumResult.documentList)
+	#if($dto.albumResult.documentList.indexOf($item) != 0)
+	, 
+	#end
+	{
+		"ArtistId": "$!{item.artist_id}",
+		"ArtistName": "$!StringCutUtil.removeTagJSON($item.artist_name)",
+		"MainImage": "$!{EscapeTool.xml($item.thumb)}",
+        "AlbumId": "$!{item.album_id}",
+		"AlbumVolumn": "$!{item.album_vol}",
+        "AlbumTitle": "$!StringCutUtil.removeTagJSON($item.album_name)",
+        #set($trackList = $item.getTrackList())
+		"SongList": [
+					#foreach($track in $trackList)
+					#if($foreach.index > 0) , #end
+					{
+						"SongId": "$!{track.songId}",
+						"Title": "$!StringCutUtil.removeTagJSON($!{track.title})",
+						"ArtistId": "$!{item.artist_id}",
+						"ArtistName": "$!StringCutUtil.removeTagJSON($item.artist_name)",
+						"ListenYN" : "$!{track.listenYN}"
+					}
+					#end
+					]
+	}
+#end
+];
+
+var PageHandler = {
+	"pageNo": "$!{command.pageNo}",
+	"onePageCnt": "$!{dto.ph.onePageCnt}",
+	"oneBlockCnt": "$!{dto.ph.oneBlockCnt}",
+	"totalCnt": "$!{dto.ph.totalCnt}"
+};

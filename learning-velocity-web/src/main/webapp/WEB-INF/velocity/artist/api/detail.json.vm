@@ -1,0 +1,302 @@
+#set ($serviceId = "music")
+#set ($sectionId = "artist")
+##아티스트 타입(PS, BD)
+#set($artistType = $artist.artistType)
+{
+	"serviceid":"${serviceId}",
+	"sectionid":"${sectionId}",
+	"itemid" : ${artist.artistId},
+	"title" : $JSONUtil.valueToString($!{artist.name}),
+	"subtitle" : $JSONUtil.valueToString("$!{artist.nameKorLang}"),
+	"synonym" : [
+	#foreach($synonym in $artist.synonymList)
+		$JSONUtil.valueToString($!{synonym})#if($velocityHasNext),#end
+	#end
+	],
+	"link" : "http://music.daum.net/artist/main?artist_id=${artist.artistId}",
+	"image" : "$ImageUtil.getImageUrl( "$!{artist.mainImage.filePath}", "74x107", "ARTIST")",
+	"point" : "",
+	"point_cnt" : "",
+	"mod_dttm" : "$!{artist.modDateTime}",
+	"status" : #if("$!{artist.svcstatus}" == "2") "Y" #else "N" #end,
+	"detail" : {
+		"type" : {
+			"title" : "아티스트 타입",
+			"content" : [
+				#if($!{artistType})
+				{
+					"title" : $JSONUtil.valueToString($!{artistType})
+				}
+				#end
+			]
+		},
+		"credit" : {
+			"title" : "대표직업(역할)",
+			"content" : [
+				#if($!{artist.creditTitle1})
+				{
+					"title" : $JSONUtil.valueToString($!{artist.creditTitle1})
+				}
+				#end
+				#if($!{artist.creditTitle1} && $!{artist.creditTitle2})
+				,
+				#end
+				#if($!{artist.creditTitle2})
+				{
+					"title" : $JSONUtil.valueToString($!{artist.creditTitle2})
+				}
+				#end
+			]
+		},
+		"birthdate" : {
+			"title" : "출생일",
+			"content" : [
+				#if($!{artist.birthDt})
+				{
+					"title" : "$!{CheckDate.makeReleaseDate($artist.birthDt)}"
+				}
+				#end
+			]
+		},
+		"deathdate" : {
+			"title" : "사망일",
+			"content" : [
+				#if($!{artist.deathDt})
+				{
+					"title" : "$!{CheckDate.makeReleaseDate($artist.deathDt)}"
+				}
+				#end
+			]
+		},
+		"debutdate" : {
+			"title" : "데뷔일",
+			"content" : [
+				#if($!{artist.debutDt})
+				{
+					"title" : "$!{CheckDate.makeReleaseDate($artist.debutDt)}"
+				}
+				#end
+			]
+		},
+		"nation" : {
+			"title" : "국가",
+			"content" : [
+				#if($!{artist.birthCity})
+				{
+					"title" : $JSONUtil.valueToString($!{artist.birthCity})
+				}
+				#end
+			]
+		},
+		"genre" : {
+			"title" : "장르",
+			"content" : [
+
+			]
+		},
+		"activityNation" : {
+			"title" : "활동국가",
+			"content" : [
+			#foreach($nation in $nationList)
+				{
+					"title" : $JSONUtil.valueToString($!{nation})
+				}#if($velocityHasNext),#end
+			#end
+			]
+		},
+		"activityName" : {
+			"title" : "활동명",
+			"content" : [
+				{
+					"title" : $JSONUtil.valueToString($!{artist.name})      
+				}#if($!{artistNameList.size()} > 0),#end
+			#foreach($name in $artistNameList)
+				{
+					"title" : $JSONUtil.valueToString($!{name})      
+				}#if($velocityHasNext),#end
+			#end
+			]
+		},
+		"activityYear" : {
+			"title" : "활동연도",
+			"content" : [
+			#if($!{artist.strActYear})
+				{
+					"title" : "$!{artist.strActYear}"
+				}
+			#end
+			#if( $!{artist.strActYear} != $!{artist.endActYear} )
+				,
+				{
+					"title" : "$!{artist.endActYear}"
+				}
+			#end
+			]
+		},
+		"masterSong" : {
+			"title" : "대표곡",
+			"content" : [
+			#foreach( $song in ${artistMainSongList} )
+				{
+					"id" : "$!{song.songId}",
+					"title" : $JSONUtil.valueToString($!{song.title}),
+					"listenAvailable" : #if($song.AODLinkId && ${song.AODLinkId} != "")true #else false#end
+				}#if($velocityHasNext),#end
+			#end
+			]
+		},
+		"bestSong" : {
+			"title" : "인기차트(5곡)",
+			"content" : [
+			#foreach( $song in ${popularSongList} )
+			#if($StringUtils.equals("$!{song.creditCd}","0055"))#set($coverArtistYn = "Y")#else#set($coverArtistYn = "N")#end
+				{
+					"id" : "$!{song.songId}",
+					"artist" : [
+					#foreach( $artist in ${song.keyArtistList} )
+						{
+							"id" : "$!{artist.artistId}",
+							"title" : $JSONUtil.valueToString($!{artist.name})
+						}#if($velocityHasNext),#end
+					#end
+					],
+					"title" : $JSONUtil.valueToString($!{song.title}),
+					"rank" : "$!{velocityCount}",
+					#set( $roleName = "" )
+					#foreach( $creditArtist in ${song.creditArtistList} )
+						#if($creditArtist.artistId == $artist.artistId)
+							#if(!$StringUtils.equals($roleName,""))
+								#set( $roleName = $roleName + "," + $creditArtist.creditTitle )
+							#else
+								#set( $roleName = $roleName + $creditArtist.creditTitle )
+							#end
+						#end
+					#end
+					"role" : "$!{roleName}",
+					"albumId" : "$!{song.album.albumId}",
+					"albumTitle" : $JSONUtil.valueToString($!{song.album.title}),
+					"vclipId" : "$!{song.vclipLinkId}",
+					"aodListenYn" : #if($!{song.AODLinkId} && ${song.AODLinkId} != "") "Y" #else "N" #end,
+					"vclipYn" : #if(${song.vclipLinkId} && ${song.vclipLinkId} != 0) "Y" #else "N" #end,
+					"lyricsYn" : "$!{song.lyricsYn}",
+					"bgmSaleYn" : #if(${song.BMGLinkId} && ${song.BGMLinkId} != "") "Y" #else "N"#end,
+					"mp3SaleYn" : #if(${song.MP3LinkId} && ${song.MP3LinkId} != "") "Y" #else "N"#end,
+					"coverArtistYn" : "$!{coverArtistYn}"
+				}#if($velocityHasNext),#end
+			#end
+			]
+		},
+		"movie" : {
+			"title" : "뮤직비디오",
+			"content" : [
+			#foreach( $vclip in ${vclipList} )
+				#if($StringUtils.equals("$!{vclip.creditCd}","0055"))#set($coverArtistYn = "Y")#else#set($coverArtistYn = "N")#end
+				{
+					"id" : "$!{vclip.vclipId}",
+					"image" : "$!{vclip.mainImage.filePath}",
+					"title" : $JSONUtil.valueToString($!{vclip.title}),
+					"artist" : [
+					#foreach( $artist in ${vclip.keyArtistList} )
+						{
+							"id" : "$!{artist.artistId}",
+							"title" : $JSONUtil.valueToString($!{artist.name})
+						}#if($velocityHasNext),#end
+					#end
+					],
+					"date" : "$!{vclip.regDateTime}",
+					"albumId" : "$!{vclip.album.albumId}",
+					"songId" : "$!{vclip.song.songId}",
+					"coverArtistYn" : "$!{coverArtistYn}"
+				}#if($velocityHasNext),#end
+			#end
+			]
+		},
+		"album" : {
+			"title" : "앨범",
+			"content" : [
+			#foreach( $album in ${albumList} )
+				#if($StringUtils.equals("$!{album.creditCd}","0055"))#set($coverArtistYn = "Y")#else#set($coverArtistYn = "N")#end
+				{
+					"id" : "$!{album.albumId}",
+					"image" : "$!{album.mainImage.filePath}",
+					"title" : $JSONUtil.valueToString($!{album.title}),
+					"releaseDate" : "$!{album.releaseDt}",
+					"role" : "발매",
+					"listenYn" : "$!{album.playYn}",
+					"bgmSaleYn" : "$!{album.bgmSaleYn}",
+					"mp3SaleYn" : "$!{album.mp3SaleYn}",
+					"coverArtistYn" : "$!{coverArtistYn}",
+					"masterSong" : [
+					#foreach( $song in ${album.masterSongList} )
+						{
+							"id" : "$!{song.songId}",
+							"title" : $JSONUtil.valueToString($!{song.title})
+						}#if($velocityHasNext),#end
+					#end
+					],
+					"Songs" : [
+						#foreach( $song in ${album.songList} )
+						{
+							"id" : "$!{song.songId}",
+							"title" : $JSONUtil.valueToString($!{song.title}),
+							"masterYn" : "$!{song.masterYn}",
+							"listenYn" : #if(${song.AODLinkId} && ${song.AODLinkId} != "") "Y" #else "N" #end,
+							"lyricsYn" : "$!{song.lyricsYn}",
+							"vclipYn" : #if(${song.vclipLinkId} && ${song.vclipLinkId} != 0) "Y" #else "N" #end,
+							"mp3SaleYn" : #if(${song.MP3LinkId} && ${song.MP3LinkId} != "") "Y" #else "N" #end,
+							"bgmSaleYn" : #if(${song.BGMLinkId} && ${song.BGMLinkId} != "") "Y" #else "N" #end,
+							"ringSaleYn" : "",
+							"bellSaleYn" : ""
+						}#if($velocityHasNext),#end
+						#end
+					],
+					"artist" : [
+						#foreach( $artist in ${album.keyArtistList} )
+							{
+								"id" : "$!{artist.artistId}",
+								"title" : $JSONUtil.valueToString($!{artist.name})
+							}#if($velocityHasNext),#end
+						#end
+					]
+				}#if($velocityHasNext),#end
+			#end
+			]
+		},
+		"imageCount" : {
+			"title" : "아티스트 이미지 수",
+			"content" : [
+				{
+					"title" : "$!{imageCount}"
+				}
+			]
+		},
+		"belongTo" : {
+			"title" : "소속정보",
+			"content" : [
+			#foreach( $band in ${artistBandList} )
+				{
+					#if(!$StringUtils.equals("$!{band.bandOrderNo}","999"))
+						#set ($bandName = "(전) " + $!{band.name})
+						"title" : $JSONUtil.valueToString($bandName)
+					#else
+						"title" : $JSONUtil.valueToString($!{band.name})
+					#end
+				}#if($velocityHasNext),#end
+			#end
+			]
+		},
+		"member" : {
+			"title" : "멤버",
+			"content" : [
+			#foreach( $member in ${artistCurrnetbandMemberList} )
+				{
+					"title" : $JSONUtil.valueToString($!{member.name}),
+					"link" : "http://music.daum.net/artist/main?artist_id=${member.artistId}"
+				}#if($velocityHasNext),#end
+			#end
+			]
+		}
+	},
+	"ucc" : {
+	}
+}

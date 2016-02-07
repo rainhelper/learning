@@ -1,0 +1,307 @@
+#*
+<style type="text/css">	
+	.section_djreview .cont_info .wrap_djreview .djreview {height:97px;}
+	.section_djreview .cont_info .wrap_djreview .txt_djreview {width:430px;}
+	.viewFrame{position:absolute; width:630px; height:159px; overflow:hidden;}
+	.wrap_listRoll{position:relative; width:790px;}
+	.list_view{position:absolute; left:0;padding-left:0;}
+
+	.layer_info.layer_djInfo {width:205px;}
+	.layer_info.layer_djInfo .bg_tmid, .bg_bmid {width:177px;}
+	.layer_info.layer_djInfo .ico_arrow {left:98px;}
+	.layer_info.layer_djInfo .info_body {padding:0px 13px 0 17px;color:#666;}
+	.layer_info.layer_djInfo .info_body .tit_dj {display:block;padding-bottom:3px;}
+</style>
+<style type="text/css">
+		.section_djreview .cont_info .section_head .tit_genre .txt_genre {line-height:14px;}
+		.section_djreview .cont_info .wrap_djreview .txt_djreview {letter-spacing:0px;}
+		.section_djreview .cont_info .wrap_djreview .djreview {height:83px; padding-bottom:0px;}
+		
+	</style>
+*#
+<div class="wrap_cont section_djreview" style="width:698px;">
+	<div class="wrap_option">
+		<h3 class="tit_cont">
+			<img width="545" height="21" alt="DJ 추천음악. 뮤직 BAR DJ가 함께 듣고 싶은 음악을 소개합니다" src="http://s1.daumcdn.net/img-contents/music/2011_home/bar/tit_dj.gif">
+		</h3>
+	</div>
+	<div class="wrap_djinfo">
+		<div class="box_dj">
+			<div class="wrap_dj CT_ZONE_DJSLIDE">
+			<div class="viewFrame">	## 롤링을 위해서 추가된 태그
+				<div class="wrap_listRoll">	## 롤링을 위해서 추가된 태그
+    				<ul id="DjList" class="list_dj list_view">
+    					#foreach($dj in $allDjList)
+						#if($foreach.count == 1)
+						<li id="DjListAll" class="roll">
+    						<a href="/musicbar/djalbum/list?order_type=DATE" class="thumb_link" onclick="daum.Music.MusicBar.genreDetail(); return false;">
+    				##			<span class="cover_on"><span class="txt_djname">전체</span><span class="bg_txt"></span></span>
+    							<span class="line_thumb"></span>
+    						</a>
+    					</li>
+						#end
+    					<li id="DjList$!{dj.djId}" class="roll">
+    						<a href="#" class="thumb_link" title="$!{dj.nickName}" onclick="daum.Music.MusicBar.genreDetail($!{dj.djId}); return false;" onmouseover="daum.Music.MusicBar.OverHandler(event); return false;">
+    							<img src="$ImageUtil.getImageUrl("$!{dj.imageUrlForTab}", "55x55", "PHOTO", "S")">
+    							<span class="cover_on"><span class="txt_djname">#strCut( "$!{dj.nickName}", 6 )</span><span class="bg_txt"></span></span>
+    							<span class="line_thumb"></span>
+    						</a>
+    					</li>
+    					#end
+					</ul>
+				</div>
+			</div>
+				<span class="btn_prev"><a id="msPrevBtn" class="btn_detail prev_off" href="javascript:;" title="이전내용">이전내용</a></span>
+				<span class="btn_next"><a id="msNextBtn" class="btn_detail next_on" href="javascript:;" title="다음내용">다음내용</a></span>
+			</div>
+		</div>
+		<div class="wrap_genre CT_ZONE_DJGENRE">
+			<ul id="tabgenreName" class="tab_bar tab_genre">
+				<li class="genre_menu1 #if( $StringUtils.isEmpty("$!{genre.genreCode}")) on#end"><a href="#" onclick="daum.Music.MusicBar.DjgenreDetail('TO', 'DATE'); return false;" title="전체">전체</a></li>
+				<li class="genre_menu2 #if($StringUtils.equals("$!{genre.genreCode}", "KO"))on#end"><a href="#" onclick="daum.Music.MusicBar.DjgenreDetail('KO', 'DATE'); return false;" title="가요">가요</a></li>
+				<li class="genre_menu3 #if($StringUtils.equals("$!{genre.genreCode}", "PO"))on#end"><a href="#" onclick="daum.Music.MusicBar.DjgenreDetail('PO', 'DATE'); return false;" title="POP">POP</a></li>
+				<li class="genre_menu4 #if($StringUtils.equals("$!{genre.genreCode}", "OS"))on#end"><a href="#" onclick="daum.Music.MusicBar.DjgenreDetail('OS', 'DATE'); return false;" title="OST">OST</a></li>
+				<li class="genre_menu5 #if($StringUtils.equals("$!{genre.genreCode}", "JP"))on#end"><a href="#" onclick="daum.Music.MusicBar.DjgenreDetail('JP', 'DATE'); return false;" title="J-POP">J-POP</a></li>
+				<li class="genre_menu6 #if($StringUtils.equals("$!{genre.genreCode}", "JA"))on#end"><a href="#" onclick="daum.Music.MusicBar.DjgenreDetail('JA', 'DATE'); return false;" title="재즈&amp;블루스">재즈&amp;블루스</a></li>
+				<li class="genre_menu7 #if($StringUtils.equals("$!{genre.genreCode}", "CL"))on#end"><a href="#" onclick="daum.Music.MusicBar.DjgenreDetail('CL', 'DATE'); return false;" title="클래식&amp;뉴에이지">클래식&amp;뉴에이지</a></li>
+				<li class="genre_menu8 #if($StringUtils.equals("$!{genre.genreCode}", "WO"))on#end"><a href="#" onclick="daum.Music.MusicBar.DjgenreDetail('WO', 'DATE'); return false;" title="월드뮤직">월드뮤직</a></li>
+				<li class="genre_menu9 #if($StringUtils.equals("$!{genre.genreCode}", "RE"))on#end"><a href="#" onclick="daum.Music.MusicBar.DjgenreDetail('RE', 'DATE'); return false;" title="종교음악">종교음악</a></li>
+				<li class="genre_menu10 #if($StringUtils.equals("$!{genre.genreCode}", "ET"))on#end"><a href="#" onclick="daum.Music.MusicBar.DjgenreDetail('ET', 'DATE'); return false;" title="그외장르">기타</a></li>
+			</ul>
+			#if( $StringUtils.isNotEmpty("$!{genre.genreCode}"))
+			<div class="box_genre_list">
+				<ul id="subgenreName" class="list_keyword">
+					<li><a href="/musicbar/djalbum/list?genre_group_cd=$!{genre.genreCode}&order_type=$!{command.order_type}#if( $StringUtils.isNotEmpty("$!{command.dj_id}"))&dj_id=$!{command.dj_id}#end"><span>종합</span></a></li>
+					#foreach($subgenre in $genre.genreList)
+					<li code="$!{subgenre.genreCode}"><a href="/musicbar/djalbum/list?genre_group_cd=$!{genre.genreCode}&genre_cd=$!{subgenre.genreCode}&order_type=$!{command.order_type}#if( $StringUtils.isNotEmpty("$!{command.dj_id}"))&dj_id=$!{command.dj_id}#end"><span>$!{subgenre.genreName}</span></a></li>
+    					#if($StringUtils.equals("$!{command.genre_cd}", "$!{subgenre.genreCode}"))
+							#set($selectedSubgenreName = "$!{subgenre.genreName}")
+    					#end
+					#end
+				</ul>
+			</div>
+			#end
+		</div>
+	</div>
+	<div class="cont_info">
+		#if( $djAlbumList.size() != 0 )
+		<div class="section_head">
+			<h4 class="tit_genre">
+				<span class="txt_dj fst">DJ</span>
+				<span id="DJName" class="arr_comm txt_genre"></span>
+				#if( $StringUtils.isNotBlank( "$!{command.dj_id}" ) && $djAlbumList.size() != 0  )
+					#set($info = $djAlbumList.get(0).recommendDj.info.replaceAll("'","\\'").replaceAll('"','&quot;').replaceAll("\r\n","<br/>"))
+				<a id="DjIntroduceBtn" href="#" class="btn_bar btn_djintroduce" onclick="daum.Music.MusicBar.getDjInfo(this, '$!{djAlbumList.get(0).recommendDj.nickName}', '$!{info}', '$!{djAlbumList.get(0).recommendDj.djId}'); return false;">DJ소개</a>
+				<span class="fst">, #if( $StringUtils.isEmpty( "$!{genre.genreName}" ) )장르#{else}$!{genre.genreName}#end</span>
+				#else
+				<span class="fst">,  #if( $StringUtils.isEmpty( "$!{genre.genreName}" ) )장르#{else}$!{genre.genreName}#end</span>
+				#end
+				<span id="RecommendGenre" class="arr_comm txt_genre"></span>
+			</h4>
+			<div class="list_align CT_ZONE_DJSORT">
+				<a href="#" onclick="daum.Music.MusicBar.DjgenreDetail('$!{genre.genreCode}', 'DATE'); return false;" class="#if( $StringUtils.equals("$!{command.order_type}","DATE") || $StringUtils.isBlank("$!{command.order_type}") )on#end txt_align">최신순</a><span class="txt_bar">|</span>
+				<a href="#" onclick="daum.Music.MusicBar.DjgenreDetail('$!{genre.genreCode}', 'POP'); return false;" class="#if($StringUtils.equals("$!{command.order_type}","POP") )on#end txt_align">인기순</a><span class="txt_bar">|</span>
+				<a href="#" onclick="daum.Music.MusicBar.DjgenreDetail('$!{genre.genreCode}', 'RDATE'); return false;" class="#if($StringUtils.equals("$!{command.order_type}","RDATE") )on#end txt_align">발매일순</a>
+			</div>
+		</div>
+		#end
+		#if( $djAlbumList.size() == 0 )
+		<div class="wrap_nodata">
+			<strong>추천된 음악이 없습니다</strong>
+		</div>
+		#else
+		<ul class="list_review CT_ZONE_DJLIST">
+			#foreach($album in $djAlbumList)
+				#if($StringUtils.equals("$!{command.genre_group_cd}", "$!{album.genre.genreGroupCode}" ))
+					#set($selectedGenreGroupName = "$!{album.genre.genreGroupName}")
+				#end
+			#end
+			#foreach($album in $djAlbumList)
+			<li>
+				<div class="wrap_djreview">
+					<div class="djreview">
+					##	<img src="$ImageUtil.getImageUrl("$!{album.recommendDj.imageUrl}", "90x90", "PHOTO", "C")" alt="$!{album.recommendDj.nickName} 추천평" class="img_dj">
+						<img src="$ImageUtil.getImageUrl("$!{album.recommendDj.imageUrl}", "172x97", "PHOTO", "C")" alt="$!{album.recommendDj.nickName} 추천평" class="img_dj">
+						#set($info = $album.recommendDj.info.replaceAll("'","\\'").replaceAll('"','&quot;').replaceAll("\r\n","<br/>"))
+						<a href="/musicbar/djalbum/list?dj_id=$!{album.recommendDj.djId}" title="$!{album.recommendDj.nickName}님의 추천평" style="text-decoration:none;" onmouseover="daum.Music.MusicBar.getDjInfo(this, '$!{album.recommendDj.nickName}', '$!{info}', '$!{album.recommendDj.djId}'); return false;" ><strong class="main_dj_recommend txt_djname">$!{album.recommendDj.nickName}님의 추천평</strong></a>
+						<span class="txt_bar">|</span><span class="txt_reviewdate">$!{CheckDate.makeReleaseDate($album.recommendDj.regdttm)}</span>
+						<p class="txt_djreview">#strCut($!{album.recommendDj.comments}, 210)</p>
+						<span class="btn_send_layer">
+							#set($AODLinkId = "")
+							#if( $StringUtils.isNotBlank("$!{album.recommendDj.songList.get(0).AODLinkId}") )
+								#set($AODLinkId = $!{album.recommendDj.songList.get(0).AODLinkId})
+							#elseif( $!{album.masterSongList.size()} > 0 )
+								#set($AODLinkId = $album.masterSongList.get(0).AODLinkId)
+							#else
+								#set($AODLinkId = $album.songList.get(0).AODLinkId)
+							#end
+							#set($link = "http://music.daum.net/album/main?album_id=$!{album.albumId}")
+							##set($thumb = $ImageUtil.getImageUrl($!{album.recommendDj.imageUrl}, '90x90', 'PHOTO', 'C'))
+							##set($prefix = "#printArtistName($!{album.keyArtistList} '' 0 false) - #printAlbumName($!{album} '' 0 4 false)")
+							#set($thumb = $ImageUtil.getImageUrl("$!{album.mainImage.filePath}", "42x42", "ALBUM"))
+							##set($prefix = "#strCut($!{album.recommendDj.comments}, 160) by $!{album.recommendDj.nickName}")
+							##set($prefix = "#escScript($!{prefix})")
+							##set($prefix = $prefix.replaceAll("\'", "&apos;"))
+							#set($albumName = $album.title.replaceAll("'","\\'").replaceAll('"','&quot;').replaceAll("\r\n","<br/>"))
+							##set($albumName = "#stripHTML($!{albumName})")
+							#set($djName = $album.recommendDj.nickName.replaceAll("'","\\'").replaceAll('"','&quot;').replaceAll("\r\n","<br/>"))
+							
+						#printListItemButton( $!{album.albumId} "sns" "{link : '$!{link}', thumb: '$!{thumb}', prefix: 'Daum뮤직 DJ $!{album.recommendDj.nickName}님의 추천음악 $!{albumName}'}" $!{AODLinkId} "" "" "" "" "" "" "" "")
+				##		#printListItemButton( $!{album.albumId} "sns" "{link : '$!{link}', thumb: '$!{thumb}', prefix: '$!{prefix}', albumName:'$!{albumName}', djNickName:'$!{album.recommendDj.nickName}'}" )
+				##		#printListItemButton( $!{album.albumId} "sns_more" "{sns_type:'sns2', link : '$!{link}', thumb: '$!{thumb}', prefix: '$!{prefix}', albumName:'$!{albumName}', djNickName:'$!{album.recommendDj.nickName}'}" $!{AODLinkId})
+						</span>
+					##	<a href="#" class="btn_comm btn_send">보내기</a>
+					</div>
+				</div>
+				<div class="cont_album">
+					<div class="wrap_thumb">
+						#printAlbumThumb($album 4 ""  "")
+					</div>
+					<dl class="info">
+						<dt class="screen_out">앨범명</dt>
+						<dd class="tit_album">
+							#printAlbumName( $album "" 60 1 true )
+						</dd>
+					</dl>
+					<dl class="info info_add">
+						<dt class="screen_out">아티스트</dt>
+						<dd class="txt_artist">
+							#printArtistName( $album.keyArtistList "name_artist" 20 true )
+						</dd>
+						#if( $StringUtils.isNotBlank( $!{album.genre.genreGroupName} ) || $StringUtils.isNotBlank( $!{album.genre.genreName} ) )
+						<dt class="screen_out">앨범장르</dt>
+						<dd class="txt_artist"><span class="txt_bar">|</span><a href="/genre/genrealbum/list?genre_group_cd=$!{album.genre.genreGroupCode}&genre_cd=$!{album.genre.genreCode}" title="$Display.alt($!{selectedGenreGroupName}, $!{album.genre.genreGroupName})$Display.alt($!{selectedSubgenreName}, $!{album.genre.genreName})바로가기">$Display.alt($!{selectedGenreGroupName}, $!{album.genre.genreGroupName})<span class="txt_arrow">&gt; </span>$Display.alt($!{selectedSubgenreName}, $!{album.genre.genreName})</a></dd>
+						#end
+						<dt class="screen_out">발매일</dt>
+						<dd class="txt_artist"><span class="txt_bar">|</span><span class="txt_issuedate">$!{CheckDate.makeReleaseDate($!{album.releaseDt})}</span></dd>
+					</dl>
+					<dl class="info">
+						#if( $StringUtils.isNotBlank("$!{album.recommendDj.songList.get(0)}") )
+						<dt class="screen_out">추천곡</dt>
+						#foreach( $song in $album.recommendDj.songList )
+						#if($StringUtils.isNotBlank("$!{song.AODLinkId}") )
+						<dd class="titlesong">
+							#printSongName( $song "ico_comm ico_listen" 50 true false false)
+						</dd>
+						#end
+						#end
+						#else
+							#if( $album.masterSongList.size() != 0 )
+    						<dt class="screen_out">대표곡</dt>
+							#set($num = 0)
+    						#foreach($masterSong in $album.masterSongList)
+							#if($StringUtils.isNotBlank("$!{masterSong.AODLinkId}") )
+							#set($num = $num + 1)
+    							<dd class="titlesong">
+    							#if($num == 1 || $num == 2)
+    								#printSongName( $masterSong "ico_comm ico_listen" 50 true false false)
+    							#end
+    							</dd>
+							#end
+							#end
+							#else
+								<dt class="screen_out">일반곡</dt>
+								#set($num = 0)
+								#foreach($song in $album.songList)
+								#if($StringUtils.isNotBlank("$!{song.AODLinkId}") )
+								#set($num = $num + 1)
+								<dd class="titlesong">
+    							#if($num == 1 || $num == 2)
+    								#printSongName( $song "ico_comm ico_listen" 50 true false false)
+    							#end
+    							</dd>
+								#end
+								#end
+							#end
+						#end
+					</dl>
+					<div class="btn_consumer">
+						<a class="btn_comm btn_recom" href="#" title="추천하기" onclick="daum.Music.API.Recommend.send({id:'$!{album.albumId}',contents:'album',el:'recomNum$!{foreach.count}', user:'#if($StringUtils.isNotEmpty($!{user.userId}))Y#end'}); return false;"><span class="screen_out">추천</span><em id="recomNum$!{foreach.count}" class="num_recom">$!{album.recommendCount}</em></a>
+						<a class="btn_comm btn_interest" href="javascript:;" title="관심등록하기" onclick="daum.Music.API.Favorite.send({id:'$!{album.albumId}', contents:'album', el:this});"><span class="screen_out">관심등록</span></a>
+					</div>
+				</div>
+			</li>
+			#end
+		</ul>
+		#end
+		#printPaging($pagingUrl, $command.page_no, $pageHandler, "", 10)
+	</div>
+</div>
+<script type="text/javascript">
+	var controller = new daum.Music.ListPrototype();
+	var param = daum.getParam('dj_id');
+	var DjName = daum.$('DJName');
+	new daum.Music.Genre("tabgenreName","subgenreName", {groupGenreName:"$!{genre.genreName}",subGenre:"$!{command.genre_cd}"});
+	#if( $djAlbumList.size() != 0 )
+	if( param ){
+	#foreach($dj in $allDjList)
+		if( param == '$dj.djId' ){
+			var djname = '$dj.nickName';
+		}
+	#end
+		DjName.innerHTML = djname;
+	} else{
+		DjName.innerHTML = '전체';
+	}
+	daum.Music.MusicBar.DjRecomGenre();
+	#end
+	daum.Music.MusicBar.changeFocus();
+	var msRoll = new daum.Music.ListRoll("DjList", {amount:9, duration:0.2, loadCount:0, liwidth:69, viewList:true, contentType:"thumb", prevId:"msPrevBtn", nextId:"msNextBtn", defaultIdx:0, loop:false, preonclassName:"prev_on", preoffclassName:"prev_off",	nextonclassName:"next_on",	nextoffclassName:"next_off"});
+	msRoll.render();
+</script>
+
+<script type="text/javascript">//<![CDATA[
+//var ct_pid = "music_djalbum_list"; 
+//]]></script>
+
+
+#if( $StringUtils.equals("$!{command.debugmode}","2") )
+우측메뉴<br/>
+#foreach($motTemplete in $rightMenuList)
+	타이틀 : $motTemplete.title <br/>
+	일반이미지 : $motTemplete.imageUrl <br/>
+	활성화이미지2 : $motTemplete.activatedImageUrl <br/>
+	링크 : $motTemplete.linkUrl <br/>
+	활성화여부 : $motTemplete.activatedYn <br/>
+	<br/><br/>
+#end
+
+#foreach($dj in $allDjList)
+	djId : $dj.djId <br/>
+	닉네임 : $dj.nickName <br/>
+	이미지명 : $dj.imageUrl <br/>
+	정보 : $dj.info <br/>
+#end
+<br/><br/>
+#foreach($album in $djAlbumList)
+	앨범아이디 : $album.albumId <br/>
+	앨범명 : $album.title <br/>
+	앨범볼륨 : $album.volume <br/>
+	앨범이미지 : $album.mainImage.filePath <br/>
+	앨범재생여부 : $album.playYn <br/>
+	앨범추천수 : $album.recommendCount <br/>
+	앨범장르 : $album.genre.genreGroupName > $album.genre.genreName <br/>
+	#foreach($masterSong in $album.masterSongList)
+		타이틀곡명 : $masterSong.title <br/> 
+		타이틀곡아이디 : $masterSong.songId <br/> 
+		타이틀곡듣기여부 : $masterSong.AODLinkId <br/>
+	#end
+	발매일 : $album.releaseDt <br/>
+	#foreach($artist in $album.keyArtistList)
+		아티스트명 : $artist.name<br/>
+		아티스트아이디 : $artist.artistId<br/>
+		아티스트링크 : 아직 형식미정입니다.<br/>
+	#end
+	추천dj이미지 : $album.recommendDj.imageUrl<br/>
+	추천dj아이디 : $album.recommendDj.djId<br/>
+	추천dj설명 : $album.recommendDj.info<br/>
+	추천dj명 : $album.recommendDj.nickName<br/>
+	추천dj추천평 : $album.recommendDj.comments<br/>
+	추천곡명 : $album.recommendDj.songList.get(0).title <br/> 
+	추천곡아이디 : $album.recommendDj.songList.get(0).songId <br/> 
+	추천곡듣기여부 : $album.recommendDj.songList.get(0).AODLinkId <br/>
+	추천일 : $album.recommendDj.regdttm <br/>
+	<br/><br/>
+#end
+#end
+##page

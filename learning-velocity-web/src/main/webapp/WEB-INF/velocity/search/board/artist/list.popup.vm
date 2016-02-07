@@ -1,0 +1,111 @@
+<script type='text/javascript'>
+function checkForm( form ){
+    if( form.query.value == "" ){
+	   form.query.focus();
+	   alert("검색어를 입력해 주세요");
+	   return false;
+	}
+	
+	return true;
+}
+function searchArticle(artistId){
+    opener.location.href="http://bbs.music.daum.net/gaia/do/music/album/list?searchKey=meta&bbsId=M002&searchValue=2:" + artistId;
+}
+</script>
+#set($count = $dto.artistResultCount)
+#set($artistList = $dto.artistList)
+
+	<div class="con">
+
+        <!-- 검색창 -->
+        <div class="conSch">
+            <fieldset>
+            <form action="/search/boardArtist.do" method="get" onsubmit="return checkForm(this);" >
+            <label class="em" for="pzArtiName" class="lArtiName">아티스트명</label> <input type="text" class="input" id="pzArtiName" name="query"  value="$!{command.query}">
+			<input type="hidden" name="sortType" id="sortType" value="$!{command.sortType}"/>
+            <input type="image" src="http://i1.daumcdn.net/img-contents/music/2008_home/common/btn_search2.gif">
+            </form>
+            </fieldset>
+			<script type="text/javascript">UI.$("pzArtiName").focus();</script>
+
+        </div>
+        <!-- 검색결과 -->
+        <div class="conRslt">
+            <div class="conHead">
+#if( $StringUtils.equals( $command.query, "" ) )
+                <p class="none">아티스트명을 입력 후 검색해 주세요</p>
+#else			
+                <p class="cnt">총 <em class="em">$!{count}</em>건이 검색되었습니다.</p>
+#if($count > 0)				
+#set($url="$request.getRequestURI()?$request.getQueryString()")
+                <span class="grpSort">
+                    <a href="/search/artistPopup.do?query=$!{command.query}&sortType=0" class="sort #if($url.indexOf("sortType=0")>=0) on #else off #end">정확도</a>
+                    <span class="bar">|</span>
+                    <a href="/search/artistPopup.do?query=$!{command.query}&sortType=2" class="sort #if($url.indexOf("sortType=2")>=0) on #else off #end">인기순</a>
+                </span>
+#end				
+#end				
+            </div>
+		
+#if($count > 0)
+            <ul class="lst atrist clearfix">
+#foreach($artist in $artistList)
+            <li class="itm#if( $foreach.index == 0 ) first#end" onmouseover="mOverPaging(this);" onmouseout="mOutPaging(this);">
+                <a href="javascript:;" onclick="selectBoardArtistArticle( '$!{artist.artistId}', '$!StringCutUtil.removeTag( $!{artist.name} )' );" class="thumb"><img src="$ImageOldUtil.getImageUrl("$!{artist.thumbImage}", $ImageOldUtil.ARTIST_74_107)" alt="$!{artist.name}"></a>
+                <ul class="inf">
+                <li class="i1"><a href="javascript:;" onclick="selectBoardArtistArticle( '$!{artist.artistId}', '$!StringCutUtil.removeTag( ${artist.name} )' );" class="b name">$!{artist.name}</a>#if( !$StringUtils.equals( $!{artist.nameKorLang}, "" )) <em class="nameEn fs_smaller">($!{artist.nameKorLang})</em>#end</li>
+                <li class="i2"><label>활동유형</label><span class="dat">$!{artist.typeName}</span></li>
+                <li class="i3"><label>장르</label><span class="dat">$!{artist.artistClassName}
+						#if( !$StringUtils.equals( $!{artist.artistGenreName}, "")  ) > $!{artist.artistGenreName}#end</span></li>
+				<li class="i4"><p class="btn"><input type="button" class="typeBtn btSelect" value="선택" title="선택" onclick="selectBoardArtistArticle( '$!{artist.artistId}', '$!StringCutUtil.removeTag( $!{artist.name} )' );"></p></li>
+                </ul>
+
+            </li>
+    #end
+</table>
+            </ul>
+## 페이징
+#set ($url = "?query=" + $command.query + "&sortType=" + $command.sortType )
+#printPaging("${url}&pageNo=", $dto.ph.pageNo, $dto.ph, "", 10)
+#end
+        </div>
+#*		
+<script type='text/javascript'>
+document.domain = "daum.net";
+
+function artistSearch(){
+	var query = document.getElementById("query").value;
+	var sortType = document.getElementById("sortType").value;
+	document.location.href="http://music.daum.net/search/artistPopup.do?query=" + query;
+}
+
+function searchArticle(artistId){
+	opener.location.href="http://bbs.music.daum.net/gaia/do/music/album/list?searchKey=meta&bbsId=M002&searchValue=2:" + artistId;
+}
+</script>
+#set($count = $dto.artistResultCount)
+#set($artistList = $dto.artistList)
+<b>아티스트명</b><input type="text" id="query" name="query" value=""/> <input type="button" value="검색" onClick="javascript:artistSearch();"/><br/>
+<input type="hidden" name="sortType" id="sortType" value="$command.sortType"/>
+총 $!{count}건이 검색되었습니다.
+<a href="http://music.daum.net/search/artistPopup.do?query=$!{command.query}&">정확도</a> <a href="">인기도</a>
+<br/>
+#if($count > 0)
+<table border="1">
+	#foreach($artist in $artistList)
+	<tr>
+		<td>
+		<img src="$ImageOldUtil.getImageUrl("$artist.thumbImage", $ImageOldUtil.ALBUM_110_110)"/></td>
+		<td>$!{artist.name}</td>
+		<td>$!{artist.typeName}</td>
+		<td>$artist.artistClassName > $artist.artistGenreName</td>
+		</td>
+		<td>
+			<input type="button" value="게시글 보기" onClick="searchArticle($artist.artistId);"/>
+		</td>
+	</tr>
+	#end
+</table>
+#end
+
+*#

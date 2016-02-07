@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XML>
+	<RESULT>
+		<RESULT_CODE>$!{aod.resultCode}</RESULT_CODE> 
+	</RESULT>
+#if($!{orgSongList})			
+	<ORG_SONG>
+		<ORG_SONG_LIST>$!{orgSongList}</ORG_SONG_LIST>
+	</ORG_SONG>
+#end
+</XML>

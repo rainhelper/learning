@@ -1,0 +1,133 @@
+	<h1>
+		<a href="/" id="daumServiceLogo"  title="뮤직 메인페이지로 가기"><span class="ir_wa">뮤직</span></a>
+	</h1>
+	<h2 class="screen_out">관련서비스</h2>
+	<ul id="daumRelServices">
+		<li><a href="http://webtoon.daum.net/" target="_self" title="만화 메인페이지로 가기" class="link_services link_services1"><span class="ir_wa">만화</span></a></li>
+		<li><a href="http://movie.daum.net/" target="_self"  title="영화 메인페이지로 가기" class="link_services link_services2"><span class="ir_wa">영화</span></a></li>
+		<li><a href="http://media.daum.net/entertain/" target="_self" title="연예 메인페이지로 가기" class="link_services link_services3"><span class="ir_wa">연예</span></a></li>
+	</ul>		
+	
+	#parse( "/mot/header/promotion.vm")
+	
+	<h2 class="screen_out">검색</h2>
+	<form id="daumSearch" name="daumSearch" onsubmit="return checkSubmit(this);">
+		<fieldset class="fld_inside opt_on"><!--  내부검색 fld_inside 추가 --><!--  내부검색 옵션이 있을경우 opt_on 추가 -->
+			<legend class="screen_out">검색</legend>
+			<div class="box_searchbar" id="box_searchbar"><!-- 입력창 선택시 search_on 추가  -->
+				<input type="text" class="tf_keyword" id="qTop" name="query" value="$!{command.query}" title="검색어 입력" autocomplete="off" spellcheck="false">
+				<input type="hidden" name="referer" value="music">
+				<button id="daumBtnSearch" class="ico_search btn_search" type="submit"><span class="ir_wa">검색</span></button>
+			</div>
+		</fieldset>
+		
+		<!--  서제스트 썸네일 미리보기형 -->
+	</form>
+	
+#set( $URI = "#getter('URI', '')" )
+#set( $PATH = "#getter('PATH_URI', '')" )
+#set( $DOMAIN = $URI.split($PATH)[0] )
+	 
+	<h2 class="screen_out">뮤직 메인메뉴</h2> 	
+	<div id="daumGnb">
+		<ul class="gnb_music">
+			<li#if($URI.indexOf("/home/")>-1 || ($URI.indexOf("/chart/")==-1 && $URI.indexOf("/genre/")==-1 && $URI.indexOf("/musicbar/")==-1 && $URI.indexOf("/imagene/")==-1 && $URI.indexOf("/sym/")==-1 && $URI.indexOf("$!{DOMAIN}/vclip/")==-1 && $URI.indexOf("/event/")==-1 && $URI.indexOf("/my/")==-1 && $URI.indexOf("/purchase/")==-1 && $URI.indexOf("/ticketitem/")==-1 && $URI.indexOf("/album/")==-1 && $URI.indexOf("/artist/")==-1 && $URI.indexOf("/search/")==-1 && $URI.indexOf("/musicguide?info_type=mobile")==-1) && $URI.indexOf("/onair/")==-1) class="on"#end><a class="link_gnb link_gnb1" href="/"  title="뮤직홈"><span class="ir_wa">뮤직홈</span></a></li><!-- 현재페이지에 on클래스 추가  -->
+			<li#if($URI.indexOf("/chart/")>-1) class="on"#end><a href="/chart/" class="link_gnb link_gnb2" title="차트"><span class="ir_wa">차트</span></a></li>
+			<li#if($URI.indexOf("/genre/")>-1) class="on"#end><a href="/genre/" class="link_gnb link_gnb3" title="장르뮤직"><span class="ir_wa">장르뮤직</span></a></li>
+			<li#if($URI.indexOf("/musicbar/")>-1 && $URI.indexOf("my/favorite/musicbar") < 0) class="on"#end><a href="/musicbar/" class="link_gnb link_gnb4" title="뮤직 BAR"><span class="ir_wa">뮤직 BAR</span></a></li>
+			<li#if($URI.indexOf("/onair/")>-1) class="on"#end><a href="/onair/timeline" class="link_gnb link_gnb5"  title="방금그곡"><span class="ir_wa">방금그곡</span></a></li> <!-- 2014-03-20 추가 -->
+			<li#if($URI.indexOf("$!{DOMAIN}/vclip/")>-1) class="on"#end><a href="/vclip/" class="link_gnb link_gnb6"  title="뮤비"><span class="ir_wa">뮤비</span></a></li>
+			<li#if($URI.indexOf("/ticketitem/")>-1) class="on"#end><a href="#" onclick="alert('2015년 6월 30일 다음뮤직 서비스 종료에 따라 상품 판매가 종료되었습니다. 이미 구매하신 이용권으로 음악감상 / MP3 다운로드 / BGM 구매는 6월 14일까지 가능합니다. \n그동안 이용해주셔서 감사합니다.')" class="link_gnb link_gnb7" title="이용권구매"><span class="ir_wa">이용권구매</span></a></li>
+			<li#if($URI.indexOf("/my/")>-1) class="on"#end><a href="/my/top" class="link_gnb link_gnb8" title="MY 뮤직"><span class="ir_wa">MY 뮤직</span></a></li>
+		</ul>
+		<ul class="gnb_with">
+			<li><a href="#" onclick="daum.Music.AodPlayer.add();return false;" title="플레이어" class="link_gnb link_gnb1"><span class="ir_wa">플레이어</span></a></li>
+		</ul>
+		<a href="http://search.daum.net/search?w=tot&amp;DA=YZRR&amp;t__nil_searchbox=btn&amp;sug=&amp;sq=&amp;o=&amp;q=%EB%B0%A9%EA%B8%88%EA%B7%B8%EA%B3%A1%EC%95%B1" target="_blank" class="link_app"  title="뮤직앱">뮤직앱 설치</a>
+	</div>
+	#set($divStyle='')
+	#set($aStyle='')
+	#if($URI.indexOf("/genre/") > -1 || $URI.indexOf("/musicbar/top") > -1 || $URI.indexOf("/imagene/") > -1 || $URI.indexOf("/sym/") > -1 || $URI.indexOf("/onair/") > -1)
+    	#set($divStyle='style="border-bottom:0 none"')
+    	#set($aStyle='style="bottom:0;"')
+	#end
+	
+	<div id="SponsorBarWrap" class="gnb_bnr" $!divStyle> 
+		<a href="" class="ad_bar">광고 배너</a> 
+		<a href="" class="ad_object" $!aStyle>광고 배너</a>
+		#parse( "/mot/header/banner.vm")
+    </div>
+	
+<script type="text/javascript">
+
+domReady(function(){
+    var bannerIdx = 0; 
+    var rnd = ad_bar.length; 
+   	bannerIdx = parseInt(Math.random()*rnd,10);
+
+	var banner_bar = daum.$$("#SponsorBarWrap a")[0]; 
+	var banner_obj = daum.$$("#SponsorBarWrap a")[1];
+	
+	console.log(banner_obj);
+	
+	if( !ad_bar[bannerIdx] ){
+		bannerIdx = 0; 
+	}
+
+	banner_bar.href  = ad_bar[bannerIdx].link; 
+	banner_bar.style.backgroundImage = "url(" + ad_bar[bannerIdx].src +")";
+	banner_obj.href  = ad_object[bannerIdx].link;
+	banner_obj.style.backgroundImage = "url(" + ad_object[bannerIdx].src +")";
+//	daum.Element.setPngOpacity(banner_obj, ad_object[bannerIdx].src, "image");
+	
+	if( daum.Browser.ie6 ){
+		daum.Element.setStyle(banner_obj, "background:none;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"+ ad_object[bannerIdx].src+"', sizingMethod='crop')");
+	}
+});
+
+	// extended gnb menu
+	var toggleExtendedMenu = function(el) {
+		var parent = el;
+		if(daum.Element.hasClassName(parent, "sub_on")) {
+			daum.Element.removeClassName(parent, "sub_on");
+		} else {
+			daum.Element.addClassName(parent, "sub_on");
+		}
+	};
+	
+
+// 연관서비스 운영
+(function(){
+	if(!!topPromotionSectionUseValue) {
+    	var promotionIdx = 0;
+		var tempArr = [];
+		
+		for(var i=0,len=topPromotionSectionItems.length; i<len; i++) {
+			if(topPromotionSectionItems[i].title !== "" && topPromotionSectionItems[i].title.indexOf("제목이") < 0) {
+				tempArr.push(topPromotionSectionItems[i])
+			}
+		}
+		
+    	var rnd = tempArr.length;
+    	promotionIdx = parseInt(Math.random()*rnd,10);
+    	
+    	var promotionSectionWrap = daum.$("daumRelServices");
+    	
+    	if( !!tempArr[promotionIdx] ){
+        	var width = tempArr[promotionIdx].width || 74;
+        	var temp = new daum.Template('<li><a href="#{href}" title="#{title}" target="_self" class="link_services link_services4"><img src="#{src}" width="74" height="24" alt="#{title}" /></a></li>');
+			
+			var el = temp.toElement({
+    			title : tempArr[promotionIdx].title,   
+    			href : tempArr[promotionIdx].link,
+    			src : tempArr[promotionIdx].src  
+            });  
+            promotionSectionWrap.appendChild(el);	
+    	}
+	}
+})();
+
+</script>
+
+
+$!{gnorePlayerStingValue}		

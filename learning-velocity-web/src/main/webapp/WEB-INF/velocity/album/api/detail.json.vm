@@ -1,0 +1,153 @@
+## album (for CIA-ITEM-VIEW)
+#set ($serviceId = "music")
+#set ($sectionId = "album")
+{
+	"serviceid":"${serviceId}",
+	"sectionid":"${sectionId}",
+	"itemid" : ${album.albumId},
+	"title" : "$!{EscapeUtil.escapeJsonString($!{album.title})}",
+	"subtitle" : "$!{EscapeUtil.escapeJsonString($!{album.subTitle})}",
+	"synonym" : [
+    #foreach($synonym in $album.synonymList)
+    	#if($album.synonymList.indexOf($synonym) != 0),#end
+    	"$!{synonym}"
+    #end
+    ],
+	"link" : "http://music.daum.net/album/main?album_id=${album.albumId}",
+	"image" : "$!{album.mainImage.filePath}",
+	"point" : "",
+	"point_cnt" : "",
+	"playYn" : "$!{album.playYn}",
+	"imageneYn" : "$!{album.imageneYn}",
+	"detail" : {
+		"artist" : {
+			"title" : "아티스트",
+			"content" : [
+			#foreach( $artist in ${album.keyArtistList} )
+				#if($album.keyArtistList.indexOf($artist) != 0),#end
+				{
+					"title" : "$!{EscapeUtil.escapeJsonString($!{artist.name})}",
+					"link" : #if("$!{artist.artistId}" == "0")""#else"http://music.daum.net/artist/main?artist_id=$!{artist.artistId}"#end
+				}
+			#end
+			]
+		},
+		"title_song" : {
+			"title" : "타이틀곡",
+			"content" : [
+			#foreach($song in $album.masterSongList)
+				#if($album.masterSongList.indexOf($song) != 0),#end
+				{
+					"title" : "$!{EscapeUtil.escapeJsonString($!{song.title})}",
+					"link" : "http://music.daum.net/album/main?song_id=$!{song.songId}",
+					"songid" : "$!{song.songId}",
+					"vclip" : "$!{song.vclipLinkId}",
+					"aod" :  #if("$!{song.AODLinkId}" == "0")""#else"$!{song.AODLinkId}"#end,
+					"mp3" : "$!{song.MP3LinkId}",
+					"bgm" : "$!{song.BGMLinkId}",
+					"bellYn" : "",
+					"ringYn" : "",
+					"LyricYn" : "$!{song.lyricsYn}"
+				}
+			#end
+			]
+		},
+		"release" : {
+			"title" : "발매",
+			"content" : [
+				#if($!{album.releaseDt})
+				{
+					"title" : "$!{album.releaseDt}"
+				}
+				#end
+			]
+		},
+		"volume" : {
+			"title" : "볼륨",
+			"content" : [
+				#if($!{album.volume})
+				{
+					"title" : "$!{album.volume}"
+				}
+				#end
+			]
+		},
+		"type" : {
+			"title" : "앨범타입",
+			"content" : [
+				#if($!{album.typeName})
+				{
+					"title" : "$!{album.typeName}"
+				}
+				#end
+			]
+		},
+		"tag" : {
+			"title" : "앨범속성",
+			"content" : [
+			#foreach($tag in $tagList)
+				#if($tagList.indexOf($tag) != 0),#end
+				{
+					"title" : "$!{tag}"
+				}
+			#end
+			]
+		},
+		"recordType" : {
+			"title" : "녹음방식",
+			"content" : [
+				#if($!{album.recordTypeName})
+				{
+					"title" : "$!{album.recordTypeName}"
+				}
+				#end
+			]
+		},
+		"genre" : {
+			"title" : "장르",
+			"content" : [
+			#foreach($genre in $genreList)
+				#if($genreList.indexOf($genre) != 0),#end
+				{
+					"title" : "$!{genre.genreGroupName} &gt; $!{genre.genreName}",
+					"genreGroupCode" : "$!{EscapeUtil.escapeJsonString($!{genre.genreGroupCode})}",
+					"genreGroupName" : "$!{EscapeUtil.escapeJsonString($!{genre.genreGroupName})}",
+					"genreCode" : "$!{EscapeUtil.escapeJsonString($!{genre.genreCode})}",
+					"genreName" : "$!{EscapeUtil.escapeJsonString($!{genre.genreName})}"
+				}
+			#end
+			]
+		}
+    },
+	"etc" : {
+		"songList" : "곡목록",
+		"content" : [
+			#foreach($song in $album.songList)
+				#if($album.songList.indexOf($song) != 0),#end
+				{
+					"songId" : "$!{song.songId}",
+					"title" : "$!{EscapeUtil.escapeJsonString($!{song.title})}",
+					"aod" : #if("$!{song.AODLinkId}" == "0")""#else"$!{song.AODLinkId}"#end,
+					"mp3" : "$!{song.MP3LinkId}",
+					"bgm" : "$!{song.BGMLinkId}",
+					"adultyn" : "$!{song.adultYn}",
+					"link" : "http://music.daum.net/album/main?song_id=$!{song.songId}",
+					"artist" : [
+					#foreach($artist in $song.keyArtistList)
+						#if($song.keyArtistList.indexOf($artist) != 0),#end
+						{
+							"artistdetailid" : "$!{artist.artistId}",
+							"artistname" : "$!{EscapeUtil.escapeJsonString($!{artist.name})}"
+						}
+					#end
+					],
+					"masteryn" : "$!{song.masterYn}",
+					"tvpotvid" : "$!{song.tvpotVId}",
+					"featartist" : "$!{EscapeUtil.escapeJsonString($!{song.featAllArtistWithComma})}"
+				}
+			#end
+		]
+	},
+    "ucc" : {
+    }
+}
