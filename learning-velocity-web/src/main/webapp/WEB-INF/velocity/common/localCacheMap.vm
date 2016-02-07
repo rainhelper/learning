@@ -1,5 +1,0 @@
-size : $!{localCacheMap.size()}
-<br/><br/>
-#foreach($localCache IN $localCacheMap.keySet())
-    $localCache<br/>
-#end

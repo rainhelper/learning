@@ -1,7 +1,0 @@
-#set( $URI = "#getter('URI', '')" )##
-<h2 class="screen_out">방금 그 곡</h2>
-<ul class="tab_now"> <!-- li에 on 클래스 추가시 해당 탭 선택 -->
-	<li #if( $URI.indexOf("/onair/timeline") > -1 )class="on"#end><a href="/onair/timeline" class="link_tab link_now" title="방금 그 곡"><span class="ico_now ico_check"></span>방금그곡</a></li>
-	<li #if( $URI.indexOf("/onair/radio") > -1 )class="on"#end><a href="/onair/radio/recomm/list" class="link_tab link_radio" title="라디오 선곡표"><span class="ico_now ico_check"></span>라디오 선곡표</a></li>
-	<li #if( $URI.indexOf("/onair/tv") > -1 )class="on"#end><a href="/onair/tv/list" class="link_tab link_bgm" title="TV BGM"><span class="ico_now ico_check"></span>TV BGM</a></li>
-</ul>

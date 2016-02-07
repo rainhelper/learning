@@ -1,5 +1,0 @@
-<div class="wing_bn">
-	<a href="#" class="link_mp" onclick="daum.popup('/event/mypeople.popup',778,605,{name:'winMyPeople'});return false;">
-		<img src="http://s1.daumcdn.net/img-contents/music/2011_home/my/img_mpinform_130322.gif" width="248" height="85" alt="시사회/콘서트 이벤트 알림받으세요!">
-	</a>
-</div>

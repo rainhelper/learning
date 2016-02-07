@@ -1,4 +1,0 @@
-<result>
-	<ret_code><![CDATA[$!{resultCode}]]></ret_code>
-	<ret_msg><![CDATA[$!{resultMessage}]]></ret_msg>
-</result>

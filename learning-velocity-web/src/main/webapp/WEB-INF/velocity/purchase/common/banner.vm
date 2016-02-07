@@ -1,5 +1,0 @@
-<div class="info_ad">
-	#foreach($data in $bannerList)
-	<a href="$data['link']" class="link_ad #if($foreach.index == 0)link_ad1#end"><img src="$data['imageUrl']" alt="$data['title']"><span class="frame_ad"></span></a>
-	#end
-</div> 

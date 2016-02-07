@@ -1,5 +1,0 @@
-<ul class="tab_sort tab_radio">
-	<li #if( $URI.indexOf("/onair/radio/recomm") > -1 )class="on"#end><a href="/onair/radio/recomm" class="link_tab link_recomm" title="추천">추천</a></li> <!-- on 클래스를 추가시 활성화 -->
-	<li #if( $URI.indexOf("/onair/radio/genre") > -1 )class="on"#end><a href="/onair/radio/genre" class="link_tab link_genre" title="장르별">장르별</a></li> <!-- on 클래스를 추가시 활성화 -->
-	<li #if( $URI.indexOf("/onair/radio/channel") > -1 )class="on"#end><a href="/onair/radio/channel" class="link_tab link_channel" title="채널별">채널별</a></li> <!-- on 클래스를 추가시 활성화 -->
-</ul>

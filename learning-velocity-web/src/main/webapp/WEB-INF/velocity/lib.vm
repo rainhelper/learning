@@ -1,5 +1,0 @@
-
-
-#macro(getter $key1 $key2)#if("$!key2" == "")$Config.getProperty($key1).getValue()#else$Config.getProperty($key1).getValue().get($key2)#end#end
-
-#macro(setter $key $object)$Config.setProperty($key, $object)#end

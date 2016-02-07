@@ -1,1 +1,0 @@
-var Songs = [#foreach($song in $songList){"SongId": "${song.songId}"}#if($velocityHasNext),#end#end];

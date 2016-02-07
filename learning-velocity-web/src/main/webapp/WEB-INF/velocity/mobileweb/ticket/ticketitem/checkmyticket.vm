@@ -1,4 +1,0 @@
-<script type="text/javascript">
-	alert("이미 음악듣기 \r\n이용권을 사용중입니다 \r\n듣기 이용권은 중복구매할 수 없습니다.");
-	window.history.back();
-</script>

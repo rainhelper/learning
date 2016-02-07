@@ -1,6 +1,0 @@
-#uaCheck()
-#if($isWVGA)
-<script type="text/javascript" src="http://go.daum.net/bin/minidaum.cgi?minidaum_mobile=y&amp;js_url=minidaumMobile2011&amp;viewport=480" charset="euc-kr"></script>
-#else
-<script type="text/javascript" src="http://go.daum.net/bin/minidaum.cgi?minidaum_mobile=y&amp;js_url=minidaumMobile2011&amp;viewport=320" charset="euc-kr"></script>
-#end

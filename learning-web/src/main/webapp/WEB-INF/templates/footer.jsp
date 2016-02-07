@@ -1,1 +1,0 @@
-<p>Copyright &copy; test.com</p>

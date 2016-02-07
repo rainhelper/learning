@@ -1,8 +1,0 @@
-{
-"list" :[
-#foreach($songid in $songidList)
-#if($songidList.indexOf($songid) != 0),#end
-{ "songid" : "${songid}" }
-#end
-]
-}

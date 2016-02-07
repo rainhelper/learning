@@ -1,4 +1,0 @@
-<script type="text/javascript">
-	opener.parent.location.href = '/purchase/ticket/purchase/bi/resultTicket?rtnParam=$!{rtnParam}';
-	window.close();
-</script>

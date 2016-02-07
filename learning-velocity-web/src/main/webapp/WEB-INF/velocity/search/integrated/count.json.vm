@@ -1,8 +1,0 @@
-#set($albumCount = $dto.albumResult.totalResultsCount)
-#set($songCount = $dto.songResult.totalResultsCount)
-#set($videoCount = $dto.videoResult.totalResultsCount)
-{
-"songTotalCount" : "$!{songCount}",
-"albumTotalCount" : "$!{albumCount}",
-"vclipTotalCount" : "$!{videoCount}"
-}

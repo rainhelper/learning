@@ -1,8 +1,0 @@
-var obj = [
-#foreach($item in $chartSongList)
-	#if($chartSongList.indexOf($item) != 0),#end
-	{
-	K: "$!{item.title}"
-	}
-#end
-];

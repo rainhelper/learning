@@ -1,5 +1,0 @@
-var Result = {
-	"DaumId": "$!{dto.user.daumId}",
-	"DaumName": "$!{dto.user.daumName}",
-	"DaumCashBalance":  ${dto.daumCashBalance} 
-}

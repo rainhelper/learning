@@ -1,9 +1,0 @@
-#parse("/velocity/purchase/common/bi_prepare_error.vm")
-{
-	"Rcvseq": "$!{rsvseq}",
-	"Pgcate": "$!{pgcate}",
-	"errorCode": "$!{errorCode}",
-	"errorName": "$!{errorMsg}",
-	"ResultUrl" : "$!{resultUrl}",
-	"RtnParam" : "$!{rtnParam}"
-}

@@ -1,7 +1,0 @@
-#parse("/velocity/purchase/common/phone/complete.vm")
-#if($StringUtils.equals("$!{command.debugmode}","2"))
-result: $!{dto.apiResult.result}<br/>
-resultCode: $!{dto.apiResult.resultCode}<br/>
-resultMessage: $!{dto.apiResult.resultMessage}<br/>
-resultDesc: $!{dto.apiResult.resultDesc}<br/>
-#end

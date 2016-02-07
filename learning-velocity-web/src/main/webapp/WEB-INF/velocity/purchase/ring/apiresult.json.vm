@@ -1,8 +1,0 @@
-{
-    "result": "$!{dto.apiResult.result}",
-    "resultCode": "$!{dto.apiResult.resultCode}",
-    "resultMessage": "$!{dto.apiResult.resultMessage}",
-    "resultDesc": "$!{dto.apiResult.resultDesc}",
-    "keyValue": "$!{dto.apiResult.keyValue}"
-}
-
